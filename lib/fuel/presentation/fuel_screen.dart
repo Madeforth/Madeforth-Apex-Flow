@@ -18,9 +18,14 @@ import 'package:apexflow/core/design/theme_extensions.dart';
 import 'widgets/fuel_history_list.dart';
 
 class FuelScreen extends ConsumerStatefulWidget {
-  const FuelScreen({super.key, required this.strings});
+  const FuelScreen({
+    super.key,
+    required this.strings,
+    this.topPadding = 0.0,
+  });
 
   final AppStrings strings;
+  final double topPadding;
 
   @override
   ConsumerState<FuelScreen> createState() => _FuelScreenState();
@@ -115,9 +120,12 @@ class _FuelScreenState extends ConsumerState<FuelScreen> {
       backgroundColor: context.colors.background,
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: EdgeInsets.only(
+            top: widget.topPadding + 16,
+            left: 16,
+            right: 16,
+          ),
           children: [
-            const SizedBox(height: 16),
             // Top Navigation & Header
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:apexflow/rides/presentation/widgets/start_ride_sheet.dart';
 import 'package:apexflow/rituals/application/rituals_state.dart';
 import 'package:apexflow/rituals/presentation/ride_readiness_screen.dart';
@@ -72,189 +73,220 @@ class _RidesScreenState extends ConsumerState<RidesScreen> {
       child: Scaffold(
         backgroundColor: context.colors.background,
         body: SafeArea(
-          child: Column(
+          child: Stack(
             children: [
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                padding: const EdgeInsets.all(3),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.05), // bg-accent container
-                  borderRadius: BorderRadius.circular(6), // Design Rules: 4-6 radius
-                ),
-                child: TabBar(
-                  dividerColor: Colors.transparent,
-                  indicatorSize: TabBarIndicatorSize.tab,
-                  indicator: BoxDecoration(
-                    color: const Color(0xFF090D14), // bg-background for active tab
-                    borderRadius: BorderRadius.circular(6), // Shape: default size/pill
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.12), // border-border
-                      width: 1,
+              TabBarView(
+                children: [
+                  ListView(
+                    padding: const EdgeInsets.only(
+                      top: 72, // 16 top + 38 height + 18 spacing
+                      left: 16,
+                      right: 16,
+                      bottom: 12,
                     ),
-                  ),
-                  tabs: [
-                    Tab(
-                      text: tInline(
-                        AppStrings.currentLanguageCode,
-                        'Solo Sürüş',
-                        'Solo Ride',
-                        'Solo-Fahrt',
-                      ),
-                    ),
-                    Tab(
-                      text: tInline(
-                        AppStrings.currentLanguageCode,
-                        'Grup Sürüşü',
-                        'Group Ride',
-                        'Gruppenfahrt',
-                      ),
-                    ),
-                  ],
-                  labelColor: Colors.white,
-                  unselectedLabelColor: Colors.white54,
-                  labelStyle: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 13,
-                    letterSpacing: 0.2,
-                  ),
-                  unselectedLabelStyle: const TextStyle(
-                    fontWeight: FontWeight.w400,
-                    fontSize: 13,
-                    letterSpacing: 0.2,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 4),
-
-              Expanded(
-                child: TabBarView(
-                  children: [
-                    ListView(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                      children: [
-                        // Top Navigation Bar
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    tInline(
-                                      AppStrings.currentLanguageCode,
-                                      'Sürüşler',
-                                      'Rides',
-                                      'Fahrten',
-                                    ),
-                                    style: const TextStyle(
-                                      fontSize: 32,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                      letterSpacing: -0.5,
-                                    ),
+                    children: [
+                      // Top Navigation Bar
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  tInline(
+                                    AppStrings.currentLanguageCode,
+                                    'Sürüşler',
+                                    'Rides',
+                                    'Fahrten',
                                   ),
-                                  const SizedBox(height: 4),
+                                  style: const TextStyle(
+                                    fontSize: 32,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    letterSpacing: -0.5,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  tInline(
+                                    AppStrings.currentLanguageCode,
+                                    'Sürüşlerini kaydet, incele ve geliştir.',
+                                    'Save, analyze and improve your rides.',
+                                    'Speichern, analysieren und verbessern Sie Ihre Fahrten.',
+                                  ),
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    color: Color(0xFF9CA3AF),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () => _showCoffeeInviteSheet(context),
+                            borderRadius: BorderRadius.circular(8),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.white.withValues(alpha: 0.1),
+                                ),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.coffee_outlined,
+                                    color: Color(0xFF9CA3AF),
+                                    size: 16,
+                                  ),
+                                  const SizedBox(width: 6),
                                   Text(
                                     tInline(
                                       AppStrings.currentLanguageCode,
-                                      'Sürüşlerini kaydet, incele ve geliştir.',
-                                      'Save, analyze and improve your rides.',
-                                      'Speichern, analysieren und verbessern Sie Ihre Fahrten.',
+                                      'Kahve Daveti',
+                                      'Coffee Invite',
+                                      'Kaffee Einladung',
                                     ),
                                     style: const TextStyle(
-                                      fontSize: 13,
                                       color: Color(0xFF9CA3AF),
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w500,
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                            InkWell(
-                              onTap: () => _showCoffeeInviteSheet(context),
-                              borderRadius: BorderRadius.circular(8),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 8,
-                                ),
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: Colors.white.withValues(alpha: 0.1),
-                                  ),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      if (_gpsStatusMessage != null &&
+                          state.isRideActive) ...[
+                        _GpsStatusBanner(
+                          message: _gpsStatusMessage!,
+                          isTracking: _locationService.isTracking,
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+
+                      // START RIDE PANEL
+                      _StartRidePanel(
+                        isActive: state.isRideActive,
+                        onStart: () =>
+                            showQuickStartRideSheet(context, ref, strings),
+                        onEnd: () => _endRideAutomatically(context, state),
+                        tr: tr,
+                      ),
+                      const SizedBox(height: 16),
+
+                      // LAST RIDE PANEL
+                      if (state.sessions.isNotEmpty)
+                        _LastRidePanel(latestRide: state.latestRide, tr: tr)
+                      else
+                        _NoRidePanelEmptyState(tr: tr),
+
+                      const SizedBox(height: 16),
+
+                      // RIDE MEMORY PANEL
+                      _RideMemoryPanel(sessions: state.sessions, tr: tr),
+                      const SizedBox(height: 80),
+                    ],
+                  ),
+                  isPremium
+                      ? GroupRideLobbyScreen(
+                          strings: strings,
+                          isEmbedded: true,
+                        )
+                      : PremiumPaywallScreen(strings: strings),
+                ],
+              ),
+              Positioned(
+                top: 16,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(19),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      child: Container(
+                        height: 38,
+                        constraints: const BoxConstraints(maxWidth: 270),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1A1F2B).withValues(alpha: 0.8), // Semi-transparent navbar background
+                          borderRadius: BorderRadius.circular(19),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.08),
+                            width: 1,
+                          ),
+                        ),
+                        child: TabBar(
+                          dividerColor: Colors.transparent,
+                          indicatorSize: TabBarIndicatorSize.tab,
+                          indicator: BoxDecoration(
+                            color: context.colors.cyan.withValues(alpha: 0.14), // Liquid highlight
+                            borderRadius: BorderRadius.circular(17),
+                          ),
+                          tabs: [
+                            Tab(
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
                                 child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    const Icon(
-                                      Icons.coffee_outlined,
-                                      color: Color(0xFF9CA3AF),
-                                      size: 16,
-                                    ),
+                                    const Icon(Icons.navigation_outlined, size: 14),
                                     const SizedBox(width: 6),
-                                    Text(
-                                      tInline(
-                                        AppStrings.currentLanguageCode,
-                                        'Kahve Daveti',
-                                        'Coffee Invite',
-                                        'Kaffee Einladung',
-                                      ),
-                                      style: const TextStyle(
-                                        color: Color(0xFF9CA3AF),
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
+                                    Text(tInline(
+                                      AppStrings.currentLanguageCode,
+                                      'Solo Sürüş',
+                                      'Solo Ride',
+                                      'Solo-Fahrt',
+                                    )),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Tab(
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(Icons.group_outlined, size: 14),
+                                    const SizedBox(width: 6),
+                                    Text(tInline(
+                                      AppStrings.currentLanguageCode,
+                                      'Grup Sürüşü',
+                                      'Group Ride',
+                                      'Gruppenfahrt',
+                                    )),
                                   ],
                                 ),
                               ),
                             ),
                           ],
-                        ),
-                        const SizedBox(height: 16),
-                        if (_gpsStatusMessage != null &&
-                            state.isRideActive) ...[
-                          _GpsStatusBanner(
-                            message: _gpsStatusMessage!,
-                            isTracking: _locationService.isTracking,
+                          labelColor: context.colors.cyan, // Selected text/icon color
+                          unselectedLabelColor: context.colors.textSecondary,
+                          labelStyle: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 11,
+                            letterSpacing: 0.2,
                           ),
-                          const SizedBox(height: 16),
-                        ],
-
-                        // START RIDE PANEL
-                        _StartRidePanel(
-                          isActive: state.isRideActive,
-                          onStart: () =>
-                              showQuickStartRideSheet(context, ref, strings),
-                          onEnd: () => _endRideAutomatically(context, state),
-                          tr: tr,
+                          unselectedLabelStyle: const TextStyle(
+                            fontWeight: FontWeight.w400,
+                            fontSize: 11,
+                            letterSpacing: 0.2,
+                          ),
                         ),
-                        const SizedBox(height: 16),
-
-                        // LAST RIDE PANEL
-                        if (state.sessions.isNotEmpty)
-                          _LastRidePanel(latestRide: state.latestRide, tr: tr)
-                        else
-                          _NoRidePanelEmptyState(tr: tr),
-
-                        const SizedBox(height: 16),
-
-                        // RIDE MEMORY PANEL
-                        _RideMemoryPanel(sessions: state.sessions, tr: tr),
-                        const SizedBox(height: 80),
-                      ],
+                      ),
                     ),
-                    isPremium
-                        ? GroupRideLobbyScreen(
-                            strings: strings,
-                            isEmbedded: true,
-                          )
-                        : PremiumPaywallScreen(strings: strings),
-                  ],
+                  ),
                 ),
               ),
             ],

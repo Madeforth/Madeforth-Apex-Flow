@@ -28,11 +28,6 @@ import 'package:apexflow/profile/presentation/qr_scanner_screen.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:apexflow/profile/application/circular_sticker_pdf.dart';
 import 'package:apexflow/profile/domain/apex_achievement.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:apexflow/core/services/firebase_service.dart';
-import 'package:apexflow/features/dashboard/dashboard_state.dart';
 import 'package:apexflow/core/design/theme_extensions.dart';
 
 class ProfileHubScreen extends ConsumerStatefulWidget {
@@ -89,77 +84,72 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
 
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          children: [
-            // Static TabBar
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                padding: const EdgeInsets.all(3),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.05), // bg-accent container
-                  borderRadius: BorderRadius.circular(6), // Design Rules: 4-6 radius
-                ),
-                child: TabBar(
-                  controller: _tabController,
-                  dividerColor: Colors.transparent,
-                  indicatorSize: TabBarIndicatorSize.tab,
-                  indicator: BoxDecoration(
-                    color: const Color(0xFF090D14), // bg-background active tab
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.12),
-                      width: 1,
-                    ),
-                  ),
-                  tabs: [
-                    Tab(text: _t('PROFİL', 'PROFILE', 'PROFIL')),
-                    Tab(text: _t('ARKADAŞLAR', 'FRIENDS', 'FREUNDE')),
-                    Tab(text: _t('LİDERLİK', 'LEADERBOARD', 'BESTENLISTE')),
-                  ],
-                  labelColor: Colors.white,
-                  unselectedLabelColor: Colors.white54,
-                  labelStyle: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 13,
-                  ),
-                  unselectedLabelStyle: const TextStyle(
-                    fontWeight: FontWeight.w400,
-                    fontSize: 13,
-                  ),
-                ),
-              ),
-            const SizedBox(height: ApexSpacing.x1),
-            // Tab Views
-            Expanded(
-              child: TabBarView(
+          child: Stack(
+            children: [
+              TabBarView(
                 controller: _tabController,
                 children: [
                   // Tab 1: PROFILE
                   ListView(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: ApexSpacing.x2,
-                      vertical: ApexSpacing.x1,
+                    padding: const EdgeInsets.only(
+                      top: 72, // 16 top + 38 height + 18 spacing
+                      left: ApexSpacing.x2,
+                      right: ApexSpacing.x2,
+                      bottom: ApexSpacing.x1,
                     ),
                     children: [
                       // Scrollable Top Bar
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  _t(
-                                    'Sürücü Hub\'ı',
-                                    'Rider Hub',
-                                    'Fahrer Hub',
-                                  ),
-                                  style: const TextStyle(
-                                    fontSize: 28,
-                                    fontWeight: FontWeight.w900,
-                                    color: Colors.white,
-                                  ),
+                                Row(
+                                  children: [
+                                    Text(
+                                      userProfile.name.isEmpty
+                                          ? _t('Rider', 'Rider', 'Fahrer')
+                                          : userProfile.name,
+                                      style: const TextStyle(
+                                        fontSize: 28,
+                                        fontWeight: FontWeight.w900,
+                                        color: Colors.white,
+                                        letterSpacing: -0.5,
+                                      ),
+                                    ),
+                                    if (userProfile.isPremium) ...[
+                                      const SizedBox(width: 6),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 6,
+                                          vertical: 2,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: context.colors.caution
+                                              .withValues(alpha: 0.15),
+                                          borderRadius:
+                                              BorderRadius.circular(4),
+                                          border: Border.all(
+                                            color: context.colors.caution
+                                                .withValues(alpha: 0.3),
+                                            width: 1,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          _t('PREMİUM', 'PREMIUM', 'PREMIUM'),
+                                          style: TextStyle(
+                                            color: context.colors.caution,
+                                            fontSize: 9,
+                                            fontWeight: FontWeight.w900,
+                                            letterSpacing: 0.5,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ],
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
@@ -577,43 +567,6 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                         tr: tr,
                         de: AppStrings.currentLanguageCode == 'de',
                       ),
-                      const SizedBox(height: ApexSpacing.x2),
-
-                      // 4. Lockscreen Wallpaper
-                      SizedBox(
-                        width: double.infinity,
-                        height: 48,
-                        child: TextButton.icon(
-                          style: TextButton.styleFrom(
-                            foregroundColor: context.colors.onAccent,
-                            backgroundColor: context.colors.cyan,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                ApexSpacing.radius,
-                              ),
-                            ),
-                          ),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    LockscreenWallpaperGeneratorScreen(
-                                      strings: widget.strings,
-                                    ),
-                              ),
-                            );
-                          },
-                          icon: const Icon(Icons.wallpaper),
-                          label: Text(
-                            _t(
-                              'Kilit Ekranı Duvar Kağıdı Üret',
-                              'Generate Safety Lockscreen',
-                              'Sperrbildschirm generieren',
-                            ),
-                          ),
-                        ),
-                      ),
                       const SizedBox(height: ApexSpacing.x3),
                     ],
                   ),
@@ -627,6 +580,7 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                         _showFriendShowcaseGarage(context, friend, tr, de),
                     strings: widget.strings,
                     onAddFriend: () => _showAddFriendSheet(context, tr, de),
+                    topPadding: 64,
                   ),
 
                   // Tab 3: Leaderboard
@@ -647,14 +601,90 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                     onOpenFriendProfile: (f) =>
                         _showFriendShowcaseGarage(context, f, tr, de),
                     onAddFriend: () => _showAddFriendSheet(context, tr, de),
+                    topPadding: 64,
                   ),
                 ],
               ),
-            ),
-          ],
+              Positioned(
+                top: 16,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(19),
+                    child: BackdropFilter(
+                      filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      child: Container(
+                        height: 38,
+                        constraints: const BoxConstraints(maxWidth: 270),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1A1F2B).withValues(alpha: 0.8), // Semi-transparent navbar background
+                          borderRadius: BorderRadius.circular(19),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.08),
+                            width: 1,
+                          ),
+                        ),
+                        child: TabBar(
+                          controller: _tabController,
+                          dividerColor: Colors.transparent,
+                          indicatorSize: TabBarIndicatorSize.tab,
+                          indicator: BoxDecoration(
+                            color: context.colors.cyan.withValues(alpha: 0.14), // Liquid highlight
+                            borderRadius: BorderRadius.circular(17),
+                          ),
+                          tabs: [
+                            Tab(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(Icons.person_outline, size: 13),
+                                  const SizedBox(width: 4),
+                                  Text(_t('Profil', 'Profile', 'Profil')),
+                                ],
+                              ),
+                            ),
+                            Tab(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(Icons.people_outline, size: 13),
+                                  const SizedBox(width: 4),
+                                  Text(_t('Arkadaşlar', 'Friends', 'Freunde')),
+                                ],
+                              ),
+                            ),
+                            Tab(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(Icons.leaderboard_outlined, size: 13),
+                                  const SizedBox(width: 4),
+                                  Text(_t('Liderlik', 'Leaderboard', 'Bestenliste')),
+                                ],
+                              ),
+                            ),
+                          ],
+                          labelColor: context.colors.cyan, // Selected text/icon color
+                          unselectedLabelColor: context.colors.textSecondary,
+                          labelStyle: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 10,
+                          ),
+                          unselectedLabelStyle: const TextStyle(
+                            fontWeight: FontWeight.w400,
+                            fontSize: 10,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
-    );
+      );
   }
 
   void _showPaywall(BuildContext context) {
@@ -3219,6 +3249,7 @@ class _FriendsList extends ConsumerStatefulWidget {
     required this.onFriendTap,
     required this.strings,
     required this.onAddFriend,
+    this.topPadding = 0.0,
   });
 
   final List<FriendProfile> friends;
@@ -3227,6 +3258,7 @@ class _FriendsList extends ConsumerStatefulWidget {
   final ValueChanged<FriendProfile> onFriendTap;
   final AppStrings strings;
   final VoidCallback onAddFriend;
+  final double topPadding;
 
   @override
   ConsumerState<_FriendsList> createState() => _FriendsListState();
@@ -3262,7 +3294,12 @@ class _FriendsListState extends ConsumerState<_FriendsList> {
     }).toList();
 
     return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: EdgeInsets.only(
+        top: widget.topPadding + 12,
+        left: 16,
+        right: 16,
+        bottom: 12,
+      ),
       children: [
         // Friends Title & Badge Count
         Row(
@@ -4109,6 +4146,7 @@ class _LeaderboardList extends StatefulWidget {
     required this.userAvatarIndex,
     required this.onOpenFriendProfile,
     required this.onAddFriend,
+    this.topPadding = 0.0,
   });
 
   final List<FriendProfile> friends;
@@ -4119,6 +4157,7 @@ class _LeaderboardList extends StatefulWidget {
   final int userAvatarIndex;
   final void Function(FriendProfile) onOpenFriendProfile;
   final VoidCallback onAddFriend;
+  final double topPadding;
 
   @override
   State<_LeaderboardList> createState() => _LeaderboardListState();
@@ -4158,7 +4197,12 @@ class _LeaderboardListState extends State<_LeaderboardList> {
     final userRank = items.indexWhere((e) => e.isUser) + 1;
 
     return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: EdgeInsets.only(
+        top: widget.topPadding + 8,
+        left: 16,
+        right: 16,
+        bottom: 8,
+      ),
       children: [
         // Header
         Text(
@@ -6058,624 +6102,6 @@ class RadarChartPainter extends CustomPainter {
         oldDelegate.color != color ||
         oldDelegate.labels != labels;
   }
-}
-
-class LockscreenWallpaperGeneratorScreen extends StatefulWidget {
-  final AppStrings strings;
-
-  const LockscreenWallpaperGeneratorScreen({super.key, required this.strings});
-
-  @override
-  State<LockscreenWallpaperGeneratorScreen> createState() =>
-      _LockscreenWallpaperGeneratorScreenState();
-}
-
-class _LockscreenWallpaperGeneratorScreenState
-    extends State<LockscreenWallpaperGeneratorScreen> {
-  final GlobalKey _repaintKey = GlobalKey();
-  bool _isSharing = false;
-
-  Future<void> _shareWallpaper(
-    UserProfile profile,
-    String activeBike,
-    double totalKm,
-    int totalRides,
-    int harmonyScore,
-  ) async {
-    setState(() {
-      _isSharing = true;
-    });
-    try {
-      final boundary =
-          _repaintKey.currentContext?.findRenderObject()
-              as RenderRepaintBoundary?;
-      if (boundary == null) return;
-
-      final image = await boundary.toImage(pixelRatio: 3.0);
-      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-      if (byteData == null) return;
-
-      final Uint8List pngBytes = byteData.buffer.asUint8List();
-      final tempDir = await getTemporaryDirectory();
-      final file = await File(
-        '${tempDir.path}/apexflow_lockscreen.png',
-      ).create();
-      await file.writeAsBytes(pngBytes);
-
-      final tr = widget.strings.locale.languageCode == 'tr';
-      await SharePlus.instance.share(
-        ShareParams(
-          files: [XFile(file.path)],
-          text: tInline(
-            AppStrings.currentLanguageCode,
-            'Apex Flow Kilit Ekranı Güvenlik Duvar Kağıdı',
-            'Apex Flow Safety Lockscreen Wallpaper',
-            'Apex Flow Safety Lockscreen-Hintergrundbild',
-          ),
-        ),
-      );
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error generating wallpaper: $e');
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isSharing = false;
-        });
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final tr = widget.strings.locale.languageCode == 'tr';
-    final de = widget.strings.locale.languageCode == 'de';
-
-    return Consumer(
-      builder: (context, ref, child) {
-        final userProfile = ref.watch(userProfileProvider);
-        final garageState = ref.watch(garageStateProvider);
-        final rideState = ref.watch(rideStateProvider);
-
-        final totalKm = rideState.sessions.fold<double>(
-          0.0,
-          (sum, s) => sum + s.distanceKm,
-        );
-        final totalRides = rideState.sessions.length;
-
-        final activeBike = garageState.activeBike.name != '—'
-            ? '${garageState.activeBike.name} ${garageState.activeBike.model}'
-            : (tInline(
-                AppStrings.currentLanguageCode,
-                'Motosiklet Yok',
-                'No Motorcycle',
-                'Kein Motorrad',
-              ));
-
-        final harmonyScore = garageState.activeBike.name != '—' ? 95 : 0;
-        final theme =
-            riderCardThemes[userProfile.cardThemeIndex.clamp(
-              0,
-              riderCardThemes.length - 1,
-            )];
-
-        return Scaffold(
-          appBar: AppBar(
-            title: Text(
-              tInline(
-                AppStrings.currentLanguageCode,
-                'Kilit Ekranı Oluşturucu',
-                'Lockscreen Generator',
-                'Lockscreen-Generator',
-              ),
-            ),
-          ),
-          body: Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
-                  child: Center(
-                    child: Container(
-                      constraints: const BoxConstraints(maxWidth: 340),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: context.colors.border,
-                          width: 2,
-                        ),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(14),
-                        child: AspectRatio(
-                          aspectRatio: 9 / 16,
-                          child: RepaintBoundary(
-                            key: _repaintKey,
-                            child: Stack(
-                              children: [
-                                Positioned.fill(
-                                  child: CustomPaint(
-                                    painter: CarbonFiberPainter(
-                                      stripeColor: theme.colors.first,
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 20.0,
-                                    vertical: 28.0,
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.stretch,
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 8,
-                                          horizontal: 12,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: context.colors.red,
-                                          borderRadius: BorderRadius.circular(
-                                            6,
-                                          ),
-                                        ),
-                                        child: Center(
-                                          child: Text(
-                                            tInline(
-                                              AppStrings.currentLanguageCode,
-                                              'ACİL DURUM MEDİKAL BİLGİ',
-                                              'EMERGENCY MEDICAL INFO',
-                                              'MEDIZINISCHE NOTFALLINFORMATIONEN',
-                                            ),
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w900,
-                                              letterSpacing: 1.0,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 16),
-
-                                      Container(
-                                        padding: const EdgeInsets.all(12),
-                                        decoration: BoxDecoration(
-                                          color: const Color(
-                                            0xFFE2E8F0,
-                                          ), // Slate 200 (slightly darker than off-white)
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                          border: Border.all(
-                                            color: const Color(0xFF0F172A),
-                                            width: 2,
-                                          ), // Slate 900
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black.withValues(
-                                                alpha: 0.2,
-                                              ),
-                                              blurRadius: 6,
-                                              offset: const Offset(2, 2),
-                                            ),
-                                          ],
-                                        ),
-                                        child: Column(
-                                          children: [
-                                            _buildWallpaperMedRow(
-                                              tInline(
-                                                AppStrings.currentLanguageCode,
-                                                'Kan Grubu',
-                                                'Blood Type',
-                                                'Blutgruppe',
-                                              ),
-                                              userProfile.bloodType.isEmpty
-                                                  ? '—'
-                                                  : userProfile.bloodType,
-                                              isRed: true,
-                                            ),
-                                            const Divider(
-                                              color: Colors.black12,
-                                              height: 12,
-                                            ),
-                                            _buildWallpaperMedRow(
-                                              tInline(
-                                                AppStrings.currentLanguageCode,
-                                                'Acil Durum Yakını',
-                                                'Emergency Contact',
-                                                'Notfallkontakt',
-                                              ),
-                                              userProfile
-                                                      .emergencyContactName
-                                                      .isEmpty
-                                                  ? '—'
-                                                  : userProfile
-                                                        .emergencyContactName,
-                                            ),
-                                            const Divider(
-                                              color: Colors.black12,
-                                              height: 12,
-                                            ),
-                                            _buildWallpaperMedRow(
-                                              tInline(
-                                                AppStrings.currentLanguageCode,
-                                                'Yakın Telefonu',
-                                                'Emergency Phone',
-                                                'Notruftelefon',
-                                              ),
-                                              userProfile
-                                                      .emergencyContactPhone
-                                                      .isEmpty
-                                                  ? '—'
-                                                  : userProfile
-                                                        .emergencyContactPhone,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      const SizedBox(height: 16),
-
-                                      Expanded(
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Container(
-                                              width: 140,
-                                              decoration: BoxDecoration(
-                                                color: const Color(
-                                                  0xFFE2E8F0,
-                                                ), // Slate 200 (slightly darker than off-white)
-                                                borderRadius:
-                                                    BorderRadius.circular(16),
-                                                border: Border.all(
-                                                  color: const Color(
-                                                    0xFF0F172A,
-                                                  ),
-                                                  width: 2,
-                                                ), // Slate 900
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: Colors.black
-                                                        .withValues(
-                                                          alpha: 0.25,
-                                                        ),
-                                                    blurRadius: 6,
-                                                    offset: const Offset(2, 3),
-                                                  ),
-                                                ],
-                                              ),
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 14,
-                                                    vertical: 14,
-                                                  ),
-                                              child: Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  // Mini Header
-                                                  const Text(
-                                                    'A P E X   F L O W',
-                                                    style: TextStyle(
-                                                      fontSize: 8.5,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Color(0xFF0F172A),
-                                                      letterSpacing: 0.8,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(height: 2),
-                                                  Text(
-                                                    tInline(
-                                                      AppStrings
-                                                          .currentLanguageCode,
-                                                      'ACİL MEDİKAL',
-                                                      'EMERGENCY PASS',
-                                                      'NOTFALLPASS',
-                                                    ),
-                                                    style: const TextStyle(
-                                                      fontSize: 6,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Color(
-                                                        0xFFEF4444,
-                                                      ), // Red accent
-                                                      letterSpacing: 0.5,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(height: 8),
-
-                                                  // White QR code block
-                                                  Container(
-                                                    padding:
-                                                        const EdgeInsets.all(5),
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.white,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                            6,
-                                                          ),
-                                                      border: Border.all(
-                                                        color: Colors
-                                                            .grey
-                                                            .shade200,
-                                                        width: 1,
-                                                      ),
-                                                    ),
-                                                    child: QrImageView(
-                                                      data:
-                                                          'https://apex-flow-7baea.web.app/?id=${Uri.encodeComponent(userProfile.riderTag)}',
-                                                      size: 80,
-                                                      gapless: false,
-                                                      eyeStyle:
-                                                          const QrEyeStyle(
-                                                            eyeShape: QrEyeShape
-                                                                .square,
-                                                            color: Colors.black,
-                                                          ),
-                                                      dataModuleStyle:
-                                                          const QrDataModuleStyle(
-                                                            dataModuleShape:
-                                                                QrDataModuleShape
-                                                                    .square,
-                                                            color: Colors.black,
-                                                          ),
-                                                    ),
-                                                  ),
-                                                  const SizedBox(height: 8),
-
-                                                  // Rider Tag Pill Tag
-                                                  Container(
-                                                    padding:
-                                                        const EdgeInsets.symmetric(
-                                                          horizontal: 8,
-                                                          vertical: 3,
-                                                        ),
-                                                    decoration: BoxDecoration(
-                                                      color: const Color(
-                                                        0xFF0F172A,
-                                                      ),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                            4,
-                                                          ),
-                                                    ),
-                                                    child: Text(
-                                                      userProfile.riderTag,
-                                                      style: const TextStyle(
-                                                        fontSize: 8,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Color(
-                                                          0xFFE2E8F0,
-                                                        ),
-                                                        letterSpacing: 0.5,
-                                                      ),
-                                                      maxLines: 1,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            const SizedBox(height: 16),
-
-                                            Transform.scale(
-                                              scale: 0.9,
-                                              child: RiderIdCard(
-                                                name: userProfile.name.isEmpty
-                                                    ? (tInline(
-                                                        AppStrings
-                                                            .currentLanguageCode,
-                                                        'Sürücü',
-                                                        'Rider',
-                                                        'Fahrer',
-                                                      ))
-                                                    : userProfile.name,
-                                                riderTag:
-                                                    userProfile.riderTag.isEmpty
-                                                    ? '@rider'
-                                                    : userProfile.riderTag,
-                                                ridingStyle:
-                                                    userProfile.ridingStyle,
-                                                bloodType:
-                                                    userProfile
-                                                        .bloodType
-                                                        .isEmpty
-                                                    ? '—'
-                                                    : userProfile.bloodType,
-                                                phoneNumber:
-                                                    userProfile.phoneNumber,
-                                                emergencyContactName:
-                                                    userProfile
-                                                        .emergencyContactName,
-                                                emergencyContactPhone:
-                                                    userProfile
-                                                        .emergencyContactPhone,
-                                                activeBike: activeBike,
-                                                totalRides: totalRides,
-                                                totalKm: totalKm,
-                                                harmonyScore: harmonyScore,
-                                                avatarIndex:
-                                                    userProfile.avatarIndex,
-                                                tr: tr,
-                                                de:
-                                                    AppStrings
-                                                        .currentLanguageCode ==
-                                                    'de',
-
-                                                themeIndex:
-                                                    userProfile.cardThemeIndex,
-                                                city: userProfile.city,
-                                                instagram:
-                                                    userProfile.instagram,
-                                                tiktok: userProfile.tiktok,
-                                                licensePlate:
-                                                    userProfile.licensePlate,
-                                                selectedBadges:
-                                                    userProfile.selectedBadges,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-
-                                      const SizedBox(height: 8),
-                                      Center(
-                                        child: Text(
-                                          tInline(
-                                            AppStrings.currentLanguageCode,
-                                            'Apex Flow Güvenlik Protokolü',
-                                            'Apex Flow Safety Protocol',
-                                            'Apex Flow-Sicherheitsprotokoll',
-                                          ),
-                                          style: TextStyle(
-                                            color: Colors.white.withValues(
-                                              alpha: 0.35,
-                                            ),
-                                            fontSize: 9,
-                                            fontWeight: FontWeight.bold,
-                                            letterSpacing: 0.5,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 48,
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: context.colors.cyan,
-                      foregroundColor: context.colors.onAccent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    onPressed: _isSharing
-                        ? null
-                        : () => _shareWallpaper(
-                            userProfile,
-                            activeBike,
-                            totalKm,
-                            totalRides,
-                            harmonyScore,
-                          ),
-                    icon: _isSharing
-                        ? const SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(
-                              color: Colors.black,
-                              strokeWidth: 2,
-                            ),
-                          )
-                        : const Icon(Icons.share_outlined),
-                    label: Text(
-                      tInline(
-                        AppStrings.currentLanguageCode,
-                        'Görseli Paylaş / Kaydet',
-                        'Share / Save Image',
-                        'Bild teilen / speichern',
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildWallpaperMedRow(
-    String label,
-    String value, {
-    bool isRed = false,
-    Color textColor = const Color(0xFF0F172A),
-  }) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            color: textColor.withValues(alpha: 0.7),
-            fontSize: 11,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        Text(
-          value,
-          style: TextStyle(
-            color: isRed ? const Color(0xFFEF4444) : textColor,
-            fontSize: 11,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class CarbonFiberPainter extends CustomPainter {
-  final Color stripeColor;
-
-  CarbonFiberPainter({required this.stripeColor});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final double w = size.width;
-    final double h = size.height;
-
-    final Paint bgPaint = Paint()..color = const Color(0xFF121212);
-    canvas.drawRect(Rect.fromLTWH(0, 0, w, h), bgPaint);
-
-    final Paint patternPaint = Paint()
-      ..color = const Color(0xFF1C1C1C)
-      ..style = PaintingStyle.fill;
-
-    const double sizeBlock = 6.0;
-    for (double y = 0; y < h; y += sizeBlock) {
-      for (double x = 0; x < w; x += sizeBlock * 2) {
-        final double offset = ((y ~/ sizeBlock) % 2) * sizeBlock;
-        final rect = Rect.fromLTWH(x + offset, y, sizeBlock, sizeBlock);
-        canvas.drawRect(rect, patternPaint);
-      }
-    }
-
-    final Paint stripePaint = Paint()
-      ..color = stripeColor.withValues(alpha: 0.85)
-      ..style = PaintingStyle.fill;
-
-    final Paint stripeSubPaint = Paint()
-      ..color = stripeColor.withValues(alpha: 0.4)
-      ..style = PaintingStyle.fill;
-
-    final double rightEdge = w * 0.85;
-    canvas.drawRect(Rect.fromLTWH(rightEdge - 30, 0, 20, h), stripePaint);
-    canvas.drawRect(Rect.fromLTWH(rightEdge - 5, 0, 6, h), stripeSubPaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class AnimatedBadge extends StatefulWidget {

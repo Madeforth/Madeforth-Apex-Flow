@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 import 'dart:async';
 import 'package:apexflow/core/design/apex_colors.dart';
 import 'package:apexflow/core/design/apex_spacing.dart';
@@ -22,9 +23,14 @@ import 'package:apexflow/notifications/notification_scheduler.dart';
 import 'package:apexflow/core/design/theme_extensions.dart';
 
 class DocumentVaultScreen extends ConsumerStatefulWidget {
-  const DocumentVaultScreen({super.key, required this.strings});
+  const DocumentVaultScreen({
+    super.key,
+    required this.strings,
+    this.topPadding = 0.0,
+  });
 
   final AppStrings strings;
+  final double topPadding;
 
   @override
   ConsumerState<DocumentVaultScreen> createState() =>
@@ -73,105 +79,115 @@ class _DocumentVaultScreenState extends ConsumerState<DocumentVaultScreen> {
 
     return Scaffold(
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(ApexSpacing.x2),
+        child: Stack(
           children: [
-            // Header
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            ListView(
+              padding: EdgeInsets.only(
+                top: widget.topPadding + 64, // 16 top + 38 height + 10 spacing
+                left: ApexSpacing.x2,
+                right: ApexSpacing.x2,
+                bottom: 80,
+              ),
               children: [
-                Text(
-                  widget.strings.vaultTitle,
-                  style: const TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => AccidentRegionSelectorScreen(
-                          strings: widget.strings,
+                // Header
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      widget.strings.vaultTitle,
+                      style: const TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AccidentRegionSelectorScreen(
+                              strings: widget.strings,
+                            ),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.description_outlined),
+                      label: Text(
+                        tInline(
+                          AppStrings.currentLanguageCode,
+                          'Kaza Tutanağı',
+                          'Accident Report',
+                          'Unfallbericht',
                         ),
                       ),
-                    );
-                  },
-                  icon: const Icon(Icons.description_outlined),
-                  label: Text(
-                    tInline(
-                      AppStrings.currentLanguageCode,
-                      'Kaza Tutanağı',
-                      'Accident Report',
-                      'Unfallbericht',
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: context.colors.red.withValues(alpha: 0.1),
+                        foregroundColor: context.colors.red,
+                        elevation: 0,
+                      ),
                     ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: context.colors.red.withValues(alpha: 0.1),
-                    foregroundColor: context.colors.red,
-                    elevation: 0,
-                  ),
+                  ],
                 ),
+                const SizedBox(height: 4),
+                Text(
+                  widget.strings.vaultSubtitle,
+                  style: TextStyle(color: context.colors.textSecondary),
+                ),
+                const SizedBox(height: 24),
+
+                // Content
+                if (_activeTab == 'docs')
+                  _DocsTabContent(
+                    documents: bikeDocs,
+                    strings: widget.strings,
+                    bikeStableId: activeBike.id,
+                    onAdd: () {
+                      final isPremium = ref.read(userProfileProvider).isPremium;
+                      if (bikeDocs.length >= 2 && !isPremium) {
+                        Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (_) =>
+                                PremiumPaywallScreen(strings: widget.strings),
+                          ),
+                        );
+                      } else {
+                        _showAddDocSheet(context, activeBike.id);
+                      }
+                    },
+                  )
+                else
+                  _TaxTabContent(
+                    records: bikeTaxes,
+                    strings: widget.strings,
+                    bikeStableId: activeBike.id,
+                    onAdd: () {
+                      final isPremium = ref.read(userProfileProvider).isPremium;
+                      if (bikeTaxes.length >= 2 && !isPremium) {
+                        Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (_) =>
+                                PremiumPaywallScreen(strings: widget.strings),
+                          ),
+                        );
+                      } else {
+                        _showAddTaxSheet(context, activeBike.id);
+                      }
+                    },
+                    onLoadTemplate: () =>
+                        _showTemplateDialog(context, activeBike.id),
+                  ),
               ],
             ),
-            const SizedBox(height: 4),
-            Text(
-              widget.strings.vaultSubtitle,
-              style: TextStyle(color: context.colors.textSecondary),
-            ),
-            const SizedBox(height: ApexSpacing.x2),
-
-            // Tab Selector
-            _VaultTabSelector(
-              strings: widget.strings,
-              activeTab: _activeTab,
-              onChanged: (tab) => setState(() => _activeTab = tab),
-            ),
-            const SizedBox(height: ApexSpacing.x2),
-
-            // Content
-            if (_activeTab == 'docs')
-              _DocsTabContent(
-                documents: bikeDocs,
+            Positioned(
+              top: widget.topPadding + 12, // Pushed down below topPadding
+              left: 0,
+              right: 0,
+              child: _VaultTabSelector(
                 strings: widget.strings,
-                bikeStableId: activeBike.id,
-                onAdd: () {
-                  final isPremium = ref.read(userProfileProvider).isPremium;
-                  if (bikeDocs.length >= 2 && !isPremium) {
-                    Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                        builder: (_) =>
-                            PremiumPaywallScreen(strings: widget.strings),
-                      ),
-                    );
-                  } else {
-                    _showAddDocSheet(context, activeBike.id);
-                  }
-                },
-              )
-            else
-              _TaxTabContent(
-                records: bikeTaxes,
-                strings: widget.strings,
-                bikeStableId: activeBike.id,
-                onAdd: () {
-                  final isPremium = ref.read(userProfileProvider).isPremium;
-                  if (bikeTaxes.length >= 2 && !isPremium) {
-                    Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                        builder: (_) =>
-                            PremiumPaywallScreen(strings: widget.strings),
-                      ),
-                    );
-                  } else {
-                    _showAddTaxSheet(context, activeBike.id);
-                  }
-                },
-                onLoadTemplate: () =>
-                    _showTemplateDialog(context, activeBike.id),
+                activeTab: _activeTab,
+                onChanged: (tab) => setState(() => _activeTab = tab),
               ),
-            const SizedBox(height: 80),
+            ),
           ],
         ),
       ),
@@ -721,68 +737,117 @@ class _VaultTabSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: context.colors.elevated,
-        border: Border.all(color: context.colors.border, width: 1),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      padding: const EdgeInsets.all(3),
-      child: Row(
-        children: [
-          Expanded(
-            child: GestureDetector(
-              onTap: () => onChanged('docs'),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 150),
-                alignment: Alignment.center,
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                decoration: BoxDecoration(
-                  color: activeTab == 'docs'
-                      ? context.colors.cyan
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  strings.vaultDocTab,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w800,
-                    color: activeTab == 'docs'
-                        ? context.colors.onAccent
-                        : context.colors.textSecondary,
+    return Center(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(19),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            height: 38,
+            constraints: const BoxConstraints(maxWidth: 270),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1A1F2B).withValues(alpha: 0.8), // Semi-transparent navbar background
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.08),
+                width: 1,
+              ),
+              borderRadius: BorderRadius.circular(19),
+            ),
+            padding: const EdgeInsets.all(2),
+            child: Row(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => onChanged('docs'),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 150),
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      decoration: BoxDecoration(
+                        color: activeTab == 'docs'
+                            ? context.colors.cyan.withValues(alpha: 0.14) // Liquid-like highlight
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(17),
+                      ),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.description_outlined,
+                              size: 14, // Slimmer icon
+                              color: activeTab == 'docs'
+                                  ? context.colors.cyan // Selected tab icon color
+                                  : context.colors.textSecondary,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              strings.vaultDocTab,
+                              style: TextStyle(
+                                fontSize: 11, // Slimmer text
+                                fontWeight: activeTab == 'docs'
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                                color: activeTab == 'docs'
+                                    ? context.colors.cyan // Selected tab text color
+                                    : context.colors.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-          ),
-          Expanded(
-            child: GestureDetector(
-              onTap: () => onChanged('tax'),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 150),
-                alignment: Alignment.center,
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                decoration: BoxDecoration(
-                  color: activeTab == 'tax'
-                      ? context.colors.cyan
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  strings.vaultTaxTab,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w800,
-                    color: activeTab == 'tax'
-                        ? context.colors.onAccent
-                        : context.colors.textSecondary,
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => onChanged('tax'),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 150),
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      decoration: BoxDecoration(
+                        color: activeTab == 'tax'
+                            ? context.colors.cyan.withValues(alpha: 0.14) // Liquid-like highlight
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(17),
+                      ),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.receipt_long_outlined,
+                              size: 14, // Slimmer icon
+                              color: activeTab == 'tax'
+                                  ? context.colors.cyan // Selected tab icon color
+                                  : context.colors.textSecondary,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              strings.vaultTaxTab,
+                              style: TextStyle(
+                                fontSize: 11, // Slimmer text
+                                fontWeight: activeTab == 'tax'
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                                color: activeTab == 'tax'
+                                    ? context.colors.cyan // Selected tab text color
+                                    : context.colors.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }

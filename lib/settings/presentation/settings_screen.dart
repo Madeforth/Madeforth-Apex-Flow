@@ -626,43 +626,55 @@ class ApexSegmentedToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: context.colors.elevated,
-        border: Border.all(color: context.colors.border, width: 1),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      padding: const EdgeInsets.all(3),
-      child: Row(
-        children: options.map((entry) {
-          final isSelected = entry.key == selected;
-          return Expanded(
-            child: GestureDetector(
-              onTap: () {
-                onChanged(entry.key);
-              },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 150),
-                alignment: Alignment.center,
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                decoration: BoxDecoration(
-                  color: isSelected ? context.colors.cyan : Colors.transparent,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  entry.value,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w800,
+    return Center(
+      child: Container(
+        height: 48,
+        constraints: const BoxConstraints(maxWidth: 310),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1A1F2B), // Navbar background
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.08),
+            width: 1,
+          ),
+          borderRadius: BorderRadius.circular(24),
+        ),
+        padding: const EdgeInsets.all(3),
+        child: Row(
+          children: options.map((entry) {
+            final isSelected = entry.key == selected;
+            return Expanded(
+              child: GestureDetector(
+                onTap: () {
+                  onChanged(entry.key);
+                },
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 150),
+                  alignment: Alignment.center,
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  decoration: BoxDecoration(
                     color: isSelected
-                        ? context.colors.onAccent
-                        : context.colors.textSecondary,
+                        ? context.colors.cyan.withValues(alpha: 0.14) // Liquid-like highlight
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(22),
+                  ),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      entry.value,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                        color: isSelected
+                            ? context.colors.cyan // Selected tab text color
+                            : context.colors.textSecondary,
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
-          );
-        }).toList(),
+            );
+          }).toList(),
+        ),
       ),
     );
   }

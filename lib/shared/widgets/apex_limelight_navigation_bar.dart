@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:apexflow/core/design/theme_extensions.dart';
 
@@ -41,26 +42,30 @@ class ApexLimelightNavigationBar extends StatelessWidget {
       child: Center(
         child: Material(
           color: Colors.transparent,
-          child: Container(
-            height: height,
-            constraints: const BoxConstraints(maxWidth: 310),
-            decoration: BoxDecoration(
-              color: const Color(0xFF1A1F2B),
-              borderRadius: BorderRadius.circular(28),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.08),
-                width: 1,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.5),
-                  blurRadius: 20,
-                  offset: const Offset(0, 6),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(28),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(
+                height: height,
+                constraints: const BoxConstraints(maxWidth: 310),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1A1F2B).withValues(alpha: 0.8), // Semi-transparent navbar background
+                  borderRadius: BorderRadius.circular(28),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.08),
+                    width: 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.5),
+                      blurRadius: 20,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-            child: LayoutBuilder(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                child: LayoutBuilder(
               builder: (context, constraints) {
                 final itemWidth = constraints.maxWidth / count;
                 final highlightWidth = itemWidth - 4;
@@ -109,7 +114,9 @@ class ApexLimelightNavigationBar extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ),
+  ),
+);
   }
 }
 

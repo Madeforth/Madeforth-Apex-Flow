@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:apexflow/core/design/apex_colors.dart';
 import 'package:apexflow/core/design/apex_spacing.dart';
 import 'package:apexflow/core/i18n/app_strings.dart';
@@ -46,250 +47,293 @@ class GarageScreen extends ConsumerWidget {
       child: Scaffold(
         backgroundColor: context.colors.background,
         body: SafeArea(
-          child: Column(
+          child: Stack(
             children: [
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                padding: const EdgeInsets.all(3),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.05), // bg-accent container
-                  borderRadius: BorderRadius.circular(6), // Design Rules: 4-6 radius
-                ),
-                child: TabBar(
-                  dividerColor: Colors.transparent,
-                  indicatorSize: TabBarIndicatorSize.tab,
-                  indicator: BoxDecoration(
-                    color: const Color(0xFF090D14), // bg-background active tab
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.12),
-                      width: 1,
+              TabBarView(
+                children: [
+                  ListView(
+                    padding: const EdgeInsets.only(
+                      top: 72, // 16 top + 38 height + 18 spacing
+                      left: ApexSpacing.x2,
+                      right: ApexSpacing.x2,
+                      bottom: ApexSpacing.x2,
                     ),
-                  ),
-                  tabs: [
-                    Tab(
-                      text: tInline(
-                        AppStrings.currentLanguageCode,
-                        'Garaj',
-                        'Garage',
-                        'Garage',
+                    children: [
+                      _GarageHeader(
+                        strings: strings,
+                        onOpenNotifications: onOpenNotifications,
                       ),
-                    ),
-                    Tab(
-                      text: tInline(
-                        AppStrings.currentLanguageCode,
-                        'Belgeler',
-                        'Documents',
-                        'Dokumente',
-                      ),
-                    ),
-                    Tab(
-                      text: tInline(
-                        AppStrings.currentLanguageCode,
-                        'Yakıt',
-                        'Fuel',
-                        'Kraftstoff',
-                      ),
-                    ),
-                  ],
-                  labelColor: Colors.white,
-                  unselectedLabelColor: Colors.white54,
-                  labelStyle: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 13,
-                  ),
-                  unselectedLabelStyle: const TextStyle(
-                    fontWeight: FontWeight.w400,
-                    fontSize: 13,
-                  ),
-                ),
-              ),
-              Expanded(
-                child: TabBarView(
-                  children: [
-                    ListView(
-                      padding: const EdgeInsets.all(ApexSpacing.x2),
-                      children: [
-                        _GarageHeader(
-                          strings: strings,
-                          onOpenNotifications: onOpenNotifications,
-                        ),
-                        const SizedBox(height: ApexSpacing.x2),
-                        if (state.isHydrating) ...[
-                          ApexStatePanel(
-                            icon: Icons.storage_outlined,
-                            title: tInline(
-                              AppStrings.currentLanguageCode,
-                              'Garaj okunuyor',
-                              'Reading garage',
-                              'Lesegarage',
-                            ),
-                            message: tInline(
-                              AppStrings.currentLanguageCode,
-                              'Yerel motosiklet ve servis kayıtları hazırlanıyor.',
-                              'Local motorcycle and service records are being prepared.',
-                              'Lokale Motorrad- und Wartungsunterlagen werden erstellt.',
-                            ),
-                            loading: true,
+                      const SizedBox(height: ApexSpacing.x2),
+                      if (state.isHydrating) ...[
+                        ApexStatePanel(
+                          icon: Icons.storage_outlined,
+                          title: tInline(
+                            AppStrings.currentLanguageCode,
+                            'Garaj okunuyor',
+                            'Reading garage',
+                            'Lesegarage',
                           ),
-                          const SizedBox(height: 80),
-                        ] else if (state.motorcycles.isEmpty) ...[
-                          ApexStatePanel(
-                            icon: Icons.two_wheeler_outlined,
-                            title: tInline(
-                              AppStrings.currentLanguageCode,
-                              'Garaj boş',
-                              'Garage is empty',
-                              'Garage ist leer',
-                            ),
-                            message: tInline(
-                              AppStrings.currentLanguageCode,
-                              'İlk makineyi ekleyerek servis aralığı, parça durumu ve hafızayı başlat.',
-                              'Add the first machine to start service windows, part status, and memory.',
-                              'Fügen Sie die erste Maschine hinzu, um Servicefenster, Teilestatus und Speicher zu starten.',
-                            ),
-                            action: SizedBox(
-                              width: double.infinity,
-                              child: TextButton.icon(
-                                style: TextButton.styleFrom(
-                                  foregroundColor: context.colors.onAccent,
-                                  backgroundColor: context.colors.cyan,
-                                ),
-                                onPressed: () =>
-                                    _showAddBikeSheet(context, ref),
-                                icon: const Icon(
-                                  Icons.add_road_outlined,
-                                  size: 18,
-                                ),
-                                label: Text(
-                                  tInline(
-                                    AppStrings.currentLanguageCode,
-                                    'Motosiklet Ekle',
-                                    'Add Motorcycle',
-                                    'Motorrad hinzufügen',
-                                  ),
+                          message: tInline(
+                            AppStrings.currentLanguageCode,
+                            'Yerel motosiklet ve servis kayıtları hazırlanıyor.',
+                            'Local motorcycle and service records are being prepared.',
+                            'Lokale Motorrad- und Wartungsunterlagen werden erstellt.',
+                          ),
+                          loading: true,
+                        ),
+                        const SizedBox(height: 80),
+                      ] else if (state.motorcycles.isEmpty) ...[
+                        ApexStatePanel(
+                          icon: Icons.two_wheeler_outlined,
+                          title: tInline(
+                            AppStrings.currentLanguageCode,
+                            'Garaj boş',
+                            'Garage is empty',
+                            'Garage ist leer',
+                          ),
+                          message: tInline(
+                            AppStrings.currentLanguageCode,
+                            'İlk makineyi ekleyerek servis aralığı, parça durumu ve hafızayı başlat.',
+                            'Add the first machine to start service windows, part status, and memory.',
+                            'Fügen Sie die erste Maschine hinzu, um Servicefenster, Teilestatus und Speicher zu starten.',
+                          ),
+                          action: SizedBox(
+                            width: double.infinity,
+                            child: TextButton.icon(
+                              style: TextButton.styleFrom(
+                                foregroundColor: context.colors.onAccent,
+                                backgroundColor: context.colors.cyan,
+                              ),
+                              onPressed: () => _showAddBikeSheet(context, ref),
+                              icon: const Icon(
+                                Icons.add_road_outlined,
+                                size: 18,
+                              ),
+                              label: Text(
+                                tInline(
+                                  AppStrings.currentLanguageCode,
+                                  'Motosiklet Ekle',
+                                  'Add Motorcycle',
+                                  'Motorrad hinzufügen',
                                 ),
                               ),
                             ),
                           ),
-                          const SizedBox(height: 80),
-                        ] else ...[
-                          _GarageSummaryCard(
-                            bike: state.activeBike,
-                            strings: strings,
+                        ),
+                        const SizedBox(height: 80),
+                      ] else ...[
+                        _GarageSummaryCard(
+                          bike: state.activeBike,
+                          strings: strings,
+                        ),
+                        const SizedBox(height: 12),
+                        _QuickActionsRow(
+                          strings: strings,
+                          onServiceEntry: () => showServiceEntrySheet(
+                            context,
+                            ref,
+                            state,
+                            strings,
                           ),
-                          const SizedBox(height: 12),
-                          _QuickActionsRow(
-                            strings: strings,
-                            onServiceEntry: () => showServiceEntrySheet(
-                              context,
-                              ref,
-                              state,
-                              strings,
-                            ),
-                            onPartStatus: () => onOpenPartStatus?.call(),
-                            onAddBike: () {
-                              final isPremium = ref
-                                  .read(userProfileProvider)
-                                  .isPremium;
-                              if (state.motorcycles.length >= 1 && !isPremium) {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute<void>(
-                                    builder: (_) =>
-                                        PremiumPaywallScreen(strings: strings),
-                                  ),
-                                );
-                              } else {
-                                _showAddBikeSheet(context, ref);
-                              }
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                          _MachineHealthGrid(
-                            statuses: state.componentStatuses,
-                            bike: state.activeBike,
-                            strings: strings,
-                            onOpenPartStatus: onOpenPartStatus,
-                          ),
-                          const SizedBox(height: 16),
-                          _SystemMenuGrid(
-                            strings: strings,
-                            onOpenMemory: () {
+                          onPartStatus: () => onOpenPartStatus?.call(),
+                          onAddBike: () {
+                            final isPremium = ref.read(userProfileProvider).isPremium;
+                            if (state.motorcycles.length >= 1 && !isPremium) {
                               Navigator.of(context).push(
                                 MaterialPageRoute<void>(
                                   builder: (_) =>
-                                      MachineMemoryScreen(strings: strings),
+                                      PremiumPaywallScreen(strings: strings),
                                 ),
                               );
-                            },
-                            onOpenPassport: () {
+                            } else {
+                              _showAddBikeSheet(context, ref);
+                            }
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        _MachineHealthGrid(
+                          statuses: state.componentStatuses,
+                          bike: state.activeBike,
+                          strings: strings,
+                          onOpenPartStatus: onOpenPartStatus,
+                        ),
+                        const SizedBox(height: 16),
+                        _SystemMenuGrid(
+                          strings: strings,
+                          onOpenMemory: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                builder: (_) =>
+                                    MachineMemoryScreen(strings: strings),
+                              ),
+                            );
+                          },
+                          onOpenPassport: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                builder: (_) =>
+                                    GaragePassportScreen(strings: strings),
+                              ),
+                            );
+                          },
+                          onCertifiedLedger: () async {
+                            final userProfile = ref.read(userProfileProvider);
+                            if (!userProfile.isPremium) {
                               Navigator.of(context).push(
                                 MaterialPageRoute<void>(
                                   builder: (_) =>
-                                      GaragePassportScreen(strings: strings),
+                                      PremiumPaywallScreen(strings: strings),
                                 ),
                               );
-                            },
-                            onCertifiedLedger: () async {
-                              final userProfile = ref.read(userProfileProvider);
-                              if (!userProfile.isPremium) {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute<void>(
-                                    builder: (_) =>
-                                        PremiumPaywallScreen(strings: strings),
+                            } else {
+                              showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (context) => Center(
+                                  child: CircularProgressIndicator(
+                                    color: context.colors.cyan,
                                   ),
+                                ),
+                              );
+                              try {
+                                await CertifiedLedgerPdf.generateAndShare(
+                                  bike: state.activeBike,
+                                  records: state.serviceRecords,
+                                  riderTag: userProfile.riderTag,
+                                  isTurkish: tr,
                                 );
-                              } else {
-                                showDialog(
-                                  context: context,
-                                  barrierDismissible: false,
-                                  builder: (context) => Center(
-                                    child: CircularProgressIndicator(
-                                      color: context.colors.cyan,
-                                    ),
-                                  ),
-                                );
-                                try {
-                                  await CertifiedLedgerPdf.generateAndShare(
-                                    bike: state.activeBike,
-                                    records: state.serviceRecords,
-                                    riderTag: userProfile.riderTag,
-                                    isTurkish: tr,
-                                  );
-                                } finally {
-                                  if (context.mounted) {
-                                    Navigator.pop(context);
-                                  }
+                              } finally {
+                                if (context.mounted) {
+                                  Navigator.pop(context);
                                 }
                               }
-                            },
-                            onParkAlert: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute<void>(
-                                  builder: (_) => _ParkedBikeAlertScreen(
-                                    strings: strings,
-                                    bike: state.activeBike,
-                                  ),
+                            }
+                          },
+                          onParkAlert: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                builder: (_) => _ParkedBikeAlertScreen(
+                                  strings: strings,
+                                  bike: state.activeBike,
                                 ),
-                              );
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                          _CostAnalyticsPanel(strings: strings),
-                          const SizedBox(height: 16),
-                          _ServiceTimeline(
-                            records: state.serviceRecords,
-                            strings: strings,
-                          ),
-                          const SizedBox(height: 16),
-                          _MotorcycleListPanel(state: state, strings: strings),
-                          const SizedBox(height: 80),
-                        ],
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        _CostAnalyticsPanel(strings: strings),
+                        const SizedBox(height: 16),
+                        _ServiceTimeline(
+                          records: state.serviceRecords,
+                          strings: strings,
+                        ),
+                        const SizedBox(height: 16),
+                        _MotorcycleListPanel(state: state, strings: strings),
+                        const SizedBox(height: 80),
                       ],
+                    ],
+                  ),
+                  DocumentVaultScreen(strings: strings, topPadding: 64),
+                  FuelScreen(strings: strings, topPadding: 64),
+                ],
+              ),
+              Positioned(
+                top: 16,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(19),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      child: Container(
+                        height: 38,
+                        constraints: const BoxConstraints(maxWidth: 270),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1A1F2B).withValues(alpha: 0.8), // Semi-transparent navbar background
+                          borderRadius: BorderRadius.circular(19),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.08),
+                            width: 1,
+                          ),
+                        ),
+                        child: TabBar(
+                          dividerColor: Colors.transparent,
+                          indicatorSize: TabBarIndicatorSize.tab,
+                          indicator: BoxDecoration(
+                            color: context.colors.cyan.withValues(alpha: 0.14), // Liquid highlight
+                            borderRadius: BorderRadius.circular(17),
+                          ),
+                          tabs: [
+                            Tab(
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(Icons.garage_outlined, size: 14),
+                                    const SizedBox(width: 6),
+                                    Text(tInline(
+                                      AppStrings.currentLanguageCode,
+                                      'Garaj',
+                                      'Garage',
+                                      'Garage',
+                                    )),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Tab(
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(Icons.folder_open_outlined, size: 14),
+                                    const SizedBox(width: 6),
+                                    Text(tInline(
+                                      AppStrings.currentLanguageCode,
+                                      'Belgeler',
+                                      'Documents',
+                                      'Dokumente',
+                                    )),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Tab(
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(Icons.local_gas_station_outlined, size: 14),
+                                    const SizedBox(width: 6),
+                                    Text(tInline(
+                                      AppStrings.currentLanguageCode,
+                                      'Yakıt',
+                                      'Fuel',
+                                      'Kraftstoff',
+                                    )),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                          labelColor: context.colors.cyan, // Selected text/icon color
+                          unselectedLabelColor: context.colors.textSecondary,
+                          labelStyle: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 11,
+                          ),
+                          unselectedLabelStyle: const TextStyle(
+                            fontWeight: FontWeight.w400,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ),
                     ),
-                    DocumentVaultScreen(strings: strings),
-                    FuelScreen(strings: strings),
-                  ],
+                  ),
                 ),
               ),
             ],

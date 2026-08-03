@@ -205,7 +205,7 @@ window.sendNotification = async (reason) => {
   if (db) {
     try {
       await addDoc(collection(db, "parking_notifications"), {
-        vehicleId: vehicleId,
+        vehicleId: vehicleId.toLowerCase(),
         reason: reason,
         timestamp: serverTimestamp(),
         read: false

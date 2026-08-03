@@ -601,7 +601,7 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
           children: [
             Positioned.fill(
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+                padding: EdgeInsets.fromLTRB(16, widget.isEmbedded ? 72 : 16, 16, 100),
                 children: [
                   if (!widget.isEmbedded) ...[
                     // 1. Custom App Bar

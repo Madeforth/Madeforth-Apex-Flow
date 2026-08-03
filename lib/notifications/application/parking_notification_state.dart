@@ -15,12 +15,20 @@ final parkingNotificationStreamProvider = StreamProvider<Map<String, dynamic>?>(
         .collection('parking_notifications')
         .where('vehicleId', isEqualTo: tag)
         .where('read', isEqualTo: false)
-        .orderBy('timestamp', descending: true)
-        .limit(1)
         .snapshots()
         .map((snapshot) {
           if (snapshot.docs.isEmpty) return null;
-          final doc = snapshot.docs.first;
+          // Sort in-memory by timestamp descending to avoid needing a Firestore composite index
+          final docs = List<QueryDocumentSnapshot<Map<String, dynamic>>>.from(snapshot.docs);
+          docs.sort((a, b) {
+            final aTime = a.data()['timestamp'] as Timestamp?;
+            final bTime = b.data()['timestamp'] as Timestamp?;
+            if (aTime == null && bTime == null) return 0;
+            if (aTime == null) return 1;
+            if (bTime == null) return -1;
+            return bTime.compareTo(aTime);
+          });
+          final doc = docs.first;
           final data = doc.data();
           data['id'] = doc.id; // Store document ID for updating later
           return data;
