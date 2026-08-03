@@ -1,0 +1,199 @@
+import 'package:apexflow/core/design/apex_colors.dart';
+import 'package:apexflow/core/i18n/app_settings_state.dart';
+import 'package:apexflow/core/i18n/app_strings.dart';
+import 'package:apexflow/features/dashboard/apex_dashboard_screen.dart';
+import 'package:apexflow/features/dashboard/dashboard_state.dart';
+import 'package:apexflow/fuel/presentation/fuel_screen.dart';
+import 'package:apexflow/garage/presentation/garage_screen.dart';
+import 'package:apexflow/insights/presentation/insights_screen.dart';
+import 'package:apexflow/rides/presentation/rides_screen.dart';
+import 'package:apexflow/settings/presentation/settings_screen.dart';
+import 'package:apexflow/features/documents/presentation/document_vault_screen.dart';
+import 'package:apexflow/profile/presentation/profile_hub_screen.dart';
+import 'package:apexflow/notifications/presentation/notifications_screen.dart';
+import 'package:apexflow/notifications/application/notification_state.dart';
+import 'package:apexflow/rides/presentation/group_ride_lobby_screen.dart';
+import 'package:apexflow/profile/presentation/premium_paywall_screen.dart'; // Import paywall
+import 'package:apexflow/settings/application/user_profile_state.dart'; // Import userProfileProvider
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:apexflow/core/design/theme_extensions.dart';
+
+class ApexAppShell extends ConsumerStatefulWidget {
+  const ApexAppShell({super.key});
+
+  @override
+  ConsumerState<ApexAppShell> createState() => _ApexAppShellState();
+}
+
+class _ApexAppShellState extends ConsumerState<ApexAppShell> {
+  int _index = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final harmonyScore = ref.watch(dashboardStateProvider).harmony.score;
+    final locale = ref.watch(appSettingsProvider).locale;
+    final strings = AppStrings(locale);
+    final isTurkish = locale.languageCode == 'tr';
+    final compactNavigation = MediaQuery.sizeOf(context).width < 430;
+    final isPremium = ref.watch(userProfileProvider).isPremium;
+    final pages = <Widget>[
+      ApexDashboardScreen(
+        strings: strings,
+        onOpenRides: () => setState(() => _index = 3),
+        onOpenGarage: () => setState(() => _index = 1),
+        onOpenFuel: () => setState(() => _index = 5),
+        onOpenInsights: () => setState(() => _index = 6),
+        onOpenNotifications: () => setState(() => _index = 8),
+      ),
+      GarageScreen(strings: strings),
+      DocumentVaultScreen(strings: strings),
+      RidesScreen(strings: strings),
+      GroupRideLobbyScreen(strings: strings),
+      FuelScreen(strings: strings),
+      InsightsScreen(strings: strings),
+      ProfileHubScreen(
+        strings: strings,
+        onOpenSettings: () => setState(() => _index = 9),
+        onOpenNotifications: () => setState(() => _index = 8),
+      ),
+      NotificationsScreen(strings: strings),
+      SettingsScreen(strings: strings),
+    ];
+
+    return Scaffold(
+      body: Stack(
+        children: [
+          Positioned.fill(child: pages[_index]),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: 180,
+            child: IgnorePointer(child: _HealthUnderlay(score: harmonyScore)),
+          ),
+        ],
+      ),
+      bottomNavigationBar: NavigationBarTheme(
+        data: NavigationBarThemeData(
+          backgroundColor: context.colors.surface,
+          indicatorColor: context.colors.cyan.withValues(alpha: 0.1),
+          iconTheme: WidgetStateProperty.resolveWith((states) {
+            return IconThemeData(
+              color: states.contains(WidgetState.selected)
+                  ? context.colors.cyan
+                  : context.colors.textSecondary,
+            );
+          }),
+          labelTextStyle: WidgetStateProperty.resolveWith((states) {
+            return TextStyle(
+              color: states.contains(WidgetState.selected)
+                ? context.colors.white
+                : context.colors.textSecondary,
+              fontSize: compactNavigation ? 10 : 11,
+              fontWeight: FontWeight.w700,
+            );
+          }),
+        ),
+        child: NavigationBar(
+          height: 72,
+          elevation: 0,
+           selectedIndex: _index > 7 ? 7 : _index, // Clamp selected navigation destination if settings/notifications is open
+          labelBehavior: compactNavigation
+              ? NavigationDestinationLabelBehavior.alwaysHide
+              : NavigationDestinationLabelBehavior.alwaysShow,
+          onDestinationSelected: (index) {
+            if ((index == 2 || index == 4) && !isPremium) {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => PremiumPaywallScreen(strings: strings),
+                ),
+              );
+            } else {
+              setState(() => _index = index);
+            }
+          },
+          destinations: [
+            NavigationDestination(
+              icon: Icon(Icons.space_dashboard_outlined),
+              selectedIcon: Icon(Icons.space_dashboard),
+              label: strings.navHome,
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.two_wheeler_outlined),
+              selectedIcon: Icon(Icons.two_wheeler),
+              label: strings.navGarage,
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.folder_shared_outlined),
+              selectedIcon: Icon(Icons.folder_shared),
+              label: strings.navDocuments,
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.route_outlined),
+              selectedIcon: Icon(Icons.route),
+              label: strings.navRides,
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.groups_outlined),
+              selectedIcon: Icon(Icons.groups),
+              label: tInline('Grup Sürüşü', 'Group Rides', 'Gruppenfahrten'),
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.local_gas_station_outlined),
+              selectedIcon: Icon(Icons.local_gas_station),
+              label: strings.navFuel,
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.insights_outlined),
+              selectedIcon: Icon(Icons.insights),
+              label: strings.navInsights,
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.person_outline),
+              selectedIcon: Icon(Icons.person),
+              label: tInline('Profil', 'Profile', 'Profil'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _HealthUnderlay extends StatelessWidget {
+  const _HealthUnderlay({required this.score});
+
+  final int score;
+
+  @override
+  Widget build(BuildContext context) {
+    final normalizedScore = score.clamp(0, 100) / 100;
+    final color = _colorFor(context, score);
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.bottomCenter,
+          end: Alignment.topCenter,
+          colors: [
+            color.withValues(alpha: 0.05 + normalizedScore * 0.05),
+            color.withValues(alpha: 0.025),
+            color.withValues(alpha: 0),
+          ],
+          stops: const [0, 0.48, 1],
+        ),
+      ),
+    );
+  }
+
+  Color _colorFor(BuildContext context, int score) {
+    if (score >= 70) {
+      return context.colors.healthy;
+    }
+    if (score >= 50) {
+      return context.colors.caution;
+    }
+    return context.colors.red;
+  }
+}

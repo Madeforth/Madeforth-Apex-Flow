@@ -1,0 +1,86 @@
+================================================================================
+          APEXFLOW - FULL SYSTEM ARCHITECTURE & ENGINE SPECIFICATION
+================================================================================
+App Version: ApexFlow 2.0 MVP (Flutter / Riverpod / Isar / Firebase)
+Target Platform: iOS & Android (Offline-First Architecture)
+Product Philosophy: Calm, Industrial, Premium Motorcycle OS (Zero Hype, Zero Paywalls)
+
+--------------------------------------------------------------------------------
+1. LOCAL DATABASE & CLOUD SYNC ARCHITECTURE (LOCAL-FIRST ENGINE)
+--------------------------------------------------------------------------------
+1.1 Local Storage Engine (ApexKvStore & Isar Database):
+    - All telemetry, motorcycle profiles, maintenance logs, fuel receipts, daily 
+      pre-ride checks, and rider statistics are immediately written to local 
+      device storage using ApexKvStore (fast KV engine / Isar entity store).
+    - UI reads data synchronously from local memory/KV store with ZERO network 
+      latency.
+
+1.2 Cloud Synchronization Engine (FirebaseService & Single-Package Backup):
+    - Unified Cloud Backup: On app launch or re-installation, ApexFlow executes 
+      EXACTLY 1 READ request to retrieve the user's complete profile and garage 
+      bundle from Cloud Firestore (`users/{uid}`).
+    - Batch Write: Profile and garage updates execute EXACTLY 1 BATCH WRITE to 
+      update user profile and public tag index (`rider_tags/{tag}`).
+    - Free Tier Quota Safety: Exceeding Firebase Spark free limits (50,000 reads / 
+      20,000 writes daily) is mathematically impossible due to single-package 1-read/1-write design.
+
+1.3 Strict Privacy & Security Guardrails:
+    - Accident Reports (Kaza Tutanakları) & Weather Snapshots (Anlık Hava Durumu): 
+      Strictly isolated on-device in ApexKvStore. NEVER uploaded to Cloud Firestore.
+    - Developer Tag Security (@apex_dev#1881): Unlocked tag field in profile hub 
+      protected by secret PIN validation (#1881). Plain 'apex_dev' entries without 
+      the PIN are rejected.
+
+--------------------------------------------------------------------------------
+2. GARAGE PART WEAR & MAINTENANCE INTELLIGENCE ENGINE
+--------------------------------------------------------------------------------
+2.1 Tracked Machine Components:
+    - Brake Pads (Fren Balataları), Chain & Sprockets (Zincir & Dişli), Tires (Lastikler), 
+      Engine Oil (Motor Yağı), Spark Plugs (Bujiler), Air Filter (Hava Filtresi).
+
+2.2 Dynamic Ride Impact Progression (applyRideImpact):
+    - Part wear percentage (0% = New, 100% = Worn Out) updates dynamically after every ride:
+      * Oil Wear: Delta km / target oil service interval (e.g. 5,000 km).
+      * Brake Wear: Base km wear + (hardBrakes * 0.4%) + (Aggressive mood multiplier 1.5x).
+      * Tire Wear: Base km wear + (maxLeanAngle > 25° ? 0.3% : 0.1%) + (hardAccelerations * 0.3%).
+      * Chain Wear: Base km wear + (hardAccelerations * 0.2%).
+
+2.3 Service Memory & Maintenance Alerts:
+    - Service intervals auto-calculate next due distance (e.g. Next service at 12,500 km).
+    - Status badges: "Ritminde" (Optimal), "Bakım Yakın" (Service Due Soon), "Gecikti" (Overdue).
+
+--------------------------------------------------------------------------------
+3. HARMONY SCORE ENGINE (UYUM PUANI MOTORU)
+--------------------------------------------------------------------------------
+3.1 Harmony Score Computation (0 to 100):
+    - Aggregates 4 core vehicle health signals:
+      1. Machine Part Health (40% Weight): Weighted average of 6 garage parts health %.
+      2. Maintenance Compliance (30% Weight): Overdue services penalize score by up to -30 pts.
+      3. Daily Pre-Ride Checks (15% Weight): Missing or failed daily check items reduce score.
+      4. Ride Smoothness & Observations (15% Weight): Hard brakes, rapid accelerations, and 
+         rider mechanical observations influence final harmony score.
+    - Score Bands:
+      * 90 - 100: Zen State (Perfect Machine Harmony)
+      * 70 - 89: Stable / Balanced State
+      * < 70: Attention Required (Service / Part Inspection Recommended)
+
+--------------------------------------------------------------------------------
+4. RIDER CARD, RIDER TAG, LOBBY & LEADERBOARD
+--------------------------------------------------------------------------------
+4.1 Rider Card & Public Profile:
+    - Displays total rides count, total distance (km), active machine, earned badges, 
+      and optional user-enabled shared info (phone number, emergency contact, license plate).
+    - Shared profiles sync to `rider_tags/{tag}` for friends and group ride members.
+
+4.2 Group Ride Lobby Engine:
+    - Real-time lobby session created by Leader with a unique 6-digit connection code.
+    - Members join using code. Features real-time GPS location sharing and leader/member roles.
+
+4.3 Calm Leaderboard (Non-Gamified):
+    - Ranks riders strictly by Total Distance (km), Total Rides Count, or Harmony Score.
+    - PERMANENT RULE: Top Speed and Max Lean Angle are STRICTLY PROHIBITED on leaderboards 
+      to eliminate dangerous competitive riding on public roads.
+
+================================================================================
+                                END OF DOCUMENT
+================================================================================

@@ -1,0 +1,16 @@
+@@ -10,6 +10,7 @@
+ import 'package:apexflow/notifications/apex_notification_service.dart';
+ import 'package:firebase_core/firebase_core.dart'; // Import Firebase Core
+ import 'package:apexflow/features/splash/presentation/apex_splash_screen.dart';
++import 'package:apexflow/garage/presentation/part_status_screen.dart';
+ import 'package:apexflow/garage/presentation/smart_park_alert_handler_screen.dart';
+ import 'package:apexflow/settings/application/theme_mode_provider.dart';
+ import 'package:apexflow/notifications/presentation/global_notification_overlay.dart';
+@@ -109,6 +117,7 @@
+           7 => 4,
+           8 => 4,
+           9 => 4,
++          10 => 1,
+           _ => 0,
+         },
+         onDestinationSelected: (idx) {

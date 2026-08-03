@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "29839209813",
+    "project_id": "apex-flow-7baea",
+    "storage_bucket": "apex-flow-7baea.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:29839209813:android:b4245e4dd12b0bce796bdc",
+        "android_client_info": {
+          "package_name": "com.apexflow.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "29839209813-ulc1uos0dt50n4u0oa4mq0ssdp662fl4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAD-gWs08JYU5xFD0LntTtBWJUkXuMgkW4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "29839209813-ulc1uos0dt50n4u0oa4mq0ssdp662fl4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

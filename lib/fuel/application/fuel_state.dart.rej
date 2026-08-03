@@ -1,0 +1,8 @@
+@@ -109,6 +109,7 @@
+         ),
+       FuelRange.month => DateTime(now.year, now.month),
++      FuelRange.year => DateTime(now.year),
+       FuelRange.custom =>
+           customStartIso != null ? DateTime.parse(customStartIso) : now,
+     };
+ 

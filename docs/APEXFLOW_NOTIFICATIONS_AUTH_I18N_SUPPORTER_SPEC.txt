@@ -1,0 +1,131 @@
+================================================================================
+  APEXFLOW - NOTIFICATIONS, AUTH, I18N, PAYWALL, PROFILE & SETTINGS SPECIFICATION
+================================================================================
+Belge Türü: Antigravity & ChatGPT Mimari Spesifikasyonu
+Kapsam: Bildirimler, Auth, i18n, Freemium/Premium, Profil/Rider Card ve Ayarlar Motorları
+Teknoloji: Flutter / Riverpod / Firebase Auth / FCM / Local-First / SharedPreferences / i18n (TR, EN, DE)
+Mimari İlke: Industrial, Calm, Offline-First, Privacy-by-Default (Zero Hype)
+
+--------------------------------------------------------------------------------
+1. APPLICATION NOTIFICATION SYSTEM (BİLDİRİM VE UYARI MOTORU)
+--------------------------------------------------------------------------------
+1.1 Bildirim Mimari Katmanları:
+    - ApexFlow bildirim sistemi iki ana koldan çalışır:
+      * Yerel Cihaz Bildirimleri (Local System Notifications): İnternet bağlantısı 
+        olmadan periyodik bakım vakti, evrak süre dolumu (30, 15, 3 gün kala) ve 
+        günlük sürüş öncesi kontrol hatırlatmalarını cihaz saatine göre tetikler.
+      * Anlık Ağ Bildirimleri (Firebase Cloud Messaging - FCM): QR Akıllı Park 
+        Uyarısı, grup sürüşü daveti ve anonim acil durum iletilerini iletir.
+
+1.2 Ön Plan Canlı Bildirim Katmanı (GlobalNotificationOverlay):
+    - Kullanıcı uygulama açıkken (foreground) acil bir QR park uyarısı veya sistem 
+      bildirimi aldığında varsayılan işletim sistemi diyalogları yerine ApexFlow'un 
+      endüstriyel tasarım diline uygun `GlobalNotificationOverlay` penceresi açılır.
+    - Özellikler: Ekranın üst kısmından kayarak inen yüksek öncelikli kart, acil ses 
+      efekti, "Konumu Gör" veya "Anladım" aksiyon butonları.
+
+1.3 Spam Önleme ve Cooldown Motoru (Notification Cooldown Policy):
+    - Aynı bileşen veya park uyarısı için 24 saat içerisinde üst üste bildirim 
+      oluşturulması engellenir (`lastNotifiedAtUtc`).
+    - İstisna: Fiziksel acil durum uyarısı (örn. "Motorunuza müdahale ediliyor" 
+      veya "Fren sıvısı sızıntısı") cooldown süresini aşarak anında iletilir.
+
+--------------------------------------------------------------------------------
+2. AUTH, SIGN-IN & ONBOARDING SYSTEM (KAYIT, GİRİŞ VE ONBOARDING MOTORU)
+--------------------------------------------------------------------------------
+2.1 Çoklu Oturum ve Kimlik Sağlayıcıları (Authentication Providers):
+    - Firebase Auth Entegrasyonu: E-posta/Şifre ile kayıt, Google Sign-In ile 
+      tek tıkla giriş ve Anonim (Guest Mode) oturum desteği.
+    - Misafir Modu (Offline Guest Mode): Kullanıcı oturum açmak istemezse 
+      uygulama %100 yerel modda başlatılır. Tüm garaj, bakım, sürüş ve yakıt verileri 
+      cihaz hafızasında yerel olarak saklanır.
+
+2.2 "Beni Hatırla" ve Otomatik Oturum Açma Motoru (Remember Me Hydration):
+    - `Remember Me` Mantığı: Kullanıcı "Beni Hatırla" seçeneğini aktif ettiğinde 
+      oturum token'ları ve `onboardingDone` durumu kalıcı olarak saklanır.
+    - Hatırlama Kapalıysa: Uygulama kapatılıp açıldığında oturum durumu güvenli 
+      biçimde sıfırlanır ve kullanıcı giriş/onboarding ekranına yönlendirilir.
+
+2.3 Kurulum Kimliği (Installation ID Engine):
+    - Her cihaza benzersiz bir geliştirici kurulum kimliği (`inst_timestamp_random`) 
+      atanır. Bu ID, kayıt olmadan da kullanıcının yerel tercihlerini ve 
+      Rider Tag haklarını cihaz seviyesinde doğrular.
+
+--------------------------------------------------------------------------------
+3. FREEMIUM, PREMIUM & SUPPORTER SYSTEM (FREEMIUM/PREMIUM MİMARİ MOTORU)
+--------------------------------------------------------------------------------
+3.1 Ücretsiz Katman (Free Tier - Core Product Loop):
+    - ApexFlow temel kullanıcı deneyimini kısıtlamaz. %100 ÜCRETSİZ Özellikler:
+      * Garaj Yönetimi (Maksimum 2 Aktif Motosiklet).
+      * Akıllı Bakım & Parça Ömrü Takibi (6 Temel Bileşen).
+      * Hız Telemetri Motoru V2 (Kalman Filtresi & Nis Gate).
+      * Yakıt Takibi & OCR Fiş Tarayıcısı.
+      * Harmony Score Engine V2 (4 Pillar Uyum Puanı).
+      * Sürücü Kartı (Rider Card) & Kamu Profil Bağlantısı.
+      * Sakin Liderlik Tablosu (Calm Leaderboard).
+
+3.2 Premium Katman Yapısı (Premium Tier - Exclusive Capabilities):
+    - İsteğe Bağlı Tek Seferlik veya Abonelik Modeli:
+      * Sınırsız Motosiklet Garajı (3 ve üzeri makine kaydı).
+      * Smart Park QR Sticker & Anonim Acil Bildirim Sistemi.
+      * Kriptografik Sicil Mühürlü PDF Garaj Pasaportu İndirme.
+      * Sınırsız Evrak Kasası Depolama & Erken Süre İkazı.
+
+3.3 Geliştiriciye Destek Ol ve Bahşiş Sistemi (Supporter Tier / Tip Jar):
+    - Kullanıcılar bağımsız geliştiricilere tek seferlik veya aylık bahşiş ("Kahve Ismarla") 
+      gönderebilir.
+    - Ödüller: Taşınabilir "Supporter Badge" (Destekçi Rozeti) ve özel altın profil çerçevesi.
+
+--------------------------------------------------------------------------------
+4. PROFILE EDITING & RIDER CARD ENGINE (PROFİL VE RIDER CARD DÜZENLEME MOTORU)
+--------------------------------------------------------------------------------
+4.1 Profil Düzenleme ve Veri Alanları:
+    - İsim & Soyisim: Kullanıcının ekranda görünen adı (Display Name).
+    - Rider Tag Identity: `@rider_tag#XXXX` benzersiz sosyal etiket.
+    - Sürüş Stili: Cruiser, Track, Touring, Commuter, Enduro, Vintage.
+    - Avatar & Çerçeve Seçimi: Avatar endeksi ve özel kilitli çerçeveler (`selectedFrameIndex`).
+    - Acil Durum Bilgileri: Kan grubu, acil durum kişisi adı ve telefon numarası.
+
+4.2 Seçici Mahremiyet Kontrolleri (Selective Privacy Controls):
+    - Alan Bazlı Görünürlük Ayarları:
+      * Telefon Numarası: [Açık / Gizli] Toggle.
+      * Acil Durum Kişisi: [Açık / Gizli] Toggle.
+      * Plaka Numarası: [Açık / Maskeli / Gizli] Toggle.
+    - Kamusal Kart İlkesi: Hassas veriler onay verilmedikçe dış dünyaya kapalıdır.
+
+4.3 Dinamik Sürücü Kartı (Rider Card Generator):
+    - Kullanıcının toplam sürüş mesafesini, toplam sürüş sayısını, aktik makinesini, 
+      kazandığı rozetleri ve özel QR bağlantısını içeren görsel kimlik kartı üretir.
+
+--------------------------------------------------------------------------------
+5. SETTINGS SCREEN ENGINE (AYARLAR EKRANI MOTORU)
+--------------------------------------------------------------------------------
+5.1 Dil Seçim Motoru (Language Switcher):
+    - Canlı Türkçe (`tr`), İngilizce (`en`), Almanca (`de`) seçimi. 
+    - Uygulama yeniden başlatılmadan `AppSettings` notifier ile tüm arayüz anında güncellenir.
+
+5.2 Metrik ve Birim Seçimi (Unit System Engine):
+    - Metrik Sistem: Kilometre (km), km/saat (km/h), Santigrat (°C).
+    - İmperyal Sistem: Mil (mi), mil/saat (mph), Fahrenhayt (°F).
+
+5.3 Görünüm ve Tema Motoru (Theme Engine):
+    - Koyu Tema (Apex Dark Industrial Theme - varsayılan).
+    - Açık Tema (Clean High Contrast Industrial).
+    - Sistem Varsayılanı (OS Auto Match).
+
+5.4 Yerel Veri Sıfırlama ve Yedekleme (Data Management & Reset):
+    - Cihaz Hafızasını Temizle: `ApexKvStore` sıfırlama.
+    - Yerel Veri Yedeği Al: JSON veri snapshot çıktısı oluşturma.
+    - Onboarding Sıfırla: Karşılama ekranını yeniden başlatma.
+
+--------------------------------------------------------------------------------
+6. INTERNATIONALIZATION & I18N SYSTEM (ÜÇ DİLLİ ÇEVİRİ MOTORU)
+--------------------------------------------------------------------------------
+6.1 Satır İçi Çeviri Fonksiyonu (tInline Helper Engine):
+    - 4 Parametreli Metot Yapısı:
+      `tInline(languageCode, 'Türkçe Metin', 'English Text', 'Deutscher Text')`
+    - Geri Düşme Zinciri (Fallback Chain): Türkçe (`tr`) $\rightarrow$ İngilizce (`en`) $\rightarrow$ Almanca (`de`).
+
+================================================================================
+                                END OF DOCUMENT
+================================================================================

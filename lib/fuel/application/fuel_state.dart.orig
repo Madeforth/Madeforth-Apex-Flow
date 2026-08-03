@@ -1,0 +1,254 @@
+import 'dart:async';
+import 'dart:convert';
+
+import 'package:apexflow/core/storage/apex_kv_store.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+
+enum FuelRange { day, week, month, custom }
+
+class FuelEntry {
+  const FuelEntry({
+    required this.dateIso,
+    required this.litres,
+    required this.totalTry,
+    this.odometerKm,
+    required this.note,
+    required this.brand,
+    this.imagePath,
+  });
+
+  final String dateIso;
+  final double litres;
+  final double totalTry;
+  final int? odometerKm;
+  final String note;
+  final String brand;
+  final String? imagePath;
+
+  DateTime get date => DateTime.parse(dateIso);
+  double get pricePerLitre => litres <= 0 ? 0 : totalTry / litres;
+
+  Map<String, dynamic> toJson() => {
+    'dateIso': dateIso,
+    'litres': litres,
+    'totalTry': totalTry,
+    'odometerKm': odometerKm,
+    'note': note,
+    'brand': brand,
+    'imagePath': imagePath,
+  };
+
+  factory FuelEntry.fromJson(Map<String, dynamic> json) {
+    return FuelEntry(
+      dateIso: json['dateIso'] as String? ?? DateTime.now().toIso8601String(),
+      litres: (json['litres'] as num?)?.toDouble() ?? 0,
+      totalTry: (json['totalTry'] as num?)?.toDouble() ?? 0,
+      odometerKm: (json['odometerKm'] as num?)?.toInt(),
+      note: json['note'] as String? ?? '',
+      brand: json['brand'] as String? ?? '',
+      imagePath: json['imagePath'] as String?,
+    );
+  }
+}
+
+class FuelSummary {
+  const FuelSummary({
+    required this.entryCount,
+    required this.totalLitres,
+    required this.totalTry,
+  });
+
+  final int entryCount;
+  final double totalLitres;
+  final double totalTry;
+
+  double get averagePricePerLitre =>
+      totalLitres <= 0 ? 0 : totalTry / totalLitres;
+}
+
+class FuelState {
+  const FuelState({
+    required this.isHydrating,
+    required this.entries,
+    required this.activeRange,
+    required this.customStartIso,
+    required this.customEndIso,
+  });
+
+  final bool isHydrating;
+  final List<FuelEntry> entries;
+  final FuelRange activeRange;
+  final String? customStartIso;
+  final String? customEndIso;
+
+  FuelState copyWith({
+    bool? isHydrating,
+    List<FuelEntry>? entries,
+    FuelRange? activeRange,
+    String? customStartIso,
+    String? customEndIso,
+  }) {
+    return FuelState(
+      isHydrating: isHydrating ?? this.isHydrating,
+      entries: entries ?? this.entries,
+      activeRange: activeRange ?? this.activeRange,
+      customStartIso: customStartIso ?? this.customStartIso,
+      customEndIso: customEndIso ?? this.customEndIso,
+    );
+  }
+
+  List<FuelEntry> get filteredEntries {
+    final now = DateTime.now();
+    final start = switch (activeRange) {
+      FuelRange.day => DateTime(now.year, now.month, now.day),
+      FuelRange.week => DateTime(
+        now.year,
+        now.month,
+        now.day,
+      ).subtract(Duration(days: now.weekday - 1)),
+      FuelRange.month => DateTime(now.year, now.month),
+      FuelRange.custom =>
+        customStartIso == null
+            ? DateTime(1970)
+            : DateTime.parse(customStartIso!),
+    };
+    final end = activeRange == FuelRange.custom && customEndIso != null
+        ? DateTime.parse(customEndIso!).add(const Duration(days: 1))
+        : now.add(const Duration(days: 1));
+
+    return entries.where((entry) {
+      final date = entry.date;
+      return !date.isBefore(start) && date.isBefore(end);
+    }).toList();
+  }
+
+  FuelSummary get summary {
+    final items = filteredEntries;
+    return FuelSummary(
+      entryCount: items.length,
+      totalLitres: items.fold<double>(0, (sum, item) => sum + item.litres),
+      totalTry: items.fold<double>(0, (sum, item) => sum + item.totalTry),
+    );
+  }
+
+  Map<String, FuelSummary> get dailyChart {
+    final grouped = <String, List<FuelEntry>>{};
+    for (final entry in filteredEntries) {
+      final key = DateFormat('yyyy-MM-dd').format(entry.date);
+      grouped.putIfAbsent(key, () => []).add(entry);
+    }
+    return {
+      for (final item in grouped.entries)
+        item.key: FuelSummary(
+          entryCount: item.value.length,
+          totalLitres: item.value.fold(0, (sum, e) => sum + e.litres),
+          totalTry: item.value.fold(0, (sum, e) => sum + e.totalTry),
+        ),
+    };
+  }
+}
+
+final fuelStateProvider = NotifierProvider<FuelController, FuelState>(
+  FuelController.new,
+);
+
+class FuelController extends Notifier<FuelState> {
+  static const _storageKey = 'fuel.state.v1';
+
+  @override
+  FuelState build() {
+    unawaited(_hydrate());
+    return const FuelState(
+      isHydrating: true,
+      entries: [],
+      activeRange: FuelRange.day,
+      customStartIso: null,
+      customEndIso: null,
+    );
+  }
+
+  void addEntry({
+    required DateTime date,
+    required double litres,
+    required double totalTry,
+    int? odometerKm,
+    required String note,
+    required String brand,
+    String? imagePath,
+  }) {
+    final entry = FuelEntry(
+      dateIso: date.toIso8601String(),
+      litres: litres,
+      totalTry: totalTry,
+      odometerKm: odometerKm,
+      note: note.trim(),
+      brand: brand.trim(),
+      imagePath: imagePath,
+    );
+    final entries = [entry, ...state.entries]
+      ..sort((a, b) => b.date.compareTo(a.date));
+    state = state.copyWith(entries: entries);
+    unawaited(_persist());
+  }
+
+  void setRange(FuelRange range) {
+    state = state.copyWith(activeRange: range);
+    unawaited(_persist());
+  }
+
+  void setCustomRange(DateTime start, DateTime end) {
+    final first = start.isAfter(end) ? end : start;
+    final last = start.isAfter(end) ? start : end;
+    state = state.copyWith(
+      activeRange: FuelRange.custom,
+      customStartIso: DateTime(
+        first.year,
+        first.month,
+        first.day,
+      ).toIso8601String(),
+      customEndIso: DateTime(last.year, last.month, last.day).toIso8601String(),
+    );
+    unawaited(_persist());
+  }
+
+  Future<void> _hydrate() async {
+    final raw = await ApexKvStore.getString(_storageKey);
+    if (raw == null || raw.isEmpty) {
+      state = state.copyWith(isHydrating: false);
+      return;
+    }
+    try {
+      final json = jsonDecode(raw) as Map<String, dynamic>;
+      final entries =
+          (json['entries'] as List<dynamic>? ?? [])
+              .map(
+                (item) => FuelEntry.fromJson(Map<String, dynamic>.from(item)),
+              )
+              .toList()
+            ..sort((a, b) => b.date.compareTo(a.date));
+      state = state.copyWith(
+        isHydrating: false,
+        entries: entries,
+        activeRange: FuelRange.values.firstWhere(
+          (range) => range.name == json['activeRange'],
+          orElse: () => FuelRange.day,
+        ),
+        customStartIso: json['customStartIso'] as String?,
+        customEndIso: json['customEndIso'] as String?,
+      );
+    } catch (_) {
+      state = state.copyWith(isHydrating: false);
+    }
+  }
+
+  Future<void> _persist() async {
+    final payload = {
+      'entries': state.entries.map((entry) => entry.toJson()).toList(),
+      'activeRange': state.activeRange.name,
+      'customStartIso': state.customStartIso,
+      'customEndIso': state.customEndIso,
+    };
+    await ApexKvStore.setString(_storageKey, jsonEncode(payload));
+  }
+}

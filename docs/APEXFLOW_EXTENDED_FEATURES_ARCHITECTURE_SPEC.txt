@@ -1,0 +1,184 @@
+================================================================================
+  APEXFLOW - EXTENDED FEATURES ARCHITECTURE & ENGINE SPECIFICATION
+================================================================================
+Belge Türü: Antigravity & ChatGPT Mimari Spesifikasyonu
+Kapsam: 01-07 numaralı belgeler dışındaki tüm uygulama motorları, Park Uyarısı, QR sistemleri ve sosyal motorlar
+Teknoloji: Flutter / Riverpod / Local-First (ApexKvStore & Isar) / Dart PDF / Google ML Kit Barcode Scanner / QrFlutter / Realtime DB
+Mimari İlke: Industrial, Calm, Offline-First, Privacy-by-Default (Zero Hype)
+
+--------------------------------------------------------------------------------
+1. RIDE READINESS & WEATHER ASSESSMENT ENGINE (SÜRÜŞ HAZIRLIK VE HAVA MOTORU)
+--------------------------------------------------------------------------------
+1.1 Sürüş Hazırlık Puanı Mantığı (Ride Readiness Score Engine):
+    - Hazırlık Puanı (0 - 100), sürücünün yola çıkmadan önceki güvenlik düzeyini 
+      ve çevre koşullarına uyumunu derecelendiren dinamik bir hesaplama motorudur.
+    - Sinyal Ağırlıkları:
+      * Hava Durumu ve Yol Koşulları (%40 Ağırlık): Sıcaklık, yağış ihtimali, 
+        rüzgar hızı, nem ve görünürlük.
+      * Günlük Ön Kontrol Disiplini (%35 Ağırlık): Lastik basınçları, fren hidroliği, 
+        zincir gerginliği, far/sinyal kontrolü, kask/ekipman kontrolü.
+      * Araç Bakım ve Sağlık Durumu (%25 Ağırlık): Gecikmiş servis uyarısı 
+        veya kritik parça gözlemi olup olmaması.
+
+1.2 Hava Durumu Önbellek ve Bayatlık Hesabı (Weather Snapshot Decay):
+    - Anlık Hava Durumu Özeti (Weather Snapshot), açık hava API'lerinden veya 
+      yerel sensör verilerinden çekilerek cihaza kaydedilir.
+    - Bayatlık Analizi (Stale Snapshot Decay):
+      * 0 - 2 Saat: Taze veri (%100 hava güveni).
+      * 2 - 6 Saat: Orta bayatlık (Hazırlık puanına %10 bayatlık cezası).
+      * > 6 Saat: Bayat veri (Hava durumu katkısı askıya alınır, kullanıcıya 
+        "Hava durumunu güncelleyin" uyarısı verilir).
+    - Gizlilik İlkesi: Hava durumu verileri kesinlikle yerelde (`ApexKvStore`) 
+      saklanır. Sunucuya veya Cloud Firestore'a HİÇBİR zaman yüklenmez.
+
+1.3 Değerlendirme Bantları ve Aksiyon Önerileri:
+    - 85 - 100 (Hazır / Optimal): Sürüş koşulları mükemmel, ekipman ve makine tam.
+    - 65 - 84 (Dikkatli Sürüş): Hafif yağmur, rüzgar veya eksik ön kontrol.
+    - < 65 (Yüksek Risk / Kontrol Gerekli): Şiddetli yağış, don riski veya 
+      başarısız ön kontrol öğesi.
+
+--------------------------------------------------------------------------------
+2. FUEL TRACKING & RECEIPT OCR PARSER ENGINE (YAKIT TAKİBİ VE FİŞ TARAMA MOTORU)
+--------------------------------------------------------------------------------
+2.1 Yakıt Kaydı ve Verimlilik Hesap Motoru (Fuel Efficiency Engine):
+    - Yakıt tüketim hesabı her dolumda otomatik çalışır:
+      * Tüketim Oranı (L/100 km) = (Alınan Litre / Kat Edilen Mesafe km) * 100.
+      * Kilometre Başına Maliyet = Toplam Ödenen Tutar / Kat Edilen Mesafe km.
+    - Odometer İlerlemesi: Girilen yakıt fişi kilometresi, motosikletin mevcut 
+      odometer değerini otomatik olarak ileriye günceller.
+
+2.2 Akıllı Fiş OCR Ayrıştırma Motoru (Receipt Parser Engine):
+    - Kamera ile çekilen veya galeriden yüklenen akaryakıt fişlerinin metni 
+      özel RegEx ayrıştırıcı ile taranır.
+    - Ayrıştırma Kuralları:
+      * Toplam Tutar (TL): Fiş üzerindeki KDV, Birim Fiyat ve Gürültü satırlarından 
+        ayrılarak "TOPLAM", "TOP", "TUTAR" anahtar kelimeleriyle eşleştirilir.
+      * Litre (L): "LİTRE", "LT", "L" etiketli küsuratlı sayılar çekilir.
+      * İstasyon Markası: Shell, Opet, BP, Petrol Ofisi, TotalEnergies, Aytemiz 
+        gibi markalar metin içerisinden otomatik tanınır.
+    - Hata Toleransı: Birim fiyat gürültüsü ile toplam tutar karıştırılmaz. 
+      Eksik alanlar kullanıcı onayına varsayılan değerlerle sunulur.
+
+--------------------------------------------------------------------------------
+3. DOCUMENT VAULT & EXPIRY PROTECTION ENGINE (EVRAK KASASI VE SÜRE TAKİP MOTORU)
+--------------------------------------------------------------------------------
+3.1 Takip Edilen Resmi Evraklar:
+    - Ruhsat (Motosiklet Tescil Belgesi)
+    - Zorunlu Mali Sorumluluk Trafik Sigortası
+    - KASKO Poliçesi
+    - Periyodik TÜVTÜRK Muayenesi
+    - Sürücü Belgesi (Ehliyet)
+
+3.2 Süre Dolumu ve Erken Uyarı Seviyeleri (Expiry Thresholds):
+    - Kalan gün sayısı ($D = \text{Bitiş Tarihi} - \text{Bugün}$) hesaplanır.
+    - Uyarı Seviyeleri:
+      * $D > 30$ gün: Güvenli (Yeşil).
+      * $15 < D \le 30$ gün: Yaklaşıyor (Sarı / Uyarı).
+      * $0 \le D \le 15$ gün: Kritik (Turuncu / Acil Aksiyon).
+      * $D < 0$ gün: Süresi Doldu (Kırmızı / Gecikmiş).
+    - Bildirim Politikası: Süresi dolmaya 30 gün, 15 gün ve 3 gün kala cihaz içi 
+      yerel bildirim oluşturulur.
+
+--------------------------------------------------------------------------------
+4. SMART PARK & ANONYMOUS PARK WARNING ENGINE (AKILLI PARK UYARISI MOTORU)
+--------------------------------------------------------------------------------
+4.1 Park Konum Konfigürasyonu ve Durum Kilidi:
+    - Sürücü motosikletini park ettiğinde tek dokunuşla "Park Modu" aktif hale gelir.
+    - Park Anı Verileri: O anki GPS koordinatları, park zamanı ve opsiyonel park notu 
+      yerel cihaz hafızasına (`ApexKvStore`) kaydedilir.
+
+4.2 Anonim Acil Park Uyarı Mekanizması (Anonymous Park Alerts):
+    - Motosiklet üzerindeki Smart Park QR kodunu tayan vatandaşlar, sürücünün telefon 
+      numarasını veya ismini görmeksizin hızlı anonim bildirim şablonlarını kullanır:
+      * "Aracınız hatalı park edilmiş / geçişi engelliyor."
+      * "Motosikletinize müdahale ediliyor veya alarmı çalıyor."
+      * "Kaskınız / çantanız aracın üzerinde kalmış."
+      * "Sıvı/yağ sızıntısı gözlemlendi."
+    - Anlık Bildirim İletimi: İletilen bildirim, `GlobalNotificationOverlay` ve 
+      Firebase Cloud Messaging altyapısıyla sürücünün telefonuna push bildirim ve 
+      sesli uyarı olarak anında düşer. Sürücünün gizliliği %100 korunur.
+
+--------------------------------------------------------------------------------
+5. QR FRIENDSHIP & INSTANT CONNECT ENGINE (QR İLE ARKADAŞLIK MOTORU)
+--------------------------------------------------------------------------------
+5.1 Sürücü Kimlik QR Kodu Üretimi:
+    - Profil Hub ve Rider Card üzerinde her kullanıcıya özel benzersiz bir QR kodu 
+      (`QrImageView`) üretilir.
+    - QR İçeriği: `https://apexflow.app/connect?tag=@rider_tag#1234` formatında 
+      kullanıcı etiketini ve bağlantı dizesini içerir.
+
+5.2 Kamera ile QR Arkadaş Ekleme Mekanizması:
+    - Sürücüler yüz yüze buluştuğunda veya etkinliklerde birbirlerinin QR kodunu 
+      `QrScannerScreen` (Google ML Kit Barcode Scanner) ile taratır.
+    - Otomatik Bağlantı Akışı:
+      * Kamera QR kodunu milisaniyeler içinde çözer ve Rider Tag'i çıkarır.
+      * Sistem Firestore üzerinden `getProfileByTag()` sorgusu atar.
+      * Profil kartı popup olarak açılır ve "Arkadaş Ekle / Takip Et" isteği 
+        tek dokunuşla tamamlanır. Manuel etiket yazma zorunluluğu ortadan kalkar.
+
+--------------------------------------------------------------------------------
+6. QR GROUP RIDE LOBBY JOIN ENGINE (QR İLE LOBİYE KATILMA MOTORU)
+--------------------------------------------------------------------------------
+6.1 Lobi Oluşturma ve QR Kod Üretimi:
+    - Sürüş Lideri bir Grup Sürüşü Lobisi başlattığında sistem 6 haneli rastgele bir 
+      bağlantı kodu (ör. `482910`) ve buna bağlı bir Lobi QR Kodu üretir.
+    - QR İçeriği: `https://apexflow.app/lobby?code=482910`.
+
+6.2 QR Kod ile Anında Lobiye Katılma Mekanizması:
+    - Sürüşe katılacak grup üyeleri Lider'in ekranındaki Lobi QR kodunu 
+      `QrScannerScreen` ile taratır.
+    - Otomatik Katılım Akışı:
+      * Kamera QR koddaki lobi kodunu okur.
+      * Sistem üyenin profil bilgileriyle `FirebaseService.instance.joinLobby()` 
+        metodunu tetikler.
+      * Üye 6 haneli kodu elle girmek zorunda kalmadan doğrudan canlı grup sürüşü 
+        lobisine dahil olur ve Realtime Database varlık (presence) düğümüne bağlanır.
+
+--------------------------------------------------------------------------------
+7. CERTIFIED LEDGER QR VERIFICATION ENGINE (ONAYLI SİCİL QR DOĞRULAMA MOTORU)
+--------------------------------------------------------------------------------
+7.1 Kriptografik Sicil QR Kodu (Certified Ledger Stamp):
+    - Garaj Pasaportu (Garage Passport) ve Servis Sicili PDF çıktılarının sağ alt 
+      köşesine doğrudan bir Onaylı Sicil QR Kodu eklenir (`pw.Barcode.qrCode()`).
+    - QR İçeriği: `https://apexflow.app/verify_ledger?vin={vin}&hash={sha256Hash}`.
+
+7.2 Ekspertiz ve İkinci El Doğrulama Mantığı:
+    - İkinci el alıcısı veya yetkili servis, basılı PDF veya dijital belge üzerindeki 
+      QR kodu tarattığında ApexFlow doğrulanmış veri ağacından ilgili şasiye ait 
+      kilometre ve bakım geçmişinin orijinalliğini teyit eder. Sahte servis kaydı 
+      oluşturulması engellenir.
+
+--------------------------------------------------------------------------------
+8. GARAJ PASAPORTU VE ONAYLI SİCİL DIŞA AKTARIM MOTORU (GARAGE PASSPORT)
+--------------------------------------------------------------------------------
+8.1 Pasaport Derleme ve Doğrulama Motoru (Passport Aggregator):
+    - Motosiklet satışı veya ekspertiz durumunda kullanılmak üzere aracın tüm 
+      geçmişini tek bir onaylı dijital pasaportta toplar.
+    - Derlenen Veriler: Araç Kimliği, Servis Sicili, Parça Aşınma Durumu, Yakıt Özeti.
+
+8.2 PDF ve Metin Formatında Dışa Aktarım (GaragePassportPdfService):
+    - `toShareableText`: Tüm geçmişi temiz, okunabilir metin formatında hazırlar.
+    - `generatePdf`: ApexFlow tasarım çizgilerine uygun resmi PDF dokümanı oluşturur.
+
+--------------------------------------------------------------------------------
+9. RIDE VIBE & REFLECTION MEMORY EXPORTER ENGINE (SÜRÜŞ ANISI DİŞA AKTARIM)
+--------------------------------------------------------------------------------
+9.1 Sürüş Yansıması ve Hissi (Ride Mood Reflection):
+    - Sürüş bitiminde sürücünün ruh hali ve mekanik gözlem notları kaydedilir.
+
+9.2 PDF ve Anı Kartı Oluşturucu (RideVibePdfService):
+    - Sürüş mesafesini, süresini, ortalama hızını, ruh halini ve hava durumunu 
+      estetik bir visual anı kartına dönüştürür.
+
+--------------------------------------------------------------------------------
+10. RIDER PERSONALIZATION & STYLES ENGINE (SÜRÜCÜ STİLİ VE ÇERÇEVE MOTORU)
+--------------------------------------------------------------------------------
+10.1 Sürüş Stili Etiketleri:
+    - Cruiser, Track, Touring, Commuter, Enduro, Vintage stilleri.
+
+10.2 Profil Çerçeveleri ve Rozetler:
+    - Kazanılan Rozetler: Zen Master, Iron Butt, Trackday Hero, Garage Mechanic.
+
+================================================================================
+                                END OF DOCUMENT
+================================================================================

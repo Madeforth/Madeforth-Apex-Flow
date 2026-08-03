@@ -1,0 +1,459 @@
+Resolving dependencies...
+Downloading packages...
+  _fe_analyzer_shared 61.0.0 (105.0.0 available)
+  _flutterfire_internals 1.3.59 (1.3.75 available)
+  analyzer 5.13.0 (14.1.0 available)
+  build 2.4.1 (4.0.10 available)
+  build_config 1.1.2 (1.3.2 available)
+  build_daemon 4.1.1 (4.1.3 available)
+  build_resolvers 2.4.2 (3.0.4 available)
+  build_runner 2.4.13 (2.16.0 available)
+  build_runner_core 7.3.2 (9.3.2 available)
+  camera 0.10.6 (0.12.0+2 available)
+  camera_android 0.10.10+17 (0.10.11 available)
+  camera_avfoundation 0.9.23+2 (0.10.2 available)
+  camera_platform_interface 2.13.0 (2.13.1 available)
+  camera_web 0.3.5+3 (0.3.5+4 available)
+  cli_util 0.4.2 (0.5.2 available)
+  cloud_firestore 5.6.12 (6.7.1 available)
+  cloud_firestore_platform_interface 6.6.12 (8.0.5 available)
+  cloud_firestore_web 4.4.12 (5.7.1 available)
+  code_assets 1.2.0 (1.2.1 available)
+  cross_file 0.3.5+2 (0.3.5+4 available)
+  dart_style 2.3.2 (3.1.12 available)
+  equatable 2.0.8 (2.1.0 available)
+  firebase_auth 5.7.0 (6.5.6 available)
+  firebase_auth_platform_interface 7.7.3 (9.0.5 available)
+  firebase_auth_web 5.15.3 (6.2.5 available)
+  firebase_core 3.15.2 (4.12.1 available)
+  firebase_core_platform_interface 6.0.3 (8.0.0 available)
+  firebase_core_web 2.24.1 (3.9.1 available)
+  firebase_messaging 15.2.10 (16.4.3 available)
+  firebase_messaging_platform_interface 4.6.10 (4.9.2 available)
+  firebase_messaging_web 3.10.10 (4.2.3 available)
+  flutter_launcher_icons 0.13.1 (0.14.4 available)
+  flutter_local_notifications 18.0.1 (22.2.0 available)
+  flutter_local_notifications_linux 5.0.0 (8.0.1 available)
+  flutter_local_notifications_platform_interface 8.0.0 (12.1.0 available)
+  flutter_native_splash 2.4.7 (2.4.8 available)
+  flutter_plugin_android_lifecycle 2.0.34 (2.0.35 available)
+  flutter_riverpod 2.6.1 (3.4.2 available)
+  geolocator 13.0.4 (14.0.3 available)
+  geolocator_android 4.6.2 (5.0.3 available)
+  google_fonts 6.3.3 (8.2.1 available)
+  google_maps 8.2.0 (8.3.0 available)
+  google_maps_flutter 2.17.1 (2.18.0 available)
+  google_maps_flutter_android 2.19.10 (2.19.12 available)
+  google_maps_flutter_ios 2.18.3 (2.18.4 available)
+  google_maps_flutter_platform_interface 2.15.0 (2.16.0 available)
+  google_maps_flutter_web 0.6.2+3 (0.6.3 available)
+  google_mlkit_barcode_scanning 0.14.2 (0.15.0 available)
+  google_mlkit_commons 0.11.1 (0.12.0 available)
+  google_mlkit_text_recognition 0.15.1 (0.16.0 available)
+  google_sign_in 6.3.0 (7.2.0 available)
+  google_sign_in_android 6.2.1 (7.2.16 available)
+  google_sign_in_ios 5.9.0 (6.3.0 available)
+  google_sign_in_platform_interface 2.5.0 (3.1.0 available)
+  google_sign_in_web 0.12.4+4 (1.1.3 available)
+  home_widget 0.6.0 (0.9.3 available)
+  hooks 2.0.0 (2.1.0 available)
+  image 4.8.0 (4.9.1 available)
+  image_picker 0.8.9 (1.2.3 available)
+  image_picker_android 0.8.13+17 (0.8.13+19 available)
+  image_picker_for_web 2.1.12 (3.1.1 available)
+  intl 0.20.2 (0.20.3 available)
+  jni 1.0.0 (1.0.3 available)
+  jni_flutter 1.0.1 (1.0.2 available)
+  js 0.6.7 (0.7.2 available)
+  matcher 0.12.19 (0.12.20 available)
+  meta 1.17.0 (1.19.0 available)
+  objective_c 9.4.1 (9.5.0 available)
+  package_config 2.2.0 (3.0.0 available)
+  path_provider 2.1.5 (2.1.6 available)
+  path_provider_linux 2.2.1 (2.2.2 available)
+  path_provider_platform_interface 2.1.2 (2.1.3 available)
+  pdf 3.12.0 (3.13.0 available)
+  permission_handler 12.0.2 (13.0.0 available)
+  permission_handler_android 13.0.1 (14.0.0 available)
+  permission_handler_apple 9.4.8 (9.5.0 available)
+  permission_handler_html 0.1.3+5 (0.1.4+1 available)
+  permission_handler_platform_interface 4.3.0 (4.4.0 available)
+  permission_handler_windows 0.2.1 (0.2.2 available)
+  posix 6.5.0 (6.5.2 available)
+  printing 5.14.3 (5.15.0 available)
+  purchases_flutter 10.4.0 (10.7.0 available)
+  qr 3.0.2 (4.0.0 available)
+  record_use 0.6.0 (1.0.0 available)
+  riverpod 2.6.1 (3.4.2 available)
+  sanitize_html 2.1.0 (2.2.0 available)
+  share_plus 12.0.2 (13.3.0 available)
+  share_plus_platform_interface 6.1.0 (7.2.0 available)
+  shared_preferences_android 2.4.23 (2.4.27 available)
+  shelf_web_socket 2.0.1 (3.0.0 available)
+  signature 6.3.0 (6.4.0 available)
+  source_gen 1.5.0 (4.2.4 available)
+  source_helper 1.3.5 (1.3.13 available)
+  test_api 0.7.10 (0.7.13 available)
+  timezone 0.10.1 (0.11.1 available)
+  url_launcher_android 6.3.30 (6.3.32 available)
+  uuid 4.5.3 (4.6.0 available)
+  vector_graphics 1.2.2 (1.2.3 available)
+  vector_graphics_compiler 1.2.6 (1.3.0 available)
+  vector_math 2.2.0 (2.4.2 available)
+  win32 5.15.0 (6.3.0 available)
+  xml 6.6.1 (7.0.1 available)
+Got dependencies!
+102 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+Analyzing Madeforth-Apex-Flow-main 2...                         
+
+   info • Don't invoke 'print' in production code • fix_strings.dart:30:7 • avoid_print
+warning • Unused import: 'package:apexflow/core/design/theme_extensions.dart' • lib/core/design/apex_theme.dart:2:8 • unused_import
+   info • Statements in an if should be enclosed in a block • lib/core/services/firebase_service.dart:32:7 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/core/services/firebase_service.dart:52:7 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/core/services/firebase_service.dart:176:7 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/core/services/firebase_service.dart:213:9 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/core/services/firebase_service.dart:216:9 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/core/services/firebase_service.dart:221:11 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/core/services/firebase_service.dart:223:11 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/core/services/firebase_service.dart:260:9 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/core/services/firebase_service.dart:262:9 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/core/services/firebase_service.dart:264:9 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/core/services/firebase_service.dart:266:9 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/core/services/firebase_service.dart:268:9 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/core/services/firebase_service.dart:270:9 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/core/services/firebase_service.dart:272:9 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/core/services/firebase_service.dart:274:9 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/core/services/firebase_service.dart:276:9 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/core/services/firebase_service.dart:278:9 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/core/services/firebase_service.dart:284:9 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/core/services/firebase_service.dart:291:9 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/core/services/firebase_service.dart:293:9 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/core/services/firebase_service.dart:295:9 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/core/services/firebase_service.dart:298:9 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/core/services/firebase_service.dart:300:9 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/core/services/firebase_service.dart:304:9 • curly_braces_in_flow_control_structures
+warning • 'getByIndex' is experimental and could be removed or changed at any time • lib/core/storage/entities/daily_check_entity.g.dart:193:12 • experimental_member_use
+warning • 'getByIndexSync' is experimental and could be removed or changed at any time • lib/core/storage/entities/daily_check_entity.g.dart:197:12 • experimental_member_use
+warning • 'deleteByIndex' is experimental and could be removed or changed at any time • lib/core/storage/entities/daily_check_entity.g.dart:201:12 • experimental_member_use
+warning • 'deleteByIndexSync' is experimental and could be removed or changed at any time • lib/core/storage/entities/daily_check_entity.g.dart:205:12 • experimental_member_use
+warning • 'getAllByIndex' is experimental and could be removed or changed at any time • lib/core/storage/entities/daily_check_entity.g.dart:210:12 • experimental_member_use
+warning • 'getAllByIndexSync' is experimental and could be removed or changed at any time • lib/core/storage/entities/daily_check_entity.g.dart:215:12 • experimental_member_use
+warning • 'deleteAllByIndex' is experimental and could be removed or changed at any time • lib/core/storage/entities/daily_check_entity.g.dart:220:12 • experimental_member_use
+warning • 'deleteAllByIndexSync' is experimental and could be removed or changed at any time • lib/core/storage/entities/daily_check_entity.g.dart:225:12 • experimental_member_use
+warning • 'putByIndex' is experimental and could be removed or changed at any time • lib/core/storage/entities/daily_check_entity.g.dart:229:12 • experimental_member_use
+warning • 'putByIndexSync' is experimental and could be removed or changed at any time • lib/core/storage/entities/daily_check_entity.g.dart:233:12 • experimental_member_use
+warning • 'putAllByIndex' is experimental and could be removed or changed at any time • lib/core/storage/entities/daily_check_entity.g.dart:237:12 • experimental_member_use
+warning • 'putAllByIndexSync' is experimental and could be removed or changed at any time • lib/core/storage/entities/daily_check_entity.g.dart:242:12 • experimental_member_use
+warning • 'getByIndex' is experimental and could be removed or changed at any time • lib/core/storage/entities/document_entity.g.dart:174:12 • experimental_member_use
+warning • 'getByIndexSync' is experimental and could be removed or changed at any time • lib/core/storage/entities/document_entity.g.dart:178:12 • experimental_member_use
+warning • 'deleteByIndex' is experimental and could be removed or changed at any time • lib/core/storage/entities/document_entity.g.dart:182:12 • experimental_member_use
+warning • 'deleteByIndexSync' is experimental and could be removed or changed at any time • lib/core/storage/entities/document_entity.g.dart:186:12 • experimental_member_use
+warning • 'getAllByIndex' is experimental and could be removed or changed at any time • lib/core/storage/entities/document_entity.g.dart:191:12 • experimental_member_use
+warning • 'getAllByIndexSync' is experimental and could be removed or changed at any time • lib/core/storage/entities/document_entity.g.dart:196:12 • experimental_member_use
+warning • 'deleteAllByIndex' is experimental and could be removed or changed at any time • lib/core/storage/entities/document_entity.g.dart:201:12 • experimental_member_use
+warning • 'deleteAllByIndexSync' is experimental and could be removed or changed at any time • lib/core/storage/entities/document_entity.g.dart:206:12 • experimental_member_use
+warning • 'putByIndex' is experimental and could be removed or changed at any time • lib/core/storage/entities/document_entity.g.dart:210:12 • experimental_member_use
+warning • 'putByIndexSync' is experimental and could be removed or changed at any time • lib/core/storage/entities/document_entity.g.dart:214:12 • experimental_member_use
+warning • 'putAllByIndex' is experimental and could be removed or changed at any time • lib/core/storage/entities/document_entity.g.dart:218:12 • experimental_member_use
+warning • 'putAllByIndexSync' is experimental and could be removed or changed at any time • lib/core/storage/entities/document_entity.g.dart:223:12 • experimental_member_use
+warning • 'getByIndex' is experimental and could be removed or changed at any time • lib/core/storage/entities/friend_entity.g.dart:270:12 • experimental_member_use
+warning • 'getByIndexSync' is experimental and could be removed or changed at any time • lib/core/storage/entities/friend_entity.g.dart:274:12 • experimental_member_use
+warning • 'deleteByIndex' is experimental and could be removed or changed at any time • lib/core/storage/entities/friend_entity.g.dart:278:12 • experimental_member_use
+warning • 'deleteByIndexSync' is experimental and could be removed or changed at any time • lib/core/storage/entities/friend_entity.g.dart:282:12 • experimental_member_use
+warning • 'getAllByIndex' is experimental and could be removed or changed at any time • lib/core/storage/entities/friend_entity.g.dart:287:12 • experimental_member_use
+warning • 'getAllByIndexSync' is experimental and could be removed or changed at any time • lib/core/storage/entities/friend_entity.g.dart:292:12 • experimental_member_use
+warning • 'deleteAllByIndex' is experimental and could be removed or changed at any time • lib/core/storage/entities/friend_entity.g.dart:297:12 • experimental_member_use
+warning • 'deleteAllByIndexSync' is experimental and could be removed or changed at any time • lib/core/storage/entities/friend_entity.g.dart:302:12 • experimental_member_use
+warning • 'putByIndex' is experimental and could be removed or changed at any time • lib/core/storage/entities/friend_entity.g.dart:306:12 • experimental_member_use
+warning • 'putByIndexSync' is experimental and could be removed or changed at any time • lib/core/storage/entities/friend_entity.g.dart:310:12 • experimental_member_use
+warning • 'putAllByIndex' is experimental and could be removed or changed at any time • lib/core/storage/entities/friend_entity.g.dart:314:12 • experimental_member_use
+warning • 'putAllByIndexSync' is experimental and could be removed or changed at any time • lib/core/storage/entities/friend_entity.g.dart:319:12 • experimental_member_use
+warning • 'getByIndex' is experimental and could be removed or changed at any time • lib/core/storage/entities/motorcycle_entity.g.dart:215:12 • experimental_member_use
+warning • 'getByIndexSync' is experimental and could be removed or changed at any time • lib/core/storage/entities/motorcycle_entity.g.dart:219:12 • experimental_member_use
+warning • 'deleteByIndex' is experimental and could be removed or changed at any time • lib/core/storage/entities/motorcycle_entity.g.dart:223:12 • experimental_member_use
+warning • 'deleteByIndexSync' is experimental and could be removed or changed at any time • lib/core/storage/entities/motorcycle_entity.g.dart:227:12 • experimental_member_use
+warning • 'getAllByIndex' is experimental and could be removed or changed at any time • lib/core/storage/entities/motorcycle_entity.g.dart:233:12 • experimental_member_use
+warning • 'getAllByIndexSync' is experimental and could be removed or changed at any time • lib/core/storage/entities/motorcycle_entity.g.dart:238:12 • experimental_member_use
+warning • 'deleteAllByIndex' is experimental and could be removed or changed at any time • lib/core/storage/entities/motorcycle_entity.g.dart:243:12 • experimental_member_use
+warning • 'deleteAllByIndexSync' is experimental and could be removed or changed at any time • lib/core/storage/entities/motorcycle_entity.g.dart:248:12 • experimental_member_use
+warning • 'putByIndex' is experimental and could be removed or changed at any time • lib/core/storage/entities/motorcycle_entity.g.dart:252:12 • experimental_member_use
+warning • 'putByIndexSync' is experimental and could be removed or changed at any time • lib/core/storage/entities/motorcycle_entity.g.dart:256:12 • experimental_member_use
+warning • 'putAllByIndex' is experimental and could be removed or changed at any time • lib/core/storage/entities/motorcycle_entity.g.dart:260:12 • experimental_member_use
+warning • 'putAllByIndexSync' is experimental and could be removed or changed at any time • lib/core/storage/entities/motorcycle_entity.g.dart:265:12 • experimental_member_use
+warning • 'getByIndex' is experimental and could be removed or changed at any time • lib/core/storage/entities/service_record_entity.g.dart:198:12 • experimental_member_use
+warning • 'getByIndexSync' is experimental and could be removed or changed at any time • lib/core/storage/entities/service_record_entity.g.dart:202:12 • experimental_member_use
+warning • 'deleteByIndex' is experimental and could be removed or changed at any time • lib/core/storage/entities/service_record_entity.g.dart:206:12 • experimental_member_use
+warning • 'deleteByIndexSync' is experimental and could be removed or changed at any time • lib/core/storage/entities/service_record_entity.g.dart:210:12 • experimental_member_use
+warning • 'getAllByIndex' is experimental and could be removed or changed at any time • lib/core/storage/entities/service_record_entity.g.dart:216:12 • experimental_member_use
+warning • 'getAllByIndexSync' is experimental and could be removed or changed at any time • lib/core/storage/entities/service_record_entity.g.dart:221:12 • experimental_member_use
+warning • 'deleteAllByIndex' is experimental and could be removed or changed at any time • lib/core/storage/entities/service_record_entity.g.dart:226:12 • experimental_member_use
+warning • 'deleteAllByIndexSync' is experimental and could be removed or changed at any time • lib/core/storage/entities/service_record_entity.g.dart:231:12 • experimental_member_use
+warning • 'putByIndex' is experimental and could be removed or changed at any time • lib/core/storage/entities/service_record_entity.g.dart:235:12 • experimental_member_use
+warning • 'putByIndexSync' is experimental and could be removed or changed at any time • lib/core/storage/entities/service_record_entity.g.dart:239:12 • experimental_member_use
+warning • 'putAllByIndex' is experimental and could be removed or changed at any time • lib/core/storage/entities/service_record_entity.g.dart:243:12 • experimental_member_use
+warning • 'putAllByIndexSync' is experimental and could be removed or changed at any time • lib/core/storage/entities/service_record_entity.g.dart:248:12 • experimental_member_use
+warning • 'getByIndex' is experimental and could be removed or changed at any time • lib/core/storage/entities/tax_record_entity.g.dart:172:12 • experimental_member_use
+warning • 'getByIndexSync' is experimental and could be removed or changed at any time • lib/core/storage/entities/tax_record_entity.g.dart:176:12 • experimental_member_use
+warning • 'deleteByIndex' is experimental and could be removed or changed at any time • lib/core/storage/entities/tax_record_entity.g.dart:180:12 • experimental_member_use
+warning • 'deleteByIndexSync' is experimental and could be removed or changed at any time • lib/core/storage/entities/tax_record_entity.g.dart:184:12 • experimental_member_use
+warning • 'getAllByIndex' is experimental and could be removed or changed at any time • lib/core/storage/entities/tax_record_entity.g.dart:189:12 • experimental_member_use
+warning • 'getAllByIndexSync' is experimental and could be removed or changed at any time • lib/core/storage/entities/tax_record_entity.g.dart:194:12 • experimental_member_use
+warning • 'deleteAllByIndex' is experimental and could be removed or changed at any time • lib/core/storage/entities/tax_record_entity.g.dart:199:12 • experimental_member_use
+warning • 'deleteAllByIndexSync' is experimental and could be removed or changed at any time • lib/core/storage/entities/tax_record_entity.g.dart:204:12 • experimental_member_use
+warning • 'putByIndex' is experimental and could be removed or changed at any time • lib/core/storage/entities/tax_record_entity.g.dart:208:12 • experimental_member_use
+warning • 'putByIndexSync' is experimental and could be removed or changed at any time • lib/core/storage/entities/tax_record_entity.g.dart:212:12 • experimental_member_use
+warning • 'putAllByIndex' is experimental and could be removed or changed at any time • lib/core/storage/entities/tax_record_entity.g.dart:216:12 • experimental_member_use
+warning • 'putAllByIndexSync' is experimental and could be removed or changed at any time • lib/core/storage/entities/tax_record_entity.g.dart:221:12 • experimental_member_use
+warning • The value of the field '_isFallback' isn't used • lib/core/storage/isar_db_service.dart:25:8 • unused_field
+warning • The value of the field '_conflictResolver' isn't used • lib/core/sync/sync_coordinator.dart:33:9 • unused_field
+  error • The method 'getStringList' isn't defined for the type 'ApexKvStore' • lib/core/sync/sync_coordinator.dart:48:35 • undefined_method
+  error • The method 'setStringList' isn't defined for the type 'ApexKvStore' • lib/core/sync/sync_coordinator.dart:63:23 • undefined_method
+  error • The class 'FirebaseService' doesn't have an unnamed constructor • lib/core/sync/sync_coordinator.dart:228:20 • new_with_undefined_constructor_default
+  error • The getter 'currentUser' isn't defined for the type 'FirebaseService' • lib/core/sync/sync_coordinator.dart:228:38 • undefined_getter
+   info • The imported package 'crypto' isn't a dependency of the importing package • lib/core/sync/sync_models.dart:2:8 • depend_on_referenced_packages
+warning • Unused import: 'package:apexflow/core/design/apex_colors.dart' • lib/features/dashboard/apex_dashboard_screen.dart:3:8 • unused_import
+warning • Unused import: 'package:apexflow/core/design/apex_breakpoints.dart' • lib/features/dashboard/apex_dashboard_screen.dart:4:8 • unused_import
+warning • Unused import: 'package:apexflow/core/i18n/app_settings_state.dart' • lib/features/dashboard/apex_dashboard_screen.dart:7:8 • unused_import
+warning • Unused import: 'package:apexflow/rides/application/ride_detection_state.dart' • lib/features/dashboard/apex_dashboard_screen.dart:12:8 • unused_import
+warning • Unused import: 'package:apexflow/rituals/application/rituals_state.dart' • lib/features/dashboard/apex_dashboard_screen.dart:13:8 • unused_import
+warning • Unused import: 'package:apexflow/shared/widgets/apex_panel.dart' • lib/features/dashboard/apex_dashboard_screen.dart:16:8 • unused_import
+   info • The import of 'package:flutter/services.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' • lib/features/dashboard/apex_dashboard_screen.dart:19:8 • unnecessary_import
+warning • Unused import: 'package:intl/intl.dart' • lib/features/dashboard/apex_dashboard_screen.dart:21:8 • unused_import
+   info • Statements in an if should be enclosed in a block • lib/features/dashboard/apex_dashboard_screen.dart:578:7 • curly_braces_in_flow_control_structures
+warning • Unused import: 'package:apexflow/core/design/apex_colors.dart' • lib/features/documents/presentation/document_vault_screen.dart:3:8 • unused_import
+warning • The value of the local variable 'tr' isn't used • lib/features/documents/presentation/document_vault_screen.dart:46:11 • unused_local_variable
+warning • The value of the local variable 'tr' isn't used • lib/features/documents/presentation/document_vault_screen.dart:183:11 • unused_local_variable
+warning • The value of the local variable 'tr' isn't used • lib/features/documents/presentation/document_vault_screen.dart:446:11 • unused_local_variable
+warning • The value of the local variable 'tr' isn't used • lib/features/documents/presentation/document_vault_screen.dart:628:11 • unused_local_variable
+warning • The value of the local variable 'tr' isn't used • lib/features/documents/presentation/document_vault_screen.dart:1059:11 • unused_local_variable
+warning • The value of the local variable 'tr' isn't used • lib/features/documents/presentation/document_vault_screen.dart:1215:11 • unused_local_variable
+   info • Statements in an if should be enclosed in a block • lib/features/harmony/domain/harmony_engine_v2.dart:228:9 • curly_braces_in_flow_control_structures
+   info • The import of 'dart:ui' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' • lib/features/splash/presentation/apex_splash_screen.dart:3:8 • unnecessary_import
+warning • Unused import: 'package:apexflow/core/design/apex_colors.dart' • lib/features/splash/presentation/apex_splash_screen.dart:4:8 • unused_import
+warning • Unused import: 'package:flutter_native_splash/flutter_native_splash.dart' • lib/features/splash/presentation/apex_splash_screen.dart:15:8 • unused_import
+warning • Unused import: 'package:apexflow/core/design/apex_colors.dart' • lib/features/support/bug_report/presentation/bug_report_screen.dart:1:8 • unused_import
+   info • 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre • lib/features/support/bug_report/presentation/bug_report_screen.dart:148:23 • deprecated_member_use
+   info • Statements in an if should be enclosed in a block • lib/features/support/bug_report/presentation/bug_report_screen.dart:173:27 • curly_braces_in_flow_control_structures
+   info • 'activeColor' is deprecated and shouldn't be used. Use activeThumbColor instead. This feature was deprecated after v3.31.0-2.0.pre • lib/features/support/bug_report/presentation/bug_report_screen.dart:321:23 • deprecated_member_use
+warning • Unused import: 'package:apexflow/core/design/apex_breakpoints.dart' • lib/fuel/presentation/fuel_screen.dart:1:8 • unused_import
+warning • Unused import: 'package:apexflow/core/design/apex_colors.dart' • lib/fuel/presentation/fuel_screen.dart:2:8 • unused_import
+warning • Unused import: 'package:apexflow/core/design/apex_spacing.dart' • lib/fuel/presentation/fuel_screen.dart:3:8 • unused_import
+warning • Unused import: 'package:apexflow/shared/widgets/apex_panel.dart' • lib/fuel/presentation/fuel_screen.dart:10:8 • unused_import
+warning • Unused import: 'package:apexflow/shared/widgets/apex_state_panel.dart' • lib/fuel/presentation/fuel_screen.dart:11:8 • unused_import
+warning • Unused import: 'package:image_picker/image_picker.dart' • lib/fuel/presentation/fuel_screen.dart:15:8 • unused_import
+warning • The value of the field '_formKey' isn't used • lib/fuel/presentation/fuel_screen.dart:30:9 • unused_field
+warning • The value of the field '_error' isn't used • lib/fuel/presentation/fuel_screen.dart:38:11 • unused_field
+warning • The value of the field '_scanNotice' isn't used • lib/fuel/presentation/fuel_screen.dart:39:11 • unused_field
+warning • The value of the field '_scanNoticeIsWarning' isn't used • lib/fuel/presentation/fuel_screen.dart:40:8 • unused_field
+warning • The value of the local variable 'tr' isn't used • lib/fuel/presentation/fuel_screen.dart:74:11 • unused_local_variable
+   info • Statements in an if should be enclosed in a block • lib/fuel/presentation/fuel_screen.dart:103:13 • curly_braces_in_flow_control_structures
+warning • The value of the local variable 'tr' isn't used • lib/fuel/presentation/fuel_screen.dart:644:11 • unused_local_variable
+warning • The declaration '_smartDefaultsLine' isn't referenced • lib/fuel/presentation/fuel_screen.dart:851:11 • unused_element
+warning • Unused import: 'package:apexflow/core/design/apex_colors.dart' • lib/fuel/presentation/receipt_scan_screen.dart:4:8 • unused_import
+warning • Unused import: 'package:apexflow/core/design/apex_theme.dart' • lib/fuel/presentation/widgets/fuel_history_list.dart:5:8 • unused_import
+warning • Unused import: 'package:apexflow/core/design/apex_spacing.dart' • lib/fuel/presentation/widgets/fuel_history_list.dart:6:8 • unused_import
+warning • The value of the local variable 'tr' isn't used • lib/fuel/presentation/widgets/fuel_history_list.dart:19:11 • unused_local_variable
+warning • The declaration '_buildImpactRow' isn't referenced • lib/garage/application/accident_pdf_generator.dart:1417:20 • unused_element
+   info • The imported package 'uuid' isn't a dependency of the importing package • lib/garage/application/garage_state.dart:15:8 • depend_on_referenced_packages
+warning • The value of the local variable 'textDark' isn't used • lib/garage/application/park_sticker_pdf.dart:29:11 • unused_local_variable
+   info • The imported package 'uuid' isn't a dependency of the importing package • lib/garage/domain/service_record.dart:1:8 • depend_on_referenced_packages
+warning • Unused import: 'package:apexflow/core/design/apex_colors.dart' • lib/garage/presentation/accident_region_selector.dart:5:8 • unused_import
+   info • The private field _euChecksA could be 'final' • lib/garage/presentation/eu_accident_wizard_screen.dart:50:13 • prefer_final_fields
+   info • The private field _euChecksB could be 'final' • lib/garage/presentation/eu_accident_wizard_screen.dart:89:13 • prefer_final_fields
+   info • Statements in an if should be enclosed in a block • lib/garage/presentation/eu_accident_wizard_screen.dart:314:13 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/garage/presentation/eu_accident_wizard_screen.dart:316:13 • curly_braces_in_flow_control_structures
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/garage/presentation/eu_accident_wizard_screen.dart:883:38 • deprecated_member_use
+warning • Unused import: 'package:apexflow/core/design/apex_colors.dart' • lib/garage/presentation/garage_passport_screen.dart:1:8 • unused_import
+warning • The value of the local variable 'tr' isn't used • lib/garage/presentation/garage_passport_screen.dart:226:11 • unused_local_variable
+warning • The value of the local variable 'tr' isn't used • lib/garage/presentation/garage_passport_screen.dart:381:11 • unused_local_variable
+warning • The value of the local variable 'tr' isn't used • lib/garage/presentation/garage_passport_screen.dart:525:11 • unused_local_variable
+warning • Unused import: 'package:apexflow/core/design/apex_colors.dart' • lib/garage/presentation/garage_screen.dart:1:8 • unused_import
+   info • Use 'isNotEmpty' instead of 'length' to test whether the collection is empty • lib/garage/presentation/garage_screen.dart:180:35 • prefer_is_empty
+   info • Use 'isNotEmpty' instead of 'length' to test whether the collection is empty • lib/garage/presentation/garage_screen.dart:291:9 • prefer_is_empty
+warning • The value of the local variable 'tr' isn't used • lib/garage/presentation/garage_screen.dart:299:11 • unused_local_variable
+   info • Unnecessary use of string interpolation • lib/garage/presentation/garage_screen.dart:900:23 • unnecessary_string_interpolations
+   info • Unnecessary use of string interpolation • lib/garage/presentation/garage_screen.dart:923:23 • unnecessary_string_interpolations
+warning • The declaration '_MachineMetric' isn't referenced • lib/garage/presentation/garage_screen.dart:1126:7 • unused_element
+warning • The declaration '_GarageActionStrip' isn't referenced • lib/garage/presentation/garage_screen.dart:1643:7 • unused_element
+warning • The field doesn't override an inherited getter or setter • lib/garage/presentation/garage_screen.dart:1917:15 • override_on_non_overriding_member
+warning • The value of the local variable 'tr' isn't used • lib/garage/presentation/garage_screen.dart:1942:11 • unused_local_variable
+warning • The value of the local variable 'tr' isn't used • lib/garage/presentation/garage_screen.dart:2180:11 • unused_local_variable
+warning • The declaration '_PartStatusEntry' isn't referenced • lib/garage/presentation/garage_screen.dart:2206:7 • unused_element
+warning • The declaration '_StatusSlider' isn't referenced • lib/garage/presentation/garage_screen.dart:2287:7 • unused_element
+warning • The declaration '_ComponentRail' isn't referenced • lib/garage/presentation/garage_screen.dart:3163:7 • unused_element
+warning • The declaration '_StatusTag' isn't referenced • lib/garage/presentation/garage_screen.dart:3481:7 • unused_element
+warning • The declaration '_StatMiniPanel' isn't referenced • lib/garage/presentation/garage_screen.dart:3910:7 • unused_element
+warning • The value of the local variable 'tr' isn't used • lib/garage/presentation/garage_screen.dart:4024:11 • unused_local_variable
+warning • The declaration '_buildSimulatorButton' isn't referenced • lib/garage/presentation/garage_screen.dart:4516:10 • unused_element
+warning • The declaration '_triggerMockAlert' isn't referenced • lib/garage/presentation/garage_screen.dart:4570:8 • unused_element
+warning • Unused import: 'package:apexflow/core/design/apex_colors.dart' • lib/garage/presentation/machine_memory_screen.dart:1:8 • unused_import
+warning • Unused import: 'package:apexflow/core/design/apex_theme.dart' • lib/garage/presentation/part_status_screen.dart:5:8 • unused_import
+warning • The value of the local variable 'bike' isn't used • lib/garage/presentation/part_status_screen.dart:164:11 • unused_local_variable
+   info • Statements in an if should be enclosed in a block • lib/garage/presentation/part_status_screen.dart:199:11 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/garage/presentation/part_status_screen.dart:206:11 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/garage/presentation/part_status_screen.dart:220:11 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/garage/presentation/part_status_screen.dart:227:11 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/garage/presentation/part_status_screen.dart:241:11 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/garage/presentation/part_status_screen.dart:248:11 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/garage/presentation/part_status_screen.dart:262:11 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/garage/presentation/part_status_screen.dart:269:11 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/garage/presentation/part_status_screen.dart:283:11 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/garage/presentation/part_status_screen.dart:290:11 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/garage/presentation/part_status_screen.dart:316:9 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/garage/presentation/part_status_screen.dart:318:9 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/garage/presentation/part_status_screen.dart:320:9 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/garage/presentation/part_status_screen.dart:323:9 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/garage/presentation/part_status_screen.dart:325:9 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/garage/presentation/part_status_screen.dart:327:9 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/garage/presentation/part_status_screen.dart:431:7 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/garage/presentation/part_status_screen.dart:433:7 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/garage/presentation/part_status_screen.dart:435:7 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/garage/presentation/part_status_screen.dart:442:13 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/garage/presentation/part_status_screen.dart:444:13 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/garage/presentation/part_status_screen.dart:446:13 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/garage/presentation/part_status_screen.dart:449:13 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/garage/presentation/part_status_screen.dart:451:13 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/garage/presentation/part_status_screen.dart:453:13 • curly_braces_in_flow_control_structures
+warning • Unused import: 'package:apexflow/core/design/apex_colors.dart' • lib/garage/presentation/smart_park_alert_handler_screen.dart:3:8 • unused_import
+warning • The value of the local variable 'tr' isn't used • lib/garage/presentation/smart_park_alert_handler_screen.dart:86:11 • unused_local_variable
+   info • The private field _trChecksA could be 'final' • lib/garage/presentation/tr_accident_wizard_screen.dart:49:13 • prefer_final_fields
+   info • The private field _trChecksB could be 'final' • lib/garage/presentation/tr_accident_wizard_screen.dart:87:13 • prefer_final_fields
+   info • Statements in an if should be enclosed in a block • lib/garage/presentation/tr_accident_wizard_screen.dart:284:13 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/garage/presentation/tr_accident_wizard_screen.dart:286:13 • curly_braces_in_flow_control_structures
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/garage/presentation/tr_accident_wizard_screen.dart:785:38 • deprecated_member_use
+warning • Unused import: 'package:apexflow/core/design/apex_colors.dart' • lib/insights/presentation/insights_screen.dart:1:8 • unused_import
+warning • Unused import: 'package:apexflow/core/design/apex_breakpoints.dart' • lib/insights/presentation/insights_screen.dart:2:8 • unused_import
+warning • Unused import: 'package:apexflow/core/design/apex_spacing.dart' • lib/insights/presentation/insights_screen.dart:3:8 • unused_import
+warning • Unused import: 'package:apexflow/shared/widgets/apex_panel.dart' • lib/insights/presentation/insights_screen.dart:10:8 • unused_import
+warning • Unused import: 'package:apexflow/shared/widgets/apex_state_panel.dart' • lib/insights/presentation/insights_screen.dart:11:8 • unused_import
+warning • Unused import: 'package:url_launcher/url_launcher.dart' • lib/insights/presentation/insights_screen.dart:16:8 • unused_import
+warning • Unused import: 'package:apexflow/garage/presentation/part_status_screen.dart' • lib/insights/presentation/insights_screen.dart:19:8 • unused_import
+warning • The receiver can't be null, so the null-aware operator '?.' is unnecessary • lib/insights/presentation/insights_screen.dart:96:53 • invalid_null_aware_operator
+warning • The receiver can't be null, so the null-aware operator '?.' is unnecessary • lib/insights/presentation/insights_screen.dart:252:51 • invalid_null_aware_operator
+warning • The receiver can't be null, so the null-aware operator '?.' is unnecessary • lib/insights/presentation/insights_screen.dart:252:98 • invalid_null_aware_operator
+warning • The value of the local variable 'strings' isn't used • lib/insights/presentation/insights_screen.dart:442:11 • unused_local_variable
+warning • A value for optional parameter 'onTap' isn't ever given • lib/insights/presentation/insights_screen.dart:1047:10 • unused_element_parameter
+   info • Statements in an if should be enclosed in a block • lib/insights/presentation/insights_screen.dart:1235:19 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/insights/presentation/insights_screen.dart:1237:19 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/insights/presentation/insights_screen.dart:1239:19 • curly_braces_in_flow_control_structures
+   info • Unnecessary use of multiple underscores • lib/insights/presentation/insights_screen.dart:1773:49 • unnecessary_underscores
+   info • Unnecessary use of multiple underscores • lib/insights/presentation/insights_screen.dart:1895:45 • unnecessary_underscores
+   info • Statements in an if should be enclosed in a block • lib/insights/presentation/insights_screen.dart:2068:5 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/insights/presentation/insights_screen.dart:2075:5 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/insights/presentation/insights_screen.dart:2082:5 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/insights/presentation/insights_screen.dart:2089:5 • curly_braces_in_flow_control_structures
+   info • The import of 'package:flutter/foundation.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/foundation.dart' • lib/main.dart:2:8 • unnecessary_import
+warning • Unused import: 'package:flutter_native_splash/flutter_native_splash.dart' • lib/main.dart:19:8 • unused_import
+   info • Statements in an if should be enclosed in a block • lib/main.dart:32:7 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/main.dart:34:7 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/main.dart:36:7 • curly_braces_in_flow_control_structures
+   info • Use the null-aware marker '?' rather than a null check via an 'if' • lib/main.dart:151:22 • use_null_aware_elements
+   info • Statements in an if should be enclosed in a block • lib/notifications/notification_scheduler.dart:46:7 • curly_braces_in_flow_control_structures
+warning • Unused import: 'package:apexflow/core/design/apex_colors.dart' • lib/notifications/presentation/global_notification_overlay.dart:3:8 • unused_import
+   info • Statements in an if should be enclosed in a block • lib/notifications/presentation/global_notification_overlay.dart:22:11 • curly_braces_in_flow_control_structures
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/notifications/presentation/global_notification_overlay.dart:31:35 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/notifications/presentation/global_notification_overlay.dart:171:34 • deprecated_member_use
+warning • Unused import: 'package:apexflow/core/design/apex_colors.dart' • lib/notifications/presentation/notifications_screen.dart:3:8 • unused_import
+   info • Unnecessary use of multiple underscores • lib/notifications/presentation/notifications_screen.dart:157:45 • unnecessary_underscores
+   info • Statements in an if should be enclosed in a block • lib/notifications/presentation/notifications_screen.dart:371:7 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/notifications/presentation/notifications_screen.dart:373:7 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/notifications/presentation/notifications_screen.dart:375:7 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/notifications/presentation/notifications_screen.dart:377:7 • curly_braces_in_flow_control_structures
+   info • The private field _sharePhone could be 'final' • lib/onboarding/presentation/profile_setup_wizard_screen.dart:36:8 • prefer_final_fields
+   info • The private field _shareEmergency could be 'final' • lib/onboarding/presentation/profile_setup_wizard_screen.dart:37:8 • prefer_final_fields
+warning • The value of the local variable 'textDark' isn't used • lib/profile/application/circular_sticker_pdf.dart:28:11 • unused_local_variable
+warning • The value of the local variable 'isTurkish' isn't used • lib/profile/application/friends_state.dart:209:11 • unused_local_variable
+warning • The declaration '_mockFriends' isn't referenced • lib/profile/application/friends_state.dart:297:23 • unused_element
+warning • Unused import: 'package:flutter/material.dart' • lib/profile/domain/apex_achievement.dart:1:8 • unused_import
+   info • Statements in an if should be enclosed in a block • lib/profile/domain/apex_achievement.dart:133:25 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/profile/domain/apex_achievement.dart:134:29 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/profile/domain/apex_achievement.dart:135:28 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/profile/domain/apex_achievement.dart:203:26 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/profile/domain/apex_achievement.dart:204:30 • curly_braces_in_flow_control_structures
+warning • Unused import: 'package:flutter/material.dart' • lib/profile/domain/rider_xp_system.dart:1:8 • unused_import
+warning • Unused import: 'package:apexflow/core/design/apex_colors.dart' • lib/profile/presentation/premium_paywall_screen.dart:1:8 • unused_import
+warning • The value of the local variable 'tr' isn't used • lib/profile/presentation/premium_paywall_screen.dart:24:11 • unused_local_variable
+warning • Unused import: 'package:geolocator/geolocator.dart' • lib/profile/presentation/profile_hub_screen.dart:2:8 • unused_import
+warning • Unused import: 'package:apexflow/core/design/apex_colors.dart' • lib/profile/presentation/profile_hub_screen.dart:10:8 • unused_import
+warning • Unused import: 'package:cloud_firestore/cloud_firestore.dart' • lib/profile/presentation/profile_hub_screen.dart:33:8 • unused_import
+warning • Unused import: 'package:apexflow/core/services/firebase_service.dart' • lib/profile/presentation/profile_hub_screen.dart:34:8 • unused_import
+warning • Unused import: 'package:apexflow/features/dashboard/dashboard_state.dart' • lib/profile/presentation/profile_hub_screen.dart:35:8 • unused_import
+   info • The local variable '_t' starts with an underscore • lib/profile/presentation/profile_hub_screen.dart:76:12 • no_leading_underscores_for_local_identifiers
+   info • The parameter name 'sum' matches a visible type name • lib/profile/presentation/profile_hub_screen.dart:86:8 • avoid_types_as_parameter_names
+warning • The declaration '_parsePhoneNumber' isn't referenced • lib/profile/presentation/profile_hub_screen.dart:1030:23 • unused_element
+warning • The declaration '_CardThemeSelectorPanel' isn't referenced • lib/profile/presentation/profile_hub_screen.dart:1360:7 • unused_element
+   info • The local variable '_t' starts with an underscore • lib/profile/presentation/profile_hub_screen.dart:1729:12 • no_leading_underscores_for_local_identifiers
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/profile/presentation/profile_hub_screen.dart:1968:52 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/profile/presentation/profile_hub_screen.dart:1969:46 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/profile/presentation/profile_hub_screen.dart:1972:57 • deprecated_member_use
+warning • The declaration '_ProfileStatsRow' isn't referenced • lib/profile/presentation/profile_hub_screen.dart:2383:7 • unused_element
+warning • A value for optional parameter 'de' isn't ever given • lib/profile/presentation/profile_hub_screen.dart:2389:10 • unused_element_parameter
+   info • The local variable '_t' starts with an underscore • lib/profile/presentation/profile_hub_screen.dart:2400:12 • no_leading_underscores_for_local_identifiers
+warning • The declaration '_ProfileBloodTypeRow' isn't referenced • lib/profile/presentation/profile_hub_screen.dart:2537:7 • unused_element
+warning • A value for optional parameter 'de' isn't ever given • lib/profile/presentation/profile_hub_screen.dart:2541:10 • unused_element_parameter
+warning • A value for optional parameter 'de' isn't ever given • lib/profile/presentation/profile_hub_screen.dart:2615:10 • unused_element_parameter
+warning • The value of the local variable 'fillPaint' isn't used • lib/profile/presentation/profile_hub_screen.dart:2958:11 • unused_local_variable
+   info • Statements in a for should be enclosed in a block • lib/profile/presentation/profile_hub_screen.dart:2969:11 • curly_braces_in_flow_control_structures
+   info • Statements in a for should be enclosed in a block • lib/profile/presentation/profile_hub_screen.dart:2971:11 • curly_braces_in_flow_control_structures
+   info • Statements in a for should be enclosed in a block • lib/profile/presentation/profile_hub_screen.dart:3011:11 • curly_braces_in_flow_control_structures
+   info • Statements in a for should be enclosed in a block • lib/profile/presentation/profile_hub_screen.dart:3070:11 • curly_braces_in_flow_control_structures
+warning • The declaration '_UserGarageModifications' isn't referenced • lib/profile/presentation/profile_hub_screen.dart:3135:7 • unused_element
+warning • The value of the local variable 'de' isn't used • lib/profile/presentation/profile_hub_screen.dart:3233:11 • unused_local_variable
+   info • The local variable '_t' starts with an underscore • lib/profile/presentation/profile_hub_screen.dart:3234:12 • no_leading_underscores_for_local_identifiers
+   info • The local variable '_t' starts with an underscore • lib/profile/presentation/profile_hub_screen.dart:3806:12 • no_leading_underscores_for_local_identifiers
+warning • The value of the local variable 'tr' isn't used • lib/profile/presentation/profile_hub_screen.dart:4115:11 • unused_local_variable
+   info • Unnecessary braces in a string interpolation • lib/profile/presentation/profile_hub_screen.dart:4428:18 • unnecessary_brace_in_string_interps
+   info • Unnecessary braces in a string interpolation • lib/profile/presentation/profile_hub_screen.dart:4513:18 • unnecessary_brace_in_string_interps
+warning • The value of the local variable 'tr' isn't used • lib/profile/presentation/profile_hub_screen.dart:6090:13 • unused_local_variable
+warning • The value of the local variable 'de' isn't used • lib/profile/presentation/profile_hub_screen.dart:6118:11 • unused_local_variable
+   info • The parameter name 'sum' matches a visible type name • lib/profile/presentation/profile_hub_screen.dart:6128:12 • avoid_types_as_parameter_names
+warning • A value for optional parameter 'key' isn't ever given • lib/profile/presentation/profile_hub_screen.dart:6748:11 • unused_element_parameter
+warning • The value of the local variable 'de' isn't used • lib/profile/presentation/profile_hub_screen.dart:6829:16 • unused_local_variable
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/profile/presentation/profile_hub_screen.dart:6963:35 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/profile/presentation/profile_hub_screen.dart:6968:48 • deprecated_member_use
+   info • The local variable '_t' starts with an underscore • lib/profile/presentation/profile_hub_screen.dart:8406:12 • no_leading_underscores_for_local_identifiers
+   info • Unnecessary use of multiple underscores • lib/profile/presentation/profile_hub_screen.dart:8751:41 • unnecessary_underscores
+   info • The parameter name 'sum' matches a visible type name • lib/profile/presentation/profile_hub_screen.dart:8763:24 • avoid_types_as_parameter_names
+   info • The local variable '_t' starts with an underscore • lib/profile/presentation/profile_hub_screen.dart:8998:12 • no_leading_underscores_for_local_identifiers
+warning • The value of the local variable 'tr' isn't used • lib/profile/presentation/qr_scanner_screen.dart:232:11 • unused_local_variable
+warning • The value of the local variable 'tr' isn't used • lib/profile/presentation/supporter_paywall_screen.dart:24:11 • unused_local_variable
+warning • The value of the local variable 'tr' isn't used • lib/profile/presentation/supporter_paywall_screen.dart:137:11 • unused_local_variable
+   info • Statements in an if should be enclosed in a block • lib/rides/application/lean_angle_engine_v3.dart:564:7 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/rides/application/lean_angle_engine_v3.dart:566:7 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/rides/application/lean_angle_engine_v3.dart:568:7 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/rides/application/ride_telemetry_analyzer.dart:92:11 • curly_braces_in_flow_control_structures
+   info • Unnecessary braces in a string interpolation • lib/rides/application/ride_vibe_pdf.dart:294:50 • unnecessary_brace_in_string_interps
+warning • The declaration '_normalize' isn't referenced • lib/rides/application/telemetry_isolate.dart:137:23 • unused_element
+warning • The declaration '_dotProduct' isn't referenced • lib/rides/application/telemetry_isolate.dart:143:17 • unused_element
+   info • The import of 'package:flutter/foundation.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' • lib/rides/presentation/group_ride_lobby_screen.dart:5:8 • unnecessary_import
+warning • Unused import: 'package:apexflow/core/design/apex_colors.dart' • lib/rides/presentation/group_ride_lobby_screen.dart:9:8 • unused_import
+warning • Unused import: 'package:apexflow/profile/application/friends_state.dart' • lib/rides/presentation/group_ride_lobby_screen.dart:17:8 • unused_import
+warning • Unused import: 'package:apexflow/shared/widgets/apex_panel.dart' • lib/rides/presentation/group_ride_lobby_screen.dart:19:8 • unused_import
+warning • Unused import: 'package:url_launcher/url_launcher.dart' • lib/rides/presentation/group_ride_lobby_screen.dart:22:8 • unused_import
+   info • The private field _isSimulating could be 'final' • lib/rides/presentation/group_ride_lobby_screen.dart:50:8 • prefer_final_fields
+warning • The value of the field '_isSimulating' isn't used • lib/rides/presentation/group_ride_lobby_screen.dart:50:8 • unused_field
+warning • The value of the field '_isLoadingLobby' isn't used • lib/rides/presentation/group_ride_lobby_screen.dart:58:8 • unused_field
+warning • The receiver can't be null, so the null-aware operator '?.' is unnecessary • lib/rides/presentation/group_ride_lobby_screen.dart:566:33 • invalid_null_aware_operator
+warning • The receiver can't be null, so the null-aware operator '?.' is unnecessary • lib/rides/presentation/group_ride_lobby_screen.dart:586:44 • invalid_null_aware_operator
+warning • The value of the local variable 'de' isn't used • lib/rides/presentation/rides_screen.dart:47:11 • unused_local_variable
+warning • The value of the local variable 'weather' isn't used • lib/rides/presentation/rides_screen.dart:65:11 • unused_local_variable
+warning • The value of the local variable 'de' isn't used • lib/rides/presentation/rides_screen.dart:67:11 • unused_local_variable
+warning • The value of the local variable 'de' isn't used • lib/rides/presentation/rides_screen.dart:248:11 • unused_local_variable
+warning • The declaration '_ShareVibeButton' isn't referenced • lib/rides/presentation/rides_screen.dart:1491:7 • unused_element
+warning • Unused import: 'dart:io' • lib/rides/presentation/widgets/start_ride_sheet.dart:9:8 • unused_import
+warning • Unused import: 'package:flutter/foundation.dart' • lib/rides/presentation/widgets/start_ride_sheet.dart:10:8 • unused_import
+warning • The value of the local variable 'tr' isn't used • lib/rides/presentation/widgets/start_ride_sheet.dart:106:11 • unused_local_variable
+   info • 'activeColor' is deprecated and shouldn't be used. Use activeThumbColor instead. This feature was deprecated after v3.31.0-2.0.pre • lib/rides/presentation/widgets/start_ride_sheet.dart:249:19 • deprecated_member_use
+   info • Statements in an if should be enclosed in a block • lib/rituals/application/ride_readiness_model.dart:75:5 • curly_braces_in_flow_control_structures
+   info • Statements in an if should be enclosed in a block • lib/rituals/application/ride_readiness_model.dart:77:5 • curly_braces_in_flow_control_structures
+   info • Constructors for public widgets should have a named 'key' parameter • lib/rituals/presentation/ride_readiness_screen.dart:555:9 • use_key_in_widget_constructors
+warning • The declaration '_buildToggle' isn't referenced • lib/rituals/presentation/ride_readiness_screen.dart:1097:10 • unused_element
+warning • The declaration '_showSelectionSheet' isn't referenced • lib/rituals/presentation/ride_readiness_screen.dart:1267:8 • unused_element
+warning • Unused import: 'package:apexflow/core/storage/db_provider.dart' • lib/settings/application/user_profile_state.dart:12:8 • unused_import
+warning • The value of the local variable 'randomNum' isn't used • lib/settings/application/user_profile_state.dart:696:11 • unused_local_variable
+   info • The imported package 'path_provider_platform_interface' isn't a dependency of the importing package • test/garage_passport_test.dart:11:8 • depend_on_referenced_packages
+   info • The imported package 'plugin_platform_interface' isn't a dependency of the importing package • test/garage_passport_test.dart:12:8 • depend_on_referenced_packages
+warning • Unused import: 'package:apexflow/onboarding/presentation/onboarding_screen.dart' • test/widget_test.dart:2:8 • unused_import
+warning • Unused import: 'package:apexflow/shared/widgets/apex_limelight_navigation_bar.dart' • test/widget_test.dart:9:8 • unused_import
+

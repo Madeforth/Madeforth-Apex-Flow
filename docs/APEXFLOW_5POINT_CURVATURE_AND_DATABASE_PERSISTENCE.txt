@@ -1,0 +1,222 @@
+================================================================================
+  APEXFLOW - 5-POINT GPS CURVATURE ENGINE & DATABASE PERSISTENCE CODE EXPORT
+================================================================================
+Belge Türü: Antigravity GPS Curvature & Database Persistence Source Code Export
+Hedef: ChatGPT / AI Modelleme için Beş Noktalı GPS Eğrilik Motoru ve Veritabanı Kayıt Kodu
+
+--------------------------------------------------------------------------------
+1. BEŞ NOKTALI GPS DİFERANSİYEL GEOMETRİ EĞRİLİK MOTORU (RIDE_TELEMETRY_ANALYZER.DART)
+--------------------------------------------------------------------------------
+Açıklama:
+  GPS konum dizisinden (Lat/Lon) yerel metrik ENU koordinatlarına (x, y) dönüşüm
+  yapılır. Ardından birinci türev (hız $\mathbf{v}$) ve ikinci türev (ivme $\mathbf{a}$)
+  sonlu farklar (finite differences) yöntemiyle hesaplanır.
+  Yörünge eğriliği ($\kappa$) ve merkezcil ivme ($a_c$) ile kinematic lean angle üretilir.
+
+```dart
+// High-Precision Differential Geometry Trajectory Curvature Engine
+if (positions.length >= 3) {
+  final p0 = positions[0];
+  final lat0 = p0.latitude;
+  final lon0 = p0.longitude;
+  const double cosLat = 111320.0; // Metric scale per degree latitude
+  final double cosScale = math.cos(lat0 * math.pi / 180.0) * cosLat;
+
+  for (int i = 1; i < positions.length - 1; i++) {
+    final pPrev = positions[i - 1];
+    final pCurr = positions[i];
+    final pNext = positions[i + 1];
+
+    // Filter out low accuracy GPS points (> 20 meters)
+    if (pCurr.accuracy > 20.0 || pPrev.accuracy > 20.0 || pNext.accuracy > 20.0) continue;
+
+    final dt1 = pCurr.timestamp.difference(pPrev.timestamp).inMilliseconds / 1000.0;
+    final dt2 = pNext.timestamp.difference(pCurr.timestamp).inMilliseconds / 1000.0;
+
+    if (dt1 <= 0.1 || dt2 <= 0.1 || dt1 > 5.0 || dt2 > 5.0) continue;
+
+    // Convert Lat/Lon to Local Metric Coordinates (x, y)
+    final x0 = (pPrev.longitude - lon0) * cosScale;
+    final y0 = (pPrev.latitude - lat0) * cosLat;
+    final x1 = (pCurr.longitude - lon0) * cosScale;
+    final y1 = (pCurr.latitude - lat0) * cosLat;
+    final x2 = (pNext.longitude - lon0) * cosScale;
+    final y2 = (pNext.latitude - lat0) * cosLat;
+
+    // Velocity components (dx/dt, dy/dt)
+    final vx1 = (x1 - x0) / dt1;
+    final vy1 = (y1 - y0) / dt1;
+    final vx2 = (x2 - x1) / dt2;
+    final vy2 = (y2 - y1) / dt2;
+
+    final speed = math.sqrt(vx1 * vx1 + vy1 * vy1);
+    if (speed < 4.5) continue; // Ignore low speed noise (< 16 km/h)
+
+    // Acceleration components (d^2x/dt^2, d^2y/dt^2)
+    final dtAvg = (dt1 + dt2) / 2.0;
+    final ax = (vx2 - vx1) / dtAvg;
+    final ay = (vy2 - vy1) / dtAvg;
+
+    // Trajectory Curvature Formula: kappa = |vx*ay - vy*ax| / (vx^2 + vy^2)^(3/2)
+    final num = (vx1 * ay - vy1 * ax).abs();
+    final den = math.pow(vx1 * vx1 + vy1 * vy1, 1.5).toDouble();
+
+    if (den > 0.001) {
+      final kappa = num / den;
+      // Centripetal acceleration: a_c = v^2 * kappa
+      final ac = speed * speed * kappa;
+
+      // Physical Lean Angle: theta = arctan(a_c / g)
+      final leanRad = math.atan(ac / 9.81);
+      final leanDeg = leanRad * (180.0 / math.pi);
+
+      if (!leanDeg.isNaN && !leanDeg.isInfinite && leanDeg > maxLean) {
+        maxLean = leanDeg;
+      }
+    }
+  }
+}
+```
+
+--------------------------------------------------------------------------------
+2. CANLI SÜRÜŞ ESNASINDA MAKSİMUM YATIŞ AÇISININ GÜNCELLENMESİ (RIDE_LOCATION_SERVICE.DART)
+--------------------------------------------------------------------------------
+
+```dart
+// Continuous Telemetry Stream Listener during active ride
+_telemetrySub = _telemetryIsolate.telemetryStream.listen((msg) {
+  final absLean = msg.fusedLeanAngle.abs();
+  if (absLean > _maxFusedLeanAngle && !absLean.isNaN && !absLean.isInfinite) {
+    _maxFusedLeanAngle = absLean; // Track absolute maximum fused lean angle
+  }
+});
+
+// Pass fused max lean angle to final analysis upon ride completion
+final telemetry = analyzer.analyze(_positions, maxSpeedKmh, fusedMaxLeanAngle: _maxFusedLeanAngle);
+```
+
+--------------------------------------------------------------------------------
+3. MAKSİMUM YATIŞ AÇISININ VERİTABANINA YAZILMASI VE SAKLANMASI (RIDE_STATE.DART)
+--------------------------------------------------------------------------------
+
+```dart
+void endRide({
+  required double distanceKm,
+  required int durationMinutes,
+  required double averageSpeedKmh,
+  required String mood,
+  required String mechanicalObservation,
+  double maxSpeedKmh = 0,
+  double maxLeanAngle = 0,
+  int hardAccelerations = 0,
+  int hardBrakes = 0,
+  int harmonyScore = 0,
+}) {
+  // Discard non-movement 0km / zero duration rides
+  if ((distanceKm < 0.1 && averageSpeedKmh < 1.0) || (distanceKm <= 0.05 && durationMinutes == 0)) {
+    cancelRide();
+    return;
+  }
+
+  final bool isRealMovement = distanceKm > 0.1 && averageSpeedKmh > 2.0;
+  final maxSpeed = maxSpeedKmh > 0 ? maxSpeedKmh : (isRealMovement ? averageSpeedKmh * 1.5 : 0.0);
+  final maxLean = maxLeanAngle > 0 ? maxLeanAngle : 0.0;
+
+  final session = RideSession(
+    distanceKm: distanceKm,
+    durationMinutes: durationMinutes,
+    averageSpeedKmh: averageSpeedKmh,
+    mood: mood.trim().isEmpty ? state.activeMood : mood.trim(),
+    mechanicalObservation: mechanicalObservation.trim(),
+    maxSpeedKmh: maxSpeed,
+    maxLeanAngle: maxLean, // Max lean angle stored in session
+    hardAccelerations: hardAccelerations,
+    hardBrakes: hardBrakes,
+    harmonyScore: harmonyScore,
+    loggedAtIso: DateTime.now().toUtc().toIso8601String(),
+  );
+
+  // Update Riverpod UI State
+  state = state.copyWith(
+    isRideActive: false,
+    activeMood: session.mood,
+    sessions: [session, ...state.sessions],
+    clearRideStartedAt: true,
+  );
+
+  // Persist to ApexKvStore / Isar Local Database
+  final db = ref.read(dbServiceProvider);
+  final activeBike = ref.read(garageStateProvider).activeBike;
+  unawaited(db.saveRideSession(session, activeBike.id));
+}
+```
+
+--------------------------------------------------------------------------------
+4. RIDESESSION MODEL VE VERİTABANI SERİLEŞTİRME (RIDE_SESSION.DART)
+--------------------------------------------------------------------------------
+
+```dart
+class RideSession {
+  const RideSession({
+    required this.distanceKm,
+    required this.durationMinutes,
+    required this.averageSpeedKmh,
+    required this.mood,
+    required this.mechanicalObservation,
+    this.maxSpeedKmh = 0,
+    this.maxLeanAngle = 0,
+    this.hardAccelerations = 0,
+    this.hardBrakes = 0,
+    this.harmonyScore = 0,
+    this.loggedAtIso = '1970-01-01T00:00:00.000Z',
+  });
+
+  final double distanceKm;
+  final int durationMinutes;
+  final double averageSpeedKmh;
+  final String mood;
+  final String mechanicalObservation;
+  final double maxSpeedKmh;
+  final double maxLeanAngle;
+  final int hardAccelerations;
+  final int hardBrakes;
+  final int harmonyScore;
+  final String loggedAtIso;
+
+  Map<String, dynamic> toJson() {
+    return {
+      'distanceKm': distanceKm,
+      'durationMinutes': durationMinutes,
+      'averageSpeedKmh': averageSpeedKmh,
+      'mood': mood,
+      'mechanicalObservation': mechanicalObservation,
+      'maxSpeedKmh': maxSpeedKmh,
+      'maxLeanAngle': maxLeanAngle, // JSON database field
+      'hardAccelerations': hardAccelerations,
+      'hardBrakes': hardBrakes,
+      'harmonyScore': harmonyScore,
+      'loggedAtIso': loggedAtIso,
+    };
+  }
+
+  factory RideSession.fromJson(Map<String, dynamic> json) {
+    return RideSession(
+      distanceKm: (json['distanceKm'] as num?)?.toDouble() ?? 0,
+      durationMinutes: json['durationMinutes'] as int? ?? 0,
+      averageSpeedKmh: (json['averageSpeedKmh'] as num?)?.toDouble() ?? 0,
+      mood: json['mood'] as String? ?? 'Focused',
+      mechanicalObservation: json['mechanicalObservation'] as String? ?? '',
+      maxSpeedKmh: (json['maxSpeedKmh'] as num?)?.toDouble() ?? 0,
+      maxLeanAngle: (json['maxLeanAngle'] as num?)?.toDouble() ?? 0,
+      hardAccelerations: json['hardAccelerations'] as int? ?? 0,
+      hardBrakes: json['hardBrakes'] as int? ?? 0,
+      harmonyScore: json['harmonyScore'] as int? ?? 0,
+      loggedAtIso: json['loggedAtIso'] as String? ?? '1970-01-01T00:00:00.000Z',
+    );
+  }
+}
+```
+
+================================================================================
+                                END OF FILE
+================================================================================

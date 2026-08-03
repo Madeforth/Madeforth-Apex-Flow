@@ -1,0 +1,88 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function changedOnly(fields) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(fields);
+    }
+
+    // Private user profile documents (Owner read/write only, PII protected)
+    match /users/{uid} {
+      allow read: if isOwner(uid);
+      allow create: if isOwner(uid)
+        && request.resource.data.keys().hasOnly([
+          'name', 'phoneNumber', 'bloodType', 'emergencyContactName',
+          'emergencyContactPhone', 'city', 'socialLinks',
+          'sharePhone', 'shareEmergency', 'riderTag',
+          'riderTagNormalized', 'createdAt', 'updatedAt'
+        ]);
+      allow update: if isOwner(uid)
+        && changedOnly([
+          'name', 'phoneNumber', 'bloodType', 'emergencyContactName',
+          'emergencyContactPhone', 'city', 'socialLinks',
+          'sharePhone', 'shareEmergency', 'updatedAt'
+        ]);
+      allow delete: if false; // Deletion handled securely by Cloud Functions
+    }
+
+    // Public Rider Cards (Public read, Backend write only)
+    match /public_rider_cards/{uid} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Rider Tag lookup registry (Public read, Backend transaction write only)
+    match /rider_tags/{tag} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Entitlements & Premium subscriptions (Owner read only, Backend/Store webhook write only)
+    match /entitlements/{uid} {
+      allow read: if isOwner(uid);
+      allow write: if false;
+    }
+
+    // Private notification FCM tokens (Owner create/update/delete only, Read false)
+    match /notification_tokens/{uid}/devices/{deviceId} {
+      allow read: if false;
+      allow create, update, delete: if isOwner(uid);
+    }
+
+    // Smart Park Relay (Callable Functions only)
+    match /parking_requests/{requestId} {
+      allow read, write: if false;
+    }
+
+    // Bug Reports & Madeforth QA Engine (Callable Functions create/update, Reporter read only)
+    match /bug_reports/{bugId} {
+      allow create, update, delete: if false;
+      allow read: if signedIn() && resource.data.reporterUid == request.auth.uid;
+      match /events/{eventId} {
+        allow write: if false;
+        allow read: if signedIn()
+                    && get(/databases/$(database)/documents/bug_reports/$(bugId)).data.reporterUid == request.auth.uid
+                    && resource.data.publicMessage != null;
+      }
+    }
+    match /bug_dispatch_outbox/{document=**} {
+      allow read, write: if false;
+    }
+    match /bug_report_idempotency/{document=**} {
+      allow read, write: if false;
+    }
+
+    // Default deny all other paths
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
