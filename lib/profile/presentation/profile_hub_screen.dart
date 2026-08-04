@@ -7038,6 +7038,14 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   }
 }
 
+enum StudioPanel {
+  mainStudio,
+  backgroundGallery,
+  rideTypeCatalog,
+  badgeLibrary,
+  avatarFrame,
+}
+
 class ProfileAppearanceScreen extends ConsumerStatefulWidget {
   const ProfileAppearanceScreen({
     super.key,
@@ -7063,6 +7071,10 @@ class _ProfileAppearanceScreenState
   late int localThemeIndex;
   late String localRidingStyle;
 
+  StudioPanel _currentPanel = StudioPanel.mainStudio;
+  String _backgroundFilter = 'Tümü';
+  String _badgeFilter = 'Tümü';
+
   @override
   void initState() {
     super.initState();
@@ -7072,6 +7084,9 @@ class _ProfileAppearanceScreenState
     localSelectedBadges = List.from(profile.selectedBadges);
     localThemeIndex = profile.cardThemeIndex;
     localRidingStyle = profile.ridingStyle;
+
+    _backgroundFilter = widget.tr ? 'Tümü' : (widget.de ? 'Alle' : 'All');
+    _badgeFilter = widget.tr ? 'Tümü' : (widget.de ? 'Alle' : 'All');
   }
 
   void _save() {
@@ -7089,7 +7104,7 @@ class _ProfileAppearanceScreenState
           selectedFrameIndex: localSelectedFrameIndex,
           selectedBadges: localSelectedBadges,
         );
-    // Note: themeIndex needs to be updated if added to profile model. Assuming updateProfile handles it or it's implicitly handled.
+    ref.read(userProfileProvider.notifier).selectTheme(localThemeIndex);
     Navigator.pop(context);
   }
 
@@ -7179,98 +7194,26 @@ class _ProfileAppearanceScreenState
       ? trStr
       : ((AppStrings.currentLanguageCode == 'de') ? deStr : enStr);
 
-  void _showFrameSelectionSheet() {
-    final profile = ref.read(userProfileProvider);
-    final frames = [
-      {'id': 0, 'name': 'Standart', 'icon': Icons.circle_outlined},
-      {'id': 1, 'name': 'Premium', 'icon': Icons.stars},
-      {'id': 2, 'name': 'Founder', 'icon': Icons.workspace_premium},
-    ];
-
-    if (profile.supporterTier > 0) {
-      frames.add({'id': 3, 'name': 'Apex Supporter', 'icon': Icons.diamond});
-    }
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: const Color(0xFF1E293B),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (ctx) {
-        return Container(
-          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                _t('Çerçeve Seçin', 'Select Frame', 'Rahmen auswählen'),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                children: frames.map((f) {
-                  final idx = f['id'] as int;
-                  final isSelected = localSelectedFrameIndex == idx;
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        localSelectedFrameIndex = idx;
-                      });
-                      Navigator.pop(ctx);
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 12,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? context.colors.cyan
-                            : const Color(0xFF0F172A),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: isSelected
-                              ? context.colors.cyan
-                              : const Color(0xFF334155),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            f['icon'] as IconData,
-                            color: isSelected
-                                ? Colors.white
-                                : context.colors.textSecondary,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            f['name'] as String,
-                            style: TextStyle(
-                              color: isSelected
-                                  ? Colors.white
-                                  : context.colors.textSecondary,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 24),
-            ],
-          ),
-        );
+  String _translateRidingStyle(String style, String Function(String, String, String) t) {
+    return t(
+      switch (style) {
+        'Focused' => 'Odaklı',
+        'Aggressive' => 'Agresif',
+        'Touring' => 'Gezi',
+        'Track' => 'Pist',
+        'Commuter' => 'Şehir İçi',
+        'Chill' => 'Sakin',
+        _ => style,
+      },
+      style,
+      switch (style) {
+        'Focused' => 'Fokussiert',
+        'Aggressive' => 'Dynamisch',
+        'Touring' => 'Touren',
+        'Track' => 'Rennstrecke',
+        'Commuter' => 'Pendler',
+        'Chill' => 'Entspannt',
+        _ => style,
       },
     );
   }
@@ -7282,45 +7225,120 @@ class _ProfileAppearanceScreenState
       } else {
         if (localSelectedBadges.length < 3) {
           localSelectedBadges.add(badgeId);
-        } else {
-          // Could show a snackbar here that max 3 badges allowed
         }
       }
     });
   }
 
+  List<int> getFilteredThemeIndexes(String filter, UserProfile profile) {
+    final indexes = <int>[];
+    for (int i = 0; i < riderCardThemes.length; i++) {
+      final theme = riderCardThemes[i];
+      var isUnlocked = true;
+      if (theme.isPremiumOnly && !profile.isPremium) {
+        isUnlocked = false;
+      } else if (theme.isPaid && !profile.purchasedThemes.contains(i)) {
+        isUnlocked = false;
+      } else if (theme.requiredSupporterTier > 0 &&
+          profile.supporterTier < theme.requiredSupporterTier) {
+        isUnlocked = false;
+      }
+
+      if (filter == 'Kilitli' || filter == 'Locked' || filter == 'Gesperrt') {
+        if (!isUnlocked) indexes.add(i);
+      } else if (filter == 'Signature') {
+        if (i == 0 || i == 10) indexes.add(i);
+      } else if (filter == 'Touring') {
+        if (i == 2 || i == 6 || i == 7) indexes.add(i);
+      } else if (filter == 'Urban') {
+        if (i == 0 || i == 3 || i == 5 || i == 8) indexes.add(i);
+      } else {
+        indexes.add(i);
+      }
+    }
+    return indexes;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final profile = ref.read(userProfileProvider);
+    final profile = ref.watch(userProfileProvider);
 
-    // We get all badges in one unified list (mocking unlocked ones for UI)
     final allBadges = [
       {
         'id': 'first_ride',
         'icon': '🏁',
         'name': _t('İlk Sürüş', 'First Ride', 'Erste Fahrt'),
+        'status': 'won',
       },
       {
         'id': 'mileage_100',
         'icon': '🌟',
-        'name': _t('100 KM', 'Mileage 100', '100 Kilometer'),
-      },
-      {
-        'id': 'speed_demon',
-        'icon': '🔥',
-        'name': _t('Hız Canavarı', 'Speed Demon', 'Tempo-Teufel'),
-      },
-      {
-        'id': 'night_rider',
-        'icon': '🌙',
-        'name': _t('Gece Sürücüsü', 'Night Rider', 'Nachtfahrer'),
+        'name': _t('100 KM Yolcu', '100 KM Rider', '100 KM Fahrer'),
+        'status': 'won',
       },
       {
         'id': 'maintenance_master',
         'icon': '🛠️',
         'name': _t('Bakım Ustası', 'Maintenance Master', 'Wartungsmeister'),
+        'status': 'progress',
+        'progress': 72,
+      },
+      {
+        'id': 'discovery_compass',
+        'icon': '🧭',
+        'name': _t('Keşif Pusulası', 'Discovery Compass', 'Entdecker-Kompass'),
+        'status': 'won',
+        'isNew': true,
+      },
+      {
+        'id': 'regular_rider',
+        'icon': '📅',
+        'name': _t('Düzenli Sürücü', 'Regular Rider', 'Regelmäßiger Fahrer'),
+        'status': 'progress',
+        'progress': 45,
+      },
+      {
+        'id': 'safe_start',
+        'icon': '🛡️',
+        'name': _t('Güvenli Başlangıç', 'Safe Start', 'Sicherer Start'),
+        'status': 'won',
+      },
+      {
+        'id': 'community_support',
+        'icon': '👥',
+        'name': _t('Topluluk Desteği', 'Community Support', 'Community-Unterstützung'),
+        'status': 'locked',
+      },
+      {
+        'id': 'sunrise_route',
+        'icon': '☀️',
+        'name': _t('Gün Doğumu Rotası', 'Sunrise Route', 'Sonnenaufgangsroute'),
+        'status': 'locked',
+      },
+      {
+        'id': 'ride_log',
+        'icon': '📓',
+        'name': _t('Sürüş Günlüğü', 'Ride Log', 'Fahrtenbuch'),
+        'status': 'locked',
       },
     ];
+
+    switch (_currentPanel) {
+      case StudioPanel.mainStudio:
+        return _buildMainStudio(context, profile);
+      case StudioPanel.backgroundGallery:
+        return _buildBackgroundGallery(context, profile);
+      case StudioPanel.rideTypeCatalog:
+        return _buildRideTypeCatalog(context);
+      case StudioPanel.badgeLibrary:
+        return _buildBadgeLibrary(context, allBadges);
+      case StudioPanel.avatarFrame:
+        return _buildAvatarFrame(context, profile);
+    }
+  }
+
+  Widget _buildMainStudio(BuildContext context, UserProfile profile) {
+    final currentTheme = riderCardThemes[localThemeIndex.clamp(0, riderCardThemes.length - 1)];
 
     return Scaffold(
       backgroundColor: context.colors.background,
@@ -7332,11 +7350,7 @@ class _ProfileAppearanceScreenState
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          _t(
-            'Profil Görünümü',
-            'Profile Appearance',
-            'Profil-Erscheinungsbild',
-          ),
+          _t('Sürücü Kartı Stüdyosu', 'Rider Card Studio', 'Fahrerkarte-Studio'),
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -7344,194 +7358,287 @@ class _ProfileAppearanceScreenState
           ),
         ),
         centerTitle: false,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0, top: 10, bottom: 10),
-            child: ElevatedButton(
-              onPressed: _save,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: context.colors.cyan,
-                foregroundColor: Colors.white,
-                elevation: 0,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
-              child: Text(
-                _t('Kaydet', 'Save', 'Speichern'),
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-        ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
+      body: Column(
         children: [
-          // PREVIEW
-          Text(
-            _t('ÖNİZLEME', 'PREVIEW', 'VORSCHAU'),
-            style: TextStyle(
-              color: context.colors.textSecondary,
-              fontSize: 11,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.2,
-            ),
-          ),
-          const SizedBox(height: 12),
-          IgnorePointer(
-            child: RiderIdCard(
-              name: profile.name,
-              riderTag: profile.riderTag,
-              ridingStyle: localRidingStyle,
-              bloodType: profile.bloodType,
-              phoneNumber: profile.phoneNumber,
-              emergencyContactName: profile.emergencyContactName,
-              emergencyContactPhone: profile.emergencyContactPhone,
-              activeBike: 'Preview Bike',
-              totalRides: 120,
-              totalKm: 4500.5,
-              harmonyScore: 95,
-              avatarIndex: localAvatarIndex,
-              themeIndex: localThemeIndex,
-              selectedFrameIndex: localSelectedFrameIndex,
-              selectedBadges: localSelectedBadges,
-              supporterTier: profile.supporterTier,
-              city: profile.city,
-              instagram: profile.instagram,
-              tiktok: profile.tiktok,
-              licensePlate: profile.licensePlate,
-              tr: widget.tr,
-              de: AppStrings.currentLanguageCode == 'de',
-              compact: true,
-              hideActiveBike: true,
-            ),
-          ),
-
-          const SizedBox(height: 32),
-
-          // FRAME
-          Text(
-            _t('PROFİL ÇERÇEVESİ', 'PROFILE FRAME', 'PROFILRAHMEN'),
-            style: TextStyle(
-              color: context.colors.textSecondary,
-              fontSize: 11,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.2,
-            ),
-          ),
-          const SizedBox(height: 12),
-          GestureDetector(
-            onTap: _showFrameSelectionSheet,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              decoration: BoxDecoration(
-                color: const Color(0xFF1E293B),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFF334155)),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.face_outlined, color: context.colors.cyan),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _t(
-                            'Mevcut Çerçeve',
-                            'Current Frame',
-                            'Aktueller Rahmen',
-                          ),
-                          style: TextStyle(
-                            color: context.colors.textSecondary,
-                            fontSize: 11,
-                          ),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1E293B),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: context.colors.cyan.withValues(alpha: 0.15),
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.layers_outlined, color: context.colors.cyan, size: 18),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _t('Katalog güncellendi', 'Catalog updated', 'Katalog aktualisiert'),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              _t('3 yeni içerik keşfedilmeyi bekliyor', '3 new items waiting to be discovered', '3 neue Elemente warten darauf, entdeckt zu werden'),
+                              style: TextStyle(
+                                color: context.colors.textSecondary,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 2),
-                        Text(
-                          localSelectedFrameIndex == 0
-                              ? 'Standart'
-                              : (localSelectedFrameIndex == 1
-                                    ? 'Premium'
-                                    : 'Founder'),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: context.colors.cyan,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          _t('YENİ', 'NEW', 'NEU'),
                           style: const TextStyle(
                             color: Colors.white,
+                            fontSize: 9,
                             fontWeight: FontWeight.bold,
-                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                IgnorePointer(
+                  child: RiderIdCard(
+                    name: profile.name,
+                    riderTag: profile.riderTag,
+                    ridingStyle: localRidingStyle,
+                    bloodType: profile.bloodType,
+                    phoneNumber: profile.phoneNumber,
+                    emergencyContactName: profile.emergencyContactName,
+                    emergencyContactPhone: profile.emergencyContactPhone,
+                    activeBike: 'Preview Bike',
+                    totalRides: 120,
+                    totalKm: 4500.5,
+                    harmonyScore: 95,
+                    avatarIndex: localAvatarIndex,
+                    themeIndex: localThemeIndex,
+                    selectedFrameIndex: localSelectedFrameIndex,
+                    selectedBadges: localSelectedBadges,
+                    supporterTier: profile.supporterTier,
+                    city: profile.city,
+                    instagram: profile.instagram,
+                    tiktok: profile.tiktok,
+                    licensePlate: profile.licensePlate,
+                    tr: widget.tr,
+                    de: AppStrings.currentLanguageCode == 'de',
+                    compact: true,
+                    hideActiveBike: true,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      _t('KİMLİK AYARLARI', 'IDENTITY SETTINGS', 'IDENTITÄTSEINSTELLUNGEN'),
+                      style: TextStyle(
+                        color: context.colors.textSecondary,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Container(
+                          width: 6,
+                          height: 6,
+                          decoration: const BoxDecoration(
+                            color: Colors.green,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          _t('CANLI ÖNİZLEME', 'LIVE PREVIEW', 'LIVE-VORSCHAU'),
+                          style: const TextStyle(
+                            color: Colors.green,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ],
                     ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                _buildMenuTile(
+                  title: _t('Kart Arka Planı', 'Card Background', 'Kartenhintergrund'),
+                  subtitle: currentTheme.getLocalizedName(AppStrings.currentLanguageCode),
+                  hasNew: true,
+                  onTap: () => setState(() => _currentPanel = StudioPanel.backgroundGallery),
+                ),
+                _buildMenuTile(
+                  title: _t('Sürüş Tipi', 'Riding Style', 'Fahrstil'),
+                  subtitle: _translateRidingStyle(localRidingStyle, _t),
+                  onTap: () => setState(() => _currentPanel = StudioPanel.rideTypeCatalog),
+                ),
+                _buildMenuTile(
+                  title: _t('Avatar ve Çerçeve', 'Avatar and Frame', 'Avatar und Rahmen'),
+                  subtitle: '${_t('Kask', 'Helmet', 'Helm')} 0${localAvatarIndex + 1} - ${
+                    localSelectedFrameIndex == 0
+                        ? 'Standart'
+                        : (localSelectedFrameIndex == 1
+                            ? 'Premium'
+                            : (localSelectedFrameIndex == 2
+                                ? 'Founder'
+                                : 'Apex Supporter'))
+                  }',
+                  onTap: () => setState(() => _currentPanel = StudioPanel.avatarFrame),
+                ),
+                _buildMenuTile(
+                  title: _t('Rozetler', 'Badges', 'Abzeichen'),
+                  subtitle: _t(
+                    '${localSelectedBadges.length} seçili',
+                    '${localSelectedBadges.length} selected',
+                    '${localSelectedBadges.length} ausgewählt',
                   ),
-                  Icon(
-                    Icons.chevron_right,
-                    color: context.colors.textSecondary,
+                  actionLabel: _t('Yönet', 'Manage', 'Verwalten'),
+                  onTap: () => setState(() => _currentPanel = StudioPanel.badgeLibrary),
+                ),
+                const SizedBox(height: 16),
+                Center(
+                  child: Text(
+                    _t('Seçimler profil kimliğine kaydedilir. Sürüş verilerin değişmez.',
+                        'Selections are saved to profile identity. Ride data is unaffected.',
+                        'Auswahlen werden im Profil gespeichert. Fahrdaten bleiben unverändert.'),
+                    style: TextStyle(
+                      color: context.colors.textSecondary,
+                      fontSize: 11,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                ],
+                ),
+              ],
+            ),
+          ),
+          _buildBottomButton(
+            label: _t('Değişiklikleri Kaydet', 'Save Changes', 'Änderungen speichern'),
+            onPressed: _save,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBackgroundGallery(BuildContext context, UserProfile profile) {
+    final themeIndexes = getFilteredThemeIndexes(_backgroundFilter, profile);
+    final filterChips = [
+      _t('Tümü', 'All', 'Alle'),
+      'Signature',
+      'Touring',
+      'Urban',
+      _t('Kilitli', 'Locked', 'Gesperrt'),
+    ];
+
+    return Scaffold(
+      backgroundColor: context.colors.background,
+      appBar: AppBar(
+        backgroundColor: context.colors.background,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => setState(() => _currentPanel = StudioPanel.mainStudio),
+        ),
+        title: Text(
+          _t('Kart Arka Planı', 'Card Background', 'Kartenhintergrund'),
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        centerTitle: false,
+      ),
+      body: Column(
+        children: [
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              children: filterChips.map((chip) {
+                final isSelected = _backgroundFilter == chip;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: ChoiceChip(
+                    label: Text(chip),
+                    selected: isSelected,
+                    onSelected: (val) {
+                      if (val) setState(() => _backgroundFilter = chip);
+                    },
+                    backgroundColor: const Color(0xFF1E293B),
+                    selectedColor: context.colors.cyan.withValues(alpha: 0.15),
+                    labelStyle: TextStyle(
+                      color: isSelected ? context.colors.cyan : context.colors.textSecondary,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      side: BorderSide(
+                        color: isSelected ? context.colors.cyan : const Color(0xFF334155),
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+          Expanded(
+            child: GridView.builder(
+              padding: const EdgeInsets.all(16),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 14,
+                crossAxisSpacing: 14,
+                childAspectRatio: 0.85,
               ),
-            ),
-          ),
-
-          const SizedBox(height: 32),
-
-          // CARD THEME SELECTOR
-          Text(
-            _t(
-              'KART ARKAPLAN TEMASI',
-              'CARD BACKGROUND THEME',
-              'KARTEN-HINTERGRUNDTHEMA',
-            ),
-            style: TextStyle(
-              color: context.colors.textSecondary,
-              fontSize: 11,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.2,
-            ),
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 108,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: riderCardThemes.length,
-              itemBuilder: (context, index) {
+              itemCount: themeIndexes.length,
+              itemBuilder: (context, gridIdx) {
+                final index = themeIndexes[gridIdx];
                 final theme = riderCardThemes[index];
                 final isSelected = localThemeIndex == index;
 
                 var isUnlocked = true;
                 if (theme.isPremiumOnly && !profile.isPremium) {
                   isUnlocked = false;
-                } else if (theme.isPaid &&
-                    !profile.purchasedThemes.contains(index)) {
+                } else if (theme.isPaid && !profile.purchasedThemes.contains(index)) {
                   isUnlocked = false;
-                } else if (theme.requiredSupporterTier > 0 &&
-                    profile.supporterTier < theme.requiredSupporterTier) {
+                } else if (theme.requiredSupporterTier > 0 && profile.supporterTier < theme.requiredSupporterTier) {
                   isUnlocked = false;
                 }
 
                 return GestureDetector(
                   onTap: () {
                     if (isUnlocked) {
-                      setState(() {
-                        localThemeIndex = index;
-                      });
-                      // Update main provider theme immediately so it syncs correctly
-                      ref.read(userProfileProvider.notifier).selectTheme(index);
+                      setState(() => localThemeIndex = index);
                     } else {
                       if (theme.requiredSupporterTier > 0) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                SupporterPaywallScreen(strings: widget.strings),
-                          ),
-                        );
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => SupporterPaywallScreen(strings: widget.strings)));
                       } else if (theme.isPremiumOnly) {
                         _showPaywall(context);
                       } else {
@@ -7540,65 +7647,68 @@ class _ProfileAppearanceScreenState
                     }
                   },
                   child: Container(
-                    width: 84,
-                    margin: const EdgeInsets.only(right: 10),
                     decoration: BoxDecoration(
                       border: Border.all(
-                        color: isSelected
-                            ? context.colors.cyan
-                            : const Color(0xFF4B5563),
-                        width: isSelected ? 1.5 : 0.5,
+                        color: isSelected ? context.colors.cyan : const Color(0xFF334155),
+                        width: isSelected ? 2 : 1,
                       ),
                       borderRadius: BorderRadius.circular(10),
-                      color: const Color(0xFF1F2937),
+                      color: const Color(0xFF1E293B),
                     ),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Container(
-                          width: 50,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: theme.colors,
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
+                        Expanded(
+                          child: Container(
+                            margin: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: theme.colors,
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              borderRadius: BorderRadius.circular(6),
                             ),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Center(
-                            child: isSelected
-                                ? const Icon(
-                                    Icons.check_circle_outline_rounded,
-                                    color: Colors.white,
-                                    size: 22,
+                            child: Stack(
+                              children: [
+                                Positioned.fill(
+                                  child: CustomPaint(
+                                    painter: CardVectorOverlayPainter(themeIndex: index),
+                                  ),
+                                ),
+                                if (isSelected)
+                                  const Center(
+                                    child: Icon(
+                                      Icons.check_circle_outline_rounded,
+                                      color: Colors.white,
+                                      size: 32,
+                                    ),
                                   )
-                                : (!isUnlocked
-                                      ? Icon(
-                                          theme.isPremiumOnly
-                                              ? Icons.star_rounded
-                                              : Icons.lock_outline_rounded,
-                                          color: Colors.white70,
-                                          size: 16,
-                                        )
-                                      : null),
+                                else if (!isUnlocked)
+                                  Center(
+                                    child: Icon(
+                                      theme.isPremiumOnly
+                                          ? Icons.star_rounded
+                                          : Icons.lock_outline_rounded,
+                                      color: Colors.white70,
+                                      size: 24,
+                                    ),
+                                  )
+                              ],
+                            ),
                           ),
                         ),
-                        const SizedBox(height: 6),
-                        Text(
-                          widget.tr ? theme.nameTr : theme.nameEn,
-                          style: TextStyle(
-                            fontSize: 9,
-                            fontWeight: isSelected
-                                ? FontWeight.bold
-                                : FontWeight.normal,
-                            color: isSelected
-                                ? Colors.white
-                                : context.colors.textSecondary,
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0),
+                          child: Text(
+                            theme.getLocalizedName(AppStrings.currentLanguageCode),
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                              color: isSelected ? Colors.white : context.colors.textSecondary,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
@@ -7607,221 +7717,820 @@ class _ProfileAppearanceScreenState
               },
             ),
           ),
-
-          const SizedBox(height: 32),
-
-          // RIDING STYLE
-          Text(
-            widget.tr
-                ? 'SÜRÜCÜ TİPİ'
-                : ((AppStrings.currentLanguageCode == 'de')
-                      ? 'FAHRSTIL'
-                      : 'RIDING STYLE'),
-            style: TextStyle(
-              color: context.colors.textSecondary,
-              fontSize: 11,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.2,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Text(
+              _t('Yeni temalar uygulama güncellemeleriyle eklenir. Mevcut seçiminiz korunur.',
+                  'New themes are added with app updates. Current selection will be saved.',
+                  'Neue Designs werden mit App-Updates hinzugefügt. Aktuelle Auswahl wird gespeichert.'),
+              style: TextStyle(color: context.colors.textSecondary, fontSize: 11),
+              textAlign: TextAlign.center,
             ),
           ),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            children:
-                [
-                  'Focused',
-                  'Aggressive',
-                  'Touring',
-                  'Track',
-                  'Commuter',
-                  'Chill',
-                  'Long Hauler 🏆',
-                  'Mechanic Mind 🛠️',
-                  'Customizer 🎨',
-                  'Night Legend 🌙',
-                ].map((style) {
-                  final isSelected = localRidingStyle == style;
-                  return GestureDetector(
-                    onTap: () => setState(() => localRidingStyle = style),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? context.colors.cyan.withValues(alpha: 0.1)
-                            : const Color(0xFF1E293B),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: isSelected
-                              ? context.colors.cyan
-                              : const Color(0xFF334155),
-                          width: isSelected ? 2 : 1,
-                        ),
-                      ),
-                      child: Text(
-                        _t(
-                          switch (style) {
-                            'Focused' => 'Odaklı',
-                            'Aggressive' => 'Agresif',
-                            'Touring' => 'Gezi',
-                            'Track' => 'Pist',
-                            'Commuter' => 'Şehir İçi',
-                            'Chill' => 'Sakin',
-                            _ => style,
-                          },
-                          style,
-                          switch (style) {
-                            'Focused' => 'Fokussiert',
-                            'Aggressive' => 'Dynamisch',
-                            'Touring' => 'Touren',
-                            'Track' => 'Rennstrecke',
-                            'Commuter' => 'Pendler',
-                            'Chill' => 'Entspannt',
-                            _ => style,
-                          },
-                        ),
-                        style: TextStyle(
-                          color: isSelected
-                              ? Colors.white
-                              : context.colors.textSecondary,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                  );
-                }).toList(),
+          _buildBottomButton(
+            label: _t('Temayı Uygula', 'Apply Theme', 'Design anwenden'),
+            onPressed: () => setState(() => _currentPanel = StudioPanel.mainStudio),
           ),
+        ],
+      ),
+    );
+  }
 
-          const SizedBox(height: 32),
+  Widget _buildRideTypeCatalog(BuildContext context) {
+    final stylesList = [
+      {
+        'id': 'Focused',
+        'title': _t('Odaklı', 'Focused', 'Fokussiert'),
+        'desc': _t('Temiz çizgi, dengeli tempo.', 'Clean line, balanced tempo.', 'Saubere Linie, ausgewogenes Tempo.'),
+        'icon': Icons.track_changes_outlined,
+      },
+      {
+        'id': 'Touring',
+        'title': _t('Gezgin', 'Explorer', 'Entdecker'),
+        'desc': _t('Yeni yolların ve küçük keşiflerin peşinde.', 'Pursuing new roads and small discoveries.', 'Auf der Suche nach neuen Wegen und Entdeckungen.'),
+        'icon': Icons.explore_outlined,
+      },
+      {
+        'id': 'Commuter',
+        'title': _t('Şehirli', 'Urban', 'Städtisch'),
+        'desc': _t('Şehrin akışını ve kısa rotaları iyi bilir.', 'Knows the city flow and short routes well.', 'Kennt den Stadtfluss und kurze Routen gut.'),
+        'icon': Icons.location_city_outlined,
+      },
+      {
+        'id': 'Long Hauler',
+        'title': _t('Uzun Yolcu', 'Long Hauler', 'Langstreckenfahrer'),
+        'desc': _t('Uzun mesafede sakin ve istikrarlı.', 'Calm and steady over long distances.', 'Ruhig und beständig auf langen Strecken.'),
+        'icon': Icons.alt_route_outlined,
+      },
+      {
+        'id': 'Mechanic Mind',
+        'title': _t('Mekanik Zihin', 'Mechanic Mind', 'Mechanikergeist'),
+        'desc': _t('Bakım ve makine detayına özen gösterir.', 'Pays close attention to maintenance and machine detail.', 'Achtet genau auf Wartung und Maschinendetails.'),
+        'icon': Icons.handyman_outlined,
+        'isLocked': true,
+      },
+      {
+        'id': 'Night Legend',
+        'title': _t('Gece Yolcusu', 'Night Legend', 'Nachtlegende'),
+        'desc': _t('Gece rotalarının sakin atmosferini sever.', 'Loves the calm atmosphere of night routes.', 'Liebt die ruhige Atmosphäre von Nachtrouten.'),
+        'icon': Icons.nights_stay_outlined,
+        'isNew': true,
+      },
+    ];
 
-          // AVATAR
-          Text(
-            widget.tr
-                ? 'AVATAR SEÇİMİ'
-                : ((AppStrings.currentLanguageCode == 'de')
-                      ? 'AVATARAUSWAHL'
-                      : 'AVATAR SELECTION'),
-            style: TextStyle(
-              color: context.colors.textSecondary,
-              fontSize: 11,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.2,
-            ),
+    return Scaffold(
+      backgroundColor: context.colors.background,
+      appBar: AppBar(
+        backgroundColor: context.colors.background,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => setState(() => _currentPanel = StudioPanel.mainStudio),
+        ),
+        title: Text(
+          _t('Sürüş Tipi', 'Riding Style', 'Fahrstil'),
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
           ),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            children: List.generate(8, (index) {
-              final isSelected = localAvatarIndex == index;
-              return GestureDetector(
-                onTap: () => setState(() => localAvatarIndex = index),
-                child: Container(
-                  padding: const EdgeInsets.all(4),
+        ),
+        centerTitle: false,
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                Text(
+                  _t('Seni en iyi anlatan birincil sürüş kimliğini seç.',
+                      'Choose the primary riding identity that represents you best.',
+                      'Wähle die primäre Fahridentität, die dich am besten beschreibt.'),
+                  style: TextStyle(color: context.colors.textSecondary, fontSize: 13),
+                ),
+                const SizedBox(height: 14),
+                Container(
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    shape: BoxShape.circle,
+                    color: const Color(0xFF1E293B),
+                    borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: isSelected
-                          ? context.colors.cyan
-                          : Colors.transparent,
-                      width: 1.5,
+                      color: Colors.amber.withValues(alpha: 0.2),
+                      width: 1,
                     ),
                   ),
-                  child: RiderAvatarWidget(avatarIndex: index, radius: 24),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(Icons.info_outline, color: Colors.amber, size: 18),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          _t('Bu seçim öz tanımdır; telemetri tarafından atanmaz. İstediğin zaman değiştirebilirsin.',
+                              'This selection is a self-definition; it is not assigned by telemetry. You can change it anytime.',
+                              'Diese Auswahl ist eine Selbstdefinition; sie wird nicht per Telemetrie zugewiesen. Du kannst sie jederzeit ändern.'),
+                          style: TextStyle(
+                            color: Colors.amber.withValues(alpha: 0.9),
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              );
-            }),
+                const SizedBox(height: 16),
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: stylesList.length,
+                  itemBuilder: (context, idx) {
+                    final item = stylesList[idx];
+                    final itemId = item['id'] as String;
+                    final isSelected = localRidingStyle.startsWith(itemId);
+                    final isLocked = item['isLocked'] == true;
+                    final isNew = item['isNew'] == true;
+
+                    return GestureDetector(
+                      onTap: () {
+                        if (!isLocked) {
+                          setState(() => localRidingStyle = itemId);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                _t('Bu sürüş tipi achievement ile açılır.',
+                                    'This riding style unlocks with achievement.',
+                                    'Dieser Fahrstil wird durch Errungenschaften freigeschaltet.'),
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? context.colors.cyan.withValues(alpha: 0.1)
+                              : const Color(0xFF1E293B),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: isSelected ? context.colors.cyan : const Color(0xFF334155),
+                            width: isSelected ? 1.5 : 1,
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              item['icon'] as IconData,
+                              color: isSelected ? context.colors.cyan : context.colors.textSecondary,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Text(
+                                        item['title'] as String,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 13,
+                                        ),
+                                      ),
+                                      if (isNew) ...[
+                                        const SizedBox(width: 6),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                          decoration: BoxDecoration(
+                                            color: context.colors.cyan,
+                                            borderRadius: BorderRadius.circular(4),
+                                          ),
+                                          child: Text(
+                                            _t('YENİ', 'NEW', 'NEU'),
+                                            style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    item['desc'] as String,
+                                    style: TextStyle(
+                                      color: context.colors.textSecondary,
+                                      fontSize: 11,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            if (isSelected)
+                              Icon(Icons.check_circle, color: context.colors.cyan, size: 20)
+                            else if (isLocked)
+                              const Icon(Icons.lock_outline, color: Colors.white60, size: 16),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Text(
+              _t('Güvenli kimlik ilkesi / Hız veya yatış derecesi sürüş tipi açmaz.',
+                  'Safe identity policy / Top speed or lean angle degree does not unlock riding types.',
+                  'Sichere Identitätsrichtlinie / Höchstgeschwindigkeit oder Schräglage schaltet keine Fahrstile frei.'),
+              style: TextStyle(color: context.colors.textSecondary, fontSize: 11),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          _buildBottomButton(
+            label: _t('Sürüş Tipini Uygula', 'Apply Riding Style', 'Fahrstil anwenden'),
+            onPressed: () => setState(() => _currentPanel = StudioPanel.mainStudio),
+          ),
+        ],
+      ),
+    );
+  }
 
-          const SizedBox(height: 32),
+  Widget _buildBadgeLibrary(BuildContext context, List<Map<String, dynamic>> allBadges) {
+    final filterChips = [
+      _t('Tümü', 'All', 'Alle'),
+      _t('Kazanıldı', 'Earned', 'Erhalten'),
+      _t('İlerliyor', 'Progress', 'Fortschritt'),
+      _t('Kilitli', 'Locked', 'Gesperrt'),
+      _t('Seçili', 'Selected', 'Ausgewählt'),
+    ];
 
-          // BADGES
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                _t('ROZETLER (MAKS. 3)', 'BADGES (MAX 3)', 'ABZEICHEN (MAX 3)'),
-                style: TextStyle(
-                  color: context.colors.textSecondary,
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.2,
+    final filteredBadges = allBadges.where((badge) {
+      final badgeId = badge['id'] as String;
+      final status = badge['status'] as String;
+      final isSelected = localSelectedBadges.contains(badgeId);
+
+      if (_badgeFilter == _t('Kazanıldı', 'Earned', 'Erhalten')) {
+        return status == 'won';
+      } else if (_badgeFilter == _t('İlerliyor', 'Progress', 'Fortschritt')) {
+        return status == 'progress';
+      } else if (_badgeFilter == _t('Kilitli', 'Locked', 'Gesperrt')) {
+        return status == 'locked';
+      } else if (_badgeFilter == _t('Seçili', 'Selected', 'Ausgewählt')) {
+        return isSelected;
+      }
+      return true;
+    }).toList();
+
+    return Scaffold(
+      backgroundColor: context.colors.background,
+      appBar: AppBar(
+        backgroundColor: context.colors.background,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => setState(() => _currentPanel = StudioPanel.mainStudio),
+        ),
+        title: Text(
+          _t('Rozet Kütüphanesi', 'Badge Library', 'Abzeichen-Bibliothek'),
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        centerTitle: false,
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  _t('Kartında en fazla üç rozet göster. Basılı tutup sırala.',
+                      'Show up to three badges on your card. Press and hold to sort.',
+                      'Zeige bis zu drei Abzeichen auf deiner Karte. Gedrückt halten zum Sortieren.'),
+                  style: TextStyle(color: context.colors.textSecondary, fontSize: 11),
+                ),
+                Text(
+                  '${localSelectedBadges.length}/3 SEÇİLİ',
+                  style: TextStyle(
+                    color: context.colors.cyan,
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              children: filterChips.map((chip) {
+                final isSelected = _badgeFilter == chip;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: ChoiceChip(
+                    label: Text(chip),
+                    selected: isSelected,
+                    onSelected: (val) {
+                      if (val) setState(() => _badgeFilter = chip);
+                    },
+                    backgroundColor: const Color(0xFF1E293B),
+                    selectedColor: context.colors.cyan.withValues(alpha: 0.15),
+                    labelStyle: TextStyle(
+                      color: isSelected ? context.colors.cyan : context.colors.textSecondary,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      side: BorderSide(
+                        color: isSelected ? context.colors.cyan : const Color(0xFF334155),
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+          Expanded(
+            child: GridView.builder(
+              padding: const EdgeInsets.all(16),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                mainAxisSpacing: 12,
+                crossAxisSpacing: 12,
+                childAspectRatio: 0.85,
+              ),
+              itemCount: filteredBadges.length,
+              itemBuilder: (context, index) {
+                final badge = filteredBadges[index];
+                final badgeId = badge['id'] as String;
+                final isSelected = localSelectedBadges.contains(badgeId);
+                final status = badge['status'] as String;
+                final isLocked = status == 'locked';
+                final isProgress = status == 'progress';
+                final progressVal = badge['progress'] as int? ?? 0;
+                final isNew = badge['isNew'] == true;
+
+                return GestureDetector(
+                  onTap: () {
+                    if (!isLocked) {
+                      _toggleBadge(badgeId);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            _t('Bu rozet kilitli.', 'This badge is locked.', 'Dieses Abzeichen ist gesperrt.'),
+                          ),
+                        ),
+                      );
+                    }
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? context.colors.cyan.withValues(alpha: 0.1)
+                          : const Color(0xFF1E293B),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: isSelected ? context.colors.cyan : const Color(0xFF334155),
+                        width: isSelected ? 1.5 : 1,
+                      ),
+                    ),
+                    padding: const EdgeInsets.all(8),
+                    child: Stack(
+                      children: [
+                        if (isNew)
+                          Positioned(
+                            right: 0,
+                            top: 0,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                              decoration: BoxDecoration(
+                                color: context.colors.cyan,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                _t('YENİ', 'NEW', 'NEU'),
+                                style: const TextStyle(color: Colors.white, fontSize: 7, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              badge['icon'] as String,
+                              style: TextStyle(
+                                fontSize: 24,
+                                color: isLocked ? Colors.white24 : Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              badge['name'] as String,
+                              style: TextStyle(
+                                color: isLocked
+                                    ? context.colors.textSecondary.withValues(alpha: 0.5)
+                                    : Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 4),
+                            if (isProgress) ...[
+                              Text(
+                                '%$progressVal',
+                                style: TextStyle(color: context.colors.cyan, fontSize: 9, fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 2),
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(2),
+                                child: LinearProgressIndicator(
+                                  value: progressVal / 100.0,
+                                  minHeight: 3,
+                                  backgroundColor: const Color(0xFF334155),
+                                  valueColor: AlwaysStoppedAnimation(context.colors.cyan),
+                                ),
+                              ),
+                            ] else if (isLocked) ...[
+                              Text(
+                                _t('KİLİTLİ', 'LOCKED', 'GESPERRT'),
+                                style: const TextStyle(color: Colors.white24, fontSize: 9, fontWeight: FontWeight.bold),
+                              ),
+                            ] else ...[
+                              Text(
+                                _t('KAZANILDI', 'EARNED', 'ERHALTEN'),
+                                style: const TextStyle(color: Colors.green, fontSize: 9, fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ],
+                        ),
+                        if (isSelected)
+                          const Positioned(
+                            left: 0,
+                            top: 0,
+                            child: Icon(Icons.check_circle, color: Colors.green, size: 14),
+                          ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Text(
+              _t('Güvenli achievement politikası / Maksimum hız ve yatış açısı rozet koşulu değildir. Konum ve rota kanıtı profilde paylaşılmaz.',
+                  'Safe achievement policy / Top speed or lean angle is not a requirement. Location or route evidence is not shared.',
+                  'Sichere Errungenschaftsrichtlinie / Höchstgeschwindigkeit oder Schräglage ist keine Voraussetzung. Standort- oder Routenbeweise werden nicht geteilt.'),
+              style: TextStyle(color: context.colors.textSecondary, fontSize: 11),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => setState(() => localSelectedBadges.clear()),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      side: const BorderSide(color: Color(0xFF334155)),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    child: Text(_t('Sıfırla', 'Reset', 'Zurücksetzen')),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => setState(() => _currentPanel = StudioPanel.mainStudio),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: context.colors.cyan,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    child: Text(_t('Seçimleri Uygula', 'Apply Selection', 'Auswahl anwenden')),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAvatarFrame(BuildContext context, UserProfile profile) {
+    final frames = [
+      {'id': 0, 'name': 'Standart', 'desc': _t('İnce mat çerçeve', 'Thin matte frame', 'Dünner matter Rahmen')},
+      {'id': 1, 'name': 'Titanium', 'desc': _t('Dengeli metalik görünüm', 'Balanced metallic look', 'Ausgewogener Metallic-Look')},
+      {'id': 2, 'name': 'Apex Cyan', 'desc': _t('Marka vurgulu çerçeve', 'Brand accented frame', 'Markenakzentierter Rahmen')},
+      {'id': 3, 'name': 'Touring', 'desc': _t('Kilitli / Achievement ile açılır', 'Locked / Unlocks with achievement', 'Gesperrt / Wird durch Errungenschaften freigeschaltet'), 'locked': true},
+    ];
+
+    return Scaffold(
+      backgroundColor: context.colors.background,
+      appBar: AppBar(
+        backgroundColor: context.colors.background,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => setState(() => _currentPanel = StudioPanel.mainStudio),
+        ),
+        title: Text(
+          _t('Avatar ve Çerçeve', 'Avatar and Frame', 'Avatar und Rahmen'),
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        centerTitle: false,
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                Text(
+                  _t('8 SEÇENEK', '8 OPTIONS', '8 OPTIONEN'),
+                  style: TextStyle(
+                    color: context.colors.textSecondary,
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 4,
+                    mainAxisSpacing: 14,
+                    crossAxisSpacing: 14,
+                  ),
+                  itemCount: 8,
+                  itemBuilder: (context, index) {
+                    final isSelected = localAvatarIndex == index;
+                    return GestureDetector(
+                      onTap: () => setState(() => localAvatarIndex = index),
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: isSelected ? context.colors.cyan : Colors.transparent,
+                            width: 2,
+                          ),
+                        ),
+                        child: RiderAvatarWidget(avatarIndex: index, radius: 24),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 32),
+                Text(
+                  _t('PROFİL ÇERÇEVESİ', 'PROFILE FRAME', 'PROFILRAHMEN'),
+                  style: TextStyle(
+                    color: context.colors.textSecondary,
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: frames.length,
+                  itemBuilder: (context, index) {
+                    final f = frames[index];
+                    final fid = f['id'] as int;
+                    final isSelected = localSelectedFrameIndex == fid;
+                    final isLocked = f['locked'] == true;
+
+                    return GestureDetector(
+                      onTap: () {
+                        if (!isLocked) {
+                          setState(() => localSelectedFrameIndex = fid);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                _t('Bu çerçeve kilitli.', 'This frame is locked.', 'Dieser Rahmen ist gesperrt.'),
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? context.colors.cyan.withValues(alpha: 0.1)
+                              : const Color(0xFF1E293B),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: isSelected ? context.colors.cyan : const Color(0xFF334155),
+                            width: isSelected ? 1.5 : 1,
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              fid == 0
+                                  ? Icons.circle_outlined
+                                  : (fid == 1
+                                      ? Icons.stars
+                                      : (fid == 2 ? Icons.workspace_premium : Icons.diamond)),
+                              color: isSelected ? context.colors.cyan : context.colors.textSecondary,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    f['name'] as String,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    f['desc'] as String,
+                                    style: TextStyle(
+                                      color: context.colors.textSecondary,
+                                      fontSize: 11,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            if (isSelected)
+                              Icon(Icons.check_circle, color: context.colors.cyan, size: 20)
+                            else if (isLocked)
+                              const Icon(Icons.lock_outline, color: Colors.white60, size: 16),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Text(
+              _t('Avatar ve çerçeve birbirinden bağısız seçilir. Glow yerine ince halka ve onay işareti kullanılır.',
+                  'Avatar and frame are selected independently. A thin ring and checkmark are used instead of glow.',
+                  'Avatar und Rahmen werden unabhängig voneinander ausgewählt. Anstelle von Glow wird ein dünner Ring und ein Häkchen verwendet.'),
+              style: TextStyle(color: context.colors.textSecondary, fontSize: 11),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          _buildBottomButton(
+            label: _t('Görünümü Uygula', 'Apply Appearance', 'Erscheinungsbild anwenden'),
+            onPressed: () => setState(() => _currentPanel = StudioPanel.mainStudio),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMenuTile({
+    required String title,
+    required String subtitle,
+    bool hasNew = false,
+    String? actionLabel,
+    required VoidCallback onTap,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E293B),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFF334155), width: 1),
+      ),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        onTap: onTap,
+        title: Row(
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+            if (hasNew) ...[
+              const SizedBox(width: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                decoration: BoxDecoration(
+                  color: context.colors.cyan,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  _t('YENİ', 'NEW', 'NEU'),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 8,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
+            ],
+          ],
+        ),
+        subtitle: Text(
+          subtitle,
+          style: TextStyle(
+            color: context.colors.textSecondary,
+            fontSize: 12,
+          ),
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (actionLabel != null) ...[
               Text(
-                '${localSelectedBadges.length}/3',
+                actionLabel,
                 style: TextStyle(
                   color: context.colors.cyan,
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
                 ),
               ),
+              const SizedBox(width: 4),
             ],
-          ),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            children: allBadges.map((badge) {
-              final badgeId = badge['id'] as String;
-              final isSelected = localSelectedBadges.contains(badgeId);
+            Icon(
+              Icons.chevron_right,
+              color: context.colors.textSecondary,
+              size: 20,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-              return GestureDetector(
-                onTap: () => _toggleBadge(badgeId),
-                child: Container(
-                  width: 80,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? context.colors.cyan.withValues(alpha: 0.1)
-                        : const Color(0xFF1E293B),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: isSelected
-                          ? context.colors.cyan
-                          : const Color(0xFF334155),
-                      width: isSelected ? 2 : 1,
-                    ),
-                    boxShadow: isSelected
-                        ? [
-                            BoxShadow(
-                              color: context.colors.cyan.withValues(alpha: 0.2),
-                              blurRadius: 8,
-                              spreadRadius: 1,
-                            ),
-                          ]
-                        : null,
-                  ),
-                  child: Column(
-                    children: [
-                      Text(
-                        badge['icon'] as String,
-                        style: const TextStyle(fontSize: 24),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        badge['name'] as String,
-                        style: TextStyle(
-                          color: isSelected
-                              ? Colors.white
-                              : context.colors.textSecondary,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }).toList(),
+  Widget _buildBottomButton({
+    required String label,
+    required VoidCallback onPressed,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: SizedBox(
+        width: double.infinity,
+        height: 48,
+        child: ElevatedButton(
+          onPressed: onPressed,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: context.colors.cyan,
+            foregroundColor: Colors.white,
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
+            ),
           ),
-        ],
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
       ),
     );
   }
