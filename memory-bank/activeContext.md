@@ -1,7 +1,11 @@
 # Active Context
 
 ## Current Task
-Working through a 6-item issue list the user identified from their own review (all verified real against code — see `progress.md`). Fix order agreed with user: #4 compile errors → #1 plaintext password → #3 Firestore rules mismatch → #5 account deletion → #6 local data isolation → #2 simulated purchases. Items #4 and #1 are done and committed (`ce6131b`, `443ea27`); about to start #3, which needs a design decision (see Next Step) so it will be proposed before editing `firestore.rules`.
+**All 6 items on the user's issue list are now fixed and committed** (`ce6131b`, `443ea27`, `aece0d1`, `e107a75`, `5ba660d`, `e2eb1d0` — see `progress.md` for the full per-item detail). Two things remain genuinely open, both requiring the user's own action, not more code:
+1. Deploy `firestore.rules` (items #3/#5) — never run this session; needs `firebase deploy --only firestore:rules` after the user verifies in Firebase Console Rules Playground (no local Java 21+ for the emulator).
+2. Swap the RevenueCat sandbox API key for the production key (item #2) before any real release build, and decide whether to add a "Restore Purchases" UI entry point and/or the optional Pub/Sub real-time notifications (both deferred, not blocking).
+
+RevenueCat dashboard setup (item #2) was done live with the user via a long screen-sharing-by-screenshot session — see the "RevenueCat Dashboard Setup Walkthrough" section below for the exact gotchas hit, useful if this needs revisiting (e.g. adding App Store/iOS later).
 
 ## Branch / Commit
 - Branch: `main`, pushed and in sync with `origin/main` (`github.com/Madeforth/Madeforth-Apex-Flow.git`).
@@ -41,9 +45,23 @@ Updated dangling references: `docs/README.md` reading order and root `README.md`
 - Committed and pushed `CLAUDE.md`, `.github/workflows/closed-test-deploy.yml`, `docs/google_closed_testing.md`, `distribution/whatsnew/*` (`faa045d`) — these were pre-existing untracked files from the user's in-progress Closed Beta release setup, now version-controlled.
 - **Security finding, resolved**: `assets/word documents/key.properties` and `assets/word documents/upload-keystore.jks` were unguarded by `.gitignore` (only `/android/key.properties` was covered). Fixed in commit `2f53bfd` by broadening the rule to `key.properties` / `*.jks` / `*.keystore` (unanchored, so it catches any location). User confirmed these `assets/word documents/` files are the current, actively-used signing config — not stale duplicates, kept on disk intentionally, just correctly excluded from git now. The plaintext password value seen in the file during this session's read has since been rotated per the user, so it is no longer live/sensitive, but was never committed or written into any repo file regardless.
 
-## Next Step
-Continuing the 6-item fix list (see `progress.md` for full detail on each). Immediate next: **#3 Firestore collection/rules mismatch** — needs a design decision before editing `firestore.rules`, since two different data-ownership shapes currently coexist in the code: (a) flat top-level collections (`bikes`, `rides`, `friendships`, `lobbies`, `parking_notifications`) filtered client-side by a `userId`/`userA`/`userB` field, used by `firebase_service.dart`; (b) `users/{uid}/{entityType}/{entityId}` subcollections, used only by the still-unwired `sync_coordinator.dart`. Plan to propose picking (a) as canonical (it's what's actually live/used) and writing owner-scoped rules for the 5 flat collections, rather than trying to support both shapes. Will present this before touching the rules file, since Firestore rule changes are hard to reverse quickly against a live closed-beta app.
-After #3: #5 (account deletion completeness, depends on #3), then #6 (Isar `userId` migration — largest single item), then #2 (real purchase integration — flagged as partially blocked on external store/RevenueCat setup the user must do).
+## RevenueCat Dashboard Setup Walkthrough (2026-08-05, done live with user via screenshots)
+Recorded in case this needs revisiting — e.g. adding the iOS app, redoing permissions, or debugging why an entitlement isn't unlocking.
+- Google Cloud project `apexflow-revenuecat` created specifically for the RevenueCat service account (kept separate from the Firebase project `apex-flow-7baea`, which is on a different Google account than the Play Console developer account "Madeforth" — do not assume they can share a GCP project).
+- Service account `revenuecat-service@apexflow-revenuecat.iam.gserviceaccount.com` created in that project, JSON key downloaded and uploaded to RevenueCat's "Service Account Credentials JSON" field under Apex Flow → Apps → Apex Flow (Play Store).
+- **The permission grant took 3 iterations before "Check credentials" passed** — if this ever needs redoing, grant all of these on the service account in Play Console → Kullanıcılar ve izinler (Users and permissions) in one pass, not incrementally:
+  1. "Finansal verileri, siparişleri ve iptal anketine verilen yanıtları görüntüleme" (View financial data, orders, and cancellation survey responses)
+  2. "Siparişleri ve abonelikleri yönetme" (Manage orders and subscriptions) — easy to miss, it's what unlocked "Can validate Google Play subscription purchases" specifically; the other two RevenueCat checks passed without it.
+  3. Explicit app-level access to "Apex Flow" (not just account-level permissions).
+  4. Also required in Google Cloud Console for the `apexflow-revenuecat` project: enable both the "Google Play Android Developer API" and the "Cloud Pub/Sub API".
+  5. Google's permission propagation had a real delay (order of an hour, not instant) even after everything above was correctly granted — if "Check credentials" fails right after granting, wait before assuming something is misconfigured.
+- Products were added via RevenueCat's "Import Products" (Product catalog → Products → Apex Flow (Play Store) → + New → Import Products), NOT the manual form — manual entry needs a Play Console "Base plan ID" that isn't visible from the app side, so always prefer Import here.
+- The Entitlements list page can show stale data ("Add your first product" even after a product was actually attached, confirmed by opening the entitlement's own detail page) — hit refresh/F5 before concluding an attach failed.
+- A leftover "Apex Flow Pro" entitlement + "Test Store" app/products exist from RevenueCat's own onboarding default setup — harmless (Test Store never fires on real devices), left in place rather than deleted.
+- Skipped by user's choice: "Google developer notifications" (Pub/Sub real-time purchase events) — the topic-ID field requires a pre-existing Pub/Sub topic and the "Connect to Google" button stayed disabled when typing a new name; not investigated further since it's optional.
 
-Several local commits are unpushed (memory bank + `.gitignore` fix + the two code fixes above). Push only when the user asks, per this session's established pattern.
+## Next Step
+No code work is currently planned — the user's issue list is fully addressed. If resuming a fresh session, check first whether the two open items above (Firestore rules deploy, RevenueCat production API key swap) have been actioned outside this tool before assuming they're still pending.
+
+Several local commits may still be unpushed — check `git status` / `git log origin/main..HEAD`. Push only when the user asks, per this session's established pattern.
 Read only the Memory Bank / source files relevant to the active step — this file plus `progress.md` should be sufficient to resume; `projectbrief.md`/`productContext.md`/`systemPatterns.md`/`techContext.md` are reference, not required reading every session.
