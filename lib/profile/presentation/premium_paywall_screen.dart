@@ -1,6 +1,6 @@
-import 'package:apexflow/core/design/apex_colors.dart';
 import 'package:apexflow/core/design/apex_spacing.dart';
 import 'package:apexflow/core/i18n/app_strings.dart';
+import 'package:apexflow/core/services/purchases_service.dart';
 import 'package:apexflow/settings/application/user_profile_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,150 +20,72 @@ class _PremiumPaywallScreenState extends ConsumerState<PremiumPaywallScreen> {
   bool _isLoading = false;
   String _selectedPlan = 'yearly'; // 'monthly', 'yearly', 'lifetime'
 
-  void _executePurchase() {
-    final tr = widget.strings.locale.languageCode == 'tr';
-    showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: context.colors.surface,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(ApexSpacing.radius),
-            side: BorderSide(color: context.colors.border),
-          ),
-          title: Row(
-            children: [
-              Icon(Icons.shop_2_outlined, color: context.colors.cyan),
-              const SizedBox(width: 10),
-              Text(
-                tInline(
-                  widget.strings.languageCode,
-                  'Google Play İşlemi',
-                  'Google Play Billing',
-                  'Google Play-Abrechnung',
-                ),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-            ],
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                tInline(
-                  widget.strings.languageCode,
-                  'Apex Flow Premium - Ömür Boyu Paket',
-                  'Apex Flow Premium - Lifetime Access',
-                  'Apex Flow Premium – lebenslanger Zugriff',
-                ),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                tInline(
-                  widget.strings.languageCode,
-                  'Fiyat: ₺34,99',
-                  'Price: \$9.99',
-                  'Preis: \$9.99',
-                ),
-                style: TextStyle(
-                  color: context.colors.caution,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                tInline(
-                  widget.strings.languageCode,
-                  'Bu ekran Google Play / App Store mağaza satın alma entegrasyonu için hazırlanmıştır. Gerçek sürümde mağaza ödeme penceresini açacaktır.',
-                  'This screen is prepared for Google Play / App Store checkout integration. In production, it will open the native store billing sheet.',
-                  'Dieser Bildschirm ist für die Checkout-Integration von Google Play/App Store vorbereitet. In der Produktion wird das Abrechnungsblatt des nativen Geschäfts geöffnet.',
-                ),
-                style: TextStyle(
-                  color: context.colors.textSecondary,
-                  fontSize: 12,
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(
-                tInline(
-                  widget.strings.languageCode,
-                  'İPTAL',
-                  'CANCEL',
-                  'STORNIEREN',
-                ),
-                style: TextStyle(
-                  color: context.colors.textSecondary,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: context.colors.cyan,
-                foregroundColor: context.colors.onAccent,
-              ),
-              onPressed: () {
-                Navigator.pop(context); // Close dialog
-                _simulateStoreCheckout();
-              },
-              child: Text(
-                tInline(
-                  widget.strings.languageCode,
-                  'TEST ÖDEMESİ YAP',
-                  'SIMULATE PAYMENT',
-                  'ZAHLUNG SIMULIEREN',
-                ),
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _simulateStoreCheckout() {
+  Future<void> _executePurchase() async {
     setState(() {
       _isLoading = true;
     });
-    Future.delayed(const Duration(milliseconds: 1500), () {
+
+    final offering = await PurchasesService.instance.getCurrentOffering();
+    final package = _selectedPlan == 'monthly'
+        ? offering?.monthly
+        : offering?.annual;
+
+    if (package == null) {
       if (!mounted) return;
       setState(() {
         _isLoading = false;
       });
-      ref.read(userProfileProvider.notifier).updatePremiumStatus(true);
-      // Show SnackBar BEFORE pop to avoid invalid context
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             tInline(
               widget.strings.languageCode,
-              'Premium üyeliğiniz başlatıldı. 👑',
-              'Premium membership started. 👑',
-              'Premium-Mitgliedschaft gestartet. 👑',
+              'Mağaza fiyatları şu anda yüklenemedi. Lütfen tekrar deneyin.',
+              'Store pricing could not be loaded right now. Please try again.',
+              'Store-Preise konnten gerade nicht geladen werden. Bitte versuchen Sie es erneut.',
             ),
           ),
-          backgroundColor: context.colors.cyan,
+          backgroundColor: context.colors.caution,
         ),
       );
-      if (Navigator.canPop(context)) Navigator.pop(context);
+      return;
+    }
+
+    final customerInfo = await PurchasesService.instance.purchasePackage(
+      package,
+    );
+    if (!mounted) return;
+    setState(() {
+      _isLoading = false;
     });
+
+    final unlocked =
+        customerInfo?.entitlements.active.containsKey(
+          PurchasesEntitlements.premium,
+        ) ??
+        false;
+
+    if (!unlocked) {
+      // Purchase failed or was cancelled by the user — no local state change.
+      return;
+    }
+
+    await ref.read(userProfileProvider.notifier).updatePremiumStatus(true);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          tInline(
+            widget.strings.languageCode,
+            'Premium üyeliğiniz başlatıldı. 👑',
+            'Premium membership started. 👑',
+            'Premium-Mitgliedschaft gestartet. 👑',
+          ),
+        ),
+        backgroundColor: context.colors.cyan,
+      ),
+    );
+    if (Navigator.canPop(context)) Navigator.pop(context);
   }
 
   @override
@@ -431,14 +353,20 @@ class _PremiumPaywallScreenState extends ConsumerState<PremiumPaywallScreen> {
                                     padding: const EdgeInsets.all(12),
                                     decoration: BoxDecoration(
                                       color: _selectedPlan == 'monthly'
-                                          ? context.colors.cyan.withValues(alpha: 0.12)
+                                          ? context.colors.cyan.withValues(
+                                              alpha: 0.12,
+                                            )
                                           : context.colors.surface,
-                                      borderRadius: BorderRadius.circular(ApexSpacing.radius),
+                                      borderRadius: BorderRadius.circular(
+                                        ApexSpacing.radius,
+                                      ),
                                       border: Border.all(
                                         color: _selectedPlan == 'monthly'
                                             ? context.colors.cyan
                                             : context.colors.border,
-                                        width: _selectedPlan == 'monthly' ? 2 : 1,
+                                        width: _selectedPlan == 'monthly'
+                                            ? 2
+                                            : 1,
                                       ),
                                     ),
                                     child: Column(
@@ -502,25 +430,34 @@ class _PremiumPaywallScreenState extends ConsumerState<PremiumPaywallScreen> {
                                     padding: const EdgeInsets.all(12),
                                     decoration: BoxDecoration(
                                       color: _selectedPlan == 'yearly'
-                                          ? context.colors.cyan.withValues(alpha: 0.12)
+                                          ? context.colors.cyan.withValues(
+                                              alpha: 0.12,
+                                            )
                                           : context.colors.surface,
-                                      borderRadius: BorderRadius.circular(ApexSpacing.radius),
+                                      borderRadius: BorderRadius.circular(
+                                        ApexSpacing.radius,
+                                      ),
                                       border: Border.all(
                                         color: _selectedPlan == 'yearly'
                                             ? context.colors.cyan
                                             : context.colors.border,
-                                        width: _selectedPlan == 'yearly' ? 2 : 1,
+                                        width: _selectedPlan == 'yearly'
+                                            ? 2
+                                            : 1,
                                       ),
                                     ),
                                     child: Column(
                                       children: [
                                         Container(
                                           padding: const EdgeInsets.symmetric(
-                                              horizontal: 6, vertical: 2),
+                                            horizontal: 6,
+                                            vertical: 2,
+                                          ),
                                           decoration: BoxDecoration(
                                             color: context.colors.caution,
-                                            borderRadius:
-                                                BorderRadius.circular(4),
+                                            borderRadius: BorderRadius.circular(
+                                              4,
+                                            ),
                                           ),
                                           child: Text(
                                             tInline(
@@ -601,8 +538,7 @@ class _PremiumPaywallScreenState extends ConsumerState<PremiumPaywallScreen> {
                                 ),
                                 elevation: 0,
                               ),
-                              onPressed:
-                                  _isLoading ? null : _executePurchase,
+                              onPressed: _isLoading ? null : _executePurchase,
                               child: _isLoading
                                   ? const SizedBox(
                                       width: 20,

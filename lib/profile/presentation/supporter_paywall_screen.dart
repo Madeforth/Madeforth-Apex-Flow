@@ -1,5 +1,6 @@
 import 'package:apexflow/core/design/apex_spacing.dart';
 import 'package:apexflow/core/i18n/app_strings.dart';
+import 'package:apexflow/core/services/purchases_service.dart';
 import 'package:apexflow/settings/application/user_profile_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,153 +21,82 @@ class _SupporterPaywallScreenState
     extends ConsumerState<SupporterPaywallScreen> {
   bool _isLoading = false;
 
-  void _executePurchase(int tierId, String tierName, String price) {
-    final tr = widget.strings.locale.languageCode == 'tr';
-    showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: context.colors.surface,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(ApexSpacing.radius),
-            side: BorderSide(color: context.colors.border),
-          ),
-          title: Row(
-            children: [
-              Icon(Icons.favorite_outline, color: context.colors.cyan),
-              const SizedBox(width: 10),
-              Text(
-                tInline(
-                  widget.strings.languageCode,
-                  'Google Play İşlemi',
-                  'Google Play Billing',
-                  'Google Play-Abrechnung',
-                ),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-            ],
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Apex Flow - $tierName',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                tInline(
-                  widget.strings.languageCode,
-                  'Fiyat: $price',
-                  'Price: $price',
-                  'Preis: $price',
-                ),
-                style: TextStyle(
-                  color: context.colors.caution,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                tInline(
-                  widget.strings.languageCode,
-                  'Bu ekran Google Play / App Store mağaza satın alma entegrasyonu için hazırlanmıştır. Gerçek sürümde mağaza ödeme penceresini açacaktır.',
-                  'This screen is prepared for Google Play / App Store checkout integration. In production, it will open the native store billing sheet.',
-                  'Dieser Bildschirm ist für die Checkout-Integration von Google Play/App Store vorbereitet. In der Produktion wird das Abrechnungsblatt des nativen Geschäfts geöffnet.',
-                ),
-                style: TextStyle(
-                  color: context.colors.textSecondary,
-                  fontSize: 12,
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(
-                tInline(
-                  widget.strings.languageCode,
-                  'İPTAL',
-                  'CANCEL',
-                  'STORNIEREN',
-                ),
-                style: TextStyle(
-                  color: context.colors.textSecondary,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: context.colors.cyan,
-                foregroundColor: context.colors.onAccent,
-              ),
-              onPressed: () {
-                Navigator.pop(context);
-                _simulateStoreCheckout(tierId);
-              },
-              child: Text(
-                tInline(
-                  widget.strings.languageCode,
-                  'TEST ÖDEMESİ YAP',
-                  'SIMULATE PAYMENT',
-                  'ZAHLUNG SIMULIEREN',
-                ),
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _simulateStoreCheckout(int tierId) {
-    final tr = widget.strings.locale.languageCode == 'tr';
+  Future<void> _executePurchase(
+    int tierId,
+    String tierName,
+    String price,
+  ) async {
     setState(() {
       _isLoading = true;
     });
-    Future.delayed(const Duration(milliseconds: 1500), () {
+
+    final product = await PurchasesService.instance.getProduct(
+      PurchasesProductIds.supporterTier(tierId),
+    );
+
+    if (product == null) {
       if (!mounted) return;
       setState(() {
         _isLoading = false;
       });
-      ref.read(userProfileProvider.notifier).updateSupporterTier(tierId);
-      final supporterThemeIndex = riderCardThemes.indexWhere(
-        (t) => t.requiredSupporterTier > 0,
-      );
-      if (supporterThemeIndex != -1) {
-        ref.read(userProfileProvider.notifier).selectTheme(supporterThemeIndex);
-      }
-
-      // Show SnackBar BEFORE pop to avoid invalid context
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             tInline(
               widget.strings.languageCode,
-              'Desteğiniz için teşekkürler! Apex Flow Supporter paketiniz başarıyla aktifleştirildi! 🏍️',
-              'Thank you for your support! Your Apex Flow Supporter pack has been activated! 🏍️',
-              'Vielen Dank für Ihre Unterstützung! Ihr Apex Flow Supporter-Paket wurde aktiviert! 🏍️',
+              'Mağaza fiyatları şu anda yüklenemedi. Lütfen tekrar deneyin.',
+              'Store pricing could not be loaded right now. Please try again.',
+              'Store-Preise konnten gerade nicht geladen werden. Bitte versuchen Sie es erneut.',
             ),
           ),
-          backgroundColor: context.colors.cyan,
+          backgroundColor: context.colors.caution,
         ),
       );
-      if (Navigator.canPop(context)) Navigator.pop(context);
+      return;
+    }
+
+    final customerInfo = await PurchasesService.instance.purchaseProduct(
+      product,
+    );
+    if (!mounted) return;
+    setState(() {
+      _isLoading = false;
     });
+
+    final unlocked =
+        customerInfo?.entitlements.active.containsKey(
+          PurchasesEntitlements.supporterTier(tierId),
+        ) ??
+        false;
+
+    if (!unlocked) {
+      // Purchase failed or was cancelled by the user — no local state change.
+      return;
+    }
+
+    await ref.read(userProfileProvider.notifier).updateSupporterTier(tierId);
+    final supporterThemeIndex = riderCardThemes.indexWhere(
+      (t) => t.requiredSupporterTier > 0,
+    );
+    if (supporterThemeIndex != -1) {
+      ref.read(userProfileProvider.notifier).selectTheme(supporterThemeIndex);
+    }
+
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          tInline(
+            widget.strings.languageCode,
+            'Desteğiniz için teşekkürler! Apex Flow Supporter paketiniz başarıyla aktifleştirildi! 🏍️',
+            'Thank you for your support! Your Apex Flow Supporter pack has been activated! 🏍️',
+            'Vielen Dank für Ihre Unterstützung! Ihr Apex Flow Supporter-Paket wurde aktiviert! 🏍️',
+          ),
+        ),
+        backgroundColor: context.colors.cyan,
+      ),
+    );
+    if (Navigator.canPop(context)) Navigator.pop(context);
   }
 
   @override

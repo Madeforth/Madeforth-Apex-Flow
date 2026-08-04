@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:apexflow/core/design/apex_theme.dart';
 import 'package:apexflow/core/i18n/app_settings_state.dart';
 import 'package:apexflow/core/i18n/app_strings.dart';
+import 'package:apexflow/core/services/firebase_service.dart';
+import 'package:apexflow/core/services/purchases_service.dart';
 import 'package:apexflow/core/storage/apex_kv_store.dart';
 import 'package:apexflow/onboarding/presentation/onboarding_screen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -89,7 +91,9 @@ void main() async {
   }
 
   try {
-    await ApexNotificationService.instance.init().timeout(const Duration(seconds: 2));
+    await ApexNotificationService.instance.init().timeout(
+      const Duration(seconds: 2),
+    );
   } catch (e) {
     debugPrint('Notification init error: $e');
   }
@@ -120,9 +124,21 @@ void main() async {
       );
     }
 
-    await Firebase.initializeApp(options: options).timeout(const Duration(seconds: 3));
+    await Firebase.initializeApp(
+      options: options,
+    ).timeout(const Duration(seconds: 3));
   } catch (e) {
     debugPrint('Firebase init error: $e');
+  }
+
+  try {
+    await PurchasesService.instance.init().timeout(const Duration(seconds: 3));
+    final ownerId = await FirebaseService.instance
+        .getOrCreateInstallationId()
+        .timeout(const Duration(seconds: 3));
+    await PurchasesService.instance.logIn(ownerId);
+  } catch (e) {
+    debugPrint('Purchases init error: $e');
   }
 
   runApp(const ApexFlowRoot());
