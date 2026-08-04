@@ -7,9 +7,14 @@
 
 RevenueCat dashboard setup (item #2) was done live with the user via a long screen-sharing-by-screenshot session — see the "RevenueCat Dashboard Setup Walkthrough" section below for the exact gotchas hit, useful if this needs revisiting (e.g. adding App Store/iOS later).
 
+After the 6-item fix list, also did two rounds of repo file cleanup at the user's request (commits `d50f8e5`, `49b6ac0`):
+- `assets/images/`: removed 5 files confirmed unreferenced anywhere in `lib/` or `pubspec.yaml` (`accident_form_eu_back.jpg`, `accident_form_eu_front.jpg`, `accident_form_tr.jpg` — the accident-report feature actually uses `assets/templates/*.pdf`/`*.png` instead; `app_logo_transparent.png`; `motorcycle_vector.png` — an old dashboard illustration removed in an earlier design pass per DEVLOG history, now gone from the repo too). Deliberately kept: `assets/images/Apex Flow Final Logo/` (brand asset archive — only one file in it is code-referenced, but the SVG masters/exports are intentional design assets, not dead weight) and `assets/word documents/*.docx`/`*.md`/`*.png` (active design reference docs).
+- Repo root: removed `analyze_output.txt`, `build_log.txt` (stale logs), `ApexFlow-Source-Code.zip` (57MB redundant full-source backup — **still present in git history**, only removed from the working tree; a history rewrite would need separate explicit approval), and four one-off dev scripts (`draw_icon.py`, `extract_vector.py`, `generate_icon.py`, `fix_strings.dart`) not imported by the app.
+- **Not done**: a full `lib/` sweep for unused/dead Dart files — user flagged limited time (12 min) as insufficient for that safely; explicitly deferred to a future session rather than rushed.
+
 ## Branch / Commit
-- Branch: `main`, pushed and in sync with `origin/main` (`github.com/Madeforth/Madeforth-Apex-Flow.git`).
-- HEAD: `faa045d` — "chore: track Closed Beta release assets and CLAUDE.md governance file" (prior: `347ae4b` memory bank init/docs cleanup, prior: `e1e57e9` README update — see `git log` for full history, not duplicated here).
+- Branch: `main`, pushed and in sync with `origin/main` (`github.com/Madeforth/Madeforth-Apex-Flow.git`) as of the last push — **verify with `git status`/`git log origin/main..HEAD` before assuming, several commits have landed since (see above) and push cadence in this session is only ever done when the user explicitly asks.**
+- HEAD (as of this update): `49b6ac0` — "chore: remove stale logs, one-off scripts, and a redundant source zip". Earlier history: `d50f8e5` (unused images), `8e83b04`/`e2eb1d0`/`5ba660d`/`e107a75`/`aece0d1`/`ce6131b`/`443ea27` (the 6-item fix list), `faa045d` and earlier (memory bank init/docs cleanup — see `git log` for full history, not duplicated here).
 - GitHub CLI (`gh`) auth: active account switched mid-session from `Krator7` (stale) to `Madeforth` (matches repo owner; scopes include `repo` + `workflow`). `Krator7` remains logged in but inactive. `gh auth setup-git` was run so `git push` uses the `gh`-managed credential instead of prompting Git Credential Manager interactively (which fails in this non-interactive shell).
 - Remaining untracked files (deliberately NOT committed — see Security note below): `assets/word documents/key.properties`, `assets/word documents/upload-keystore.jks`.
 
@@ -62,6 +67,8 @@ Recorded in case this needs revisiting — e.g. adding the iOS app, redoing perm
 
 ## Next Step
 No code work is currently planned — the user's issue list is fully addressed. If resuming a fresh session, check first whether the two open items above (Firestore rules deploy, RevenueCat production API key swap) have been actioned outside this tool before assuming they're still pending.
+
+Deferred, likely the next thing the user asks for: a full `lib/` sweep for unused/dead Dart files (not just assets) — explicitly postponed rather than rushed under a tight time budget. Do this carefully (grep every file's class/function usage before removing, watch for reflection-free but provider/route-registered files) since incorrectly removing a live file is a real regression risk, unlike the asset cleanup already done.
 
 Several local commits may still be unpushed — check `git status` / `git log origin/main..HEAD`. Push only when the user asks, per this session's established pattern.
 Read only the Memory Bank / source files relevant to the active step — this file plus `progress.md` should be sufficient to resume; `projectbrief.md`/`productContext.md`/`systemPatterns.md`/`techContext.md` are reference, not required reading every session.
