@@ -45,5 +45,7 @@ app.*.map.json
 /android/app/release
 
 # Private signing keys
-/android/key.properties
+key.properties
+*.jks
+*.keystore
 venv/
