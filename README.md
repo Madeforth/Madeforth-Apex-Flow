@@ -2,13 +2,27 @@
 
 > **Machine Relationship OS** — Motosiklet bakımı, sürüş ritüelleri ve makineyle duygusal bağı tek bir premium Flutter uygulamasında birleştiren global bir platform.
 
-Ana hedef **Android / Google Play Store** çıkışıdır. Dahili test aşaması aktif olarak devam etmektedir.
+> [!IMPORTANT]
+> 🚀 **Kapalı Beta (Closed Beta) aşamasına geçilmiştir.** — 4 Ağustos 2026
+
+Ana hedef **Android / Google Play Store** çıkışıdır.
 
 ---
 
-## 📋 Proje Durumu — v1.0.0+19 (31 Temmuz 2026)
+## 📋 Proje Durumu — v1.0.0+20 (4 Ağustos 2026)
 
-**Tüm Phase 1-7 Tamamlandı — Google Play Dahili Test Sürümü Aktif (Build 19)**
+**Phase 1-9 Tamamlandı — Kapalı Beta (Closed Beta) Aktif**
+
+### 🚀 Kapalı Beta Bilgileri
+
+| Bilgi | Detay |
+|-------|-------|
+| **Aşama** | Google Play Closed Testing |
+| **Başlangıç** | 4 Ağustos 2026 |
+| **Test Cihazı** | 6 farklı Android cihaz |
+| **Sistem Durumu** | 12/12 köprü tam bağlı, 0 kritik hata |
+| **Dil Desteği** | Türkçe, İngilizce, Almanca |
+| **Geri Bildirim** | Discord Sunucusu |
 
 ### ⚡ Öne Çıkan Çalışan Özellikler
 
@@ -93,5 +107,5 @@ flutter test
 ## 🎯 Güncel Milestone & Yayın Durumu
 
 - [x] **Dahili Test (Internal Testing):** Google Play Console AAB yüklemesi (Build 19)
-- [ ] **Kapalı Test (Closed Beta):** Davetli sürücü grubu ile saha testleri
+- [x] **Kapalı Test (Closed Beta):** Davetli sürücü grubu ile saha testleri ← **AKTİF (4 Ağustos 2026)**
 - [ ] **Genel Yayın (Production Launch):** Google Play Store & Apple App Store Canlı Lansman
