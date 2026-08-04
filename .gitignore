@@ -48,4 +48,5 @@ app.*.map.json
 key.properties
 *.jks
 *.keystore
+/ios/Flutter/Secrets.xcconfig
 venv/

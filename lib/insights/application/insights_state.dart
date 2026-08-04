@@ -238,6 +238,7 @@ class InsightsController extends Notifier<InsightsState> {
   static const _storageKey = 'insights.state.v1';
 
   bool _mounted = true;
+  List<CostEntry> _manualCostEntries = const [];
 
   @override
   InsightsState build() {
@@ -258,7 +259,7 @@ class InsightsController extends Notifier<InsightsState> {
         vault,
         isTurkish,
       ),
-      costLedger: _deriveCostLedger(fuel.entries),
+      costLedger: [..._manualCostEntries, ..._deriveCostLedger(fuel.entries)],
       patternSignals: _derivePatternSignals(rides),
       partsWishlist: const [],
       fuelSnapshot: _deriveFuelSnapshot(fuel.entries),
@@ -306,6 +307,34 @@ class InsightsController extends Notifier<InsightsState> {
     unawaited(_persist());
   }
 
+  Future<void> addCostEntry({
+    required String label,
+    required String category,
+    required double amountTry,
+  }) async {
+    final normalizedLabel = label.trim();
+    if (normalizedLabel.isEmpty || !amountTry.isFinite || amountTry <= 0) {
+      throw ArgumentError('A label and a positive amount are required.');
+    }
+
+    final entry = CostEntry(
+      label: normalizedLabel,
+      category: category,
+      amountTry: amountTry,
+    );
+    final previousManualEntries = _manualCostEntries;
+    final previousLedger = state.costLedger;
+    _manualCostEntries = [entry, ..._manualCostEntries];
+    state = state.copyWith(costLedger: [entry, ...state.costLedger]);
+    try {
+      await _persist();
+    } catch (_) {
+      _manualCostEntries = previousManualEntries;
+      state = state.copyWith(costLedger: previousLedger);
+      rethrow;
+    }
+  }
+
   Future<void> _hydrate() async {
     final raw = await ApexKvStore.getString(_storageKey);
     if (!_mounted) {
@@ -317,8 +346,19 @@ class InsightsController extends Notifier<InsightsState> {
     }
     try {
       final json = jsonDecode(raw) as Map<String, dynamic>;
+      _manualCostEntries =
+          (json['manualCostLedger'] as List<dynamic>? ?? const [])
+              .map(
+                (item) =>
+                    CostEntry.fromJson(Map<String, dynamic>.from(item as Map)),
+              )
+              .toList();
       state = state.copyWith(
         isHydrating: false,
+        costLedger: [
+          ..._manualCostEntries,
+          ..._deriveCostLedger(ref.read(fuelStateProvider).entries),
+        ],
         partsWishlist: (json['partsWishlist'] as List<dynamic>? ?? [])
             .map(
               (item) =>
@@ -334,6 +374,9 @@ class InsightsController extends Notifier<InsightsState> {
 
   Future<void> _persist() async {
     final payload = {
+      'manualCostLedger': _manualCostEntries
+          .map((item) => item.toJson())
+          .toList(),
       'partsWishlist': state.partsWishlist
           .map((item) => item.toJson())
           .toList(),

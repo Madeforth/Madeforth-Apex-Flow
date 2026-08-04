@@ -1,6 +1,8 @@
 # Active Context
 
 ## Current Task
+
+**2026-08-05 task completed locally (uncommitted):** Removed debug TLS certificate bypasses, made Insights manual cost entries validate and persist durably with rollback on storage failure, declared directly imported packages, and replaced dummy Maps keys with external Android/iOS configuration. Added two Insights regression tests. Verification: `flutter test` 93/93 passed; `flutter analyze --no-pub` has 325 pre-existing warnings/info and 0 errors (down from 328, still exits non-zero); Android debug APK built successfully. iOS build not verified on Windows. A real `MAPS_API_KEY` / `GOOGLE_MAPS_API_KEY` is still required outside Git before map rendering works. `CLAUDE.md` remained untouched and is explicitly read-only per the user.
 **All 6 items on the user's issue list are now fixed and committed** (`ce6131b`, `443ea27`, `aece0d1`, `e107a75`, `5ba660d`, `e2eb1d0` — see `progress.md` for the full per-item detail). Two things remain genuinely open, both requiring the user's own action, not more code:
 1. Deploy `firestore.rules` (items #3/#5) — never run this session; needs `firebase deploy --only firestore:rules` after the user verifies in Firebase Console Rules Playground (no local Java 21+ for the emulator).
 2. Swap the RevenueCat sandbox API key for the production key (item #2) before any real release build, and decide whether to add a "Restore Purchases" UI entry point and/or the optional Pub/Sub real-time notifications (both deferred, not blocking).

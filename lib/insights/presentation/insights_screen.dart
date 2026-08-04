@@ -322,7 +322,7 @@ class InsightsScreen extends ConsumerWidget {
                 'Kostenbuch',
               ),
             ),
-            _CostLedgerCard(state: state, tr: tr),
+            _CostLedgerCard(state: state, tr: tr, strings: strings),
             const SizedBox(height: 40),
 
             // Parts Wishlist (Kept from original design logic but updated styling)
@@ -1475,14 +1475,19 @@ class _UpcomingMaintenanceCard extends StatelessWidget {
   }
 }
 
-class _CostLedgerCard extends StatelessWidget {
+class _CostLedgerCard extends ConsumerWidget {
   final InsightsState state;
   final bool tr;
+  final AppStrings strings;
 
-  const _CostLedgerCard({required this.state, required this.tr});
+  const _CostLedgerCard({
+    required this.state,
+    required this.tr,
+    required this.strings,
+  });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFF0A0A0A),
@@ -1573,7 +1578,7 @@ class _CostLedgerCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 GestureDetector(
-                  onTap: () => _showAddCostSheet(context),
+                  onTap: () => _showAddCostSheet(context, ref, strings),
                   child: Container(
                     padding: const EdgeInsets.all(7),
                     decoration: BoxDecoration(
@@ -1852,13 +1857,17 @@ void _showLedgerSheet(BuildContext context, InsightsState state, bool tr) {
 }
 
 // Add cost entry bottom sheet
-void _showAddCostSheet(BuildContext context) {
+Future<void> _showAddCostSheet(
+  BuildContext context,
+  WidgetRef ref,
+  AppStrings strings,
+) async {
   final descCtrl = TextEditingController();
   final amountCtrl = TextEditingController();
   String selectedCategory = 'Fuel';
   final categories = ['Fuel', 'Service', 'Tyre', 'Insurance', 'Other'];
 
-  showModalBottomSheet(
+  await showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
@@ -2047,20 +2056,44 @@ void _showAddCostSheet(BuildContext context) {
                           borderRadius: BorderRadius.circular(6),
                         ),
                       ),
-                      onPressed: () {
-                        // TODO: wire to InsightsNotifier when cost ledger persistence is added
+                      onPressed: () async {
+                        final amount = double.tryParse(
+                          amountCtrl.text.trim().replaceAll(',', '.'),
+                        );
+                        if (descCtrl.text.trim().isEmpty ||
+                            amount == null ||
+                            !amount.isFinite ||
+                            amount <= 0) {
+                          ScaffoldMessenger.of(ctx).showSnackBar(
+                            SnackBar(
+                              content: Text(strings.insightsCostInvalid),
+                            ),
+                          );
+                          return;
+                        }
+
+                        try {
+                          await ref
+                              .read(insightsStateProvider.notifier)
+                              .addCostEntry(
+                                label: descCtrl.text,
+                                category: selectedCategory,
+                                amountTry: amount,
+                              );
+                        } catch (_) {
+                          if (!ctx.mounted) return;
+                          ScaffoldMessenger.of(ctx).showSnackBar(
+                            SnackBar(
+                              content: Text(strings.insightsCostSaveFailed),
+                            ),
+                          );
+                          return;
+                        }
+
+                        if (!ctx.mounted || !context.mounted) return;
                         Navigator.of(ctx).pop();
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              tInline(
-                                AppStrings.currentLanguageCode,
-                                'Kayıt eklendi (yakında kaydedilecek)',
-                                'Entry added (will be saved soon)',
-                                'Eintrag hinzugefügt (wird bald gespeichert)',
-                              ),
-                            ),
-                          ),
+                          SnackBar(content: Text(strings.insightsCostSaved)),
                         );
                       },
                       child: Text(
@@ -2086,6 +2119,8 @@ void _showAddCostSheet(BuildContext context) {
       );
     },
   );
+  descCtrl.dispose();
+  amountCtrl.dispose();
 }
 
 String _translateLine(String line, bool tr) {

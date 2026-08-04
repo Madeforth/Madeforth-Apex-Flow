@@ -55,3 +55,10 @@ Before trusting or building on any of these, grep the actual implementation (`te
 
 ## Next Step
 No active task in progress. When work begins, update `activeContext.md` with the specific task, branch/commit, and decisions before editing code.
+
+## 2026-08-05 — Safety and Broken-Flow Fixes (Local, Uncommitted)
+- Removed all repository occurrences of the debug TLS certificate bypass (`HttpOverrides.global` / `badCertificateCallback`) from app startup and Maps short-link resolution.
+- Replaced the Insights cost-entry fake-success action with validated, durable `ApexKvStore` persistence. Manual entries are kept separate from fuel-derived ledger rows, hydration restores them, and an unsuccessful write rolls state back before the UI reports failure. Added two regression tests.
+- Declared directly imported `crypto`, `path_provider_platform_interface`, and `plugin_platform_interface` packages in `pubspec.yaml`.
+- Removed Android/iOS dummy Google Maps keys. Android now reads `MAPS_API_KEY` from a Gradle property or environment variable. iOS reads `GOOGLE_MAPS_API_KEY` from a gitignored `ios/Flutter/Secrets.xcconfig`; an example file is tracked. No real key was added.
+- Verification: `flutter test --no-pub` passed 93/93; `flutter analyze --no-pub` reported 325 warnings/info and 0 errors (baseline was 328); `flutter build apk --debug --no-pub` succeeded. iOS build remains not verified because the current environment is Windows.
