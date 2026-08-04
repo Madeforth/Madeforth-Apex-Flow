@@ -165,7 +165,6 @@ class UserProfileController extends Notifier<UserProfile> {
   static const _sharePhoneKey = 'profile.share_phone';
   static const _shareEmergencyKey = 'profile.share_emergency';
   static const _isPremiumKey = 'profile.is_premium';
-  static const _passwordKey = 'profile.password';
   static const _isTagCustomizedKey = 'profile.is_tag_customized';
   static const _cardThemeIndexKey = 'profile.card_theme_index';
   static const _selectedFrameIndexKey = 'profile.selected_frame_index';
@@ -445,7 +444,6 @@ class UserProfileController extends Notifier<UserProfile> {
     await ApexKvStore.setString(_emergencyPhoneKey, emPhone);
     await ApexKvStore.setString(_riderTagKey, restoredTag);
     await ApexKvStore.setBool(_isPremiumKey, isPremium);
-    await ApexKvStore.setString(_passwordKey, password);
 
     await ApexKvStore.setString(_cityKey, city);
     await ApexKvStore.setString(_instagramKey, instagram);
@@ -544,7 +542,6 @@ class UserProfileController extends Notifier<UserProfile> {
     await ApexKvStore.setString(_emergencyPhoneKey, emPhone);
     await ApexKvStore.setString(_riderTagKey, activeTag);
     await ApexKvStore.setBool(_isPremiumKey, isPremium);
-    await ApexKvStore.setString(_passwordKey, password);
     await ApexKvStore.setBool(_isTagCustomizedKey, isTagCustomized);
 
     await ApexKvStore.setString(_cityKey, city);
@@ -739,7 +736,6 @@ class UserProfileController extends Notifier<UserProfile> {
     bool? sharePhone,
     bool? shareEmergency,
     bool? isPremium,
-    String? password,
     String? email,
     String? city,
     String? instagram,
@@ -891,10 +887,6 @@ class UserProfileController extends Notifier<UserProfile> {
       jsonEncode(state.unlockedSupporterTiers.toList()),
     );
 
-    if (password != null && password.isNotEmpty) {
-      await ApexKvStore.setString(_passwordKey, password);
-    }
-
     // Sync to Firestore database
     await _syncProfileToFirestore(oldTag: oldTag, email: email);
 
@@ -940,7 +932,6 @@ class UserProfileController extends Notifier<UserProfile> {
     await ApexKvStore.remove(_sharePhoneKey);
     await ApexKvStore.remove(_shareEmergencyKey);
     await ApexKvStore.remove(_isPremiumKey);
-    await ApexKvStore.remove(_passwordKey);
     await ApexKvStore.remove(_isTagCustomizedKey);
     await ApexKvStore.remove(_selectedFrameIndexKey);
     await ApexKvStore.remove(_cityKey);
@@ -1088,7 +1079,6 @@ class UserProfileController extends Notifier<UserProfile> {
         : const HarmonyEngine().evaluate(bike, rides.latestRide).score;
 
     final cleanEmail = email ?? FirebaseAuth.instance.currentUser?.email;
-    final savedPassword = await ApexKvStore.getString(_passwordKey);
 
     String? fcmToken;
     try {
@@ -1116,7 +1106,6 @@ class UserProfileController extends Notifier<UserProfile> {
         bloodType: state.bloodType,
         emergencyName: state.emergencyContactName,
         emergencyPhone: state.emergencyContactPhone,
-        password: savedPassword,
         email: cleanEmail,
         oldTag: oldTag,
         fcmToken: fcmToken,

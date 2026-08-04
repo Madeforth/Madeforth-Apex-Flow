@@ -135,7 +135,6 @@ class FirebaseService {
     required String emergencyName,
     required String emergencyPhone,
     String? oldTag,
-    String? password,
     String? email,
     String? activeBikeName,
     String? activeBikeModel,
@@ -317,8 +316,8 @@ class FirebaseService {
   }
 
   /// Logs in a user using their Rider Tag and password.
-  /// First checks if the tag is associated with an email. If so, logs in via FirebaseAuth.
-  /// Falls back to plain text password matching in Firestore for legacy profiles.
+  /// Requires the tag to be bound to an email (real Firebase Auth sign-in);
+  /// throws 'legacy-unbound-account' for tags with no associated email.
   Future<Map<String, dynamic>?> loginWithTag(
     String tag,
     String password,
