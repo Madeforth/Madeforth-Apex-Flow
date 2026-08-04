@@ -4,9 +4,9 @@ import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:apexflow/core/services/firebase_service.dart';
 import 'package:apexflow/core/storage/apex_kv_store.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'sync_models.dart';
 import 'sync_conflict_resolver.dart';
 
@@ -41,12 +41,12 @@ class ApexSyncCoordinator implements SyncCoordinator {
   Timer? _debounceTimer;
 
   void _init() {
-    _loadOutboxFromStorage();
+    unawaited(_loadOutboxFromStorage());
   }
 
-  void _loadOutboxFromStorage() {
+  Future<void> _loadOutboxFromStorage() async {
     try {
-      final rawList = ApexKvStore.getStringList('sync.outbox_queue') ?? [];
+      final rawList = await ApexKvStore.getStringList('sync.outbox_queue') ?? [];
       _outbox.clear();
       for (final jsonStr in rawList) {
         try {
@@ -226,7 +226,7 @@ class ApexSyncCoordinator implements SyncCoordinator {
 
   Future<bool> _executeRemoteSync(SyncOperation op) async {
     try {
-      final user = FirebaseService().currentUser;
+      final user = FirebaseAuth.instance.currentUser;
       if (user == null) {
         return false;
       }

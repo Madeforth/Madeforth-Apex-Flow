@@ -55,6 +55,25 @@ abstract final class ApexKvStore {
     await _box!.put(key, value);
   }
 
+  static Future<List<String>?> getStringList(String key) async {
+    if (_useFallback || _box == null) {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getStringList(key);
+    }
+    final raw = _box!.get(key);
+    if (raw == null) return null;
+    return (raw as List).cast<String>();
+  }
+
+  static Future<void> setStringList(String key, List<String> value) async {
+    if (_useFallback || _box == null) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList(key, value);
+      return;
+    }
+    await _box!.put(key, value);
+  }
+
   static Future<void> remove(String key) async {
     if (_useFallback || _box == null) {
       final prefs = await SharedPreferences.getInstance();
