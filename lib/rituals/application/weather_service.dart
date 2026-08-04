@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math' as math;
 import 'package:apexflow/rituals/application/rituals_state.dart';
 import 'package:http/http.dart' as http;
 import 'package:apexflow/core/i18n/app_strings.dart';
@@ -893,24 +894,59 @@ class WeatherService {
     }
   }
 
+  double _calculateDistanceKm(double lat1, double lon1, double lat2, double lon2) {
+    const p = 0.017453292519943295; // pi / 180
+    final a = 0.5 -
+        math.cos((lat2 - lat1) * p) / 2 +
+        math.cos(lat1 * p) * math.cos(lat2 * p) * (1 - math.cos((lon2 - lon1) * p)) / 2;
+    return 12742 * math.asin(math.sqrt(a)); // 2 * R; R = 6371 km
+  }
+
   Future<WeatherSnapshot> _fetchForecast(
     _WeatherLocation location, {
     required String languageCode,
   }) async {
     final cacheKey =
         'weather_cache_${location.latitude.toStringAsFixed(3)}_${location.longitude.toStringAsFixed(3)}';
-    String? cachedString;
+    final generalCacheKey = 'last_weather_query';
     try {
       await ApexKvStore.init();
-      cachedString = await ApexKvStore.getString(cacheKey);
-      if (cachedString != null && cachedString.isNotEmpty) {
-        final cachedData = jsonDecode(cachedString) as Map<String, dynamic>;
+
+      // 1. Check exact coordinates cache (within 30 mins)
+      final cachedSpecific = await ApexKvStore.getString(cacheKey);
+      if (cachedSpecific != null && cachedSpecific.isNotEmpty) {
+        final cachedData = jsonDecode(cachedSpecific) as Map<String, dynamic>;
         final snapshot = WeatherSnapshot.fromJson(cachedData);
         final observed = snapshot.observedAt;
         if (observed != null) {
           final difference = DateTime.now().toLocal().difference(observed);
           if (difference.inMinutes < 30) {
             return snapshot;
+          }
+        }
+      }
+
+      // 2. Check general cache (within 5 km and 30 mins)
+      final cachedString = await ApexKvStore.getString(generalCacheKey);
+      if (cachedString != null && cachedString.isNotEmpty) {
+        final cachedData = jsonDecode(cachedString) as Map<String, dynamic>;
+        final cachedLat = cachedData['latitude'] as double?;
+        final cachedLon = cachedData['longitude'] as double?;
+        final cachedSnapshotMap = cachedData['snapshot'] as Map<String, dynamic>?;
+        if (cachedLat != null && cachedLon != null && cachedSnapshotMap != null) {
+          final snapshot = WeatherSnapshot.fromJson(cachedSnapshotMap);
+          final observed = snapshot.observedAt;
+          if (observed != null) {
+            final difference = DateTime.now().toLocal().difference(observed);
+            final distance = _calculateDistanceKm(
+              location.latitude,
+              location.longitude,
+              cachedLat,
+              cachedLon,
+            );
+            if (difference.inMinutes < 30 && distance <= 5.0) {
+              return snapshot;
+            }
           }
         }
       }
@@ -963,6 +999,12 @@ class WeatherService {
       );
 
       try {
+        final cachedPayload = {
+          'latitude': location.latitude,
+          'longitude': location.longitude,
+          'snapshot': snapshot.toJson(),
+        };
+        await ApexKvStore.setString(generalCacheKey, jsonEncode(cachedPayload));
         await ApexKvStore.setString(cacheKey, jsonEncode(snapshot.toJson()));
       } catch (e) {
         debugPrint('[WeatherService] Cache write error: $e');

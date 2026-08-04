@@ -386,7 +386,6 @@ class GarageController extends Notifier<GarageState> {
 
     final bike = state.activeBike;
 
-    // Aggressive/sporty riding accelerates wear (detected from mood text, high speeds, lean angle, or hard braking).
     final moodLower = mood.toLowerCase();
     final isAggressive =
         moodLower.contains('aggressive') ||
@@ -399,14 +398,14 @@ class GarageController extends Notifier<GarageState> {
         averageSpeedKmh > 95.0 ||
         maxLeanAngle > 45.0 ||
         hardBrakes > 3;
-    final wearMultiplier = isAggressive ? 1.5 : 1.0;
+    final wearMultiplier = isAggressive ? 2.0 : 1.0;
 
     // Traffic (low average speed on non-trivial trip) or hard braking accelerates brake wear.
     final isTraffic =
         (averageSpeedKmh > 0 && averageSpeedKmh < 28.0 && distanceKm > 1.0) ||
         (averageSpeedKmh > 0 && averageSpeedKmh < 30.0 && !isAggressive);
     final isHardBraking = hardBrakes > 3;
-    final brakeMultiplier = (isTraffic || isHardBraking) ? 1.5 : 1.0;
+    final brakeMultiplier = (isTraffic || isHardBraking) ? 2.0 : 1.0;
 
     // Odometer always increases.
     final nextOdometer = bike.odometerKm + distanceKm.round();

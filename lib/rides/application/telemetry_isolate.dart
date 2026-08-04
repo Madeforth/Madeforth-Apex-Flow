@@ -133,16 +133,7 @@ class TelemetryIsolate {
     );
   }
 
-  // --- 3D VECTOR MATH HELPERS ---
-  static List<double> _normalize(List<double> v) {
-    final mag = math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
-    if (mag == 0) return [0, 0, 0];
-    return [v[0] / mag, v[1] / mag, v[2] / mag];
-  }
 
-  static double _dotProduct(List<double> v1, List<double> v2) {
-    return v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2];
-  }
 
   // --- ISOLATE ENTRY POINT ---
   static void _isolateEntryPoint(List<dynamic> args) {
@@ -158,8 +149,8 @@ class TelemetryIsolate {
 
     double currentLeanAngle = 0.0;
     double calibrationOffset = 0.0;
+    double lastRollRateDegS = 0.0;
     DateTime? lastTime;
-    DateTime? lastSentTime;
 
     // AHRS State
     bool isMountedMode = false;
@@ -171,11 +162,24 @@ class TelemetryIsolate {
     double lastGpsSpeed = 0.0;
     double lastGpsHeadingRate = 0.0;
 
+    // Periodic 5Hz (200ms) output timer
+    final periodicTimer = Timer.periodic(const Duration(milliseconds: 200), (timer) {
+      final now = DateTime.now();
+      mainSendPort.send(
+        TelemetryIsolateMessage(
+          fusedLeanAngle: currentLeanAngle - calibrationOffset,
+          rawRollRate: lastRollRateDegS,
+          timestamp: now,
+        ),
+      );
+    });
+
     // Listen for commands
     commandPort.listen((message) {
       if (message is TelemetryCommand) {
         switch (message.type) {
           case 'STOP':
+            periodicTimer.cancel();
             commandPort.close();
             break;
           case 'MODE_SWITCH':
@@ -227,33 +231,18 @@ class TelemetryIsolate {
                 break;
               }
 
-              double rollRateDegS = 0.0;
-
               if (isMountedMode) {
-                rollRateDegS = message.z! * (180.0 / math.pi);
-                if (rollRateDegS.abs() < 1.5) rollRateDegS = 0.0;
+                lastRollRateDegS = message.z! * (180.0 / math.pi);
+                if (lastRollRateDegS.abs() < 1.5) lastRollRateDegS = 0.0;
 
                 // Continuous time-based exponential decay (tau = 3.0s)
                 final decayAlpha = math.exp(-dt / 3.0);
-                currentLeanAngle += (rollRateDegS * dt);
+                currentLeanAngle += (lastRollRateDegS * dt);
                 currentLeanAngle *= decayAlpha;
               } else {
                 // DOC 24 SECTION 17: Pocket mode IMU does NOT integrate gyro magnitude to produce lean angle!
-                rollRateDegS = 0.0;
+                lastRollRateDegS = 0.0;
                 currentLeanAngle = 0.0;
-              }
-
-              // Throttle output to 5Hz (every 200ms)
-              if (lastSentTime == null ||
-                  now.difference(lastSentTime!).inMilliseconds >= 200) {
-                mainSendPort.send(
-                  TelemetryIsolateMessage(
-                    fusedLeanAngle: currentLeanAngle - calibrationOffset,
-                    rawRollRate: rollRateDegS,
-                    timestamp: now,
-                  ),
-                );
-                lastSentTime = now;
               }
             }
             lastTime = now;

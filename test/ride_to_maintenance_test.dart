@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('Ride-to-Maintenance Intelligence', () {
-    test('traffic (low avg speed) increases brake wear by 1.5x', () {
+    test('traffic (low avg speed) increases brake wear by 2.0x', () {
       // Simulate rides and compare brake delta with/without traffic.
       const longDistanceKm = 100.0;
 
@@ -12,15 +12,15 @@ void main() {
       expect(normalBrakeDelta, equals(2));
 
       // Traffic riding at 20 km/h:
-      // brakeDelta = 0.02 * 100 * 1.5 = 3
-      final trafficBrakeDelta = (0.02 * longDistanceKm * 1.5).round();
-      expect(trafficBrakeDelta, equals(3));
+      // brakeDelta = 0.02 * 100 * 2.0 = 4
+      final trafficBrakeDelta = (0.02 * longDistanceKm * 2.0).round();
+      expect(trafficBrakeDelta, equals(4));
 
-      // Verify the 1.5x multiplier relationship
+      // Verify the 2.0x multiplier relationship
       expect(trafficBrakeDelta, greaterThan(normalBrakeDelta));
     });
 
-    test('aggressive mood increases chain and tire wear by 1.5x', () {
+    test('aggressive mood increases chain and tire wear by 2.0x', () {
       const distanceKm = 100.0;
 
       // Normal riding:
@@ -32,12 +32,14 @@ void main() {
       expect(normalTireDelta, equals(3));
 
       // Aggressive riding:
-      // chainDelta = 0.05 * 100 * 1.5 = 7.5 -> rounds to 8
-      // tireDelta = 0.03 * 100 * 1.5 = 4.5 -> rounds to 5 (actually 4)
-      final aggressiveChainDelta = (0.05 * distanceKm * 1.5).round();
-      final aggressiveTireDelta = (0.03 * distanceKm * 1.5).round();
+      // chainDelta = 0.05 * 100 * 2.0 = 10
+      // tireDelta = 0.03 * 100 * 2.0 = 6
+      final aggressiveChainDelta = (0.05 * distanceKm * 2.0).round();
+      final aggressiveTireDelta = (0.03 * distanceKm * 2.0).round();
       expect(aggressiveChainDelta, greaterThan(normalChainDelta));
+      expect(aggressiveChainDelta, equals(10));
       expect(aggressiveTireDelta, greaterThan(normalTireDelta));
+      expect(aggressiveTireDelta, equals(6));
     });
 
     test('battery charges on rides over 10 km', () {
