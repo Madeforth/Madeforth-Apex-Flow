@@ -16,6 +16,53 @@ service cloud.firestore {
       allow read: if isOwner(uid);
       allow create, update: if isOwner(uid);
       allow delete: if false; // Deletion handled securely by Cloud Functions
+
+      // Owner-scoped sync subcollections (used by ApexSyncCoordinator's
+      // users/{uid}/{entityType}/{entityId} remote-sync model).
+      match /{document=**} {
+        allow read, write: if isOwner(uid);
+      }
+    }
+
+    // Garage motorcycles (Owner read/write only, via userId field)
+    match /bikes/{bikeId} {
+      allow read, update, delete: if signedIn() && resource.data.userId == request.auth.uid;
+      allow create: if signedIn() && request.resource.data.userId == request.auth.uid;
+    }
+
+    // Ride sessions (Owner read/write only, via userId field)
+    match /rides/{rideId} {
+      allow read, update, delete: if signedIn() && resource.data.userId == request.auth.uid;
+      allow create: if signedIn() && request.resource.data.userId == request.auth.uid;
+    }
+
+    // Friendships (Either participant may read/manage the link, via userA/userB fields)
+    match /friendships/{friendshipId} {
+      allow read, delete: if signedIn() && (
+        resource.data.userA == request.auth.uid || resource.data.userB == request.auth.uid
+      );
+      allow create: if signedIn() && (
+        request.resource.data.userA == request.auth.uid || request.resource.data.userB == request.auth.uid
+      );
+    }
+
+    // Group ride lobbies (Join-by-code product model; hostId/riders are app-level
+    // rider tags, not Firebase UIDs, so per-member Firestore-native ACLs aren't
+    // possible without a schema change. Signed-in access only, scoped decision
+    // 2026-08-04 — see memory-bank/progress.md.)
+    match /lobbies/{lobbyId} {
+      allow read, write: if signedIn();
+    }
+
+    // Smart Park QR contact notes (written anonymously by qr_contact_web with no
+    // auth — a scanner has no ApexFlow account. Read/update restricted to the
+    // vehicle's registered owner via the rider_tags ownership lookup.)
+    match /parking_notifications/{noteId} {
+      allow create: if request.resource.data.vehicleId is string
+        && request.resource.data.read == false;
+      allow read, update: if signedIn()
+        && get(/databases/$(database)/documents/rider_tags/$(resource.data.vehicleId)).data.ownerId == request.auth.uid;
+      allow delete: if false;
     }
 
     // Public Rider Cards (Public read, Backend write only)
