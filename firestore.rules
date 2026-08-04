@@ -60,9 +60,8 @@ service cloud.firestore {
     match /parking_notifications/{noteId} {
       allow create: if request.resource.data.vehicleId is string
         && request.resource.data.read == false;
-      allow read, update: if signedIn()
+      allow read, update, delete: if signedIn()
         && get(/databases/$(database)/documents/rider_tags/$(resource.data.vehicleId)).data.ownerId == request.auth.uid;
-      allow delete: if false;
     }
 
     // Public Rider Cards (Public read, Backend write only)
@@ -74,10 +73,13 @@ service cloud.firestore {
     // Rider Tag lookup registry (Public read, Owner manage permitted)
     match /rider_tags/{tag} {
       allow read: if true;
-      allow write: if signedIn() && (
+      allow create, update: if signedIn() && (
         resource == null
         || resource.data.ownerId == request.auth.uid
       ) && request.resource.data.ownerId == request.auth.uid;
+      // Separate from create/update: request.resource is always null on
+      // delete, so the write rule above can never actually permit a delete.
+      allow delete: if signedIn() && resource.data.ownerId == request.auth.uid;
     }
 
     // Entitlements & Premium subscriptions (Owner read only, Backend/Store webhook write only)

@@ -659,7 +659,7 @@ class FirebaseService {
             .collection('rider_tags')
             .doc(cleanTag)
             .get();
-        if (tagDoc.exists && tagDoc.data()?['uid'] == activeUid) {
+        if (tagDoc.exists && tagDoc.data()?['ownerId'] == activeUid) {
           await tagDoc.reference.delete();
         }
       } catch (_) {}
@@ -710,7 +710,45 @@ class FirebaseService {
       }
     } catch (_) {}
 
-    // 6. Delete Firebase Auth user account
+    // 6. Delete registered FCM device tokens
+    try {
+      final deviceDocs = await FirebaseFirestore.instance
+          .collection('notification_tokens')
+          .doc(activeUid)
+          .collection('devices')
+          .get();
+      for (final doc in deviceDocs.docs) {
+        await doc.reference.delete();
+      }
+    } catch (_) {}
+
+    // 7. Delete group ride lobbies this user hosted (hostId is the rider tag,
+    // not the UID — lobbies key participants by rider tag, see firestore.rules).
+    if (riderTag.isNotEmpty) {
+      final cleanTag = riderTag.toLowerCase().replaceAll('@', '');
+      try {
+        final hostedLobbies = await FirebaseFirestore.instance
+            .collection('lobbies')
+            .where('hostId', isEqualTo: cleanTag)
+            .get();
+        for (final doc in hostedLobbies.docs) {
+          await doc.reference.delete();
+        }
+      } catch (_) {}
+
+      // 8. Delete parking QR notes addressed to this user's rider tag
+      try {
+        final parkingNotes = await FirebaseFirestore.instance
+            .collection('parking_notifications')
+            .where('vehicleId', isEqualTo: cleanTag)
+            .get();
+        for (final doc in parkingNotes.docs) {
+          await doc.reference.delete();
+        }
+      } catch (_) {}
+    }
+
+    // 9. Delete Firebase Auth user account
     await currentUser.delete();
   }
 
