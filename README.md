@@ -82,11 +82,11 @@ graph TD
 
 ## 📖 Dokümantasyon & Kaynaklar
 
-- 📌 [`docs/HANDOFF_FOR_AI.md`](docs/HANDOFF_FOR_AI.md) — Proje Özet Bağlamı
-- 🎯 [`docs/MISSION_VISION.md`](docs/MISSION_VISION.md) — Ürün Felsefesi ve Vizyon
-- 🚀 [`docs/ROADMAP_PHASES.md`](docs/ROADMAP_PHASES.md) — Faz Yol Haritası
+- 📌 [`memory-bank/activeContext.md`](memory-bank/activeContext.md) — Güncel Görev ve Proje Bağlamı
+- 📊 [`memory-bank/progress.md`](memory-bank/progress.md) — Doğrulanmış/Bekleyen Durum ve Bilinen Riskler
+- 🎯 [`memory-bank/projectbrief.md`](memory-bank/projectbrief.md) — Misyon, Kapsam ve Vizyon
+- 🚀 [`PHASE_LOCK.md`](PHASE_LOCK.md) — Aktif Faz
 - 🎨 [`docs/RIDER_CARD_SPECS.md`](docs/RIDER_CARD_SPECS.md) — Rider Card Tasarım Spesifikasyonları
-- 📝 [`docs/DEVLOG.md`](docs/DEVLOG.md) — Geliştirme Günlüğü
 
 ---
 

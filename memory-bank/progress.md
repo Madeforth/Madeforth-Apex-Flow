@@ -1,0 +1,45 @@
+# Progress
+
+Status recorded 2026-08-04, from repo inspection (not from README claims alone unless marked as such).
+
+## Verified Working (evidence: code/rules present and consistent)
+- Firestore rules for `users`, `public_rider_cards`, `rider_tags`, `entitlements`, `notification_tokens`, `parking_requests`, `bug_reports` are defined with owner-scoping / backend-only-write patterns consistent with CLAUDE.md invariants (client cannot self-grant entitlements; PII-adjacent collections are not publicly readable).
+- Isar entity set exists for daily checks, documents, friends, motorcycles, ride sessions, service records, tax records, each with generated code — indicates schema is wired, not merely stubbed.
+- `flutter --version` succeeds locally: Flutter 3.41.4 / Dart 3.11.1 — toolchain is available for verification gates.
+
+## Documentation Claims — Not Independently Verified This Session
+- README claims: Closed Beta live since 2026-08-04, "12/12 bridges fully connected, 0 critical errors", 6 test devices, Discord feedback channel active. Treat as claim until confirmed by running the verification gate (`flutter analyze`, `flutter test`) and/or checking Play Console.
+- Commit `81057dd fix: accident PDF impact marks + complete 3 partial bridges` implies bridges were previously partial — "12/12 fully connected" in README should be spot-checked against actual sync/bridge code before repeating as fact.
+- Premium paywall pricing/billing described in README is UI/pricing-copy level; CLAUDE.md explicitly warns `purchases_flutter` installed ≠ real billing complete — production entitlement correctness not verified this session.
+
+## Known Pre-Existing Risk Areas (per CLAUDE.md, carry forward until closed by evidence)
+- Plaintext password persistence risk — `password` references found in `lib/settings/application/user_profile_state.dart`, `lib/onboarding/presentation/onboarding_screen.dart`, `lib/core/services/firebase_service.dart`. Not yet confirmed whether any of these persist a raw password to Hive/SharedPreferences (the specific CLAUDE.md-flagged risk) vs. just handling it in-memory for Firebase Auth calls — needs a targeted read before either fixing or clearing this item.
+- Incomplete per-user local isolation / account deletion — not verified this session.
+- Firestore collection-rule mismatches — rules file was only read through line ~60; full file and matching client queries not yet diffed.
+- Simulated purchases — not verified this session.
+- Sync coordinator compile errors — `lib/core/sync/sync_coordinator.dart` exists; compile health not checked this session (`flutter analyze` not run).
+- Pocket telemetry zeroing (gyro updates erasing valid pocket-mode estimates) — not verified this session; relevant files likely under `lib/rides/`. Mechanism documented in `AHRS_POCKET_MATH.md` (see `systemPatterns.md` Telemetry section) — the risk is the gyro-vector-rejection update path overwriting a valid pocket-mode lean estimate with zero instead of holding/decaying it.
+- Platform configuration inconsistencies (Android/iOS) — not verified this session.
+
+## Untracked/New Repo State as of Session Start (git status)
+- `.github/workflows/closed-test-deploy.yml` (new, untracked)
+- `CLAUDE.md` (new, untracked — this file)
+- `assets/word documents/key.properties`, `assets/word documents/upload-keystore.jks` (new, untracked — signing secrets, do not commit carelessly)
+- `distribution/` (new, untracked)
+- `docs/google_closed_testing.md` (new, untracked)
+These represent in-progress user work related to Closed Beta release; do not discard or overwrite without explicit approval.
+
+## Phase 9.1 Optimization Items — Claimed Done, Not Independently Verified
+`PHASE_LOCK.md` and commit `887ad57` ("feat(optimizations): implement Phase 9.1 core optimizations") claim these three items (detailed in `PHASE_9.1_NEXT_TASKS.md`) are complete:
+1. Telemetry isolate throttling: `telemetry_isolate.dart` buffering raw 100Hz sensor stream down to a 5Hz (200ms) `Timer`-gated send to the UI isolate.
+2. Weather API response caching via `shared_preferences` with a 30-minute TTL, to avoid an Open-Meteo call every time the ride-readiness screen opens.
+3. Harmony Engine wear penalties driven by real `RideSession` telemetry (`maxLeanAngle > 45°`, `hardBrakes > 3`) instead of only the rider's self-reported mood button.
+Before trusting or building on any of these, grep the actual implementation (`telemetry_isolate.dart`, `harmony_engine.dart`, `weather_service.dart`) to confirm the described behavior is really in place — "COMPLETED" in `PHASE_LOCK.md` is a status label, not test evidence.
+
+## Planned / Not Started (per `TODO.md`)
+- Fuel economy analytics: station comparison, anomaly detection, consumption graphs, cost-per-distance — all unchecked.
+- Document vault: encrypted local storage confirmation, renewal calendar, proactive 30/15/1-day reminders, official redirect shortcuts — unchecked.
+- Group ride live tracking (Supabase Realtime/WebSocket, live map via `flutter_map`/OSM, interpolation, battery-saving mode) — unchecked, premium-gated feature, not yet implemented per TODO (rider profile/friend system items are marked done `[x]`).
+
+## Next Step
+No active task in progress. When work begins, update `activeContext.md` with the specific task, branch/commit, and decisions before editing code.
