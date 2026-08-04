@@ -324,7 +324,8 @@ class UserProfileController extends Notifier<UserProfile> {
       } catch (_) {}
     }
 
-    final riderXp = int.tryParse(await ApexKvStore.getString(_riderXpKey) ?? '') ?? 0;
+    final riderXp =
+        int.tryParse(await ApexKvStore.getString(_riderXpKey) ?? '') ?? 0;
 
     state = UserProfile(
       name: name,
@@ -421,6 +422,30 @@ class UserProfileController extends Notifier<UserProfile> {
     final youtube = profileData['youtube'] as String? ?? '';
     final licensePlate = profileData['licensePlate'] as String? ?? '';
 
+    final avatarIndex = profileData['avatarIndex'] as int? ?? 0;
+    final cardThemeIndex = profileData['cardThemeIndex'] as int? ?? 0;
+    final ridingStyle = profileData['ridingStyle'] as String? ?? 'Focused';
+    final isFoundingMember = profileData['isFoundingMember'] as bool? ?? false;
+    final supporterTier = profileData['supporterTier'] as int? ?? 0;
+
+    List<String> selectedBadges = [];
+    if (profileData['selectedBadges'] != null) {
+      selectedBadges = List<String>.from(profileData['selectedBadges']);
+    }
+    List<String> unlockedBadges = [];
+    if (profileData['unlockedBadges'] != null) {
+      unlockedBadges = List<String>.from(profileData['unlockedBadges']);
+    }
+
+    Set<int> unlockedSupporterTiers = supporterTier > 0 ? {supporterTier} : {};
+    if (profileData['unlockedSupporterTiers'] != null) {
+      unlockedSupporterTiers = List<int>.from(
+        profileData['unlockedSupporterTiers'],
+      ).toSet();
+    }
+
+    final riderXp = (profileData['riderXp'] as num?)?.toInt() ?? 0;
+
     state = UserProfile(
       name: name,
       riderTag: restoredTag,
@@ -434,6 +459,15 @@ class UserProfileController extends Notifier<UserProfile> {
       tiktok: tiktok,
       youtube: youtube,
       licensePlate: licensePlate,
+      avatarIndex: avatarIndex,
+      cardThemeIndex: cardThemeIndex,
+      ridingStyle: ridingStyle,
+      isFoundingMember: isFoundingMember,
+      supporterTier: supporterTier,
+      selectedBadges: selectedBadges,
+      unlockedBadges: unlockedBadges,
+      unlockedSupporterTiers: unlockedSupporterTiers,
+      riderXp: riderXp,
     );
 
     // Save to local key-value store
@@ -450,6 +484,18 @@ class UserProfileController extends Notifier<UserProfile> {
     await ApexKvStore.setString(_tiktokKey, tiktok);
     await ApexKvStore.setString(_youtubeKey, youtube);
     await ApexKvStore.setString(_licensePlateKey, licensePlate);
+
+    await ApexKvStore.setString(_avatarIndexKey, avatarIndex.toString());
+    await ApexKvStore.setString(_cardThemeIndexKey, cardThemeIndex.toString());
+    await ApexKvStore.setString(_ridingStyleKey, ridingStyle);
+    await ApexKvStore.setBool(_isFoundingMemberKey, isFoundingMember);
+    await ApexKvStore.setString(_selectedBadgesKey, jsonEncode(selectedBadges));
+    await ApexKvStore.setString(_unlockedBadgesKey, jsonEncode(unlockedBadges));
+    await ApexKvStore.setString(
+      _unlockedSupporterTiersKey,
+      jsonEncode(unlockedSupporterTiers.toList()),
+    );
+    await ApexKvStore.setString(_riderXpKey, riderXp.toString());
 
     // Check if there are active motorcycle details inside the retrieved profile
     _restoreActiveBike(profileData);
@@ -695,7 +741,7 @@ class UserProfileController extends Notifier<UserProfile> {
     final baseName = user.displayName ?? 'Google Rider';
     final randomNum = (1000 + (DateTime.now().millisecondsSinceEpoch % 9000))
         .toString();
-    final generatedTag = '@google_randomNum}';
+    final generatedTag = '@google_$randomNum';
 
     state = UserProfile(
       name: baseName,
@@ -943,6 +989,10 @@ class UserProfileController extends Notifier<UserProfile> {
     await ApexKvStore.remove(_isFoundingMemberKey);
     await ApexKvStore.remove(_cardThemeIndexKey);
     await ApexKvStore.remove(_purchasedThemesKey);
+    await ApexKvStore.remove(_youtubeKey);
+    await ApexKvStore.remove(_supporterTierKey);
+    await ApexKvStore.remove(_unlockedSupporterTiersKey);
+    await ApexKvStore.remove(_riderXpKey);
 
     // Reset local state
     state = const UserProfile();
@@ -963,15 +1013,24 @@ class UserProfileController extends Notifier<UserProfile> {
     ref.read(appSettingsProvider.notifier).resetOnboarding();
   }
 
-  Future<void> deleteAccount() async {
+  /// Deletes the signed-in user's account and data. Returns `true` on
+  /// success, `false` if deletion failed (e.g. Firebase's
+  /// `requires-recent-login` error after a stale session) — the caller
+  /// should surface this to the user rather than assume success.
+  Future<bool> deleteAccount() async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     final riderTag = state.riderTag;
 
     if (uid != null) {
-      await FirebaseService.instance.deleteUserAccount(uid, riderTag);
+      try {
+        await FirebaseService.instance.deleteUserAccount(uid, riderTag);
+      } catch (_) {
+        return false;
+      }
     }
 
     await logout();
+    return true;
   }
 
   double _calculateWeeklyKm(List<RideSession> sessions) {
