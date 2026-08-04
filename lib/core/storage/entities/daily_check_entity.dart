@@ -7,8 +7,13 @@ part 'daily_check_entity.g.dart';
 class DailyCheckEntity {
   Id id = Isar.autoIncrement;
 
-  @Index(unique: true)
+  // Composite unique index: one check per (isoDate, userId) pair, not
+  // globally unique by date — otherwise two accounts on one device would
+  // silently overwrite each other's daily check for the same date.
+  @Index(composite: [CompositeIndex('userId')], unique: true)
   late String isoDate;
+
+  String userId = '';
 
   late bool tiresOk;
   late bool chainOk;
@@ -33,9 +38,13 @@ class DailyCheckEntity {
     );
   }
 
-  static DailyCheckEntity fromDomain(DailyCheckEntry domain) {
+  static DailyCheckEntity fromDomain(
+    DailyCheckEntry domain, {
+    String userId = '',
+  }) {
     return DailyCheckEntity()
       ..isoDate = domain.isoDate
+      ..userId = userId
       ..tiresOk = domain.tiresOk
       ..chainOk = domain.chainOk
       ..oilOk = domain.oilOk

@@ -10,6 +10,9 @@ class DocumentEntity {
   @Index(unique: true)
   late String stableId;
 
+  @Index()
+  String userId = '';
+
   late String bikeStableId;
   late String title;
   late String description;
@@ -27,9 +30,13 @@ class DocumentEntity {
     );
   }
 
-  static DocumentEntity fromDomain(MotorcycleDocument domain) {
+  static DocumentEntity fromDomain(
+    MotorcycleDocument domain, {
+    String userId = '',
+  }) {
     return DocumentEntity()
       ..stableId = domain.id
+      ..userId = userId
       ..bikeStableId = domain.bikeStableId
       ..title = domain.title
       ..description = domain.description

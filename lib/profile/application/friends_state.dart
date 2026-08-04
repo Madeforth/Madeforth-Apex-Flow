@@ -27,7 +27,11 @@ class FriendsController extends Notifier<List<FriendProfile>> {
   Future<void> _hydrate() async {
     final db = ref.read(dbServiceProvider);
     await db.init();
-    final list = await db.getFriends();
+    String ownerId = '';
+    try {
+      ownerId = await FirebaseService.instance.getOrCreateInstallationId();
+    } catch (_) {}
+    final list = await db.getFriends(userId: ownerId);
 
     if (!_mounted) return;
     state = list;
@@ -50,6 +54,8 @@ class FriendsController extends Notifier<List<FriendProfile>> {
       return false; // Already a friend
     }
 
+    final myId = await FirebaseService.instance.getOrCreateInstallationId();
+
     // 1. Query Firestore for the rider profile
     final profileData = await FirebaseService.instance.getProfileByTag(
       formattedTag,
@@ -62,7 +68,7 @@ class FriendsController extends Notifier<List<FriendProfile>> {
       }
 
       final db = ref.read(dbServiceProvider);
-      await db.saveFriend(mockData);
+      await db.saveFriend(mockData, userId: myId);
       if (!_mounted) return true;
       state = [mockData, ...state];
       return true;
@@ -113,10 +119,9 @@ class FriendsController extends Notifier<List<FriendProfile>> {
     );
 
     final db = ref.read(dbServiceProvider);
-    await db.saveFriend(newFriend);
+    await db.saveFriend(newFriend, userId: myId);
 
     // Save bidirectional link in Firestore
-    final myId = await FirebaseService.instance.getOrCreateInstallationId();
     if (friendUid != null) {
       unawaited(FirebaseService.instance.addFriendConnection(myId, friendUid));
     }
@@ -273,7 +278,7 @@ class FriendsController extends Notifier<List<FriendProfile>> {
                   const [],
             );
 
-            await db.saveFriend(updatedFriend);
+            await db.saveFriend(updatedFriend, userId: myId);
 
             final index = updatedList.indexWhere(
               (f) => f.stableId == friendUid,

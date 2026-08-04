@@ -61,6 +61,11 @@ const DailyCheckEntitySchema = CollectionSchema(
       id: 8,
       name: r'tiresOk',
       type: IsarType.bool,
+    ),
+    r'userId': PropertySchema(
+      id: 9,
+      name: r'userId',
+      type: IsarType.string,
     )
   },
   estimateSize: _dailyCheckEntityEstimateSize,
@@ -69,14 +74,19 @@ const DailyCheckEntitySchema = CollectionSchema(
   deserializeProp: _dailyCheckEntityDeserializeProp,
   idName: r'id',
   indexes: {
-    r'isoDate': IndexSchema(
-      id: -5087741933233584201,
-      name: r'isoDate',
+    r'isoDate_userId': IndexSchema(
+      id: -7710594624752825416,
+      name: r'isoDate_userId',
       unique: true,
       replace: false,
       properties: [
         IndexPropertySchema(
           name: r'isoDate',
+          type: IndexType.hash,
+          caseSensitive: true,
+        ),
+        IndexPropertySchema(
+          name: r'userId',
           type: IndexType.hash,
           caseSensitive: true,
         )
@@ -105,6 +115,7 @@ int _dailyCheckEntityEstimateSize(
     }
   }
   bytesCount += 3 + object.note.length * 3;
+  bytesCount += 3 + object.userId.length * 3;
   return bytesCount;
 }
 
@@ -123,6 +134,7 @@ void _dailyCheckEntitySerialize(
   writer.writeString(offsets[6], object.note);
   writer.writeBool(offsets[7], object.oilOk);
   writer.writeBool(offsets[8], object.tiresOk);
+  writer.writeString(offsets[9], object.userId);
 }
 
 DailyCheckEntity _dailyCheckEntityDeserialize(
@@ -142,6 +154,7 @@ DailyCheckEntity _dailyCheckEntityDeserialize(
   object.note = reader.readString(offsets[6]);
   object.oilOk = reader.readBool(offsets[7]);
   object.tiresOk = reader.readBool(offsets[8]);
+  object.userId = reader.readString(offsets[9]);
   return object;
 }
 
@@ -170,6 +183,8 @@ P _dailyCheckEntityDeserializeProp<P>(
       return (reader.readBool(offset)) as P;
     case 8:
       return (reader.readBool(offset)) as P;
+    case 9:
+      return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -189,57 +204,89 @@ void _dailyCheckEntityAttach(
 }
 
 extension DailyCheckEntityByIndex on IsarCollection<DailyCheckEntity> {
-  Future<DailyCheckEntity?> getByIsoDate(String isoDate) {
-    return getByIndex(r'isoDate', [isoDate]);
+  Future<DailyCheckEntity?> getByIsoDateUserId(String isoDate, String userId) {
+    return getByIndex(r'isoDate_userId', [isoDate, userId]);
   }
 
-  DailyCheckEntity? getByIsoDateSync(String isoDate) {
-    return getByIndexSync(r'isoDate', [isoDate]);
+  DailyCheckEntity? getByIsoDateUserIdSync(String isoDate, String userId) {
+    return getByIndexSync(r'isoDate_userId', [isoDate, userId]);
   }
 
-  Future<bool> deleteByIsoDate(String isoDate) {
-    return deleteByIndex(r'isoDate', [isoDate]);
+  Future<bool> deleteByIsoDateUserId(String isoDate, String userId) {
+    return deleteByIndex(r'isoDate_userId', [isoDate, userId]);
   }
 
-  bool deleteByIsoDateSync(String isoDate) {
-    return deleteByIndexSync(r'isoDate', [isoDate]);
+  bool deleteByIsoDateUserIdSync(String isoDate, String userId) {
+    return deleteByIndexSync(r'isoDate_userId', [isoDate, userId]);
   }
 
-  Future<List<DailyCheckEntity?>> getAllByIsoDate(List<String> isoDateValues) {
-    final values = isoDateValues.map((e) => [e]).toList();
-    return getAllByIndex(r'isoDate', values);
+  Future<List<DailyCheckEntity?>> getAllByIsoDateUserId(
+      List<String> isoDateValues, List<String> userIdValues) {
+    final len = isoDateValues.length;
+    assert(userIdValues.length == len,
+        'All index values must have the same length');
+    final values = <List<dynamic>>[];
+    for (var i = 0; i < len; i++) {
+      values.add([isoDateValues[i], userIdValues[i]]);
+    }
+
+    return getAllByIndex(r'isoDate_userId', values);
   }
 
-  List<DailyCheckEntity?> getAllByIsoDateSync(List<String> isoDateValues) {
-    final values = isoDateValues.map((e) => [e]).toList();
-    return getAllByIndexSync(r'isoDate', values);
+  List<DailyCheckEntity?> getAllByIsoDateUserIdSync(
+      List<String> isoDateValues, List<String> userIdValues) {
+    final len = isoDateValues.length;
+    assert(userIdValues.length == len,
+        'All index values must have the same length');
+    final values = <List<dynamic>>[];
+    for (var i = 0; i < len; i++) {
+      values.add([isoDateValues[i], userIdValues[i]]);
+    }
+
+    return getAllByIndexSync(r'isoDate_userId', values);
   }
 
-  Future<int> deleteAllByIsoDate(List<String> isoDateValues) {
-    final values = isoDateValues.map((e) => [e]).toList();
-    return deleteAllByIndex(r'isoDate', values);
+  Future<int> deleteAllByIsoDateUserId(
+      List<String> isoDateValues, List<String> userIdValues) {
+    final len = isoDateValues.length;
+    assert(userIdValues.length == len,
+        'All index values must have the same length');
+    final values = <List<dynamic>>[];
+    for (var i = 0; i < len; i++) {
+      values.add([isoDateValues[i], userIdValues[i]]);
+    }
+
+    return deleteAllByIndex(r'isoDate_userId', values);
   }
 
-  int deleteAllByIsoDateSync(List<String> isoDateValues) {
-    final values = isoDateValues.map((e) => [e]).toList();
-    return deleteAllByIndexSync(r'isoDate', values);
+  int deleteAllByIsoDateUserIdSync(
+      List<String> isoDateValues, List<String> userIdValues) {
+    final len = isoDateValues.length;
+    assert(userIdValues.length == len,
+        'All index values must have the same length');
+    final values = <List<dynamic>>[];
+    for (var i = 0; i < len; i++) {
+      values.add([isoDateValues[i], userIdValues[i]]);
+    }
+
+    return deleteAllByIndexSync(r'isoDate_userId', values);
   }
 
-  Future<Id> putByIsoDate(DailyCheckEntity object) {
-    return putByIndex(r'isoDate', object);
+  Future<Id> putByIsoDateUserId(DailyCheckEntity object) {
+    return putByIndex(r'isoDate_userId', object);
   }
 
-  Id putByIsoDateSync(DailyCheckEntity object, {bool saveLinks = true}) {
-    return putByIndexSync(r'isoDate', object, saveLinks: saveLinks);
+  Id putByIsoDateUserIdSync(DailyCheckEntity object, {bool saveLinks = true}) {
+    return putByIndexSync(r'isoDate_userId', object, saveLinks: saveLinks);
   }
 
-  Future<List<Id>> putAllByIsoDate(List<DailyCheckEntity> objects) {
-    return putAllByIndex(r'isoDate', objects);
+  Future<List<Id>> putAllByIsoDateUserId(List<DailyCheckEntity> objects) {
+    return putAllByIndex(r'isoDate_userId', objects);
   }
 
-  List<Id> putAllByIsoDateSync(List<DailyCheckEntity> objects,
+  List<Id> putAllByIsoDateUserIdSync(List<DailyCheckEntity> objects,
       {bool saveLinks = true}) {
-    return putAllByIndexSync(r'isoDate', objects, saveLinks: saveLinks);
+    return putAllByIndexSync(r'isoDate_userId', objects, saveLinks: saveLinks);
   }
 }
 
@@ -322,28 +369,28 @@ extension DailyCheckEntityQueryWhere
   }
 
   QueryBuilder<DailyCheckEntity, DailyCheckEntity, QAfterWhereClause>
-      isoDateEqualTo(String isoDate) {
+      isoDateEqualToAnyUserId(String isoDate) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IndexWhereClause.equalTo(
-        indexName: r'isoDate',
+        indexName: r'isoDate_userId',
         value: [isoDate],
       ));
     });
   }
 
   QueryBuilder<DailyCheckEntity, DailyCheckEntity, QAfterWhereClause>
-      isoDateNotEqualTo(String isoDate) {
+      isoDateNotEqualToAnyUserId(String isoDate) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
         return query
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'isoDate',
+              indexName: r'isoDate_userId',
               lower: [],
               upper: [isoDate],
               includeUpper: false,
             ))
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'isoDate',
+              indexName: r'isoDate_userId',
               lower: [isoDate],
               includeLower: false,
               upper: [],
@@ -351,15 +398,60 @@ extension DailyCheckEntityQueryWhere
       } else {
         return query
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'isoDate',
+              indexName: r'isoDate_userId',
               lower: [isoDate],
               includeLower: false,
               upper: [],
             ))
             .addWhereClause(IndexWhereClause.between(
-              indexName: r'isoDate',
+              indexName: r'isoDate_userId',
               lower: [],
               upper: [isoDate],
+              includeUpper: false,
+            ));
+      }
+    });
+  }
+
+  QueryBuilder<DailyCheckEntity, DailyCheckEntity, QAfterWhereClause>
+      isoDateUserIdEqualTo(String isoDate, String userId) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'isoDate_userId',
+        value: [isoDate, userId],
+      ));
+    });
+  }
+
+  QueryBuilder<DailyCheckEntity, DailyCheckEntity, QAfterWhereClause>
+      isoDateEqualToUserIdNotEqualTo(String isoDate, String userId) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'isoDate_userId',
+              lower: [isoDate],
+              upper: [isoDate, userId],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'isoDate_userId',
+              lower: [isoDate, userId],
+              includeLower: false,
+              upper: [isoDate],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'isoDate_userId',
+              lower: [isoDate, userId],
+              includeLower: false,
+              upper: [isoDate],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'isoDate_userId',
+              lower: [isoDate],
+              upper: [isoDate, userId],
               includeUpper: false,
             ));
       }
@@ -910,6 +1002,142 @@ extension DailyCheckEntityQueryFilter
       ));
     });
   }
+
+  QueryBuilder<DailyCheckEntity, DailyCheckEntity, QAfterFilterCondition>
+      userIdEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'userId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DailyCheckEntity, DailyCheckEntity, QAfterFilterCondition>
+      userIdGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'userId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DailyCheckEntity, DailyCheckEntity, QAfterFilterCondition>
+      userIdLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'userId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DailyCheckEntity, DailyCheckEntity, QAfterFilterCondition>
+      userIdBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'userId',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DailyCheckEntity, DailyCheckEntity, QAfterFilterCondition>
+      userIdStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'userId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DailyCheckEntity, DailyCheckEntity, QAfterFilterCondition>
+      userIdEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'userId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DailyCheckEntity, DailyCheckEntity, QAfterFilterCondition>
+      userIdContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'userId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DailyCheckEntity, DailyCheckEntity, QAfterFilterCondition>
+      userIdMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'userId',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DailyCheckEntity, DailyCheckEntity, QAfterFilterCondition>
+      userIdIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'userId',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<DailyCheckEntity, DailyCheckEntity, QAfterFilterCondition>
+      userIdIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'userId',
+        value: '',
+      ));
+    });
+  }
 }
 
 extension DailyCheckEntityQueryObject
@@ -1041,6 +1269,20 @@ extension DailyCheckEntityQuerySortBy
       sortByTiresOkDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'tiresOk', Sort.desc);
+    });
+  }
+
+  QueryBuilder<DailyCheckEntity, DailyCheckEntity, QAfterSortBy>
+      sortByUserId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'userId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DailyCheckEntity, DailyCheckEntity, QAfterSortBy>
+      sortByUserIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'userId', Sort.desc);
     });
   }
 }
@@ -1183,6 +1425,20 @@ extension DailyCheckEntityQuerySortThenBy
       return query.addSortBy(r'tiresOk', Sort.desc);
     });
   }
+
+  QueryBuilder<DailyCheckEntity, DailyCheckEntity, QAfterSortBy>
+      thenByUserId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'userId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DailyCheckEntity, DailyCheckEntity, QAfterSortBy>
+      thenByUserIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'userId', Sort.desc);
+    });
+  }
 }
 
 extension DailyCheckEntityQueryWhereDistinct
@@ -1249,6 +1505,13 @@ extension DailyCheckEntityQueryWhereDistinct
       return query.addDistinctBy(r'tiresOk');
     });
   }
+
+  QueryBuilder<DailyCheckEntity, DailyCheckEntity, QDistinct> distinctByUserId(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'userId', caseSensitive: caseSensitive);
+    });
+  }
 }
 
 extension DailyCheckEntityQueryProperty
@@ -1311,6 +1574,12 @@ extension DailyCheckEntityQueryProperty
   QueryBuilder<DailyCheckEntity, bool, QQueryOperations> tiresOkProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'tiresOk');
+    });
+  }
+
+  QueryBuilder<DailyCheckEntity, String, QQueryOperations> userIdProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'userId');
     });
   }
 }

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:apexflow/core/i18n/app_settings_state.dart';
+import 'package:apexflow/core/services/firebase_service.dart';
 import 'package:apexflow/core/storage/apex_kv_store.dart';
 import 'package:apexflow/core/storage/db_provider.dart';
 import 'package:apexflow/garage/domain/garage_passport.dart';
@@ -70,6 +71,10 @@ final garageStateProvider = NotifierProvider<GarageController, GarageState>(
 
 class GarageController extends Notifier<GarageState> {
   bool _mounted = true;
+  // Local-storage owner id: Firebase UID once signed in, otherwise a
+  // persisted per-install id. Cached from _hydrate() so the many
+  // synchronous mutation methods below don't each need to await it.
+  String _ownerId = '';
 
   @override
   GarageState build() {
@@ -148,7 +153,7 @@ class GarageController extends Notifier<GarageState> {
     );
 
     final db = ref.read(dbServiceProvider);
-    unawaited(db.saveMotorcycle(next));
+    unawaited(db.saveMotorcycle(next, userId: _ownerId));
     if (state.activeBike.id == next.id) {
       unawaited(ApexKvStore.setString('garage.active_bike_id', next.id));
     }
@@ -173,7 +178,7 @@ class GarageController extends Notifier<GarageState> {
     );
 
     final db = ref.read(dbServiceProvider);
-    unawaited(db.saveMotorcycle(next));
+    unawaited(db.saveMotorcycle(next, userId: _ownerId));
     if (state.activeBike.id == next.id) {
       unawaited(ApexKvStore.setString('garage.active_bike_id', next.id));
     }
@@ -208,7 +213,7 @@ class GarageController extends Notifier<GarageState> {
     );
 
     final db = ref.read(dbServiceProvider);
-    unawaited(db.saveMotorcycle(next));
+    unawaited(db.saveMotorcycle(next, userId: _ownerId));
     unawaited(ApexKvStore.setString('garage.active_bike_id', active.id));
   }
 
@@ -258,8 +263,8 @@ class GarageController extends Notifier<GarageState> {
     );
 
     final db = ref.read(dbServiceProvider);
-    unawaited(db.saveMotorcycle(nextBike));
-    unawaited(db.saveServiceRecord(record, nextBike.id));
+    unawaited(db.saveMotorcycle(nextBike, userId: _ownerId));
+    unawaited(db.saveServiceRecord(record, nextBike.id, userId: _ownerId));
   }
 
   int _recalculateLastServiceKm(
@@ -302,8 +307,8 @@ class GarageController extends Notifier<GarageState> {
     );
 
     final db = ref.read(dbServiceProvider);
-    unawaited(db.saveMotorcycle(nextBike));
-    unawaited(db.saveServiceRecord(record, nextBike.id));
+    unawaited(db.saveMotorcycle(nextBike, userId: _ownerId));
+    unawaited(db.saveServiceRecord(record, nextBike.id, userId: _ownerId));
   }
 
   void deleteServiceRecord(String recordId) {
@@ -333,7 +338,7 @@ class GarageController extends Notifier<GarageState> {
     );
 
     final db = ref.read(dbServiceProvider);
-    unawaited(db.saveMotorcycle(nextBike));
+    unawaited(db.saveMotorcycle(nextBike, userId: _ownerId));
     unawaited(db.deleteServiceRecord(recordId, state.activeBike.id));
   }
 
@@ -366,7 +371,7 @@ class GarageController extends Notifier<GarageState> {
     );
 
     final db = ref.read(dbServiceProvider);
-    unawaited(db.saveMotorcycle(nextBike));
+    unawaited(db.saveMotorcycle(nextBike, userId: _ownerId));
   }
 
   /// Ride-to-Maintenance Intelligence: apply ride impact to active bike.
@@ -463,7 +468,7 @@ class GarageController extends Notifier<GarageState> {
     );
 
     final db = ref.read(dbServiceProvider);
-    unawaited(db.saveMotorcycle(nextBike));
+    unawaited(db.saveMotorcycle(nextBike, userId: _ownerId));
   }
 
   void syncOdometer(int odometerKm) {
@@ -486,7 +491,7 @@ class GarageController extends Notifier<GarageState> {
     );
 
     final db = ref.read(dbServiceProvider);
-    unawaited(db.saveMotorcycle(nextBike));
+    unawaited(db.saveMotorcycle(nextBike, userId: _ownerId));
   }
 
   /// Build a [GaragePassport] snapshot for the active motorcycle.
@@ -565,7 +570,7 @@ class GarageController extends Notifier<GarageState> {
     );
 
     final db = ref.read(dbServiceProvider);
-    unawaited(db.saveMotorcycle(nextBike));
+    unawaited(db.saveMotorcycle(nextBike, userId: _ownerId));
     unawaited(ApexKvStore.setString('garage.active_bike_id', nextBike.id));
   }
 
@@ -625,8 +630,11 @@ class GarageController extends Notifier<GarageState> {
   Future<void> _hydrate() async {
     final db = ref.read(dbServiceProvider);
     await db.init();
-    final motorcycles = await db.getMotorcycles();
-    final serviceRecords = await db.getServiceRecords();
+    try {
+      _ownerId = await FirebaseService.instance.getOrCreateInstallationId();
+    } catch (_) {}
+    final motorcycles = await db.getMotorcycles(userId: _ownerId);
+    final serviceRecords = await db.getServiceRecords(userId: _ownerId);
 
     final activeStableId = await ApexKvStore.getString('garage.active_bike_id');
 

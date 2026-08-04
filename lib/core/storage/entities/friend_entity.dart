@@ -10,6 +10,9 @@ class FriendEntity {
   @Index(unique: true)
   late String stableId;
 
+  @Index()
+  String userId = '';
+
   late String name;
   late String riderTag;
   late String ridingStyle;
@@ -45,9 +48,10 @@ class FriendEntity {
     );
   }
 
-  static FriendEntity fromDomain(FriendProfile domain) {
+  static FriendEntity fromDomain(FriendProfile domain, {String userId = ''}) {
     return FriendEntity()
       ..stableId = domain.stableId
+      ..userId = userId
       ..name = domain.name
       ..riderTag = domain.riderTag
       ..ridingStyle = domain.ridingStyle

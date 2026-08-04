@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:apexflow/core/services/firebase_service.dart';
 import 'package:apexflow/core/storage/db_service.dart';
 import 'package:apexflow/core/storage/apex_kv_store.dart';
 import 'package:apexflow/garage/domain/motorcycle_profile.dart';
@@ -9,6 +10,27 @@ import 'package:apexflow/rituals/application/rituals_state.dart';
 
 class MigrationService {
   static const _migrationKey = 'app.migration_completed.v1';
+  static const _ownerIdBackfillKey = 'app.userid_backfill_completed.v1';
+
+  /// One-time pass that assigns every local record predating the userId
+  /// field (motorcycles, service records, daily checks, documents, tax
+  /// records, friends) to this install's owner id — the same id
+  /// (Firebase UID once signed in, otherwise a persisted local install id)
+  /// already used for cloud sync. Never deletes data; if it can't complete,
+  /// it does not mark itself done so it retries on the next launch.
+  static Future<void> checkAndBackfillOwnerId(DbService db) async {
+    final done = await ApexKvStore.getBool(_ownerIdBackfillKey) ?? false;
+    if (done) return;
+
+    try {
+      final ownerId = await FirebaseService.instance
+          .getOrCreateInstallationId();
+      await db.backfillOwnerId(ownerId);
+      await ApexKvStore.setBool(_ownerIdBackfillKey, true);
+    } catch (_) {
+      // Leave unmarked so it retries next launch.
+    }
+  }
 
   static Future<void> checkAndMigrate(DbService db) async {
     final migrationCompleted =

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:apexflow/core/services/firebase_service.dart';
 import 'package:apexflow/core/storage/apex_kv_store.dart';
 import 'package:apexflow/core/storage/db_provider.dart';
 import 'package:apexflow/core/i18n/app_settings_state.dart';
@@ -149,6 +150,7 @@ final ritualsStateProvider = NotifierProvider<RitualsController, RitualsState>(
 
 class RitualsController extends Notifier<RitualsState> {
   bool _mounted = true;
+  String _ownerId = '';
 
   @override
   RitualsState build() {
@@ -176,7 +178,7 @@ class RitualsController extends Notifier<RitualsState> {
     state = state.copyWith(dailyChecks: nextChecks);
 
     final db = ref.read(dbServiceProvider);
-    unawaited(db.saveDailyCheck(entry));
+    unawaited(db.saveDailyCheck(entry, userId: _ownerId));
   }
 
   void setWeather(WeatherSnapshot weather) {
@@ -216,7 +218,10 @@ class RitualsController extends Notifier<RitualsState> {
   Future<void> _hydrate() async {
     final db = ref.read(dbServiceProvider);
     await db.init();
-    final checks = await db.getDailyChecks();
+    try {
+      _ownerId = await FirebaseService.instance.getOrCreateInstallationId();
+    } catch (_) {}
+    final checks = await db.getDailyChecks(userId: _ownerId);
 
     final weatherRaw = await ApexKvStore.getString('rituals.weather_json');
 

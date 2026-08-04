@@ -82,20 +82,30 @@ class IsarDbService implements DbService {
   Isar get _db => _isar!;
 
   @override
-  Future<List<MotorcycleProfile>> getMotorcycles() async {
-    final list = await _db.collection<MotorcycleEntity>().where().findAll();
+  Future<List<MotorcycleProfile>> getMotorcycles({String? userId}) async {
+    if (userId == null || userId.isEmpty) {
+      return []; // Strict privacy: never expose local records without an owner id
+    }
+    final list = await _db
+        .collection<MotorcycleEntity>()
+        .filter()
+        .userIdEqualTo(userId)
+        .findAll();
     return list.map((e) => e.toDomain()).toList();
   }
 
   @override
-  Future<void> saveMotorcycle(MotorcycleProfile bike) async {
+  Future<void> saveMotorcycle(MotorcycleProfile bike, {String? userId}) async {
+    final ownerId = userId ?? '';
     await _db.writeTxn(() async {
       final existing = await _db
           .collection<MotorcycleEntity>()
           .filter()
           .stableIdEqualTo(bike.id)
+          .and()
+          .userIdEqualTo(ownerId)
           .findFirst();
-      final entity = MotorcycleEntity.fromDomain(bike);
+      final entity = MotorcycleEntity.fromDomain(bike, userId: ownerId);
       if (existing != null) {
         entity.id = existing.id;
       }
@@ -126,23 +136,38 @@ class IsarDbService implements DbService {
   }
 
   @override
-  Future<List<ServiceRecord>> getServiceRecords() async {
-    final list = await _db.collection<ServiceRecordEntity>().where().findAll();
+  Future<List<ServiceRecord>> getServiceRecords({String? userId}) async {
+    if (userId == null || userId.isEmpty) {
+      return [];
+    }
+    final list = await _db
+        .collection<ServiceRecordEntity>()
+        .filter()
+        .userIdEqualTo(userId)
+        .findAll();
     return list.map((e) => e.toDomain()).toList();
   }
 
   @override
   Future<void> saveServiceRecord(
     ServiceRecord record,
-    String bikeStableId,
-  ) async {
+    String bikeStableId, {
+    String? userId,
+  }) async {
+    final ownerId = userId ?? '';
     await _db.writeTxn(() async {
       final existing = await _db
           .collection<ServiceRecordEntity>()
           .filter()
           .stableIdEqualTo(record.id)
+          .and()
+          .userIdEqualTo(ownerId)
           .findFirst();
-      final entity = ServiceRecordEntity.fromDomain(record, bikeStableId);
+      final entity = ServiceRecordEntity.fromDomain(
+        record,
+        bikeStableId,
+        userId: ownerId,
+      );
       if (existing != null) {
         entity.id = existing.id;
       }
@@ -169,7 +194,8 @@ class IsarDbService implements DbService {
     if (userId == null || userId.isEmpty) {
       return []; // Strict privacy: never expose rides if user is unauthenticated
     }
-    final list = await _db.collection<RideSessionEntity>()
+    final list = await _db
+        .collection<RideSessionEntity>()
         .filter()
         .userIdEqualTo(userId)
         .findAll();
@@ -177,28 +203,46 @@ class IsarDbService implements DbService {
   }
 
   @override
-  Future<void> saveRideSession(RideSession session, String bikeStableId, {String? userId}) async {
+  Future<void> saveRideSession(
+    RideSession session,
+    String bikeStableId, {
+    String? userId,
+  }) async {
     await _db.writeTxn(() async {
-      final entity = RideSessionEntity.fromDomain(session, bikeStableId, userId: userId ?? '');
+      final entity = RideSessionEntity.fromDomain(
+        session,
+        bikeStableId,
+        userId: userId ?? '',
+      );
       await _db.collection<RideSessionEntity>().put(entity);
     });
   }
 
   @override
-  Future<List<DailyCheckEntry>> getDailyChecks() async {
-    final list = await _db.collection<DailyCheckEntity>().where().findAll();
+  Future<List<DailyCheckEntry>> getDailyChecks({String? userId}) async {
+    if (userId == null || userId.isEmpty) {
+      return [];
+    }
+    final list = await _db
+        .collection<DailyCheckEntity>()
+        .filter()
+        .userIdEqualTo(userId)
+        .findAll();
     return list.map((e) => e.toDomain()).toList();
   }
 
   @override
-  Future<void> saveDailyCheck(DailyCheckEntry entry) async {
+  Future<void> saveDailyCheck(DailyCheckEntry entry, {String? userId}) async {
+    final ownerId = userId ?? '';
     await _db.writeTxn(() async {
       final existing = await _db
           .collection<DailyCheckEntity>()
           .filter()
           .isoDateEqualTo(entry.isoDate)
+          .and()
+          .userIdEqualTo(ownerId)
           .findFirst();
-      final entity = DailyCheckEntity.fromDomain(entry);
+      final entity = DailyCheckEntity.fromDomain(entry, userId: ownerId);
       if (existing != null) {
         entity.id = existing.id;
       }
@@ -207,20 +251,30 @@ class IsarDbService implements DbService {
   }
 
   @override
-  Future<List<MotorcycleDocument>> getDocuments() async {
-    final list = await _db.collection<DocumentEntity>().where().findAll();
+  Future<List<MotorcycleDocument>> getDocuments({String? userId}) async {
+    if (userId == null || userId.isEmpty) {
+      return [];
+    }
+    final list = await _db
+        .collection<DocumentEntity>()
+        .filter()
+        .userIdEqualTo(userId)
+        .findAll();
     return list.map((e) => e.toDomain()).toList();
   }
 
   @override
-  Future<void> saveDocument(MotorcycleDocument doc) async {
+  Future<void> saveDocument(MotorcycleDocument doc, {String? userId}) async {
+    final ownerId = userId ?? '';
     await _db.writeTxn(() async {
       final existing = await _db
           .collection<DocumentEntity>()
           .filter()
           .stableIdEqualTo(doc.id)
+          .and()
+          .userIdEqualTo(ownerId)
           .findFirst();
-      final entity = DocumentEntity.fromDomain(doc);
+      final entity = DocumentEntity.fromDomain(doc, userId: ownerId);
       if (existing != null) {
         entity.id = existing.id;
       }
@@ -243,20 +297,30 @@ class IsarDbService implements DbService {
   }
 
   @override
-  Future<List<TaxRecord>> getTaxRecords() async {
-    final list = await _db.collection<TaxRecordEntity>().where().findAll();
+  Future<List<TaxRecord>> getTaxRecords({String? userId}) async {
+    if (userId == null || userId.isEmpty) {
+      return [];
+    }
+    final list = await _db
+        .collection<TaxRecordEntity>()
+        .filter()
+        .userIdEqualTo(userId)
+        .findAll();
     return list.map((e) => e.toDomain()).toList();
   }
 
   @override
-  Future<void> saveTaxRecord(TaxRecord record) async {
+  Future<void> saveTaxRecord(TaxRecord record, {String? userId}) async {
+    final ownerId = userId ?? '';
     await _db.writeTxn(() async {
       final existing = await _db
           .collection<TaxRecordEntity>()
           .filter()
           .stableIdEqualTo(record.id)
+          .and()
+          .userIdEqualTo(ownerId)
           .findFirst();
-      final entity = TaxRecordEntity.fromDomain(record);
+      final entity = TaxRecordEntity.fromDomain(record, userId: ownerId);
       if (existing != null) {
         entity.id = existing.id;
       }
@@ -279,20 +343,30 @@ class IsarDbService implements DbService {
   }
 
   @override
-  Future<List<FriendProfile>> getFriends() async {
-    final list = await _db.collection<FriendEntity>().where().findAll();
+  Future<List<FriendProfile>> getFriends({String? userId}) async {
+    if (userId == null || userId.isEmpty) {
+      return [];
+    }
+    final list = await _db
+        .collection<FriendEntity>()
+        .filter()
+        .userIdEqualTo(userId)
+        .findAll();
     return list.map((e) => e.toDomain()).toList();
   }
 
   @override
-  Future<void> saveFriend(FriendProfile friend) async {
+  Future<void> saveFriend(FriendProfile friend, {String? userId}) async {
+    final ownerId = userId ?? '';
     await _db.writeTxn(() async {
       final existing = await _db
           .collection<FriendEntity>()
           .filter()
           .stableIdEqualTo(friend.stableId)
+          .and()
+          .userIdEqualTo(ownerId)
           .findFirst();
-      final entity = FriendEntity.fromDomain(friend);
+      final entity = FriendEntity.fromDomain(friend, userId: ownerId);
       if (existing != null) {
         entity.id = existing.id;
       }
@@ -310,6 +384,72 @@ class IsarDbService implements DbService {
           .findFirst();
       if (existing != null) {
         await _db.collection<FriendEntity>().delete(existing.id);
+      }
+    });
+  }
+
+  @override
+  Future<void> backfillOwnerId(String ownerId) async {
+    if (ownerId.isEmpty) return;
+    await _db.writeTxn(() async {
+      final bikes = await _db
+          .collection<MotorcycleEntity>()
+          .filter()
+          .userIdEqualTo('')
+          .findAll();
+      for (final e in bikes) {
+        e.userId = ownerId;
+        await _db.collection<MotorcycleEntity>().put(e);
+      }
+
+      final services = await _db
+          .collection<ServiceRecordEntity>()
+          .filter()
+          .userIdEqualTo('')
+          .findAll();
+      for (final e in services) {
+        e.userId = ownerId;
+        await _db.collection<ServiceRecordEntity>().put(e);
+      }
+
+      final checks = await _db
+          .collection<DailyCheckEntity>()
+          .filter()
+          .userIdEqualTo('')
+          .findAll();
+      for (final e in checks) {
+        e.userId = ownerId;
+        await _db.collection<DailyCheckEntity>().put(e);
+      }
+
+      final docs = await _db
+          .collection<DocumentEntity>()
+          .filter()
+          .userIdEqualTo('')
+          .findAll();
+      for (final e in docs) {
+        e.userId = ownerId;
+        await _db.collection<DocumentEntity>().put(e);
+      }
+
+      final taxes = await _db
+          .collection<TaxRecordEntity>()
+          .filter()
+          .userIdEqualTo('')
+          .findAll();
+      for (final e in taxes) {
+        e.userId = ownerId;
+        await _db.collection<TaxRecordEntity>().put(e);
+      }
+
+      final friends = await _db
+          .collection<FriendEntity>()
+          .filter()
+          .userIdEqualTo('')
+          .findAll();
+      for (final e in friends) {
+        e.userId = ownerId;
+        await _db.collection<FriendEntity>().put(e);
       }
     });
   }

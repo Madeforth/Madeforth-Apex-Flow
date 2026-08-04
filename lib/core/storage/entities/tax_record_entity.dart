@@ -10,6 +10,9 @@ class TaxRecordEntity {
   @Index(unique: true)
   late String stableId;
 
+  @Index()
+  String userId = '';
+
   late String bikeStableId;
   late String type;
   late String dueDateIso;
@@ -29,9 +32,10 @@ class TaxRecordEntity {
     );
   }
 
-  static TaxRecordEntity fromDomain(TaxRecord domain) {
+  static TaxRecordEntity fromDomain(TaxRecord domain, {String userId = ''}) {
     return TaxRecordEntity()
       ..stableId = domain.id
+      ..userId = userId
       ..bikeStableId = domain.bikeStableId
       ..type = domain.type
       ..dueDateIso = domain.dueDateIso

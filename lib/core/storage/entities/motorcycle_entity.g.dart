@@ -76,6 +76,11 @@ const MotorcycleEntitySchema = CollectionSchema(
       id: 11,
       name: r'tireWearPercent',
       type: IsarType.long,
+    ),
+    r'userId': PropertySchema(
+      id: 12,
+      name: r'userId',
+      type: IsarType.string,
     )
   },
   estimateSize: _motorcycleEntityEstimateSize,
@@ -92,6 +97,19 @@ const MotorcycleEntitySchema = CollectionSchema(
       properties: [
         IndexPropertySchema(
           name: r'stableId',
+          type: IndexType.hash,
+          caseSensitive: true,
+        )
+      ],
+    ),
+    r'userId': IndexSchema(
+      id: -2005826577402374815,
+      name: r'userId',
+      unique: false,
+      replace: false,
+      properties: [
+        IndexPropertySchema(
+          name: r'userId',
           type: IndexType.hash,
           caseSensitive: true,
         )
@@ -115,6 +133,7 @@ int _motorcycleEntityEstimateSize(
   bytesCount += 3 + object.model.length * 3;
   bytesCount += 3 + object.name.length * 3;
   bytesCount += 3 + object.stableId.length * 3;
+  bytesCount += 3 + object.userId.length * 3;
   return bytesCount;
 }
 
@@ -136,6 +155,7 @@ void _motorcycleEntitySerialize(
   writer.writeLong(offsets[9], object.serviceIntervalKm);
   writer.writeString(offsets[10], object.stableId);
   writer.writeLong(offsets[11], object.tireWearPercent);
+  writer.writeString(offsets[12], object.userId);
 }
 
 MotorcycleEntity _motorcycleEntityDeserialize(
@@ -158,6 +178,7 @@ MotorcycleEntity _motorcycleEntityDeserialize(
   object.serviceIntervalKm = reader.readLong(offsets[9]);
   object.stableId = reader.readString(offsets[10]);
   object.tireWearPercent = reader.readLong(offsets[11]);
+  object.userId = reader.readString(offsets[12]);
   return object;
 }
 
@@ -192,6 +213,8 @@ P _motorcycleEntityDeserializeProp<P>(
       return (reader.readString(offset)) as P;
     case 11:
       return (reader.readLong(offset)) as P;
+    case 12:
+      return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -383,6 +406,51 @@ extension MotorcycleEntityQueryWhere
               indexName: r'stableId',
               lower: [],
               upper: [stableId],
+              includeUpper: false,
+            ));
+      }
+    });
+  }
+
+  QueryBuilder<MotorcycleEntity, MotorcycleEntity, QAfterWhereClause>
+      userIdEqualTo(String userId) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'userId',
+        value: [userId],
+      ));
+    });
+  }
+
+  QueryBuilder<MotorcycleEntity, MotorcycleEntity, QAfterWhereClause>
+      userIdNotEqualTo(String userId) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'userId',
+              lower: [],
+              upper: [userId],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'userId',
+              lower: [userId],
+              includeLower: false,
+              upper: [],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'userId',
+              lower: [userId],
+              includeLower: false,
+              upper: [],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'userId',
+              lower: [],
+              upper: [userId],
               includeUpper: false,
             ));
       }
@@ -1313,6 +1381,142 @@ extension MotorcycleEntityQueryFilter
       ));
     });
   }
+
+  QueryBuilder<MotorcycleEntity, MotorcycleEntity, QAfterFilterCondition>
+      userIdEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'userId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MotorcycleEntity, MotorcycleEntity, QAfterFilterCondition>
+      userIdGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'userId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MotorcycleEntity, MotorcycleEntity, QAfterFilterCondition>
+      userIdLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'userId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MotorcycleEntity, MotorcycleEntity, QAfterFilterCondition>
+      userIdBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'userId',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MotorcycleEntity, MotorcycleEntity, QAfterFilterCondition>
+      userIdStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'userId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MotorcycleEntity, MotorcycleEntity, QAfterFilterCondition>
+      userIdEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'userId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MotorcycleEntity, MotorcycleEntity, QAfterFilterCondition>
+      userIdContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'userId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MotorcycleEntity, MotorcycleEntity, QAfterFilterCondition>
+      userIdMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'userId',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MotorcycleEntity, MotorcycleEntity, QAfterFilterCondition>
+      userIdIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'userId',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<MotorcycleEntity, MotorcycleEntity, QAfterFilterCondition>
+      userIdIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'userId',
+        value: '',
+      ));
+    });
+  }
 }
 
 extension MotorcycleEntityQueryObject
@@ -1486,6 +1690,20 @@ extension MotorcycleEntityQuerySortBy
       sortByTireWearPercentDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'tireWearPercent', Sort.desc);
+    });
+  }
+
+  QueryBuilder<MotorcycleEntity, MotorcycleEntity, QAfterSortBy>
+      sortByUserId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'userId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<MotorcycleEntity, MotorcycleEntity, QAfterSortBy>
+      sortByUserIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'userId', Sort.desc);
     });
   }
 }
@@ -1670,6 +1888,20 @@ extension MotorcycleEntityQuerySortThenBy
       return query.addSortBy(r'tireWearPercent', Sort.desc);
     });
   }
+
+  QueryBuilder<MotorcycleEntity, MotorcycleEntity, QAfterSortBy>
+      thenByUserId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'userId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<MotorcycleEntity, MotorcycleEntity, QAfterSortBy>
+      thenByUserIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'userId', Sort.desc);
+    });
+  }
 }
 
 extension MotorcycleEntityQueryWhereDistinct
@@ -1755,6 +1987,13 @@ extension MotorcycleEntityQueryWhereDistinct
       distinctByTireWearPercent() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'tireWearPercent');
+    });
+  }
+
+  QueryBuilder<MotorcycleEntity, MotorcycleEntity, QDistinct> distinctByUserId(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'userId', caseSensitive: caseSensitive);
     });
   }
 }
@@ -1843,6 +2082,12 @@ extension MotorcycleEntityQueryProperty
       tireWearPercentProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'tireWearPercent');
+    });
+  }
+
+  QueryBuilder<MotorcycleEntity, String, QQueryOperations> userIdProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'userId');
     });
   }
 }

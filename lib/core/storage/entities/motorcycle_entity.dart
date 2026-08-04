@@ -10,6 +10,9 @@ class MotorcycleEntity {
   @Index(unique: true)
   late String stableId;
 
+  @Index()
+  String userId = '';
+
   late String name;
   late String model;
   late int odometerKm;
@@ -39,9 +42,13 @@ class MotorcycleEntity {
     );
   }
 
-  static MotorcycleEntity fromDomain(MotorcycleProfile domain) {
+  static MotorcycleEntity fromDomain(
+    MotorcycleProfile domain, {
+    String userId = '',
+  }) {
     return MotorcycleEntity()
       ..stableId = domain.id
+      ..userId = userId
       ..name = domain.name
       ..model = domain.model
       ..odometerKm = domain.odometerKm

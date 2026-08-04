@@ -13,6 +13,9 @@ class ServiceRecordEntity {
   @Index(unique: true)
   late String stableId;
 
+  @Index()
+  String userId = '';
+
   late String type;
   late String label;
   late int odometerKm;
@@ -34,11 +37,13 @@ class ServiceRecordEntity {
 
   static ServiceRecordEntity fromDomain(
     ServiceRecord domain,
-    String bikeStableId,
-  ) {
+    String bikeStableId, {
+    String userId = '',
+  }) {
     return ServiceRecordEntity()
       ..bikeStableId = bikeStableId
       ..stableId = domain.id
+      ..userId = userId
       ..type = domain.type
       ..label = domain.label
       ..odometerKm = domain.odometerKm

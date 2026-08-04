@@ -87,8 +87,13 @@ const FriendEntitySchema = CollectionSchema(
       name: r'stableId',
       type: IsarType.string,
     ),
-    r'weeklyKm': PropertySchema(
+    r'userId': PropertySchema(
       id: 14,
+      name: r'userId',
+      type: IsarType.string,
+    ),
+    r'weeklyKm': PropertySchema(
+      id: 15,
       name: r'weeklyKm',
       type: IsarType.double,
     )
@@ -107,6 +112,19 @@ const FriendEntitySchema = CollectionSchema(
       properties: [
         IndexPropertySchema(
           name: r'stableId',
+          type: IndexType.hash,
+          caseSensitive: true,
+        )
+      ],
+    ),
+    r'userId': IndexSchema(
+      id: -2005826577402374815,
+      name: r'userId',
+      unique: false,
+      replace: false,
+      properties: [
+        IndexPropertySchema(
+          name: r'userId',
           type: IndexType.hash,
           caseSensitive: true,
         )
@@ -158,6 +176,7 @@ int _friendEntityEstimateSize(
   bytesCount += 3 + object.riderTag.length * 3;
   bytesCount += 3 + object.ridingStyle.length * 3;
   bytesCount += 3 + object.stableId.length * 3;
+  bytesCount += 3 + object.userId.length * 3;
   return bytesCount;
 }
 
@@ -181,7 +200,8 @@ void _friendEntitySerialize(
   writer.writeString(offsets[11], object.riderTag);
   writer.writeString(offsets[12], object.ridingStyle);
   writer.writeString(offsets[13], object.stableId);
-  writer.writeDouble(offsets[14], object.weeklyKm);
+  writer.writeString(offsets[14], object.userId);
+  writer.writeDouble(offsets[15], object.weeklyKm);
 }
 
 FriendEntity _friendEntityDeserialize(
@@ -206,7 +226,8 @@ FriendEntity _friendEntityDeserialize(
   object.riderTag = reader.readString(offsets[11]);
   object.ridingStyle = reader.readString(offsets[12]);
   object.stableId = reader.readString(offsets[13]);
-  object.weeklyKm = reader.readDouble(offsets[14]);
+  object.userId = reader.readString(offsets[14]);
+  object.weeklyKm = reader.readDouble(offsets[15]);
   return object;
 }
 
@@ -246,6 +267,8 @@ P _friendEntityDeserializeProp<P>(
     case 13:
       return (reader.readString(offset)) as P;
     case 14:
+      return (reader.readString(offset)) as P;
+    case 15:
       return (reader.readDouble(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -437,6 +460,51 @@ extension FriendEntityQueryWhere
               indexName: r'stableId',
               lower: [],
               upper: [stableId],
+              includeUpper: false,
+            ));
+      }
+    });
+  }
+
+  QueryBuilder<FriendEntity, FriendEntity, QAfterWhereClause> userIdEqualTo(
+      String userId) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'userId',
+        value: [userId],
+      ));
+    });
+  }
+
+  QueryBuilder<FriendEntity, FriendEntity, QAfterWhereClause> userIdNotEqualTo(
+      String userId) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'userId',
+              lower: [],
+              upper: [userId],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'userId',
+              lower: [userId],
+              includeLower: false,
+              upper: [],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'userId',
+              lower: [userId],
+              includeLower: false,
+              upper: [],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'userId',
+              lower: [],
+              upper: [userId],
               includeUpper: false,
             ));
       }
@@ -2194,6 +2262,141 @@ extension FriendEntityQueryFilter
     });
   }
 
+  QueryBuilder<FriendEntity, FriendEntity, QAfterFilterCondition> userIdEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'userId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FriendEntity, FriendEntity, QAfterFilterCondition>
+      userIdGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'userId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FriendEntity, FriendEntity, QAfterFilterCondition>
+      userIdLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'userId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FriendEntity, FriendEntity, QAfterFilterCondition> userIdBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'userId',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FriendEntity, FriendEntity, QAfterFilterCondition>
+      userIdStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'userId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FriendEntity, FriendEntity, QAfterFilterCondition>
+      userIdEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'userId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FriendEntity, FriendEntity, QAfterFilterCondition>
+      userIdContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'userId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FriendEntity, FriendEntity, QAfterFilterCondition> userIdMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'userId',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FriendEntity, FriendEntity, QAfterFilterCondition>
+      userIdIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'userId',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<FriendEntity, FriendEntity, QAfterFilterCondition>
+      userIdIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'userId',
+        value: '',
+      ));
+    });
+  }
+
   QueryBuilder<FriendEntity, FriendEntity, QAfterFilterCondition>
       weeklyKmEqualTo(
     double value, {
@@ -2436,6 +2639,18 @@ extension FriendEntityQuerySortBy
     });
   }
 
+  QueryBuilder<FriendEntity, FriendEntity, QAfterSortBy> sortByUserId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'userId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FriendEntity, FriendEntity, QAfterSortBy> sortByUserIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'userId', Sort.desc);
+    });
+  }
+
   QueryBuilder<FriendEntity, FriendEntity, QAfterSortBy> sortByWeeklyKm() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'weeklyKm', Sort.asc);
@@ -2630,6 +2845,18 @@ extension FriendEntityQuerySortThenBy
     });
   }
 
+  QueryBuilder<FriendEntity, FriendEntity, QAfterSortBy> thenByUserId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'userId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FriendEntity, FriendEntity, QAfterSortBy> thenByUserIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'userId', Sort.desc);
+    });
+  }
+
   QueryBuilder<FriendEntity, FriendEntity, QAfterSortBy> thenByWeeklyKm() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'weeklyKm', Sort.asc);
@@ -2743,6 +2970,13 @@ extension FriendEntityQueryWhereDistinct
     });
   }
 
+  QueryBuilder<FriendEntity, FriendEntity, QDistinct> distinctByUserId(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'userId', caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<FriendEntity, FriendEntity, QDistinct> distinctByWeeklyKm() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'weeklyKm');
@@ -2843,6 +3077,12 @@ extension FriendEntityQueryProperty
   QueryBuilder<FriendEntity, String, QQueryOperations> stableIdProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'stableId');
+    });
+  }
+
+  QueryBuilder<FriendEntity, String, QQueryOperations> userIdProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'userId');
     });
   }
 

@@ -21,12 +21,12 @@ class InMemoryDbService implements DbService {
   Future<void> init() async {}
 
   @override
-  Future<List<MotorcycleProfile>> getMotorcycles() async {
+  Future<List<MotorcycleProfile>> getMotorcycles({String? userId}) async {
     return List.from(_motorcycles);
   }
 
   @override
-  Future<void> saveMotorcycle(MotorcycleProfile bike) async {
+  Future<void> saveMotorcycle(MotorcycleProfile bike, {String? userId}) async {
     _motorcycles.removeWhere((element) => element.id == bike.id);
     _motorcycles.add(bike);
   }
@@ -39,15 +39,16 @@ class InMemoryDbService implements DbService {
   }
 
   @override
-  Future<List<ServiceRecord>> getServiceRecords() async {
+  Future<List<ServiceRecord>> getServiceRecords({String? userId}) async {
     return _serviceRecords.map((e) => e.key).toList();
   }
 
   @override
   Future<void> saveServiceRecord(
     ServiceRecord record,
-    String bikeStableId,
-  ) async {
+    String bikeStableId, {
+    String? userId,
+  }) async {
     _serviceRecords.removeWhere((element) => element.key.id == record.id);
     _serviceRecords.add(MapEntry(record, bikeStableId));
   }
@@ -63,28 +64,32 @@ class InMemoryDbService implements DbService {
   }
 
   @override
-  Future<void> saveRideSession(RideSession session, String bikeStableId, {String? userId}) async {
+  Future<void> saveRideSession(
+    RideSession session,
+    String bikeStableId, {
+    String? userId,
+  }) async {
     _rideSessions.add(MapEntry(session, bikeStableId));
   }
 
   @override
-  Future<List<DailyCheckEntry>> getDailyChecks() async {
+  Future<List<DailyCheckEntry>> getDailyChecks({String? userId}) async {
     return List.from(_dailyChecks);
   }
 
   @override
-  Future<void> saveDailyCheck(DailyCheckEntry entry) async {
+  Future<void> saveDailyCheck(DailyCheckEntry entry, {String? userId}) async {
     _dailyChecks.removeWhere((element) => element.isoDate == entry.isoDate);
     _dailyChecks.add(entry);
   }
 
   @override
-  Future<List<MotorcycleDocument>> getDocuments() async {
+  Future<List<MotorcycleDocument>> getDocuments({String? userId}) async {
     return List.from(_documents);
   }
 
   @override
-  Future<void> saveDocument(MotorcycleDocument doc) async {
+  Future<void> saveDocument(MotorcycleDocument doc, {String? userId}) async {
     _documents.removeWhere((element) => element.id == doc.id);
     _documents.add(doc);
   }
@@ -95,12 +100,12 @@ class InMemoryDbService implements DbService {
   }
 
   @override
-  Future<List<TaxRecord>> getTaxRecords() async {
+  Future<List<TaxRecord>> getTaxRecords({String? userId}) async {
     return List.from(_taxRecords);
   }
 
   @override
-  Future<void> saveTaxRecord(TaxRecord record) async {
+  Future<void> saveTaxRecord(TaxRecord record, {String? userId}) async {
     _taxRecords.removeWhere((element) => element.id == record.id);
     _taxRecords.add(record);
   }
@@ -111,12 +116,12 @@ class InMemoryDbService implements DbService {
   }
 
   @override
-  Future<List<FriendProfile>> getFriends() async {
+  Future<List<FriendProfile>> getFriends({String? userId}) async {
     return List.from(_friends);
   }
 
   @override
-  Future<void> saveFriend(FriendProfile friend) async {
+  Future<void> saveFriend(FriendProfile friend, {String? userId}) async {
     _friends.removeWhere((element) => element.stableId == friend.stableId);
     _friends.add(friend);
   }
@@ -124,6 +129,12 @@ class InMemoryDbService implements DbService {
   @override
   Future<void> deleteFriend(String stableId) async {
     _friends.removeWhere((element) => element.stableId == stableId);
+  }
+
+  @override
+  Future<void> backfillOwnerId(String ownerId) async {
+    // No-op: the in-memory service backs tests and web builds, neither of
+    // which carries pre-existing unowned local records to migrate.
   }
 
   @override

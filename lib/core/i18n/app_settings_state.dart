@@ -142,7 +142,9 @@ class AppSettingsController extends Notifier<AppSettingsState> {
       await db.init().timeout(
         const Duration(seconds: 2),
         onTimeout: () {
-          debugPrint('[AppSettings] DB init timed out, falling back to KV store');
+          debugPrint(
+            '[AppSettings] DB init timed out, falling back to KV store',
+          );
         },
       );
       if (!_mounted) return;
@@ -151,6 +153,13 @@ class AppSettingsController extends Notifier<AppSettingsState> {
         const Duration(seconds: 2),
         onTimeout: () {
           debugPrint('[AppSettings] Migration timed out');
+        },
+      );
+
+      await MigrationService.checkAndBackfillOwnerId(db).timeout(
+        const Duration(seconds: 2),
+        onTimeout: () {
+          debugPrint('[AppSettings] Owner-id backfill timed out');
         },
       );
     } catch (e) {

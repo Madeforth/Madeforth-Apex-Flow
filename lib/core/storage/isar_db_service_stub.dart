@@ -16,9 +16,13 @@ class IsarDbService implements DbService {
   }
 
   // --- Motorcycles ---
+  String _bikesKey(String? userId) =>
+      userId != null && userId.isNotEmpty ? 'db.bikes.$userId' : 'db.bikes';
+
   @override
-  Future<List<MotorcycleProfile>> getMotorcycles() async {
-    final raw = await ApexKvStore.getString('db.bikes');
+  Future<List<MotorcycleProfile>> getMotorcycles({String? userId}) async {
+    if (userId == null || userId.isEmpty) return [];
+    final raw = await ApexKvStore.getString(_bikesKey(userId));
     if (raw == null) return [];
     final List<dynamic> decoded = jsonDecode(raw);
     return decoded
@@ -27,18 +31,22 @@ class IsarDbService implements DbService {
   }
 
   @override
-  Future<void> saveMotorcycle(MotorcycleProfile bike) async {
-    final list = await getMotorcycles();
+  Future<void> saveMotorcycle(MotorcycleProfile bike, {String? userId}) async {
+    final list = await getMotorcycles(userId: userId);
     list.removeWhere((e) => e.id == bike.id);
     list.add(bike);
     await ApexKvStore.setString(
-      'db.bikes',
+      _bikesKey(userId),
       jsonEncode(list.map((e) => e.toJson()).toList()),
     );
   }
 
   @override
   Future<void> deleteMotorcycle(String bikeStableId) async {
+    // NOTE: DbService.deleteMotorcycle takes no userId, so this stub (used
+    // only when dart.library.io is unavailable AND kIsWeb is false — not
+    // reachable via the current dbServiceProvider wiring, see db_provider.dart)
+    // cannot target a specific owner's keyed storage here.
     final list = await getMotorcycles();
     list.removeWhere((e) => e.id == bikeStableId);
     await ApexKvStore.setString(
@@ -48,9 +56,15 @@ class IsarDbService implements DbService {
   }
 
   // --- Service Records ---
+  String _serviceRecordsKey(String? userId) =>
+      userId != null && userId.isNotEmpty
+      ? 'db.service_records.$userId'
+      : 'db.service_records';
+
   @override
-  Future<List<ServiceRecord>> getServiceRecords() async {
-    final raw = await ApexKvStore.getString('db.service_records');
+  Future<List<ServiceRecord>> getServiceRecords({String? userId}) async {
+    if (userId == null || userId.isEmpty) return [];
+    final raw = await ApexKvStore.getString(_serviceRecordsKey(userId));
     if (raw == null) return [];
     final List<dynamic> decoded = jsonDecode(raw);
     return decoded
@@ -61,13 +75,14 @@ class IsarDbService implements DbService {
   @override
   Future<void> saveServiceRecord(
     ServiceRecord record,
-    String bikeStableId,
-  ) async {
-    final list = await getServiceRecords();
+    String bikeStableId, {
+    String? userId,
+  }) async {
+    final list = await getServiceRecords(userId: userId);
     list.removeWhere((e) => e.id == record.id);
     list.add(record);
     await ApexKvStore.setString(
-      'db.service_records',
+      _serviceRecordsKey(userId),
       jsonEncode(list.map((e) => e.toJson()).toList()),
     );
   }
@@ -97,7 +112,11 @@ class IsarDbService implements DbService {
   }
 
   @override
-  Future<void> saveRideSession(RideSession session, String bikeStableId, {String? userId}) async {
+  Future<void> saveRideSession(
+    RideSession session,
+    String bikeStableId, {
+    String? userId,
+  }) async {
     final key = userId != null && userId.isNotEmpty
         ? 'db.ride_sessions.$userId'
         : 'db.ride_sessions';
@@ -110,9 +129,14 @@ class IsarDbService implements DbService {
   }
 
   // --- Daily Checks ---
+  String _dailyChecksKey(String? userId) => userId != null && userId.isNotEmpty
+      ? 'db.daily_checks.$userId'
+      : 'db.daily_checks';
+
   @override
-  Future<List<DailyCheckEntry>> getDailyChecks() async {
-    final raw = await ApexKvStore.getString('db.daily_checks');
+  Future<List<DailyCheckEntry>> getDailyChecks({String? userId}) async {
+    if (userId == null || userId.isEmpty) return [];
+    final raw = await ApexKvStore.getString(_dailyChecksKey(userId));
     if (raw == null) return [];
     final List<dynamic> decoded = jsonDecode(raw);
     return decoded
@@ -121,12 +145,12 @@ class IsarDbService implements DbService {
   }
 
   @override
-  Future<void> saveDailyCheck(DailyCheckEntry entry) async {
-    final list = await getDailyChecks();
+  Future<void> saveDailyCheck(DailyCheckEntry entry, {String? userId}) async {
+    final list = await getDailyChecks(userId: userId);
     list.removeWhere((e) => e.isoDate == entry.isoDate);
     list.add(entry);
     await ApexKvStore.setString(
-      'db.daily_checks',
+      _dailyChecksKey(userId),
       jsonEncode(list.map((e) => e.toJson()).toList()),
     );
   }
@@ -154,21 +178,26 @@ class IsarDbService implements DbService {
     );
   }
 
+  String _documentsKey(String? userId) => userId != null && userId.isNotEmpty
+      ? 'db.documents.$userId'
+      : 'db.documents';
+
   @override
-  Future<List<MotorcycleDocument>> getDocuments() async {
-    final raw = await ApexKvStore.getString('db.documents');
+  Future<List<MotorcycleDocument>> getDocuments({String? userId}) async {
+    if (userId == null || userId.isEmpty) return [];
+    final raw = await ApexKvStore.getString(_documentsKey(userId));
     if (raw == null) return [];
     final List<dynamic> decoded = jsonDecode(raw);
     return decoded.map((e) => _docFromJson(e as Map<String, dynamic>)).toList();
   }
 
   @override
-  Future<void> saveDocument(MotorcycleDocument doc) async {
-    final list = await getDocuments();
+  Future<void> saveDocument(MotorcycleDocument doc, {String? userId}) async {
+    final list = await getDocuments(userId: userId);
     list.removeWhere((e) => e.id == doc.id);
     list.add(doc);
     await ApexKvStore.setString(
-      'db.documents',
+      _documentsKey(userId),
       jsonEncode(list.map((e) => _docToJson(e)).toList()),
     );
   }
@@ -208,21 +237,26 @@ class IsarDbService implements DbService {
     );
   }
 
+  String _taxRecordsKey(String? userId) => userId != null && userId.isNotEmpty
+      ? 'db.tax_records.$userId'
+      : 'db.tax_records';
+
   @override
-  Future<List<TaxRecord>> getTaxRecords() async {
-    final raw = await ApexKvStore.getString('db.tax_records');
+  Future<List<TaxRecord>> getTaxRecords({String? userId}) async {
+    if (userId == null || userId.isEmpty) return [];
+    final raw = await ApexKvStore.getString(_taxRecordsKey(userId));
     if (raw == null) return [];
     final List<dynamic> decoded = jsonDecode(raw);
     return decoded.map((e) => _taxFromJson(e as Map<String, dynamic>)).toList();
   }
 
   @override
-  Future<void> saveTaxRecord(TaxRecord record) async {
-    final list = await getTaxRecords();
+  Future<void> saveTaxRecord(TaxRecord record, {String? userId}) async {
+    final list = await getTaxRecords(userId: userId);
     list.removeWhere((e) => e.id == record.id);
     list.add(record);
     await ApexKvStore.setString(
-      'db.tax_records',
+      _taxRecordsKey(userId),
       jsonEncode(list.map((e) => _taxToJson(e)).toList()),
     );
   }
@@ -238,9 +272,13 @@ class IsarDbService implements DbService {
   }
 
   // --- Friends ---
+  String _friendsKey(String? userId) =>
+      userId != null && userId.isNotEmpty ? 'db.friends.$userId' : 'db.friends';
+
   @override
-  Future<List<FriendProfile>> getFriends() async {
-    final raw = await ApexKvStore.getString('db.friends');
+  Future<List<FriendProfile>> getFriends({String? userId}) async {
+    if (userId == null || userId.isEmpty) return [];
+    final raw = await ApexKvStore.getString(_friendsKey(userId));
     if (raw == null) return [];
     final List<dynamic> decoded = jsonDecode(raw);
     return decoded
@@ -249,12 +287,12 @@ class IsarDbService implements DbService {
   }
 
   @override
-  Future<void> saveFriend(FriendProfile friend) async {
-    final list = await getFriends();
+  Future<void> saveFriend(FriendProfile friend, {String? userId}) async {
+    final list = await getFriends(userId: userId);
     list.removeWhere((e) => e.stableId == friend.stableId);
     list.add(friend);
     await ApexKvStore.setString(
-      'db.friends',
+      _friendsKey(userId),
       jsonEncode(list.map((e) => e.toJson()).toList()),
     );
   }
@@ -267,6 +305,13 @@ class IsarDbService implements DbService {
       'db.friends',
       jsonEncode(list.map((e) => e.toJson()).toList()),
     );
+  }
+
+  @override
+  Future<void> backfillOwnerId(String ownerId) async {
+    // No-op: this stub is not reachable via the current dbServiceProvider
+    // wiring (kIsWeb is always caught by InMemoryDbService first — see
+    // db_provider.dart), so there is no real device data to migrate here.
   }
 
   @override

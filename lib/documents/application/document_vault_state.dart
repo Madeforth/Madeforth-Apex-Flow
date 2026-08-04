@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:apexflow/core/services/firebase_service.dart';
 import 'package:apexflow/core/storage/db_provider.dart';
 import 'package:apexflow/documents/domain/motorcycle_document.dart';
 import 'package:apexflow/documents/domain/tax_record.dart';
@@ -37,6 +38,8 @@ final documentVaultProvider =
     );
 
 class DocumentVaultController extends Notifier<DocumentVaultState> {
+  String _ownerId = '';
+
   @override
   DocumentVaultState build() {
     unawaited(_hydrate());
@@ -50,8 +53,11 @@ class DocumentVaultController extends Notifier<DocumentVaultState> {
   Future<void> _hydrate() async {
     final db = ref.read(dbServiceProvider);
     await db.init();
-    final docs = await db.getDocuments();
-    final taxes = await db.getTaxRecords();
+    try {
+      _ownerId = await FirebaseService.instance.getOrCreateInstallationId();
+    } catch (_) {}
+    final docs = await db.getDocuments(userId: _ownerId);
+    final taxes = await db.getTaxRecords(userId: _ownerId);
     state = DocumentVaultState(
       isHydrating: false,
       documents: docs,
@@ -102,7 +108,7 @@ class DocumentVaultController extends Notifier<DocumentVaultState> {
     state = state.copyWith(documents: updatedDocs);
 
     final db = ref.read(dbServiceProvider);
-    await db.saveDocument(doc);
+    await db.saveDocument(doc, userId: _ownerId);
   }
 
   Future<void> deleteDocument(String id) async {
@@ -135,14 +141,16 @@ class DocumentVaultController extends Notifier<DocumentVaultState> {
     state = state.copyWith(taxRecords: updatedRecords);
 
     final db = ref.read(dbServiceProvider);
-    await db.saveTaxRecord(record);
+    await db.saveTaxRecord(record, userId: _ownerId);
   }
 
   Future<void> toggleTaxPaid(String id) async {
     final updatedRecords = state.taxRecords.map((r) {
       if (r.id == id) {
         final updated = r.copyWith(isPaid: !r.isPaid);
-        unawaited(ref.read(dbServiceProvider).saveTaxRecord(updated));
+        unawaited(
+          ref.read(dbServiceProvider).saveTaxRecord(updated, userId: _ownerId),
+        );
         return updated;
       }
       return r;
@@ -220,7 +228,7 @@ class DocumentVaultController extends Notifier<DocumentVaultState> {
       );
 
       for (final r in newRecords) {
-        await db.saveTaxRecord(r);
+        await db.saveTaxRecord(r, userId: _ownerId);
       }
     } else {
       // Global Template
@@ -264,7 +272,7 @@ class DocumentVaultController extends Notifier<DocumentVaultState> {
       );
 
       for (final r in newRecords) {
-        await db.saveTaxRecord(r);
+        await db.saveTaxRecord(r, userId: _ownerId);
       }
     }
   }
