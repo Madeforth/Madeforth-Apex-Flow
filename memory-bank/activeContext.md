@@ -1,12 +1,13 @@
 # Active Context
 
 ## Current Task
-Memory Bank initialization — created `memory-bank/` structure per `CLAUDE.md` (this directory did not previously exist in the repo).
+Memory Bank initialized and pushed; most recently, tracked previously-untracked Closed Beta release assets and flagged a signing-secret exposure risk. No implementation task in progress.
 
 ## Branch / Commit
-- Branch: `main`
-- HEAD at session start: `e1e57e9` — "docs: update README for Closed Beta launch (4 Aug 2026)"
-- Working tree has untracked files not yet committed: `.github/workflows/closed-test-deploy.yml`, `CLAUDE.md`, `assets/word documents/key.properties`, `assets/word documents/upload-keystore.jks`, `distribution/`, `docs/google_closed_testing.md` — appear to be in-progress Closed Beta release setup (CI workflow, signing keystore, distribution assets). Not created or modified by this session.
+- Branch: `main`, pushed and in sync with `origin/main` (`github.com/Madeforth/Madeforth-Apex-Flow.git`).
+- HEAD: `faa045d` — "chore: track Closed Beta release assets and CLAUDE.md governance file" (prior: `347ae4b` memory bank init/docs cleanup, prior: `e1e57e9` README update — see `git log` for full history, not duplicated here).
+- GitHub CLI (`gh`) auth: active account switched mid-session from `Krator7` (stale) to `Madeforth` (matches repo owner; scopes include `repo` + `workflow`). `Krator7` remains logged in but inactive. `gh auth setup-git` was run so `git push` uses the `gh`-managed credential instead of prompting Git Credential Manager interactively (which fails in this non-interactive shell).
+- Remaining untracked files (deliberately NOT committed — see Security note below): `assets/word documents/key.properties`, `assets/word documents/upload-keystore.jks`.
 
 ## Decisions Made This Session
 - Populated all 6 core Memory Bank files from direct repo inspection (pubspec.yaml, PHASE_LOCK.md, AGENTS.md, README.md, firestore.rules, lib/ structure, git log, TODO.md) rather than from assumption or the README's Turkish marketing claims alone.
@@ -35,7 +36,13 @@ Kept untouched (still current/active, or explicitly required by CLAUDE.md): `AGE
 
 Updated dangling references: `docs/README.md` reading order and root `README.md` documentation links now point to `memory-bank/` instead of the deleted files.
 
+## Update (same session, 2026-08-04) — Pushed to GitHub, Tracked Release Assets, Found Secret-Exposure Risk
+- Committed and pushed the memory-bank init + docs cleanup (`347ae4b`).
+- Committed and pushed `CLAUDE.md`, `.github/workflows/closed-test-deploy.yml`, `docs/google_closed_testing.md`, `distribution/whatsnew/*` (`faa045d`) — these were pre-existing untracked files from the user's in-progress Closed Beta release setup, now version-controlled.
+- **Security finding, not yet resolved**: `assets/word documents/key.properties` and `assets/word documents/upload-keystore.jks` are byte-identical duplicates of the real signing secrets at `android/key.properties` / `android/app/upload-keystore.jks`. The `android/` copies are correctly excluded by `.gitignore` (`/android/key.properties`); the `assets/word documents/` copies are **not covered by any gitignore rule** and were deliberately left untracked/uncommitted rather than added. `key.properties` contains a real plaintext keystore password (`storePassword=apexflow123`, `keyPassword=apexflow123`). Recommended fix (offered to user, not yet actioned): delete the `assets/word documents/` copies, or at minimum gitignore them — see `progress.md` known-risks.
+
 ## Next Step
-Awaiting the user's next task. When one arrives:
-1. Re-check `git status` for further changes to the untracked release files above before touching anything nearby.
-2. Read only the Memory Bank / source files relevant to that specific task (per CLAUDE.md's token-efficient session protocol) — this file plus `progress.md` should be sufficient to resume; `projectbrief.md`/`productContext.md`/`systemPatterns.md`/`techContext.md` are reference, not required reading every session.
+Awaiting the user's next task. Two carry-over items to raise if not otherwise addressed:
+1. The `assets/word documents/key.properties` + `upload-keystore.jks` exposure risk above — confirm with the user whether to delete or gitignore them.
+2. Re-check `git status` before touching anything nearby.
+Read only the Memory Bank / source files relevant to that specific task (per CLAUDE.md's token-efficient session protocol) — this file plus `progress.md` should be sufficient to resume; `projectbrief.md`/`productContext.md`/`systemPatterns.md`/`techContext.md` are reference, not required reading every session.

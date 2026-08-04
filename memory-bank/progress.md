@@ -20,13 +20,11 @@ Status recorded 2026-08-04, from repo inspection (not from README claims alone u
 - Sync coordinator compile errors — `lib/core/sync/sync_coordinator.dart` exists; compile health not checked this session (`flutter analyze` not run).
 - Pocket telemetry zeroing (gyro updates erasing valid pocket-mode estimates) — not verified this session; relevant files likely under `lib/rides/`. Mechanism documented in `AHRS_POCKET_MATH.md` (see `systemPatterns.md` Telemetry section) — the risk is the gyro-vector-rejection update path overwriting a valid pocket-mode lean estimate with zero instead of holding/decaying it.
 - Platform configuration inconsistencies (Android/iOS) — not verified this session.
+- **New, 2026-08-04**: Duplicate unguarded signing secrets — `assets/word documents/key.properties` (plaintext keystore password `apexflow123`) and `assets/word documents/upload-keystore.jks` are byte-identical copies of `android/key.properties` / `android/app/upload-keystore.jks`. The `android/` originals are `.gitignore`d; the `assets/word documents/` copies are not covered by any ignore rule and remain untracked/uncommitted only because this was caught before a commit — they are one `git add -A` away from being pushed to the public-facing `Madeforth/Madeforth-Apex-Flow` GitHub repo. Not yet deleted or gitignored; user has been notified twice, no action taken yet as of this update.
 
-## Untracked/New Repo State as of Session Start (git status)
-- `.github/workflows/closed-test-deploy.yml` (new, untracked)
-- `CLAUDE.md` (new, untracked — this file)
-- `assets/word documents/key.properties`, `assets/word documents/upload-keystore.jks` (new, untracked — signing secrets, do not commit carelessly)
-- `distribution/` (new, untracked)
-- `docs/google_closed_testing.md` (new, untracked)
+## Repo State as of 2026-08-04 (post Memory Bank init + cleanup)
+- `main` is in sync with `origin/main` at commit `faa045d`. Prior session pushed two commits: `347ae4b` (memory bank init + 9-file docs cleanup) and `faa045d` (tracked `CLAUDE.md`, the closed-test-deploy workflow, `docs/google_closed_testing.md`, `distribution/whatsnew/*`).
+- Only remaining untracked files: the two signing-secret duplicates above.
 These represent in-progress user work related to Closed Beta release; do not discard or overwrite without explicit approval.
 
 ## Phase 9.1 Optimization Items — Claimed Done, Not Independently Verified
