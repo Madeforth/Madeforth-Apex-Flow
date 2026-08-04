@@ -6,6 +6,7 @@ import 'package:apexflow/core/storage/apex_kv_store.dart';
 import 'package:apexflow/core/storage/db_provider.dart';
 import 'package:apexflow/garage/domain/garage_passport.dart';
 import 'package:apexflow/garage/domain/motorcycle_profile.dart';
+import 'package:apexflow/garage/domain/maintenance_engine_v2.dart';
 import 'package:apexflow/garage/domain/service_record.dart';
 import 'package:apexflow/harmony_engine/harmony_engine.dart';
 import 'package:apexflow/rides/application/ride_state.dart';
@@ -690,41 +691,77 @@ String _newBikeId() {
 }
 
 List<GarageComponentStatus> _componentStatuses(MotorcycleProfile bike) {
-  // Kept in English for compact data model values; UI labels are localized.
+  final rules = MaintenanceEngineV2.getDefaultRules();
+  final now = DateTime.now().toUtc();
+
+  // Derive installed odometer from lastServiceKm (best available proxy)
+  final installedOdo = bike.lastServiceKm.toDouble();
+  final installedAt = now.subtract(const Duration(days: 90)); // fallback
+
+  String _signal(ComponentType type, ServiceRule rule, int wearPercent) {
+    if (wearPercent == -1) return 'Seçilmedi';
+    final assessment = MaintenanceEngineV2.assess(
+      type: type,
+      rule: rule,
+      currentOdometerKm: bike.odometerKm.toDouble(),
+      installedOdometerKm: installedOdo,
+      installedAtUtc: installedAt,
+    );
+    return assessment.nextAction;
+  }
+
   return [
     GarageComponentStatus(
       label: 'Chain',
       value: bike.chainWearPercent == -1 ? '—' : '${bike.chainWearPercent}%',
-      signal: bike.chainWearPercent == -1
-          ? 'Seçilmedi'
-          : 'Lubrication window active',
+      signal: _signal(
+        ComponentType.chainSprocket,
+        rules[ComponentType.chainSprocket]!,
+        bike.chainWearPercent,
+      ),
     ),
     GarageComponentStatus(
       label: 'Tires',
       value: bike.tireWearPercent == -1 ? '—' : '${bike.tireWearPercent}%',
-      signal: bike.tireWearPercent == -1 ? 'Seçilmedi' : 'Moderate rear wear',
+      signal: _signal(
+        ComponentType.tiresRear,
+        rules[ComponentType.tiresRear]!,
+        bike.tireWearPercent,
+      ),
     ),
     GarageComponentStatus(
       label: 'Brakes',
       value: bike.brakeWearPercent == -1 ? '—' : '${bike.brakeWearPercent}%',
-      signal: bike.brakeWearPercent == -1 ? 'Seçilmedi' : 'Rear bite sharp',
+      signal: _signal(
+        ComponentType.brakePadsRear,
+        rules[ComponentType.brakePadsRear]!,
+        bike.brakeWearPercent,
+      ),
     ),
     GarageComponentStatus(
       label: 'Oil',
       value: bike.oilHealthPercent == -1 ? '—' : '${bike.oilHealthPercent}%',
-      signal: bike.oilHealthPercent == -1 ? 'Seçilmedi' : 'Stable viscosity',
+      signal: _signal(
+        ComponentType.engineOil,
+        rules[ComponentType.engineOil]!,
+        bike.oilHealthPercent,
+      ),
     ),
     GarageComponentStatus(
       label: 'Battery',
       value: bike.batteryHealthPercent == -1
           ? '—'
           : '${bike.batteryHealthPercent}%',
-      signal: bike.batteryHealthPercent == -1 ? 'Seçilmedi' : 'Voltage stable',
+      signal: bike.batteryHealthPercent == -1 ? 'Seçilmedi' : 'Voltaj stabil',
     ),
     GarageComponentStatus(
       label: 'Service',
       value: '${bike.kmSinceService} km',
-      signal: 'Delta since last service',
+      signal: _signal(
+        ComponentType.engineOil,
+        rules[ComponentType.engineOil]!,
+        0,
+      ),
     ),
   ];
 }

@@ -46,6 +46,8 @@ class _TrAccidentWizardScreenState extends State<TrAccidentWizardScreen> {
   );
   final _impactKeyA = GlobalKey();
   final _impactKeyB = GlobalKey();
+  Uint8List _cachedImpactA = Uint8List(0);
+  Uint8List _cachedImpactB = Uint8List(0);
   List<int> _trChecksA = [];
 
   Future<Uint8List?> _captureKey(GlobalKey key) async {
@@ -176,8 +178,8 @@ class _TrAccidentWizardScreenState extends State<TrAccidentWizardScreen> {
     final sketchBytes = await _sketchController.toPngBytes() ?? Uint8List(0);
     final sigABytes = await _signatureAController.toPngBytes() ?? Uint8List(0);
     final sigBBytes = await _signatureBController.toPngBytes() ?? Uint8List(0);
-    final impactABytes = await _captureKey(_impactKeyA) ?? Uint8List(0);
-    final impactBBytes = await _captureKey(_impactKeyB) ?? Uint8List(0);
+    final impactABytes = _cachedImpactA;
+    final impactBBytes = _cachedImpactB;
 
     final report = AccidentReport(
       date: DateTime.now(),
@@ -279,11 +281,18 @@ class _TrAccidentWizardScreenState extends State<TrAccidentWizardScreen> {
       appBar: AppBar(title: const Text('Türkiye KTT Sihirbazı')),
       body: Stepper(
         currentStep: _currentStep,
-        onStepContinue: () {
-          if (_currentStep < 5)
+        onStepContinue: () async {
+          // Capture impact bytes before leaving the step that contains the canvas
+          if (_currentStep == 1) {
+            _cachedImpactA = await _captureKey(_impactKeyA) ?? Uint8List(0);
+          } else if (_currentStep == 2) {
+            _cachedImpactB = await _captureKey(_impactKeyB) ?? Uint8List(0);
+          }
+          if (_currentStep < 5) {
             setState(() => _currentStep += 1);
-          else
+          } else {
             _generateAndSharePdf();
+          }
         },
         onStepCancel: () {
           if (_currentStep > 0) setState(() => _currentStep -= 1);

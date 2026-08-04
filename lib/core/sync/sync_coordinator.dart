@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:apexflow/core/services/firebase_service.dart';
 import 'package:apexflow/core/storage/apex_kv_store.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'sync_models.dart';
 import 'sync_conflict_resolver.dart';
 
@@ -230,9 +231,51 @@ class ApexSyncCoordinator implements SyncCoordinator {
         return false;
       }
 
-      // Delegate remote operation execution
+      final docRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection(op.entityType)
+          .doc(op.entityId);
+
+      if (op.type == SyncOperationType.delete) {
+        await docRef.delete();
+        return true;
+      }
+
+      // Upsert with conflict detection
+      final payload = jsonDecode(op.payloadJson) as Map<String, dynamic>;
+      final remoteDoc = await docRef.get();
+
+      if (remoteDoc.exists && op.baseRemoteRevision > 0) {
+        final remoteData = remoteDoc.data() ?? {};
+        final remoteRevision =
+            (remoteData['_syncRevision'] as num?)?.toInt() ?? 0;
+
+        if (remoteRevision > op.baseRemoteRevision) {
+          // Conflict detected — resolve using domain-aware conflict resolver
+          final resolution = _conflictResolver.resolveConflict(
+            domainName: op.entityType,
+            localPayloadJson: op.payloadJson,
+            localRevision: op.targetLocalRevision,
+            remotePayloadJson: jsonEncode(remoteData),
+            remoteRevision: remoteRevision,
+          );
+          final mergedPayload =
+              jsonDecode(resolution.mergedPayloadJson) as Map<String, dynamic>;
+          mergedPayload['_syncRevision'] = resolution.newRevision;
+          mergedPayload['_syncedAtUtc'] = DateTime.now().toUtc().toIso8601String();
+          await docRef.set(mergedPayload, SetOptions(merge: true));
+          return true;
+        }
+      }
+
+      // No conflict — write directly
+      payload['_syncRevision'] = op.targetLocalRevision;
+      payload['_syncedAtUtc'] = DateTime.now().toUtc().toIso8601String();
+      await docRef.set(payload, SetOptions(merge: true));
       return true;
     } catch (e) {
+      debugPrint('SyncCoordinator: Remote sync failed — $e');
       return false;
     }
   }

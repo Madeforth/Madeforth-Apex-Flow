@@ -918,6 +918,96 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
                       ],
                     ),
                   ),
+                  const SizedBox(height: 12),
+
+                  // 4b. Invite from Friends List
+                  Builder(builder: (context) {
+                    final friends = ref.watch(friendsStateProvider);
+                    if (friends.isEmpty) return const SizedBox.shrink();
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1E293B),
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(
+                          color: const Color(0xFF334155),
+                          width: 0.5,
+                        ),
+                      ),
+                      child: ExpansionTile(
+                        tilePadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 2,
+                        ),
+                        collapsedIconColor: Colors.white54,
+                        iconColor: const Color(0xFF0EA5E9),
+                        title: Text(
+                          tr
+                              ? 'Arkadaşlardan Davet Et (${friends.length})'
+                              : (de
+                                    ? 'Freunde einladen (${friends.length})'
+                                    : 'Invite Friends (${friends.length})'),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        children: friends.map((friend) {
+                          return ListTile(
+                            dense: true,
+                            leading: CircleAvatar(
+                              radius: 16,
+                              backgroundColor: const Color(0xFF334155),
+                              child: Text(
+                                friend.name.isNotEmpty
+                                    ? friend.name[0].toUpperCase()
+                                    : '?',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            title: Text(
+                              friend.name,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                              ),
+                            ),
+                            subtitle: Text(
+                              friend.riderTag,
+                              style: const TextStyle(
+                                color: Colors.white38,
+                                fontSize: 11,
+                              ),
+                            ),
+                            trailing: IconButton(
+                              icon: const Icon(
+                                Icons.send,
+                                color: Color(0xFF0EA5E9),
+                                size: 18,
+                              ),
+                              onPressed: () {
+                                HapticFeedback.lightImpact();
+                                final link =
+                                    'apexflow://join?lobby=$_activeLobbyId';
+                                final msg = tr
+                                    ? '${friend.name}, seni grup sürüşüne davet ediyorum! Lobi kodu: $_activeLobbyId\n$link'
+                                    : (de
+                                          ? '${friend.name}, ich lade dich zur Gruppenfahrt ein! Lobby-Code: $_activeLobbyId\n$link'
+                                          : '${friend.name}, join my group ride! Lobby code: $_activeLobbyId\n$link');
+                                SharePlus.instance.share(
+                                  ShareParams(text: msg),
+                                );
+                              },
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    );
+                  }),
                   const SizedBox(height: 16),
 
                   // 5. Join Another Lobby Tile
