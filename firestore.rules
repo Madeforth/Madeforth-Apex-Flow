@@ -10,26 +10,11 @@ service cloud.firestore {
       return signedIn() && request.auth.uid == uid;
     }
 
-    function changedOnly(fields) {
-      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(fields);
-    }
 
     // Private user profile documents (Owner read/write only, PII protected)
     match /users/{uid} {
       allow read: if isOwner(uid);
-      allow create: if isOwner(uid)
-        && request.resource.data.keys().hasOnly([
-          'name', 'phoneNumber', 'bloodType', 'emergencyContactName',
-          'emergencyContactPhone', 'city', 'socialLinks',
-          'sharePhone', 'shareEmergency', 'riderTag',
-          'riderTagNormalized', 'createdAt', 'updatedAt'
-        ]);
-      allow update: if isOwner(uid)
-        && changedOnly([
-          'name', 'phoneNumber', 'bloodType', 'emergencyContactName',
-          'emergencyContactPhone', 'city', 'socialLinks',
-          'sharePhone', 'shareEmergency', 'updatedAt'
-        ]);
+      allow create, update: if isOwner(uid);
       allow delete: if false; // Deletion handled securely by Cloud Functions
     }
 
@@ -39,10 +24,13 @@ service cloud.firestore {
       allow write: if false;
     }
 
-    // Rider Tag lookup registry (Public read, Backend transaction write only)
+    // Rider Tag lookup registry (Public read, Owner manage permitted)
     match /rider_tags/{tag} {
       allow read: if true;
-      allow write: if false;
+      allow write: if signedIn() && (
+        resource == null
+        || resource.data.ownerId == request.auth.uid
+      ) && request.resource.data.ownerId == request.auth.uid;
     }
 
     // Entitlements & Premium subscriptions (Owner read only, Backend/Store webhook write only)

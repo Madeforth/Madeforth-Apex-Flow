@@ -51,7 +51,11 @@ const i18n = {
     ruleError: "Geçersiz veya silinmiş bir QR kod okuttunuz. Güvenlik kuralları gereği işleminiz reddedildi.",
     getItOn: "Uygulamayı İndirin",
     slogan: "Machine Relationship OS",
-    driverNoteLabel: "SÜRÜCÜ NOTU:"
+    driverNoteLabel: "SÜRÜCÜ NOTU:",
+    socialDiscordTitle: "Discord",
+    socialDiscordSub: "Topluluk sunucusu",
+    socialInstaTitle: "Instagram",
+    socialInstaSub: "Resmi sayfamız"
   },
   en: {
     invalidQrTitle: "Invalid QR Code",
@@ -70,7 +74,11 @@ const i18n = {
     ruleError: "You scanned an invalid or deleted QR code. Your request was rejected by security rules.",
     getItOn: "Get it on",
     slogan: "Machine Relationship OS",
-    driverNoteLabel: "DRIVER NOTE:"
+    driverNoteLabel: "DRIVER NOTE:",
+    socialDiscordTitle: "Discord",
+    socialDiscordSub: "Community server",
+    socialInstaTitle: "Instagram",
+    socialInstaSub: "Official page"
   },
   de: {
     invalidQrTitle: "Ungültiger QR-Code",
@@ -89,7 +97,11 @@ const i18n = {
     ruleError: "Ungültiger QR-Code. Ihre Anfrage wurde vom Sicherheitssystem abgelehnt.",
     getItOn: "Jetzt bei",
     slogan: "Machine Relationship OS",
-    driverNoteLabel: "FAHRER-NOTIZ:"
+    driverNoteLabel: "FAHRER-NOTIZ:",
+    socialDiscordTitle: "Discord",
+    socialDiscordSub: "Community-Server",
+    socialInstaTitle: "Instagram",
+    socialInstaSub: "Offizielle Seite"
   }
 };
 
@@ -117,6 +129,23 @@ if (!vehicleId) {
           <span>${t.getItOn}</span>
           <strong>Google Play</strong>
         </div>
+      </a>
+    </div>
+
+    <div class="social-buttons-container">
+      <a href="https://discord.gg/madeforth" target="_blank" class="social-button">
+        <div class="social-button-header">
+          <svg viewBox="0 0 127.14 96.36"><path d="M107.7,8.07A105.15,105.15,0,0,0,77.26,0a77.19,77.19,0,0,0-3.3,6.83A96.67,96.67,0,0,0,53.22,6.83,77.19,77.19,0,0,0,49.88,0,105.15,105.15,0,0,0,19.44,8.07C3.66,31.58-1.86,54.65,1,77.53A105.73,105.73,0,0,0,32,96.36a77.7,77.7,0,0,0,6.63-10.85,68.43,68.43,0,0,1-10.5-5c1-.73,2-1.5,2.92-2.3a75.46,75.46,0,0,0,72.16,0c.93.8,1.91,1.57,2.92,2.3a68.43,68.43,0,0,1-10.5,5,77.7,77.7,0,0,0,6.63,10.85,105.73,105.73,0,0,0,31.57-18.83C129.83,48.24,124.05,25.43,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53S36.18,40.36,42.45,40.36,53.83,46,53.83,53,48.72,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.24,60,73.24,53S78.41,40.36,84.69,40.36,96.07,46,96.07,53,91,65.69,84.69,65.69Z"/></svg>
+          <span class="social-button-title">${t.socialDiscordTitle}</span>
+        </div>
+        <span class="social-button-subtitle">${t.socialDiscordSub}</span>
+      </a>
+      <a href="https://www.instagram.com/apexflow.app/" target="_blank" class="social-button">
+        <div class="social-button-header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+          <span class="social-button-title">${t.socialInstaTitle}</span>
+        </div>
+        <span class="social-button-subtitle">${t.socialInstaSub}</span>
       </a>
     </div>
     
@@ -176,7 +205,24 @@ if (!vehicleId) {
         </div>
       </a>
     </div>
-    
+
+    <div class="social-buttons-container">
+      <a href="https://discord.gg/madeforth" target="_blank" class="social-button">
+        <div class="social-button-header">
+          <svg viewBox="0 0 127.14 96.36"><path d="M107.7,8.07A105.15,105.15,0,0,0,77.26,0a77.19,77.19,0,0,0-3.3,6.83A96.67,96.67,0,0,0,53.22,6.83,77.19,77.19,0,0,0,49.88,0,105.15,105.15,0,0,0,19.44,8.07C3.66,31.58-1.86,54.65,1,77.53A105.73,105.73,0,0,0,32,96.36a77.7,77.7,0,0,0,6.63-10.85,68.43,68.43,0,0,1-10.5-5c1-.73,2-1.5,2.92-2.3a75.46,75.46,0,0,0,72.16,0c.93.8,1.91,1.57,2.92,2.3a68.43,68.43,0,0,1-10.5,5,77.7,77.7,0,0,0,6.63,10.85,105.73,105.73,0,0,0,31.57-18.83C129.83,48.24,124.05,25.43,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53S36.18,40.36,42.45,40.36,53.83,46,53.83,53,48.72,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.24,60,73.24,53S78.41,40.36,84.69,40.36,96.07,46,96.07,53,91,65.69,84.69,65.69Z"/></svg>
+          <span class="social-button-title">${t.socialDiscordTitle}</span>
+        </div>
+        <span class="social-button-subtitle">${t.socialDiscordSub}</span>
+      </a>
+      <a href="https://www.instagram.com/apexflow.app/" target="_blank" class="social-button">
+        <div class="social-button-header">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+          <span class="social-button-title">${t.socialInstaTitle}</span>
+        </div>
+        <span class="social-button-subtitle">${t.socialInstaSub}</span>
+      </a>
+    </div>
+
     <div class="footer">Securely powered by Apex Flow</div>
   `;
 }

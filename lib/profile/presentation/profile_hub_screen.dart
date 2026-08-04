@@ -6449,30 +6449,15 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   late TextEditingController youtubeCtrl;
   late TextEditingController plateCtrl;
 
-  late TextEditingController riderCountryCodeCtrl;
-  late TextEditingController emergencyCountryCodeCtrl;
-
   @override
   void initState() {
     super.initState();
     final profile = ref.read(userProfileProvider);
     nameCtrl = TextEditingController(text: profile.name);
-
-    final parsedRiderPhone = _parsePhoneNumber(profile.phoneNumber);
-    final parsedEmergencyPhone = _parsePhoneNumber(
-      profile.emergencyContactPhone,
-    );
-    riderCountryCodeCtrl = TextEditingController(
-      text: parsedRiderPhone['code']!.replaceAll('+', ''),
-    );
-    emergencyCountryCodeCtrl = TextEditingController(
-      text: parsedEmergencyPhone['code']!.replaceAll('+', ''),
-    );
-
     riderTagCtrl = TextEditingController(text: profile.riderTag);
-    phoneCtrl = TextEditingController(text: parsedRiderPhone['number']);
+    phoneCtrl = TextEditingController(text: profile.phoneNumber);
     emNameCtrl = TextEditingController(text: profile.emergencyContactName);
-    emPhoneCtrl = TextEditingController(text: parsedEmergencyPhone['number']);
+    emPhoneCtrl = TextEditingController(text: profile.emergencyContactPhone);
     bloodCtrl = TextEditingController(text: profile.bloodType);
     cityCtrl = TextEditingController(text: profile.city);
     instagramCtrl = TextEditingController(text: profile.instagram);
@@ -6485,8 +6470,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   void dispose() {
     nameCtrl.dispose();
     riderTagCtrl.dispose();
-    riderCountryCodeCtrl.dispose();
-    emergencyCountryCodeCtrl.dispose();
     phoneCtrl.dispose();
     emNameCtrl.dispose();
     emPhoneCtrl.dispose();
@@ -6499,27 +6482,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     super.dispose();
   }
 
-  Map<String, String> _parsePhoneNumber(String fullPhone) {
-    if (fullPhone.isEmpty) return {'code': '+90', 'number': ''};
-    final spaceIdx = fullPhone.indexOf(' ');
-    if (spaceIdx != -1) {
-      return {
-        'code': fullPhone.substring(0, spaceIdx),
-        'number': fullPhone.substring(spaceIdx + 1),
-      };
-    }
-    return {'code': '+90', 'number': fullPhone};
-  }
-
   String _t(String trStr, String enStr, String deStr) => widget.tr
       ? trStr
       : ((AppStrings.currentLanguageCode == 'de') ? deStr : enStr);
 
   void _save() {
-    final combinedRiderPhone =
-        '+${riderCountryCodeCtrl.text.replaceAll('+', '').trim()} ${phoneCtrl.text}';
-    final combinedEmergencyPhone =
-        '+${emergencyCountryCodeCtrl.text.replaceAll('+', '').trim()} ${emPhoneCtrl.text}';
+    final combinedRiderPhone = phoneCtrl.text.trim();
+    final combinedEmergencyPhone = emPhoneCtrl.text.trim();
 
     final currentProfile = ref.read(userProfileProvider);
     ref
@@ -6632,11 +6601,14 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: context.colors.surface,
-          border: Border(
-            bottom: BorderSide(color: context.colors.border, width: 0.5),
+          color: const Color(0xFF1E293B),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: const Color(0xFF334155),
+            width: 1,
           ),
         ),
         child: Row(
@@ -6683,11 +6655,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     String hint, {
     bool isLocked = false,
     TextInputType? keyboardType,
+    List<TextInputFormatter>? inputFormatters,
   }) {
     return TextField(
       controller: ctrl,
       enabled: !isLocked,
       keyboardType: keyboardType,
+      inputFormatters: inputFormatters,
       style: TextStyle(
         color: isLocked ? context.colors.textSecondary : Colors.white,
         fontSize: 14,
@@ -6731,308 +6705,279 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           ),
         ),
         centerTitle: false,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0, top: 10, bottom: 10),
-            child: ElevatedButton(
-              onPressed: _save,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: context.colors.cyan,
-                foregroundColor: Colors.white,
-                elevation: 0,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+      ),
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: ListView(
+              padding: const EdgeInsets.only(top: 16, bottom: 120),
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => ProfileAppearanceScreen(
+                            tr: widget.tr,
+                            de: AppStrings.currentLanguageCode == 'de',
+                            strings: widget.strings,
+                          ),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.style, color: Colors.white),
+                    label: Text(
+                      widget.tr
+                          ? 'Sürücü Kartını Özelleştir'
+                          : ((AppStrings.currentLanguageCode == 'de')
+                                ? 'Rider Card anpassen'
+                                : 'Customize Rider Card'),
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: context.colors.cyan,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-              child: Text(
-                _t('Kaydet', 'Save', 'Speichern'),
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
+                const SizedBox(height: 16),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Text(
+                    _t('KİŞİSEL BİLGİLER', 'PERSONAL INFO', 'PERSÖNLICHE INFO'),
+                    style: TextStyle(
+                      color: context.colors.textSecondary,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
                 ),
-              ),
+                _buildFieldRow(
+                  icon: Icons.person_outline,
+                  iconColor: context.colors.cyan,
+                  label: _t('İsim', 'Name', 'Vollständiger Name'),
+                  child: _buildTextField(nameCtrl, 'John Doe'),
+                ),
+                _buildFieldRow(
+                  icon: Icons.tag,
+                  iconColor: Colors.orange,
+                  label: _t(
+                    'Rider Tag (Benzersiz Kimlik)',
+                    'Rider Tag (Unique ID)',
+                    'Rider Tag (Eindeutige ID)',
+                  ),
+                  child: _buildTextField(riderTagCtrl, '@tag', isLocked: false),
+                ),
+                _buildFieldRow(
+                  icon: Icons.phone_outlined,
+                  iconColor: Colors.blue,
+                  label: _t('Telefon', 'Phone', 'Telefon'),
+                  child: _buildTextField(
+                    phoneCtrl,
+                    _t('Örn: +90 555 123 4567', 'e.g. +44 555 123 4567', 'z.B. +49 555 123 4567'),
+                    keyboardType: TextInputType.phone,
+                    inputFormatters: [PhoneInputFormatter()],
+                  ),
+                ),
+                _buildFieldRow(
+                  icon: Icons.bloodtype_outlined,
+                  iconColor: Colors.redAccent,
+                  label: _t('Kan Grubu', 'Blood Type', 'Blutgruppe'),
+                  child: Text(
+                    bloodCtrl.text.isEmpty ? '—' : bloodCtrl.text,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  showChevron: true,
+                  onTap: _showBloodTypeSheet,
+                ),
+                _buildFieldRow(
+                  icon: Icons.location_on_outlined,
+                  iconColor: Colors.green,
+                  label: _t('Şehir', 'City', 'Stadt'),
+                  child: _buildTextField(
+                    cityCtrl,
+                    _t('Örn: İstanbul', 'e.g. London', 'z.B. Berlin'),
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Text(
+                    _t('ACİL DURUM', 'EMERGENCY', 'NOTFALL'),
+                    style: TextStyle(
+                      color: context.colors.textSecondary,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                ),
+                _buildFieldRow(
+                  icon: Icons.health_and_safety_outlined,
+                  iconColor: Colors.red,
+                  label: _t('Acil Kişi Adı', 'Emergency Contact', 'Notfallkontakt'),
+                  child: _buildTextField(emNameCtrl, _t('İsim', 'Name', 'Name')),
+                ),
+                _buildFieldRow(
+                  icon: Icons.phone_in_talk_outlined,
+                  iconColor: Colors.orangeAccent,
+                  label: _t('Acil Kişi Telefon', 'Emergency Phone', 'Notfalltelefon'),
+                  child: _buildTextField(
+                    emPhoneCtrl,
+                    _t('Örn: +90 555 987 6543', 'e.g. +44 555 987 6543', 'z.B. +49 555 987 6543'),
+                    keyboardType: TextInputType.phone,
+                    inputFormatters: [PhoneInputFormatter()],
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Text(
+                    _t('EKSTRA BİLGİLER', 'EXTRA INFO', 'ZUSATZINFO'),
+                    style: TextStyle(
+                      color: context.colors.textSecondary,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                ),
+                _buildFieldRow(
+                  icon: Icons.pin_outlined,
+                  iconColor: Colors.yellow,
+                  label: _t('Plaka', 'License Plate', 'Kennzeichen'),
+                  child: _buildTextField(plateCtrl, '34 AB 123'),
+                ),
+                _buildFieldRow(
+                  icon: Icons.camera_alt_outlined,
+                  iconColor: Colors.pinkAccent,
+                  label: 'Instagram',
+                  child: _buildTextField(instagramCtrl, '@username'),
+                ),
+                _buildFieldRow(
+                  icon: Icons.music_note_outlined,
+                  iconColor: Colors.white,
+                  label: 'TikTok',
+                  child: _buildTextField(tiktokCtrl, '@username'),
+                ),
+                _buildFieldRow(
+                  icon: Icons.play_circle_outline,
+                  iconColor: Colors.red,
+                  label: 'YouTube',
+                  child: _buildTextField(youtubeCtrl, '@username'),
+                ),
+                const SizedBox(height: 40),
+              ],
+            ),
+          ),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: _buildBottomDoubleButton(
+              leftLabel: _t('Vazgeç', 'Cancel', 'Abbrechen'),
+              onLeftPressed: () => Navigator.pop(context),
+              rightLabel: _t('Değişiklikleri Kaydet', 'Save Changes', 'Änderungen speichern'),
+              onRightPressed: _save,
             ),
           ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: ElevatedButton.icon(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => ProfileAppearanceScreen(
-                      tr: widget.tr,
-                      de: AppStrings.currentLanguageCode == 'de',
-                      strings: widget.strings,
+    );
+  }
+
+  Widget _buildBottomDoubleButton({
+    required String leftLabel,
+    required VoidCallback onLeftPressed,
+    required String rightLabel,
+    required VoidCallback onRightPressed,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+      child: Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 320),
+          height: 48,
+          child: Row(
+            children: [
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(24),
+                  child: BackdropFilter(
+                    filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                    child: GestureDetector(
+                      onTap: onLeftPressed,
+                      behavior: HitTestBehavior.opaque,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1A1F2B).withValues(alpha: 0.6),
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.05),
+                            width: 1,
+                          ),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          leftLabel,
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                );
-              },
-              icon: const Icon(Icons.style, color: Colors.white),
-              label: Text(
-                widget.tr
-                    ? 'Sürücü Kartını Özelleştir'
-                    : ((AppStrings.currentLanguageCode == 'de')
-                          ? 'Rider Card anpassen'
-                          : 'Customize Rider Card'),
-                style: const TextStyle(color: Colors.white),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: context.colors.cyan,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Text(
-              _t('KİŞİSEL BİLGİLER', 'PERSONAL INFO', 'PERSÖNLICHE INFO'),
-              style: TextStyle(
-                color: context.colors.textSecondary,
-                fontSize: 11,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1.2,
-              ),
-            ),
-          ),
-          _buildFieldRow(
-            icon: Icons.person_outline,
-            iconColor: context.colors.cyan,
-            label: _t('İsim', 'Name', 'Vollständiger Name'),
-            child: _buildTextField(nameCtrl, 'John Doe'),
-          ),
-          _buildFieldRow(
-            icon: Icons.tag,
-            iconColor: Colors.orange,
-            label: _t(
-              'Rider Tag (Benzersiz Kimlik)',
-              'Rider Tag (Unique ID)',
-              'Rider Tag (Eindeutige ID)',
-            ),
-            child: _buildTextField(riderTagCtrl, '@tag', isLocked: false),
-          ),
-          _buildFieldRow(
-            icon: Icons.phone_outlined,
-            iconColor: Colors.blue,
-            label: _t('Telefon', 'Phone', 'Telefon'),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF0F172A),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        '+',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+              const SizedBox(width: 12),
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(24),
+                  child: BackdropFilter(
+                    filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                    child: GestureDetector(
+                      onTap: onRightPressed,
+                      behavior: HitTestBehavior.opaque,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1A1F2B).withValues(alpha: 0.8),
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.08),
+                            width: 1,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 2),
-                      SizedBox(
-                        width: 38,
-                        child: TextField(
-                          controller: riderCountryCodeCtrl,
-                          keyboardType: TextInputType.number,
-                          cursorColor: const Color(0xFF06B6D4),
-                          style: const TextStyle(
-                            color: Colors.white,
+                        alignment: Alignment.center,
+                        child: Text(
+                          rightLabel,
+                          style: TextStyle(
+                            color: context.colors.cyan,
+                            fontSize: 13,
                             fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
-                          decoration: const InputDecoration(
-                            isDense: true,
-                            contentPadding: EdgeInsets.zero,
-                            filled: true,
-                            fillColor: Colors.transparent,
-                            border: InputBorder.none,
-                            enabledBorder: InputBorder.none,
-                            focusedBorder: InputBorder.none,
-                            errorBorder: InputBorder.none,
-                            disabledBorder: InputBorder.none,
                           ),
                         ),
                       ),
-                    ],
+                    ),
                   ),
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: _buildTextField(
-                    phoneCtrl,
-                    '555 123 4567',
-                    keyboardType: TextInputType.phone,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          _buildFieldRow(
-            icon: Icons.bloodtype_outlined,
-            iconColor: Colors.redAccent,
-            label: _t('Kan Grubu', 'Blood Type', 'Blutgruppe'),
-            child: Text(
-              bloodCtrl.text.isEmpty ? '—' : bloodCtrl.text,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
               ),
-            ),
-            showChevron: true,
-            onTap: _showBloodTypeSheet,
+            ],
           ),
-          _buildFieldRow(
-            icon: Icons.location_on_outlined,
-            iconColor: Colors.green,
-            label: _t('Şehir', 'City', 'Stadt'),
-            child: _buildTextField(
-              cityCtrl,
-              _t('Örn: İstanbul', 'e.g. London', 'z.B. Berlin'),
-            ),
-          ),
-
-          const SizedBox(height: 24),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Text(
-              _t('ACİL DURUM', 'EMERGENCY', 'NOTFALL'),
-              style: TextStyle(
-                color: context.colors.textSecondary,
-                fontSize: 11,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1.2,
-              ),
-            ),
-          ),
-          _buildFieldRow(
-            icon: Icons.health_and_safety_outlined,
-            iconColor: Colors.red,
-            label: _t('Acil Kişi Adı', 'Emergency Contact', 'Notfallkontakt'),
-            child: _buildTextField(emNameCtrl, _t('İsim', 'Name', 'Name')),
-          ),
-          _buildFieldRow(
-            icon: Icons.phone_in_talk_outlined,
-            iconColor: Colors.orangeAccent,
-            label: _t('Acil Kişi Telefon', 'Emergency Phone', 'Notfalltelefon'),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF0F172A),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        '+',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(width: 2),
-                      SizedBox(
-                        width: 38,
-                        child: TextField(
-                          controller: emergencyCountryCodeCtrl,
-                          keyboardType: TextInputType.number,
-                          cursorColor: const Color(0xFF06B6D4),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
-                          decoration: const InputDecoration(
-                            isDense: true,
-                            contentPadding: EdgeInsets.zero,
-                            filled: true,
-                            fillColor: Colors.transparent,
-                            border: InputBorder.none,
-                            enabledBorder: InputBorder.none,
-                            focusedBorder: InputBorder.none,
-                            errorBorder: InputBorder.none,
-                            disabledBorder: InputBorder.none,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: _buildTextField(
-                    emPhoneCtrl,
-                    '555 987 6543',
-                    keyboardType: TextInputType.phone,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 24),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Text(
-              _t('EKSTRA BİLGİLER', 'EXTRA INFO', 'ZUSATZINFO'),
-              style: TextStyle(
-                color: context.colors.textSecondary,
-                fontSize: 11,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1.2,
-              ),
-            ),
-          ),
-          _buildFieldRow(
-            icon: Icons.pin_outlined,
-            iconColor: Colors.yellow,
-            label: _t('Plaka', 'License Plate', 'Kennzeichen'),
-            child: _buildTextField(plateCtrl, '34 AB 123'),
-          ),
-          _buildFieldRow(
-            icon: Icons.camera_alt_outlined,
-            iconColor: Colors.pinkAccent,
-            label: 'Instagram',
-            child: _buildTextField(instagramCtrl, '@username'),
-          ),
-          _buildFieldRow(
-            icon: Icons.music_note_outlined,
-            iconColor: Colors.white,
-            label: 'TikTok',
-            child: _buildTextField(tiktokCtrl, '@username'),
-          ),
-          _buildFieldRow(
-            icon: Icons.play_circle_outline,
-            iconColor: Colors.red,
-            label: 'YouTube',
-            child: _buildTextField(youtubeCtrl, '@username'),
-          ),
-          const SizedBox(height: 40),
-        ],
+        ),
       ),
     );
   }
@@ -7359,11 +7304,11 @@ class _ProfileAppearanceScreenState
         ),
         centerTitle: false,
       ),
-      body: Column(
+      body: Stack(
         children: [
-          Expanded(
+          Positioned.fill(
             child: ListView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 120),
               children: [
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -7536,9 +7481,14 @@ class _ProfileAppearanceScreenState
               ],
             ),
           ),
-          _buildBottomButton(
-            label: _t('Değişiklikleri Kaydet', 'Save Changes', 'Änderungen speichern'),
-            onPressed: _save,
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: _buildBottomButton(
+              label: _t('Değişiklikleri Kaydet', 'Save Changes', 'Änderungen speichern'),
+              onPressed: _save,
+            ),
           ),
         ],
       ),
@@ -7574,8 +7524,10 @@ class _ProfileAppearanceScreenState
         ),
         centerTitle: false,
       ),
-      body: Column(
+      body: Stack(
         children: [
+          Column(
+            children: [
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -7608,9 +7560,35 @@ class _ProfileAppearanceScreenState
               }).toList(),
             ),
           ),
+          Container(
+            margin: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1E293B),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: context.colors.cyan.withValues(alpha: 0.15),
+                width: 1,
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.info_outline, color: context.colors.cyan, size: 16),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    _t('Yeni temalar uygulama güncellemeleriyle eklenir. Mevcut seçiminiz korunur.',
+                        'New themes are added with app updates. Current selection will be saved.',
+                        'Neue Designs werden mit App-Updates hinzugefügt. Aktuelle Auswahl wird gespeichert.'),
+                    style: TextStyle(color: context.colors.textSecondary, fontSize: 11, fontWeight: FontWeight.w500),
+                  ),
+                ),
+              ],
+            ),
+          ),
           Expanded(
             child: GridView.builder(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 140),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 mainAxisSpacing: 14,
@@ -7717,19 +7695,16 @@ class _ProfileAppearanceScreenState
               },
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Text(
-              _t('Yeni temalar uygulama güncellemeleriyle eklenir. Mevcut seçiminiz korunur.',
-                  'New themes are added with app updates. Current selection will be saved.',
-                  'Neue Designs werden mit App-Updates hinzugefügt. Aktuelle Auswahl wird gespeichert.'),
-              style: TextStyle(color: context.colors.textSecondary, fontSize: 11),
-              textAlign: TextAlign.center,
+        ],
+      ),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: _buildBottomButton(
+              label: _t('Temayı Uygula', 'Apply Theme', 'Design anwenden'),
+              onPressed: () => setState(() => _currentPanel = StudioPanel.mainStudio),
             ),
-          ),
-          _buildBottomButton(
-            label: _t('Temayı Uygula', 'Apply Theme', 'Design anwenden'),
-            onPressed: () => setState(() => _currentPanel = StudioPanel.mainStudio),
           ),
         ],
       ),
@@ -7797,11 +7772,11 @@ class _ProfileAppearanceScreenState
         ),
         centerTitle: false,
       ),
-      body: Column(
+      body: Stack(
         children: [
-          Expanded(
+          Positioned.fill(
             child: ListView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 120),
               children: [
                 Text(
                   _t('Seni en iyi anlatan birincil sürüş kimliğini seç.',
@@ -7829,7 +7804,11 @@ class _ProfileAppearanceScreenState
                         child: Text(
                           _t('Bu seçim öz tanımdır; telemetri tarafından atanmaz. İstediğin zaman değiştirebilirsin.',
                               'This selection is a self-definition; it is not assigned by telemetry. You can change it anytime.',
-                              'Diese Auswahl ist eine Selbstdefinition; sie wird nicht per Telemetrie zugewiesen. Du kannst sie jederzeit ändern.'),
+                              'Diese Auswahl ist eine Selbstdefinition; sie wird nicht per Telemetrie zugewiesen. Du kannst sie jederzeit ändern.') +
+                          '\n\n' +
+                          _t('Güvenli kimlik ilkesi / Hız veya yatış derecesi sürüş tipi açmaz.',
+                              'Safe identity policy / Top speed or lean angle degree does not unlock riding types.',
+                              'Sichere Identitätsrichtlinie / Höchstgeschwindigkeit oder Schräglage schaltet keine Fahrstile frei.'),
                           style: TextStyle(
                             color: Colors.amber.withValues(alpha: 0.9),
                             fontSize: 11,
@@ -7943,19 +7922,14 @@ class _ProfileAppearanceScreenState
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Text(
-              _t('Güvenli kimlik ilkesi / Hız veya yatış derecesi sürüş tipi açmaz.',
-                  'Safe identity policy / Top speed or lean angle degree does not unlock riding types.',
-                  'Sichere Identitätsrichtlinie / Höchstgeschwindigkeit oder Schräglage schaltet keine Fahrstile frei.'),
-              style: TextStyle(color: context.colors.textSecondary, fontSize: 11),
-              textAlign: TextAlign.center,
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: _buildBottomButton(
+              label: _t('Sürüş Tipini Uygula', 'Apply Riding Style', 'Fahrstil anwenden'),
+              onPressed: () => setState(() => _currentPanel = StudioPanel.mainStudio),
             ),
-          ),
-          _buildBottomButton(
-            label: _t('Sürüş Tipini Uygula', 'Apply Riding Style', 'Fahrstil anwenden'),
-            onPressed: () => setState(() => _currentPanel = StudioPanel.mainStudio),
           ),
         ],
       ),
@@ -8007,8 +7981,10 @@ class _ProfileAppearanceScreenState
         ),
         centerTitle: false,
       ),
-      body: Column(
+      body: Stack(
         children: [
+          Column(
+            children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Row(
@@ -8063,9 +8039,35 @@ class _ProfileAppearanceScreenState
               }).toList(),
             ),
           ),
+          Container(
+            margin: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1E293B),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: context.colors.cyan.withValues(alpha: 0.15),
+                width: 1,
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.info_outline, color: context.colors.cyan, size: 16),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    _t('Güvenli achievement politikası / Maksimum hız ve yatış açısı rozet koşulu değildir. Konum ve rota kanıtı profilde paylaşılmaz.',
+                        'Safe achievement policy / Top speed or lean angle is not a requirement. Location or route evidence is not shared.',
+                        'Sichere Errungenschaftsrichtlinie / Höchstgeschwindigkeit oder Schräglage ist keine Voraussetzung. Standort- oder Routenbeweise werden nicht geteilt.'),
+                    style: TextStyle(color: context.colors.textSecondary, fontSize: 11, fontWeight: FontWeight.w500),
+                  ),
+                ),
+              ],
+            ),
+          ),
           Expanded(
             child: GridView.builder(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 140),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3,
                 mainAxisSpacing: 12,
@@ -8193,46 +8195,17 @@ class _ProfileAppearanceScreenState
               },
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Text(
-              _t('Güvenli achievement politikası / Maksimum hız ve yatış açısı rozet koşulu değildir. Konum ve rota kanıtı profilde paylaşılmaz.',
-                  'Safe achievement policy / Top speed or lean angle is not a requirement. Location or route evidence is not shared.',
-                  'Sichere Errungenschaftsrichtlinie / Höchstgeschwindigkeit oder Schräglage ist keine Voraussetzung. Standort- oder Routenbeweise werden nicht geteilt.'),
-              style: TextStyle(color: context.colors.textSecondary, fontSize: 11),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => setState(() => localSelectedBadges.clear()),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      side: const BorderSide(color: Color(0xFF334155)),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                    child: Text(_t('Sıfırla', 'Reset', 'Zurücksetzen')),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () => setState(() => _currentPanel = StudioPanel.mainStudio),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: context.colors.cyan,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                    child: Text(_t('Seçimleri Uygula', 'Apply Selection', 'Auswahl anwenden')),
-                  ),
-                ),
-              ],
+        ],
+      ),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: _buildBottomDoubleButton(
+              leftLabel: _t('Sıfırla', 'Reset', 'Zurücksetzen'),
+              onLeftPressed: () => setState(() => localSelectedBadges.clear()),
+              rightLabel: _t('Seçimleri Uygula', 'Apply Selection', 'Auswahl anwenden'),
+              onRightPressed: () => setState(() => _currentPanel = StudioPanel.mainStudio),
             ),
           ),
         ],
@@ -8267,11 +8240,11 @@ class _ProfileAppearanceScreenState
         ),
         centerTitle: false,
       ),
-      body: Column(
+      body: Stack(
         children: [
-          Expanded(
+          Positioned.fill(
             child: ListView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 120),
               children: [
                 Text(
                   _t('8 SEÇENEK', '8 OPTIONS', '8 OPTIONEN'),
@@ -8283,6 +8256,32 @@ class _ProfileAppearanceScreenState
                   ),
                 ),
                 const SizedBox(height: 12),
+                Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1E293B),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: context.colors.cyan.withValues(alpha: 0.15),
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.info_outline, color: context.colors.cyan, size: 16),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          _t('Avatar ve çerçeve birbirinden bağımsız seçilir. Glow yerine ince halka ve onay işareti kullanılır.',
+                              'Avatar and frame are selected independently. A thin ring and checkmark are used instead of glow.',
+                              'Avatar und Rahmen werden unabhängig voneinander ausgewählt. Anstelle von Glow wird ein dünner Ring und ein Häkchen verwendet.'),
+                          style: TextStyle(color: context.colors.textSecondary, fontSize: 11, fontWeight: FontWeight.w500),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 GridView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
@@ -8406,19 +8405,14 @@ class _ProfileAppearanceScreenState
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Text(
-              _t('Avatar ve çerçeve birbirinden bağısız seçilir. Glow yerine ince halka ve onay işareti kullanılır.',
-                  'Avatar and frame are selected independently. A thin ring and checkmark are used instead of glow.',
-                  'Avatar und Rahmen werden unabhängig voneinander ausgewählt. Anstelle von Glow wird ein dünner Ring und ein Häkchen verwendet.'),
-              style: TextStyle(color: context.colors.textSecondary, fontSize: 11),
-              textAlign: TextAlign.center,
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: _buildBottomButton(
+              label: _t('Görünümü Uygula', 'Apply Appearance', 'Erscheinungsbild anwenden'),
+              onPressed: () => setState(() => _currentPanel = StudioPanel.mainStudio),
             ),
-          ),
-          _buildBottomButton(
-            label: _t('Görünümü Uygula', 'Apply Appearance', 'Erscheinungsbild anwenden'),
-            onPressed: () => setState(() => _currentPanel = StudioPanel.mainStudio),
           ),
         ],
       ),
@@ -8509,26 +8503,131 @@ class _ProfileAppearanceScreenState
     required VoidCallback onPressed,
   }) {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: SizedBox(
-        width: double.infinity,
-        height: 48,
-        child: ElevatedButton(
-          onPressed: onPressed,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: context.colors.cyan,
-            foregroundColor: Colors.white,
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(24),
+      padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+      child: Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 320),
+          height: 48,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: BackdropFilter(
+              filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: GestureDetector(
+                onTap: onPressed,
+                behavior: HitTestBehavior.opaque,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1A1F2B).withValues(alpha: 0.8),
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.08),
+                      width: 1,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.3),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      color: context.colors.cyan,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
-          child: Text(
-            label,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-            ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBottomDoubleButton({
+    required String leftLabel,
+    required VoidCallback onLeftPressed,
+    required String rightLabel,
+    required VoidCallback onRightPressed,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+      child: Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 320),
+          height: 48,
+          child: Row(
+            children: [
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(24),
+                  child: BackdropFilter(
+                    filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                    child: GestureDetector(
+                      onTap: onLeftPressed,
+                      behavior: HitTestBehavior.opaque,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1A1F2B).withValues(alpha: 0.6),
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.05),
+                            width: 1,
+                          ),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          leftLabel,
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(24),
+                  child: BackdropFilter(
+                    filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                    child: GestureDetector(
+                      onTap: onRightPressed,
+                      behavior: HitTestBehavior.opaque,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1A1F2B).withValues(alpha: 0.8),
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.08),
+                            width: 1,
+                          ),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          rightLabel,
+                          style: TextStyle(
+                            color: context.colors.cyan,
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -9575,6 +9674,82 @@ class _PremiumVaultSheetWidgetState
           ),
         );
       },
+    );
+  }
+}
+
+class PhoneInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final text = newValue.text;
+    
+    if (newValue.selection.baseOffset < oldValue.selection.baseOffset) {
+      return newValue;
+    }
+
+    final cleanText = text.replaceAll(RegExp(r'[^\d+]'), '');
+    String formatted = '';
+    
+    if (cleanText.startsWith('+90')) {
+      final digits = cleanText.substring(3);
+      formatted = '+90';
+      if (digits.isNotEmpty) {
+        formatted += ' ';
+        if (digits.length <= 3) {
+          formatted += digits;
+        } else if (digits.length <= 6) {
+          formatted += '${digits.substring(0, 3)} ${digits.substring(3)}';
+        } else {
+          final maxLen = digits.length < 10 ? digits.length : 10;
+          formatted += '${digits.substring(0, 3)} ${digits.substring(3, 6)} ${digits.substring(6, maxLen)}';
+        }
+      }
+    } else if (cleanText.startsWith('0') && cleanText.length <= 11) {
+      final digits = cleanText.substring(1);
+      formatted = '0';
+      if (digits.isNotEmpty) {
+        formatted += ' ';
+        if (digits.length <= 3) {
+          formatted += digits;
+        } else if (digits.length <= 6) {
+          formatted += '${digits.substring(0, 3)} ${digits.substring(3)}';
+        } else {
+          final maxLen = digits.length < 10 ? digits.length : 10;
+          formatted += '${digits.substring(0, 3)} ${digits.substring(3, 6)} ${digits.substring(6, maxLen)}';
+        }
+      }
+    } else if (cleanText.startsWith('5') && cleanText.length <= 10) {
+      if (cleanText.length <= 3) {
+        formatted = cleanText;
+      } else if (cleanText.length <= 6) {
+        formatted = '${cleanText.substring(0, 3)} ${cleanText.substring(3)}';
+      } else {
+        final maxLen = cleanText.length < 10 ? cleanText.length : 10;
+        formatted = '${cleanText.substring(0, 3)} ${cleanText.substring(3, 6)} ${cleanText.substring(6, maxLen)}';
+      }
+    } else {
+      if (cleanText.startsWith('+')) {
+        if (cleanText.length <= 3) {
+          formatted = cleanText;
+        } else if (cleanText.length <= 6) {
+          formatted = '${cleanText.substring(0, 3)} ${cleanText.substring(3)}';
+        } else if (cleanText.length <= 9) {
+          formatted = '${cleanText.substring(0, 3)} ${cleanText.substring(3, 6)} ${cleanText.substring(6)}';
+        } else {
+          final maxLen = cleanText.length < 13 ? cleanText.length : 13;
+          formatted = '${cleanText.substring(0, 3)} ${cleanText.substring(3, 6)} ${cleanText.substring(6, 9)} ${cleanText.substring(9, maxLen)}';
+        }
+      } else {
+        formatted = cleanText;
+      }
+    }
+
+    return TextEditingValue(
+      text: formatted,
+      selection: TextSelection.collapsed(offset: formatted.length),
     );
   }
 }
