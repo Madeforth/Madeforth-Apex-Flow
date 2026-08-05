@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/services.dart';
 import 'dart:math' as math;
@@ -17,6 +17,7 @@ import 'package:apexflow/garage/application/garage_state.dart';
 import 'package:apexflow/rides/application/ride_state.dart';
 import 'package:apexflow/profile/application/friends_state.dart';
 import 'package:apexflow/profile/domain/friend_profile.dart';
+import 'package:apexflow/shared/design/slate_palette.dart';
 import 'package:apexflow/shared/widgets/apex_panel.dart';
 import 'package:apexflow/notifications/application/notification_state.dart';
 import 'package:apexflow/notifications/domain/app_notification.dart';
@@ -757,7 +758,7 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                         ), // Slate 200 (slightly darker than off-white)
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: const Color(0xFF0F172A),
+                          color: SlatePalette.surfaceDeep,
                           width: 2,
                         ), // Slate 900
                         boxShadow: [
@@ -781,7 +782,7 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                             style: TextStyle(
                               fontSize: 8.5,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF0F172A),
+                              color: SlatePalette.surfaceDeep,
                               letterSpacing: 0.8,
                             ),
                           ),
@@ -836,7 +837,7 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                               vertical: 3,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF0F172A),
+                              color: SlatePalette.surfaceDeep,
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
@@ -3337,7 +3338,7 @@ class _FriendsListState extends ConsumerState<_FriendsList> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: const Color(0xFF1E293B),
+                color: SlatePalette.surface,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
@@ -3366,7 +3367,7 @@ class _FriendsListState extends ConsumerState<_FriendsList> {
         Container(
           height: 44,
           decoration: BoxDecoration(
-            color: const Color(0xFF0F172A),
+            color: SlatePalette.surfaceDeep,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
           ),
@@ -3417,7 +3418,7 @@ class _FriendsListState extends ConsumerState<_FriendsList> {
           child: Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFF1E293B),
+              color: SlatePalette.surface,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: Colors.white.withValues(alpha: 0.03)),
             ),
@@ -3494,7 +3495,7 @@ class _FriendsListState extends ConsumerState<_FriendsList> {
           child: Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFF1E293B),
+              color: SlatePalette.surface,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: Colors.white.withValues(alpha: 0.03)),
             ),
@@ -3676,7 +3677,7 @@ class _PendingRequestsScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: const Color(0xFF0B1528),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0F172A),
+        backgroundColor: SlatePalette.surfaceDeep,
         elevation: 0,
         title: Text(
           tr
@@ -3715,7 +3716,7 @@ class _PendingRequestsScreen extends ConsumerWidget {
                   margin: const EdgeInsets.only(bottom: 12),
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1E293B),
+                    color: SlatePalette.surface,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: Colors.white.withValues(alpha: 0.05),
@@ -3882,7 +3883,7 @@ class _NearbyRidersScreenState extends ConsumerState<_NearbyRidersScreen>
     return Scaffold(
       backgroundColor: const Color(0xFF0B1528),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0F172A),
+        backgroundColor: SlatePalette.surfaceDeep,
         elevation: 0,
         title: Text(
           _t('Yakınındaki Kişiler', 'Nearby Riders', 'Fahrer in der Nähe'),
@@ -4006,7 +4007,7 @@ class _NearbyRidersScreenState extends ConsumerState<_NearbyRidersScreen>
                 return Container(
                   margin: const EdgeInsets.only(bottom: 12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF0F172A),
+                    color: SlatePalette.surfaceDeep,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: Colors.white.withValues(alpha: 0.05),
@@ -4117,7 +4118,7 @@ class _NearbyRidersScreenState extends ConsumerState<_NearbyRidersScreen>
                                   ),
                                   decoration: BoxDecoration(
                                     color: isAlreadyFriend
-                                        ? const Color(0xFF1E293B)
+                                        ? SlatePalette.surface
                                         : const Color(
                                             0xFF06B6D4,
                                           ).withValues(alpha: 0.15),
@@ -6543,7 +6544,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     final bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', '0+', '0-', '—'];
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF1E293B),
+      backgroundColor: SlatePalette.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -6586,12 +6587,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       decoration: BoxDecoration(
                         color: isSelected
                             ? context.colors.cyan
-                            : const Color(0xFF0F172A),
+                            : SlatePalette.surfaceDeep,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: isSelected
                               ? context.colors.cyan
-                              : const Color(0xFF334155),
+                              : SlatePalette.border,
                         ),
                       ),
                       child: Text(
@@ -6629,9 +6630,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: const Color(0xFF1E293B),
+          color: SlatePalette.surface,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: const Color(0xFF334155), width: 1),
+          border: Border.all(color: SlatePalette.border, width: 1),
         ),
         child: Row(
           children: [
@@ -7404,7 +7405,7 @@ class _ProfileAppearanceScreenState
                     vertical: 10,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1E293B),
+                    color: SlatePalette.surface,
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
                       color: context.colors.cyan.withValues(alpha: 0.15),
@@ -7671,7 +7672,7 @@ class _ProfileAppearanceScreenState
                         onSelected: (val) {
                           if (val) setState(() => _backgroundFilter = chip);
                         },
-                        backgroundColor: const Color(0xFF1E293B),
+                        backgroundColor: SlatePalette.surface,
                         selectedColor: context.colors.cyan.withValues(
                           alpha: 0.15,
                         ),
@@ -7687,7 +7688,7 @@ class _ProfileAppearanceScreenState
                           side: BorderSide(
                             color: isSelected
                                 ? context.colors.cyan
-                                : const Color(0xFF334155),
+                                : SlatePalette.border,
                           ),
                         ),
                       ),
@@ -7702,7 +7703,7 @@ class _ProfileAppearanceScreenState
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1E293B),
+                  color: SlatePalette.surface,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
                     color: context.colors.cyan.withValues(alpha: 0.15),
@@ -7791,11 +7792,11 @@ class _ProfileAppearanceScreenState
                           border: Border.all(
                             color: isSelected
                                 ? context.colors.cyan
-                                : const Color(0xFF334155),
+                                : SlatePalette.border,
                             width: isSelected ? 2 : 1,
                           ),
                           borderRadius: BorderRadius.circular(10),
-                          color: const Color(0xFF1E293B),
+                          color: SlatePalette.surface,
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -7996,7 +7997,7 @@ class _ProfileAppearanceScreenState
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1E293B),
+                    color: SlatePalette.surface,
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
                       color: Colors.amber.withValues(alpha: 0.2),
@@ -8074,12 +8075,12 @@ class _ProfileAppearanceScreenState
                         decoration: BoxDecoration(
                           color: isSelected
                               ? context.colors.cyan.withValues(alpha: 0.1)
-                              : const Color(0xFF1E293B),
+                              : SlatePalette.surface,
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
                             color: isSelected
                                 ? context.colors.cyan
-                                : const Color(0xFF334155),
+                                : SlatePalette.border,
                             width: isSelected ? 1.5 : 1,
                           ),
                         ),
@@ -8280,7 +8281,7 @@ class _ProfileAppearanceScreenState
                         onSelected: (val) {
                           if (val) setState(() => _badgeFilter = chip);
                         },
-                        backgroundColor: const Color(0xFF1E293B),
+                        backgroundColor: SlatePalette.surface,
                         selectedColor: context.colors.cyan.withValues(
                           alpha: 0.15,
                         ),
@@ -8296,7 +8297,7 @@ class _ProfileAppearanceScreenState
                           side: BorderSide(
                             color: isSelected
                                 ? context.colors.cyan
-                                : const Color(0xFF334155),
+                                : SlatePalette.border,
                           ),
                         ),
                       ),
@@ -8311,7 +8312,7 @@ class _ProfileAppearanceScreenState
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1E293B),
+                  color: SlatePalette.surface,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
                     color: context.colors.cyan.withValues(alpha: 0.15),
@@ -8390,12 +8391,12 @@ class _ProfileAppearanceScreenState
                         decoration: BoxDecoration(
                           color: isSelected
                               ? context.colors.cyan.withValues(alpha: 0.1)
-                              : const Color(0xFF1E293B),
+                              : SlatePalette.surface,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
                             color: isSelected
                                 ? context.colors.cyan
-                                : const Color(0xFF334155),
+                                : SlatePalette.border,
                             width: isSelected ? 1.5 : 1,
                           ),
                         ),
@@ -8468,7 +8469,7 @@ class _ProfileAppearanceScreenState
                                     child: LinearProgressIndicator(
                                       value: progressVal / 100.0,
                                       minHeight: 3,
-                                      backgroundColor: const Color(0xFF334155),
+                                      backgroundColor: SlatePalette.border,
                                       valueColor: AlwaysStoppedAnimation(
                                         context.colors.cyan,
                                       ),
@@ -8624,7 +8625,7 @@ class _ProfileAppearanceScreenState
                     vertical: 8,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1E293B),
+                    color: SlatePalette.surface,
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
                       color: context.colors.cyan.withValues(alpha: 0.15),
@@ -8736,12 +8737,12 @@ class _ProfileAppearanceScreenState
                         decoration: BoxDecoration(
                           color: isSelected
                               ? context.colors.cyan.withValues(alpha: 0.1)
-                              : const Color(0xFF1E293B),
+                              : SlatePalette.surface,
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
                             color: isSelected
                                 ? context.colors.cyan
-                                : const Color(0xFF334155),
+                                : SlatePalette.border,
                             width: isSelected ? 1.5 : 1,
                           ),
                         ),
@@ -8834,9 +8835,9 @@ class _ProfileAppearanceScreenState
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
+        color: SlatePalette.surface,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFF334155), width: 1),
+        border: Border.all(color: SlatePalette.border, width: 1),
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -9428,7 +9429,7 @@ class _AchievementSheetWidgetState
                 ),
               ),
               const SizedBox(height: 8),
-              const Divider(height: 1, color: Color(0xFF334155)),
+              const Divider(height: 1, color: SlatePalette.border),
 
               // ACHIEVEMENTS LIST
               Expanded(
@@ -9528,7 +9529,7 @@ class _AchievementSheetWidgetState
                               ? const Color(0xFF78350F).withValues(alpha: 0.25)
                               : (isUnlocked
                                     ? context.colors.surface
-                                    : const Color(0xFF0F172A)),
+                                    : SlatePalette.surfaceDeep),
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(
                             color: isClaimed
@@ -9539,7 +9540,7 @@ class _AchievementSheetWidgetState
                                       ? context.colors.cyan.withValues(
                                           alpha: 0.5,
                                         )
-                                      : const Color(0xFF1E293B)),
+                                      : SlatePalette.surface),
                             width: isClaimed ? 2.0 : 1.0,
                           ),
                           boxShadow: isClaimed
@@ -9572,7 +9573,7 @@ class _AchievementSheetWidgetState
                                               ? context.colors.cyan.withValues(
                                                   alpha: 0.15,
                                                 )
-                                              : const Color(0xFF1E293B)),
+                                              : SlatePalette.surface),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: Text(
@@ -9651,7 +9652,10 @@ class _AchievementSheetWidgetState
                               ],
                             ),
                             const SizedBox(height: 10),
-                            const Divider(height: 1, color: Color(0xFF1E293B)),
+                            const Divider(
+                              height: 1,
+                              color: SlatePalette.surface,
+                            ),
                             const SizedBox(height: 8),
 
                             // REWARD CLAIM BAR
@@ -10052,16 +10056,16 @@ class _PremiumVaultSheetWidgetState
                 margin: const EdgeInsets.only(bottom: 12),
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF0F172A),
+                  color: SlatePalette.surfaceDeep,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFF334155)),
+                  border: Border.all(color: SlatePalette.border),
                 ),
                 child: Row(
                   children: [
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF334155),
+                        color: SlatePalette.border,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(
@@ -10130,7 +10134,7 @@ class _PremiumVaultSheetWidgetState
                           fontSize: 13,
                         ),
                         filled: true,
-                        fillColor: const Color(0xFF1E293B),
+                        fillColor: SlatePalette.surface,
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 14,
@@ -10138,7 +10142,7 @@ class _PremiumVaultSheetWidgetState
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide(
-                            color: Color(0xFF334155),
+                            color: SlatePalette.border,
                           ),
                         ),
                       ),

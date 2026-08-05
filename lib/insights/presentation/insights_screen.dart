@@ -3,7 +3,7 @@ import 'package:apexflow/core/design/apex_spacing.dart';
 import 'package:apexflow/core/i18n/app_settings_state.dart';
 import 'package:apexflow/core/i18n/app_strings.dart';
 import 'package:apexflow/insights/application/insights_state.dart';
-import 'package:apexflow/insights/presentation/insights_palette.dart';
+import 'package:apexflow/shared/design/slate_palette.dart';
 import 'package:apexflow/garage/application/garage_state.dart';
 import 'package:apexflow/rides/application/ride_state.dart';
 import 'package:apexflow/rides/domain/ride_session.dart';
@@ -35,8 +35,8 @@ class InsightsScreen extends ConsumerWidget {
     final tr = strings.locale.languageCode == 'tr';
 
     return Scaffold(
-      backgroundColor: InsightsPalette
-          .surfaceDeep, // Very dark background matching the image
+      backgroundColor:
+          SlatePalette.surfaceDeep, // Very dark background matching the image
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
@@ -88,9 +88,9 @@ class InsightsScreen extends ConsumerWidget {
                           vertical: 8,
                         ),
                         decoration: BoxDecoration(
-                          color: InsightsPalette.surface,
+                          color: SlatePalette.surface,
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: InsightsPalette.border),
+                          border: Border.all(color: SlatePalette.border),
                         ),
                         child: Row(
                           children: [
@@ -126,9 +126,9 @@ class InsightsScreen extends ConsumerWidget {
                       child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: InsightsPalette.surface,
+                          color: SlatePalette.surface,
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: InsightsPalette.border),
+                          border: Border.all(color: SlatePalette.border),
                         ),
                         child: const Icon(
                           Icons.badge_outlined,
@@ -147,9 +147,9 @@ class InsightsScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: InsightsPalette.surface,
+                color: SlatePalette.surface,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: InsightsPalette.border),
+                border: Border.all(color: SlatePalette.border),
               ),
               child: Row(
                 children: [
@@ -198,9 +198,9 @@ class InsightsScreen extends ConsumerWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: InsightsPalette.surfaceDeep,
+                      color: SlatePalette.surfaceDeep,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: InsightsPalette.border),
+                      border: Border.all(color: SlatePalette.border),
                     ),
                     child: Text(
                       tInline(
@@ -391,9 +391,9 @@ class InsightsScreen extends ConsumerWidget {
             else
               Container(
                 decoration: BoxDecoration(
-                  color: InsightsPalette.surface,
+                  color: SlatePalette.surface,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: InsightsPalette.border),
+                  border: Border.all(color: SlatePalette.border),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -422,7 +422,7 @@ class InsightsScreen extends ConsumerWidget {
                           },
                         ),
                         if (index < state.partsWishlist.length - 1)
-                          Divider(color: InsightsPalette.border, height: 1),
+                          Divider(color: SlatePalette.border, height: 1),
                       ],
                     );
                   }).toList(),
@@ -456,7 +456,7 @@ class InsightsScreen extends ConsumerWidget {
       builder: (context) {
         return Container(
           decoration: const BoxDecoration(
-            color: InsightsPalette.surfaceDeep, // Dark surface
+            color: SlatePalette.surfaceDeep, // Dark surface
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
           padding: EdgeInsets.fromLTRB(
@@ -491,9 +491,9 @@ class InsightsScreen extends ConsumerWidget {
                     child: Container(
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
-                        color: InsightsPalette.surface,
+                        color: SlatePalette.surface,
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: InsightsPalette.border),
+                        border: Border.all(color: SlatePalette.border),
                       ),
                       child: const Icon(
                         Icons.close,
@@ -616,7 +616,7 @@ class InsightsScreen extends ConsumerWidget {
                       'Teil speichern',
                     ),
                     style: const TextStyle(
-                      color: InsightsPalette.surfaceDeep,
+                      color: SlatePalette.surfaceDeep,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -638,9 +638,9 @@ class InsightsScreen extends ConsumerWidget {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: InsightsPalette.surface,
+        color: SlatePalette.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: InsightsPalette.border),
+        border: Border.all(color: SlatePalette.border),
       ),
       child: TextField(
         controller: controller,
@@ -649,10 +649,10 @@ class InsightsScreen extends ConsumerWidget {
         decoration: InputDecoration(
           hintText: label,
           hintStyle: const TextStyle(
-            color: InsightsPalette.mutedText,
+            color: SlatePalette.mutedText,
             fontSize: 14,
           ),
-          prefixIcon: Icon(icon, color: InsightsPalette.mutedText, size: 18),
+          prefixIcon: Icon(icon, color: SlatePalette.mutedText, size: 18),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 16,
@@ -711,9 +711,9 @@ class _MaintenanceOverviewCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: InsightsPalette.surface,
+        color: SlatePalette.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: InsightsPalette.border),
+        border: Border.all(color: SlatePalette.border),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -730,13 +730,13 @@ class _MaintenanceOverviewCard extends StatelessWidget {
                     CircularProgressIndicator(
                       value: 1.0,
                       strokeWidth: 8,
-                      color: InsightsPalette.border,
+                      color: SlatePalette.border,
                       strokeCap: StrokeCap.round,
                     ),
                     CircularProgressIndicator(
                       value: harmonyScore / 100,
                       strokeWidth: 8,
-                      color: InsightsPalette.caution, // Yellow-ish
+                      color: SlatePalette.caution, // Yellow-ish
                       strokeCap: StrokeCap.round,
                     ),
                     Center(
@@ -780,15 +780,15 @@ class _MaintenanceOverviewCard extends StatelessWidget {
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: InsightsPalette.cautionBackground, // Dark yellow bg
+                  color: SlatePalette.cautionBackground, // Dark yellow bg
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: InsightsPalette.caution, width: 1),
+                  border: Border.all(color: SlatePalette.caution, width: 1),
                 ),
                 child: Row(
                   children: [
                     const Icon(
                       Icons.error_outline,
-                      color: InsightsPalette.caution,
+                      color: SlatePalette.caution,
                       size: 12,
                     ),
                     const SizedBox(width: 4),
@@ -800,7 +800,7 @@ class _MaintenanceOverviewCard extends StatelessWidget {
                         'Achtung',
                       ),
                       style: const TextStyle(
-                        color: InsightsPalette.caution,
+                        color: SlatePalette.caution,
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
                       ),
@@ -856,8 +856,8 @@ class _MaintenanceOverviewCard extends StatelessWidget {
                   child: LinearProgressIndicator(
                     value: clampedProgress,
                     minHeight: 6,
-                    backgroundColor: InsightsPalette.border,
-                    color: InsightsPalette.caution,
+                    backgroundColor: SlatePalette.border,
+                    color: SlatePalette.caution,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -882,7 +882,7 @@ class _MaintenanceOverviewCard extends StatelessWidget {
                             return StatefulBuilder(
                               builder: (ctx, setState) {
                                 return AlertDialog(
-                                  backgroundColor: InsightsPalette.surface,
+                                  backgroundColor: SlatePalette.surface,
                                   title: Text(
                                     tInline(
                                       AppStrings.currentLanguageCode,
@@ -1065,9 +1065,9 @@ class _StatCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: InsightsPalette.surface,
+          color: SlatePalette.surface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: InsightsPalette.border),
+          border: Border.all(color: SlatePalette.border),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1144,15 +1144,13 @@ class _RecentRideImpactCard extends StatelessWidget {
             'Keine Fahrten',
           );
 
-    final iconColor = hasPattern
-        ? InsightsPalette.danger
-        : context.colors.healthy;
+    final iconColor = hasPattern ? SlatePalette.danger : context.colors.healthy;
     final iconBgColor = hasPattern
-        ? InsightsPalette.dangerBackground.withValues(alpha: 0.5)
-        : InsightsPalette.successBackground.withValues(alpha: 0.5);
+        ? SlatePalette.dangerBackground.withValues(alpha: 0.5)
+        : SlatePalette.successBackground.withValues(alpha: 0.5);
     final iconBorderColor = hasPattern
-        ? InsightsPalette.dangerDeep.withValues(alpha: 0.5)
-        : InsightsPalette.successDeep.withValues(alpha: 0.5);
+        ? SlatePalette.dangerDeep.withValues(alpha: 0.5)
+        : SlatePalette.successDeep.withValues(alpha: 0.5);
     final iconData = hasPattern
         ? Icons.settings_backup_restore
         : Icons.check_circle_outline;
@@ -1160,9 +1158,9 @@ class _RecentRideImpactCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: InsightsPalette.surface,
+        color: SlatePalette.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: InsightsPalette.border),
+        border: Border.all(color: SlatePalette.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1226,7 +1224,7 @@ class _RecentRideImpactCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Colors.transparent,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: InsightsPalette.dangerDeep),
+                    border: Border.all(color: SlatePalette.dangerDeep),
                   ),
                   child: Text(
                     tInline(
@@ -1236,7 +1234,7 @@ class _RecentRideImpactCard extends StatelessWidget {
                       'Überprüfen',
                     ),
                     style: const TextStyle(
-                      color: InsightsPalette.danger,
+                      color: SlatePalette.danger,
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                     ),
@@ -1259,7 +1257,7 @@ class _RecentRideImpactCard extends StatelessWidget {
             children: List.generate(20, (index) {
               // Creating a simple pattern similar to the image
               double height = 2;
-              Color color = InsightsPalette.border;
+              Color color = SlatePalette.border;
 
               if (index >= 5 && index <= 15) {
                 height = (index == 9 || index == 13)
@@ -1268,9 +1266,9 @@ class _RecentRideImpactCard extends StatelessWidget {
                 if (index < 9)
                   color = context.colors.cyan;
                 else if (index < 13)
-                  color = InsightsPalette.caution; // yellow
+                  color = SlatePalette.caution; // yellow
                 else
-                  color = InsightsPalette.danger; // red
+                  color = SlatePalette.danger; // red
               }
 
               return Container(
@@ -1284,7 +1282,7 @@ class _RecentRideImpactCard extends StatelessWidget {
             }),
           ),
           const SizedBox(height: 16),
-          Divider(color: InsightsPalette.border, height: 1),
+          Divider(color: SlatePalette.border, height: 1),
           const SizedBox(height: 12),
           Row(
             children: [
@@ -1358,9 +1356,9 @@ class _UpcomingMaintenanceCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: InsightsPalette.surface,
+        color: SlatePalette.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: InsightsPalette.border),
+        border: Border.all(color: SlatePalette.border),
       ),
       child: Column(
         children: [
@@ -1372,17 +1370,17 @@ class _UpcomingMaintenanceCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: InsightsPalette.cautionBackground.withValues(
+                    color: SlatePalette.cautionBackground.withValues(
                       alpha: 0.5,
                     ), // dark yellow
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: InsightsPalette.caution.withValues(alpha: 0.5),
+                      color: SlatePalette.caution.withValues(alpha: 0.5),
                     ),
                   ),
                   child: const Icon(
                     Icons.schedule,
-                    color: InsightsPalette.caution,
+                    color: SlatePalette.caution,
                     size: 20,
                   ),
                 ),
@@ -1429,7 +1427,7 @@ class _UpcomingMaintenanceCard extends StatelessWidget {
               ],
             ),
           ),
-          Divider(color: InsightsPalette.border, height: 1),
+          Divider(color: SlatePalette.border, height: 1),
           // Dynamic items
           ...items.map((item) {
             return Padding(
@@ -1439,9 +1437,9 @@ class _UpcomingMaintenanceCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: InsightsPalette.surfaceDeep.withValues(alpha: 0.5),
+                      color: SlatePalette.surfaceDeep.withValues(alpha: 0.5),
                       shape: BoxShape.circle,
-                      border: Border.all(color: InsightsPalette.border),
+                      border: Border.all(color: SlatePalette.border),
                     ),
                     child: Icon(
                       Icons.settings_suggest_outlined,
@@ -1499,9 +1497,9 @@ class _CostLedgerCard extends ConsumerWidget {
     final currencySymbol = ref.watch(appSettingsProvider).currencySymbol;
     return Container(
       decoration: BoxDecoration(
-        color: InsightsPalette.oledBackground,
+        color: SlatePalette.oledBackground,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: InsightsPalette.oledBorder, width: 0.5),
+        border: Border.all(color: SlatePalette.oledBorder, width: 0.5),
       ),
       child: Column(
         children: [
@@ -1515,7 +1513,7 @@ class _CostLedgerCard extends ConsumerWidget {
                     color: context.colors.rail,
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: InsightsPalette.oledBorder,
+                      color: SlatePalette.oledBorder,
                       width: 0.5,
                     ),
                   ),
@@ -1611,7 +1609,7 @@ class _CostLedgerCard extends ConsumerWidget {
           ),
           if (state.costLedger.isNotEmpty) ...[
             Divider(
-              color: InsightsPalette.oledBorder,
+              color: SlatePalette.oledBorder,
               height: 0.5,
               thickness: 0.5,
             ),
@@ -1681,7 +1679,7 @@ class _CostLedgerCard extends ConsumerWidget {
                       child: LinearProgressIndicator(
                         value: percent,
                         minHeight: 3,
-                        backgroundColor: InsightsPalette.oledBorder,
+                        backgroundColor: SlatePalette.oledBorder,
                         color: context.colors.cyan,
                       ),
                     ),
@@ -1793,7 +1791,7 @@ void _showLedgerSheet(
                 ),
                 const SizedBox(height: 8),
                 const Divider(
-                  color: InsightsPalette.oledBorder,
+                  color: SlatePalette.oledBorder,
                   height: 0.5,
                   thickness: 0.5,
                 ),
@@ -1817,7 +1815,7 @@ void _showLedgerSheet(
                           controller: scrollCtrl,
                           itemCount: state.costLedger.length,
                           separatorBuilder: (_, __) => const Divider(
-                            color: InsightsPalette.oledBorder,
+                            color: SlatePalette.oledBorder,
                             height: 0.5,
                             thickness: 0.5,
                           ),
@@ -1827,10 +1825,10 @@ void _showLedgerSheet(
                               leading: Container(
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  color: InsightsPalette.oledBackground,
+                                  color: SlatePalette.oledBackground,
                                   borderRadius: BorderRadius.circular(8),
                                   border: Border.all(
-                                    color: InsightsPalette.oledBorder,
+                                    color: SlatePalette.oledBorder,
                                     width: 0.5,
                                   ),
                                 ),
@@ -1960,12 +1958,12 @@ Future<void> _showAddCostSheet(
                                   ? const Color(
                                       0xFF06B6D4,
                                     ).withValues(alpha: 0.12)
-                                  : InsightsPalette.oledBackground,
+                                  : SlatePalette.oledBackground,
                               borderRadius: BorderRadius.circular(6),
                               border: Border.all(
                                 color: sel
                                     ? context.colors.cyan
-                                    : InsightsPalette.oledBorder,
+                                    : SlatePalette.oledBorder,
                                 width: 0.8,
                               ),
                             ),
@@ -2031,7 +2029,7 @@ Future<void> _showAddCostSheet(
                         'Beschreibung',
                       ),
                       filled: true,
-                      fillColor: InsightsPalette.oledBackground,
+                      fillColor: SlatePalette.oledBackground,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -2045,7 +2043,7 @@ Future<void> _showAddCostSheet(
                       hintText:
                           '${tInline(AppStrings.currentLanguageCode, 'Tutar', 'Amount', 'Betrag')} ($currencySymbol)',
                       filled: true,
-                      fillColor: InsightsPalette.oledBackground,
+                      fillColor: SlatePalette.oledBackground,
                       prefixText: '$currencySymbol ',
                       prefixStyle: TextStyle(
                         color: context.colors.cyan,
@@ -2265,7 +2263,7 @@ class _WishlistRow extends StatelessWidget {
             onPressed: onDelete,
             icon: const Icon(
               Icons.delete_outline,
-              color: InsightsPalette.danger,
+              color: SlatePalette.danger,
               size: 18,
             ),
             padding: EdgeInsets.zero,
@@ -2306,7 +2304,7 @@ void _showRecentRideImpactDetails(
                 width: 36,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: InsightsPalette.oledMutedText,
+                  color: SlatePalette.oledMutedText,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -2316,7 +2314,7 @@ void _showRecentRideImpactDetails(
               children: [
                 const Icon(
                   Icons.settings_backup_restore,
-                  color: InsightsPalette.danger,
+                  color: SlatePalette.danger,
                   size: 20,
                 ),
                 const SizedBox(width: 10),
@@ -2328,7 +2326,7 @@ void _showRecentRideImpactDetails(
                     'LETZTE FAHRTWIRKUNGSDETAILS',
                   ),
                   style: const TextStyle(
-                    color: InsightsPalette.oledMutedText,
+                    color: SlatePalette.oledMutedText,
                     fontSize: 10,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 1.5,
@@ -2349,7 +2347,7 @@ void _showRecentRideImpactDetails(
             Text(
               _translateLine(pattern.recommendation, tr),
               style: const TextStyle(
-                color: InsightsPalette.oledMutedText,
+                color: SlatePalette.oledMutedText,
                 fontSize: 13,
               ),
             ),
@@ -2392,7 +2390,7 @@ void _showRecentRideImpactDetails(
               ),
               '+1.5%',
               context,
-              valColor: InsightsPalette.danger,
+              valColor: SlatePalette.danger,
             ),
             const SizedBox(height: 24),
             SizedBox(
@@ -2442,10 +2440,7 @@ Widget _buildDetailRow(
     children: [
       Text(
         label,
-        style: const TextStyle(
-          color: InsightsPalette.oledMutedText,
-          fontSize: 13,
-        ),
+        style: const TextStyle(color: SlatePalette.oledMutedText, fontSize: 13),
       ),
       Text(
         value,
