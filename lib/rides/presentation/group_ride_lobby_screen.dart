@@ -1344,7 +1344,7 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
             // 10. Bottom Fixed Button
             if (_isHost)
               Positioned(
-                bottom: 16,
+                bottom: 96,
                 left: 16,
                 right: 16,
                 child: _buildGroupRideButton(),

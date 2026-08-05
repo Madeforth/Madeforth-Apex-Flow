@@ -36,7 +36,7 @@ class GaragePassportScreen extends ConsumerWidget {
         actions: [
           IconButton(
             tooltip: tInline(
-              AppStrings.currentLanguageCode,
+              strings.locale.languageCode,
               'PDF Olarak Paylaş',
               'Share as PDF',
               'Als PDF teilen',
@@ -60,7 +60,7 @@ class GaragePassportScreen extends ConsumerWidget {
                 ShareParams(
                   files: [XFile(path)],
                   text: tInline(
-                    AppStrings.currentLanguageCode,
+                    strings.locale.languageCode,
                     'Garaj Pasaportu',
                     'Garage Passport',
                     'Garagenpass',
@@ -223,7 +223,6 @@ class _MachineIdentityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tr = strings.locale.languageCode == 'tr';
     final bike = passport.bike;
     final odometerVal = settings
         .toDisplayDistance(bike.odometerKm.toDouble())
@@ -243,18 +242,13 @@ class _MachineIdentityCard extends StatelessWidget {
           ),
           const SizedBox(height: ApexSpacing.x2),
           _DataRow(
-            label: tInline(
-              AppStrings.currentLanguageCode,
-              'İsim',
-              'Name',
-              'Name',
-            ),
+            label: tInline(strings.locale.languageCode, 'İsim', 'Name', 'Name'),
             value: bike.name,
           ),
           const SizedBox(height: ApexSpacing.x1),
           _DataRow(
             label: tInline(
-              AppStrings.currentLanguageCode,
+              strings.locale.languageCode,
               'Model',
               'Model',
               'Modell',
@@ -264,7 +258,7 @@ class _MachineIdentityCard extends StatelessWidget {
           const SizedBox(height: ApexSpacing.x1),
           _DataRow(
             label: tInline(
-              AppStrings.currentLanguageCode,
+              strings.locale.languageCode,
               'Kilometre',
               'Odometer',
               'Kilometerzähler',
@@ -274,7 +268,7 @@ class _MachineIdentityCard extends StatelessWidget {
           const SizedBox(height: ApexSpacing.x1),
           _DataRow(
             label: tInline(
-              AppStrings.currentLanguageCode,
+              strings.locale.languageCode,
               'Servis aralığı',
               'Service interval',
               'Serviceintervall',
@@ -378,7 +372,6 @@ class _ComponentHealthCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tr = strings.locale.languageCode == 'tr';
     final bike = passport.bike;
 
     return ApexPanel(
@@ -392,7 +385,7 @@ class _ComponentHealthCard extends StatelessWidget {
           const SizedBox(height: ApexSpacing.x2),
           _ComponentBar(
             label: tInline(
-              AppStrings.currentLanguageCode,
+              strings.locale.languageCode,
               'Zincir',
               'Chain',
               'Kette',
@@ -403,7 +396,7 @@ class _ComponentHealthCard extends StatelessWidget {
           const SizedBox(height: ApexSpacing.x1),
           _ComponentBar(
             label: tInline(
-              AppStrings.currentLanguageCode,
+              strings.locale.languageCode,
               'Lastik',
               'Tires',
               'Reifen',
@@ -414,7 +407,7 @@ class _ComponentHealthCard extends StatelessWidget {
           const SizedBox(height: ApexSpacing.x1),
           _ComponentBar(
             label: tInline(
-              AppStrings.currentLanguageCode,
+              strings.locale.languageCode,
               'Fren',
               'Brakes',
               'Bremsen',
@@ -424,14 +417,14 @@ class _ComponentHealthCard extends StatelessWidget {
           ),
           const SizedBox(height: ApexSpacing.x1),
           _ComponentBar(
-            label: tInline(AppStrings.currentLanguageCode, 'Yağ', 'Oil', 'Öl'),
+            label: tInline(strings.locale.languageCode, 'Yağ', 'Oil', 'Öl'),
             percent: bike.oilHealthPercent,
             isWear: false,
           ),
           const SizedBox(height: ApexSpacing.x1),
           _ComponentBar(
             label: tInline(
-              AppStrings.currentLanguageCode,
+              strings.locale.languageCode,
               'Akü',
               'Battery',
               'Batterie',
@@ -522,7 +515,6 @@ class _MaintenanceWindowCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tr = strings.locale.languageCode == 'tr';
     final windowState = bike.serviceWindowState;
     final color = switch (windowState) {
       ServiceWindowState.stable => context.colors.healthy,
@@ -531,19 +523,19 @@ class _MaintenanceWindowCard extends StatelessWidget {
     };
     final label = switch (windowState) {
       ServiceWindowState.stable => tInline(
-        AppStrings.currentLanguageCode,
+        strings.locale.languageCode,
         'Stabil',
         'Stable',
         'Im Rhythmus',
       ),
       ServiceWindowState.dueSoon => tInline(
-        AppStrings.currentLanguageCode,
+        strings.locale.languageCode,
         'Yaklaşıyor',
         'Due soon',
         'Bald fällig',
       ),
       ServiceWindowState.overdue => tInline(
-        AppStrings.currentLanguageCode,
+        strings.locale.languageCode,
         'Gecikmiş',
         'Overdue',
         'Überfällig',
@@ -759,7 +751,7 @@ class _ServiceHistoryCard extends StatelessWidget {
               if (records.isNotEmpty)
                 _CountPill(
                   label: tInline(
-                    AppStrings.currentLanguageCode,
+                    strings.locale.languageCode,
                     '${records.length} kayıt',
                     '${records.length} logs',
                     '${records.length} Protokolle',
@@ -995,12 +987,7 @@ class _CountPill extends StatelessWidget {
 String _formatDate(String isoDate, bool tr) {
   final date = DateTime.tryParse(isoDate)?.toLocal();
   if (date == null || date.year <= 1970) {
-    return tInline(
-      AppStrings.currentLanguageCode,
-      'Bilinmiyor',
-      'Unknown',
-      'Unbekannt',
-    );
+    return tr ? 'Bilinmiyor' : 'Unknown';
   }
   final d = date.day.toString().padLeft(2, '0');
   final m = date.month.toString().padLeft(2, '0');
