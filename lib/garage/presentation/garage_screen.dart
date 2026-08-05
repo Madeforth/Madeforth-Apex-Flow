@@ -1,4 +1,4 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 import 'package:apexflow/core/design/apex_colors.dart';
 import 'package:apexflow/core/design/apex_spacing.dart';
 import 'package:apexflow/core/i18n/app_strings.dart';
@@ -635,8 +635,8 @@ class _GarageHeader extends ConsumerWidget {
                     child: Container(
                       width: 8,
                       height: 8,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF06B6D4), // Cyan
+                      decoration: BoxDecoration(
+                        color: context.colors.cyan,
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -726,7 +726,7 @@ void _showEditIntervalDialog(
                             borderRadius: BorderRadius.circular(6),
                             border: Border.all(
                               color: isSelected
-                                  ? const Color(0xFF06B6D4)
+                                  ? context.colors.cyan
                                   : Colors.white.withValues(alpha: 0.05),
                             ),
                           ),
@@ -734,7 +734,7 @@ void _showEditIntervalDialog(
                             '$preset km',
                             style: TextStyle(
                               color: isSelected
-                                  ? const Color(0xFF06B6D4)
+                                  ? context.colors.cyan
                                   : Colors.white70,
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
@@ -772,7 +772,7 @@ void _showEditIntervalDialog(
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(6),
-                        borderSide: const BorderSide(color: Color(0xFF06B6D4)),
+                        borderSide: BorderSide(color: context.colors.cyan),
                       ),
                     ),
                   ),

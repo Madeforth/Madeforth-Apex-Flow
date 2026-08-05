@@ -1,4 +1,4 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 import 'package:apexflow/rides/presentation/widgets/start_ride_sheet.dart';
 import 'package:apexflow/rituals/application/rituals_state.dart';
 import 'package:apexflow/rituals/presentation/ride_readiness_screen.dart';
@@ -832,7 +832,7 @@ class _NoRidePanelEmptyState extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const Icon(Icons.two_wheeler, size: 40, color: Color(0xFF4B5563)),
+          Icon(Icons.two_wheeler, size: 40, color: context.colors.border),
           const SizedBox(height: 10),
           Text(
             tInline(
@@ -1342,7 +1342,7 @@ class _RideMemoryPanel extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: const Color(0xFF1F2937),
+                color: context.colors.surface,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
@@ -1367,10 +1367,10 @@ class _RideMemoryPanel extends StatelessWidget {
                   child: Center(
                     child: Column(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.history_toggle_off,
                           size: 32,
-                          color: Color(0xFF4B5563),
+                          color: context.colors.border,
                         ),
                         const SizedBox(height: 8),
                         Text(

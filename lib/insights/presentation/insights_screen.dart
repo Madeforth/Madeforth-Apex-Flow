@@ -1509,7 +1509,7 @@ class _CostLedgerCard extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1C1C1E),
+                    color: context.colors.rail,
                     shape: BoxShape.circle,
                     border: Border.all(
                       color: const Color(0xFF2D2D2F),
@@ -1747,7 +1747,7 @@ void _showLedgerSheet(
                   width: 36,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF636366),
+                    color: context.colors.muted,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -1756,9 +1756,9 @@ void _showLedgerSheet(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.account_balance_wallet_outlined,
-                        color: Color(0xFF06B6D4),
+                        color: context.colors.cyan,
                         size: 18,
                       ),
                       const SizedBox(width: 10),
@@ -1769,8 +1769,8 @@ void _showLedgerSheet(
                           'Cost Ledger',
                           'Kostenbuch',
                         ),
-                        style: const TextStyle(
-                          color: Color(0xFFF5F5F5),
+                        style: TextStyle(
+                          color: context.colors.white,
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 0.3,
@@ -1779,8 +1779,8 @@ void _showLedgerSheet(
                       const Spacer(),
                       Text(
                         '$currencySymbol${state.totalCostTry.toStringAsFixed(0)}',
-                        style: const TextStyle(
-                          color: Color(0xFF06B6D4),
+                        style: TextStyle(
+                          color: context.colors.cyan,
                           fontSize: 15,
                           fontWeight: FontWeight.w900,
                         ),
@@ -1804,8 +1804,8 @@ void _showLedgerSheet(
                               'No entries yet.',
                               'Noch keine Einträge.',
                             ),
-                            style: const TextStyle(
-                              color: Color(0xFF8E8E93),
+                            style: TextStyle(
+                              color: context.colors.textSecondary,
                               fontSize: 13,
                             ),
                           ),
@@ -1835,22 +1835,22 @@ void _showLedgerSheet(
                                   e.category.toLowerCase().contains('fuel')
                                       ? Icons.water_drop_outlined
                                       : Icons.settings_outlined,
-                                  color: const Color(0xFF06B6D4),
+                                  color: context.colors.cyan,
                                   size: 16,
                                 ),
                               ),
                               title: Text(
                                 _translateLine(e.category, tr),
-                                style: const TextStyle(
-                                  color: Color(0xFFF5F5F5),
+                                style: TextStyle(
+                                  color: context.colors.white,
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
                               trailing: Text(
                                 '$currencySymbol${e.amountTry.toStringAsFixed(0)}',
-                                style: const TextStyle(
-                                  color: Color(0xFFF5F5F5),
+                                style: TextStyle(
+                                  color: context.colors.white,
                                   fontSize: 14,
                                   fontWeight: FontWeight.w900,
                                 ),
@@ -1913,7 +1913,7 @@ Future<void> _showAddCostSheet(
                       width: 36,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF636366),
+                        color: context.colors.muted,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -1926,8 +1926,8 @@ Future<void> _showAddCostSheet(
                       'NEW COST ENTRY',
                       'NEUER KOSTENEINTRAG',
                     ),
-                    style: const TextStyle(
-                      color: Color(0xFF8E8E93),
+                    style: TextStyle(
+                      color: context.colors.textSecondary,
                       fontSize: 10,
                       fontWeight: FontWeight.w600,
                       letterSpacing: 1.5,
@@ -1961,7 +1961,7 @@ Future<void> _showAddCostSheet(
                               borderRadius: BorderRadius.circular(6),
                               border: Border.all(
                                 color: sel
-                                    ? const Color(0xFF06B6D4)
+                                    ? context.colors.cyan
                                     : const Color(0xFF2D2D2F),
                                 width: 0.8,
                               ),
@@ -2003,8 +2003,8 @@ Future<void> _showAddCostSheet(
                                     ),
                               style: TextStyle(
                                 color: sel
-                                    ? const Color(0xFF06B6D4)
-                                    : const Color(0xFF8E8E93),
+                                    ? context.colors.cyan
+                                    : context.colors.textSecondary,
                                 fontSize: 12,
                                 fontWeight: sel
                                     ? FontWeight.w600
@@ -2019,10 +2019,7 @@ Future<void> _showAddCostSheet(
                   const SizedBox(height: 12),
                   TextField(
                     controller: descCtrl,
-                    style: const TextStyle(
-                      color: Color(0xFFF5F5F5),
-                      fontSize: 13,
-                    ),
+                    style: TextStyle(color: context.colors.white, fontSize: 13),
                     decoration: InputDecoration(
                       hintText: tInline(
                         AppStrings.currentLanguageCode,
@@ -2040,10 +2037,7 @@ Future<void> _showAddCostSheet(
                     keyboardType: const TextInputType.numberWithOptions(
                       decimal: true,
                     ),
-                    style: const TextStyle(
-                      color: Color(0xFFF5F5F5),
-                      fontSize: 13,
-                    ),
+                    style: TextStyle(color: context.colors.white, fontSize: 13),
                     decoration: InputDecoration(
                       hintText:
                           '${tInline(AppStrings.currentLanguageCode, 'Tutar', 'Amount', 'Betrag')} ($currencySymbol)',
@@ -2051,7 +2045,7 @@ Future<void> _showAddCostSheet(
                       fillColor: Color(0xFF0A0A0A),
                       prefixText: '$currencySymbol ',
                       prefixStyle: TextStyle(
-                        color: Color(0xFF06B6D4),
+                        color: context.colors.cyan,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -2062,7 +2056,7 @@ Future<void> _showAddCostSheet(
                     height: 48,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF06B6D4),
+                        backgroundColor: context.colors.cyan,
                         foregroundColor: Colors.black,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
@@ -2290,13 +2284,13 @@ void _showRecentRideImpactDetails(
     backgroundColor: Colors.transparent,
     builder: (ctx) {
       return Container(
-        decoration: const BoxDecoration(
-          color: Color(0xFF1F2937),
+        decoration: BoxDecoration(
+          color: context.colors.surface,
           borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
           border: Border(
-            top: BorderSide(color: Color(0xFF4B5563), width: 0.5),
-            left: BorderSide(color: Color(0xFF4B5563), width: 0.5),
-            right: BorderSide(color: Color(0xFF4B5563), width: 0.5),
+            top: BorderSide(color: context.colors.border, width: 0.5),
+            left: BorderSide(color: context.colors.border, width: 0.5),
+            right: BorderSide(color: context.colors.border, width: 0.5),
           ),
         ),
         padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
@@ -2354,11 +2348,7 @@ void _showRecentRideImpactDetails(
               style: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 13),
             ),
             const SizedBox(height: 20),
-            const Divider(
-              color: Color(0xFF4B5563),
-              height: 0.5,
-              thickness: 0.5,
-            ),
+            Divider(color: context.colors.border, height: 0.5, thickness: 0.5),
             const SizedBox(height: 16),
             _buildDetailRow(
               tInline(
@@ -2404,15 +2394,12 @@ void _showRecentRideImpactDetails(
               height: 48,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF374151),
+                  backgroundColor: context.colors.elevated,
                   foregroundColor: Colors.white,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(6),
-                    side: const BorderSide(
-                      color: Color(0xFF4B5563),
-                      width: 0.5,
-                    ),
+                    side: BorderSide(color: context.colors.border, width: 0.5),
                   ),
                 ),
                 onPressed: () => Navigator.pop(ctx),

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/services.dart';
 import 'dart:math' as math;
@@ -1538,8 +1538,8 @@ class _CardThemeSelectorPanel extends ConsumerWidget {
                                 ? FontWeight.w700
                                 : FontWeight.w400,
                             color: isSelected
-                                ? const Color(0xFFF5F5F5)
-                                : const Color(0xFF8E8E93),
+                                ? context.colors.white
+                                : context.colors.textSecondary,
                           ),
                           textAlign: TextAlign.center,
                           maxLines: 1,
@@ -3569,23 +3569,23 @@ class _FriendsListState extends ConsumerState<_FriendsList> {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF06B6D4).withValues(alpha: 0.15),
-                  border: Border.all(color: const Color(0xFF06B6D4)),
+                  color: context.colors.cyan.withValues(alpha: 0.15),
+                  border: Border.all(color: context.colors.cyan),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.person_add_outlined,
                       size: 13,
-                      color: Color(0xFF06B6D4),
+                      color: context.colors.cyan,
                     ),
                     const SizedBox(width: 4),
                     Text(
                       _t('Arkadaş Ekle', 'Add Friend', 'Freund hinzufügen'),
-                      style: const TextStyle(
-                        color: Color(0xFF06B6D4),
+                      style: TextStyle(
+                        color: context.colors.cyan,
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
                       ),
@@ -3740,8 +3740,8 @@ class _PendingRequestsScreen extends ConsumerWidget {
                                       )
                                       .toUpperCase();
                           })(),
-                          style: const TextStyle(
-                            color: Color(0xFF06B6D4),
+                          style: TextStyle(
+                            color: context.colors.cyan,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -3910,7 +3910,7 @@ class _NearbyRidersScreenState extends ConsumerState<_NearbyRidersScreen>
                         height: 120 + (_pulseController.value * 40),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: const Color(0xFF06B6D4).withValues(
+                          color: context.colors.cyan.withValues(
                             alpha: 0.1 * (1.0 - _pulseController.value),
                           ),
                           border: Border.all(
@@ -3920,10 +3920,10 @@ class _NearbyRidersScreenState extends ConsumerState<_NearbyRidersScreen>
                             width: 2 + 3 * _pulseController.value,
                           ),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.radar,
                           size: 48,
-                          color: Color(0xFF06B6D4),
+                          color: context.colors.cyan,
                         ),
                       );
                     },
@@ -4124,7 +4124,7 @@ class _NearbyRidersScreenState extends ConsumerState<_NearbyRidersScreen>
                                     border: Border.all(
                                       color: isAlreadyFriend
                                           ? Colors.white24
-                                          : const Color(0xFF06B6D4),
+                                          : context.colors.cyan,
                                     ),
                                     borderRadius: BorderRadius.circular(6),
                                   ),
@@ -4135,7 +4135,7 @@ class _NearbyRidersScreenState extends ConsumerState<_NearbyRidersScreen>
                                     style: TextStyle(
                                       color: isAlreadyFriend
                                           ? Colors.white38
-                                          : const Color(0xFF06B6D4),
+                                          : context.colors.cyan,
                                       fontSize: 11,
                                       fontWeight: FontWeight.bold,
                                     ),
