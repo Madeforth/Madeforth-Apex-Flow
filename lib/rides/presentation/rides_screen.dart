@@ -166,8 +166,7 @@ class _RidesScreenState extends ConsumerState<RidesScreen> {
                         ],
                       ),
                       const SizedBox(height: 16),
-                      if (_gpsStatusMessage != null &&
-                          state.isRideActive) ...[
+                      if (_gpsStatusMessage != null && state.isRideActive) ...[
                         _GpsStatusBanner(
                           message: _gpsStatusMessage!,
                           isTracking: _locationService.isTracking,
@@ -199,10 +198,7 @@ class _RidesScreenState extends ConsumerState<RidesScreen> {
                     ],
                   ),
                   isPremium
-                      ? GroupRideLobbyScreen(
-                          strings: strings,
-                          isEmbedded: true,
-                        )
+                      ? GroupRideLobbyScreen(strings: strings, isEmbedded: true)
                       : PremiumPaywallScreen(strings: strings),
                 ],
               ),
@@ -219,7 +215,9 @@ class _RidesScreenState extends ConsumerState<RidesScreen> {
                         height: 38,
                         constraints: const BoxConstraints(maxWidth: 270),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1A1F2B).withValues(alpha: 0.8), // Semi-transparent navbar background
+                          color: const Color(0xFF1A1F2B).withValues(
+                            alpha: 0.8,
+                          ), // Semi-transparent navbar background
                           borderRadius: BorderRadius.circular(19),
                           border: Border.all(
                             color: Colors.white.withValues(alpha: 0.08),
@@ -230,7 +228,9 @@ class _RidesScreenState extends ConsumerState<RidesScreen> {
                           dividerColor: Colors.transparent,
                           indicatorSize: TabBarIndicatorSize.tab,
                           indicator: BoxDecoration(
-                            color: context.colors.cyan.withValues(alpha: 0.14), // Liquid highlight
+                            color: context.colors.cyan.withValues(
+                              alpha: 0.14,
+                            ), // Liquid highlight
                             borderRadius: BorderRadius.circular(17),
                           ),
                           tabs: [
@@ -240,14 +240,19 @@ class _RidesScreenState extends ConsumerState<RidesScreen> {
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    const Icon(Icons.navigation_outlined, size: 14),
+                                    const Icon(
+                                      Icons.navigation_outlined,
+                                      size: 14,
+                                    ),
                                     const SizedBox(width: 6),
-                                    Text(tInline(
-                                      AppStrings.currentLanguageCode,
-                                      'Solo Sürüş',
-                                      'Solo Ride',
-                                      'Solo-Fahrt',
-                                    )),
+                                    Text(
+                                      tInline(
+                                        AppStrings.currentLanguageCode,
+                                        'Solo Sürüş',
+                                        'Solo Ride',
+                                        'Solo-Fahrt',
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -260,18 +265,21 @@ class _RidesScreenState extends ConsumerState<RidesScreen> {
                                   children: [
                                     const Icon(Icons.group_outlined, size: 14),
                                     const SizedBox(width: 6),
-                                    Text(tInline(
-                                      AppStrings.currentLanguageCode,
-                                      'Grup Sürüşü',
-                                      'Group Ride',
-                                      'Gruppenfahrt',
-                                    )),
+                                    Text(
+                                      tInline(
+                                        AppStrings.currentLanguageCode,
+                                        'Grup Sürüşü',
+                                        'Group Ride',
+                                        'Gruppenfahrt',
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
                             ),
                           ],
-                          labelColor: context.colors.cyan, // Selected text/icon color
+                          labelColor:
+                              context.colors.cyan, // Selected text/icon color
                           unselectedLabelColor: context.colors.textSecondary,
                           labelStyle: const TextStyle(
                             fontWeight: FontWeight.w600,
@@ -452,7 +460,7 @@ class _RidesScreenState extends ConsumerState<RidesScreen> {
     }
 
     final telemetry = gpsResult.telemetry;
-    ref
+    final saved = ref
         .read(rideStateProvider.notifier)
         .endRide(
           distanceKm: distanceKm,
@@ -471,6 +479,21 @@ class _RidesScreenState extends ConsumerState<RidesScreen> {
           hardBrakes: telemetry?.hardBrakingEvents ?? 0,
           harmonyScore: telemetry?.smoothnessScore ?? 0,
         );
+    if (!saved && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            tr
+                ? 'Sürüş çok kısa veya hareket algılanmadı. Kaydedilmedi.'
+                : de
+                ? 'Fahrt zu kurz oder keine Bewegung erkannt. Nicht gespeichert.'
+                : 'Ride too short or no movement detected. Not saved.',
+          ),
+          backgroundColor: context.colors.caution,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
     setState(() => _gpsStatusMessage = null);
   }
 }
@@ -541,6 +564,7 @@ class _StartRidePanelState extends ConsumerState<_StartRidePanel> {
       }
     });
   }
+
   void _handleTapCancel() => setState(() => _isPressed = false);
 
   @override
@@ -548,7 +572,9 @@ class _StartRidePanelState extends ConsumerState<_StartRidePanel> {
     final weather = ref.watch(ritualsStateProvider).weather;
     final lang = AppStrings.currentLanguageCode;
     final isActive = widget.isActive;
-    final buttonColor = isActive ? const Color(0xFFEF4444) : const Color(0xFF0EA5E9);
+    final buttonColor = isActive
+        ? const Color(0xFFEF4444)
+        : const Color(0xFF0EA5E9);
     final buttonText = isActive
         ? tInline(
             AppStrings.currentLanguageCode,
@@ -689,10 +715,21 @@ class _StartRidePanelState extends ConsumerState<_StartRidePanel> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(buttonText, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+                        Text(
+                          buttonText,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                         if (!isActive) ...[
                           const SizedBox(width: 8),
-                          const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 18),
+                          const Icon(
+                            Icons.arrow_forward_rounded,
+                            color: Colors.white,
+                            size: 18,
+                          ),
                         ],
                       ],
                     ),
@@ -710,9 +747,20 @@ class _StartRidePanelState extends ConsumerState<_StartRidePanel> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(buttonText, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+                        Text(
+                          buttonText,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                         const SizedBox(width: 8),
-                        const Icon(Icons.arrow_forward, color: Colors.white, size: 18),
+                        const Icon(
+                          Icons.arrow_forward,
+                          color: Colors.white,
+                          size: 18,
+                        ),
                       ],
                     ),
                   ),
@@ -737,7 +785,6 @@ class _StartRidePanelState extends ConsumerState<_StartRidePanel> {
     );
   }
 }
-
 
 class _LastRidePanel extends StatelessWidget {
   const _LastRidePanel({required this.latestRide, required this.tr});
@@ -785,11 +832,7 @@ class _NoRidePanelEmptyState extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const Icon(
-            Icons.two_wheeler,
-            size: 40,
-            color: Color(0xFF4B5563),
-          ),
+          const Icon(Icons.two_wheeler, size: 40, color: Color(0xFF4B5563)),
           const SizedBox(height: 10),
           Text(
             tInline(
@@ -813,10 +856,7 @@ class _NoRidePanelEmptyState extends StatelessWidget {
               'Starte deine erste Fahrt, um hier Daten zu verfolgen.',
             ),
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Color(0xFF9CA3AF),
-              fontSize: 12,
-            ),
+            style: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 12),
           ),
         ],
       ),

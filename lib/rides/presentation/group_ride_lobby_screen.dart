@@ -248,7 +248,7 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
         observation += '\n$insight (Uyum: ${t.smoothnessScore}/100)';
       }
 
-      ref
+      final saved = ref
           .read(rideStateProvider.notifier)
           .endRide(
             distanceKm: distanceKm,
@@ -268,14 +268,23 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              tInline(
-                AppStrings.currentLanguageCode,
-                'Grup sürüşü tamamlandı ve garaj verilerine yansıtıldı.',
-                'Group ride ended and reflected in garage data.',
-                'Die Gruppenfahrt wurde beendet und in den Werkstattdaten angezeigt.',
-              ),
+              saved
+                  ? tInline(
+                      AppStrings.currentLanguageCode,
+                      'Grup sürüşü tamamlandı ve garaj verilerine yansıtıldı.',
+                      'Group ride ended and reflected in garage data.',
+                      'Die Gruppenfahrt wurde beendet und in den Werkstattdaten angezeigt.',
+                    )
+                  : tInline(
+                      AppStrings.currentLanguageCode,
+                      'Grup sürüşü çok kısa veya hareket algılanmadı. Kaydedilmedi.',
+                      'Group ride too short or no movement detected. Not saved.',
+                      'Gruppenfahrt zu kurz oder keine Bewegung erkannt. Nicht gespeichert.',
+                    ),
             ),
-            backgroundColor: context.colors.cyan,
+            backgroundColor: saved
+                ? context.colors.cyan
+                : context.colors.caution,
             duration: const Duration(seconds: 4),
           ),
         );
@@ -601,7 +610,12 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
           children: [
             Positioned.fill(
               child: ListView(
-                padding: EdgeInsets.fromLTRB(16, widget.isEmbedded ? 72 : 16, 16, 100),
+                padding: EdgeInsets.fromLTRB(
+                  16,
+                  widget.isEmbedded ? 72 : 16,
+                  16,
+                  100,
+                ),
                 children: [
                   if (!widget.isEmbedded) ...[
                     // 1. Custom App Bar
@@ -921,93 +935,95 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
                   const SizedBox(height: 12),
 
                   // 4b. Invite from Friends List
-                  Builder(builder: (context) {
-                    final friends = ref.watch(friendsStateProvider);
-                    if (friends.isEmpty) return const SizedBox.shrink();
-                    return Container(
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF1E293B),
-                        borderRadius: BorderRadius.circular(6),
-                        border: Border.all(
-                          color: const Color(0xFF334155),
-                          width: 0.5,
-                        ),
-                      ),
-                      child: ExpansionTile(
-                        tilePadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 2,
-                        ),
-                        collapsedIconColor: Colors.white54,
-                        iconColor: const Color(0xFF0EA5E9),
-                        title: Text(
-                          tr
-                              ? 'Arkadaşlardan Davet Et (${friends.length})'
-                              : (de
-                                    ? 'Freunde einladen (${friends.length})'
-                                    : 'Invite Friends (${friends.length})'),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
+                  Builder(
+                    builder: (context) {
+                      final friends = ref.watch(friendsStateProvider);
+                      if (friends.isEmpty) return const SizedBox.shrink();
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1E293B),
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(
+                            color: const Color(0xFF334155),
+                            width: 0.5,
                           ),
                         ),
-                        children: friends.map((friend) {
-                          return ListTile(
-                            dense: true,
-                            leading: CircleAvatar(
-                              radius: 16,
-                              backgroundColor: const Color(0xFF334155),
-                              child: Text(
-                                friend.name.isNotEmpty
-                                    ? friend.name[0].toUpperCase()
-                                    : '?',
+                        child: ExpansionTile(
+                          tilePadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 2,
+                          ),
+                          collapsedIconColor: Colors.white54,
+                          iconColor: const Color(0xFF0EA5E9),
+                          title: Text(
+                            tr
+                                ? 'Arkadaşlardan Davet Et (${friends.length})'
+                                : (de
+                                      ? 'Freunde einladen (${friends.length})'
+                                      : 'Invite Friends (${friends.length})'),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          children: friends.map((friend) {
+                            return ListTile(
+                              dense: true,
+                              leading: CircleAvatar(
+                                radius: 16,
+                                backgroundColor: const Color(0xFF334155),
+                                child: Text(
+                                  friend.name.isNotEmpty
+                                      ? friend.name[0].toUpperCase()
+                                      : '?',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              title: Text(
+                                friend.name,
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 13,
-                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
-                            ),
-                            title: Text(
-                              friend.name,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 13,
+                              subtitle: Text(
+                                friend.riderTag,
+                                style: const TextStyle(
+                                  color: Colors.white38,
+                                  fontSize: 11,
+                                ),
                               ),
-                            ),
-                            subtitle: Text(
-                              friend.riderTag,
-                              style: const TextStyle(
-                                color: Colors.white38,
-                                fontSize: 11,
+                              trailing: IconButton(
+                                icon: const Icon(
+                                  Icons.send,
+                                  color: Color(0xFF0EA5E9),
+                                  size: 18,
+                                ),
+                                onPressed: () {
+                                  HapticFeedback.lightImpact();
+                                  final link =
+                                      'apexflow://join?lobby=$_activeLobbyId';
+                                  final msg = tr
+                                      ? '${friend.name}, seni grup sürüşüne davet ediyorum! Lobi kodu: $_activeLobbyId\n$link'
+                                      : (de
+                                            ? '${friend.name}, ich lade dich zur Gruppenfahrt ein! Lobby-Code: $_activeLobbyId\n$link'
+                                            : '${friend.name}, join my group ride! Lobby code: $_activeLobbyId\n$link');
+                                  SharePlus.instance.share(
+                                    ShareParams(text: msg),
+                                  );
+                                },
                               ),
-                            ),
-                            trailing: IconButton(
-                              icon: const Icon(
-                                Icons.send,
-                                color: Color(0xFF0EA5E9),
-                                size: 18,
-                              ),
-                              onPressed: () {
-                                HapticFeedback.lightImpact();
-                                final link =
-                                    'apexflow://join?lobby=$_activeLobbyId';
-                                final msg = tr
-                                    ? '${friend.name}, seni grup sürüşüne davet ediyorum! Lobi kodu: $_activeLobbyId\n$link'
-                                    : (de
-                                          ? '${friend.name}, ich lade dich zur Gruppenfahrt ein! Lobby-Code: $_activeLobbyId\n$link'
-                                          : '${friend.name}, join my group ride! Lobby code: $_activeLobbyId\n$link');
-                                SharePlus.instance.share(
-                                  ShareParams(text: msg),
-                                );
-                              },
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    );
-                  }),
+                            );
+                          }).toList(),
+                        ),
+                      );
+                    },
+                  ),
                   const SizedBox(height: 16),
 
                   // 5. Join Another Lobby Tile
@@ -1346,24 +1362,35 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
       setState(() {
         _isRideActive = false;
       });
-      final gpsResult = _locationService.stopTracking(
-        isTurkish: tr,
-      );
+      final gpsResult = _locationService.stopTracking(isTurkish: tr);
       final distanceKm = gpsResult.hasGpsData
-          ? double.parse(
-              gpsResult.distanceKm.toStringAsFixed(2),
-            )
+          ? double.parse(gpsResult.distanceKm.toStringAsFixed(2))
           : 0.0;
       final averageSpeedKmh = gpsResult.hasGpsData
-          ? double.parse(
-              gpsResult.averageSpeedKmh.toStringAsFixed(1),
-            )
+          ? double.parse(gpsResult.averageSpeedKmh.toStringAsFixed(1))
           : 0.0;
       final durationMinutes = gpsResult.hasGpsData
           ? gpsResult.activeDurationMinutes
           : 0;
 
-      if (distanceKm < 0.1 && averageSpeedKmh < 1.0) {
+      final saved = ref
+          .read(rideStateProvider.notifier)
+          .endRide(
+            distanceKm: distanceKm,
+            durationMinutes: durationMinutes,
+            averageSpeedKmh: averageSpeedKmh,
+            mood: tr ? 'Grup Sürüşü' : (de ? 'Gruppenfahrt' : 'Group Ride'),
+            mechanicalObservation: tr
+                ? 'Sorunsuz'
+                : (de ? 'Problemlos' : 'Fine'),
+            maxSpeedKmh: gpsResult.hasGpsData ? gpsResult.maxSpeedKmh : 0.0,
+            maxLeanAngle: gpsResult.telemetry?.maxLeanAngle ?? 0.0,
+            hardAccelerations:
+                gpsResult.telemetry?.rapidAccelerationEvents ?? 0,
+            hardBrakes: gpsResult.telemetry?.hardBrakingEvents ?? 0,
+            harmonyScore: gpsResult.telemetry?.smoothnessScore ?? 0,
+          );
+      if (!saved) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -1378,34 +1405,6 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
           ),
         );
       }
-
-      ref
-          .read(rideStateProvider.notifier)
-          .endRide(
-            distanceKm: distanceKm,
-            durationMinutes: durationMinutes,
-            averageSpeedKmh: averageSpeedKmh,
-            mood: tr
-                ? 'Grup Sürüşü'
-                : (de ? 'Gruppenfahrt' : 'Group Ride'),
-            mechanicalObservation: tr
-                ? 'Sorunsuz'
-                : (de ? 'Problemlos' : 'Fine'),
-            maxSpeedKmh: gpsResult.hasGpsData
-                ? gpsResult.maxSpeedKmh
-                : 0.0,
-            maxLeanAngle:
-                gpsResult.telemetry?.maxLeanAngle ?? 0.0,
-            hardAccelerations:
-                gpsResult
-                    .telemetry
-                    ?.rapidAccelerationEvents ??
-                0,
-            hardBrakes:
-                gpsResult.telemetry?.hardBrakingEvents ?? 0,
-            harmonyScore:
-                gpsResult.telemetry?.smoothnessScore ?? 0,
-          );
       if (_activeLobbyId != null && _isHost) {
         FirebaseService.instance.deleteLobby(_activeLobbyId!);
       }
@@ -1414,32 +1413,30 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
         _isRideActive = true;
       });
       if (_activeLobbyId != null) {
-        FirebaseService.instance.updateLobbyStatus(
-          _activeLobbyId!,
-          'active',
-        );
+        FirebaseService.instance.updateLobbyStatus(_activeLobbyId!, 'active');
       }
       ref
           .read(rideStateProvider.notifier)
           .startRide(
-            mood: tr
-                ? 'Grup Sürüşü'
-                : (de ? 'Gruppenfahrt' : 'Group Ride'),
+            mood: tr ? 'Grup Sürüşü' : (de ? 'Gruppenfahrt' : 'Group Ride'),
           );
-      _locationService.startTracking(
-        isTurkish: tr,
-        isMounted: false,
-      );
+      _locationService.startTracking(isTurkish: tr, isMounted: false);
     }
   }
 
   Widget _buildGroupRideButton() {
     final tr = widget.strings.locale.languageCode == 'tr';
     final de = widget.strings.locale.languageCode == 'de';
-    final buttonColor = _isRideActive ? const Color(0xFFEF4444) : const Color(0xFF0EA5E9);
+    final buttonColor = _isRideActive
+        ? const Color(0xFFEF4444)
+        : const Color(0xFF0EA5E9);
     final buttonText = _isRideActive
-        ? (tr ? 'Grup Sürüşünü Durdur' : (de ? 'Gruppenfahrt beenden' : 'Stop Group Ride'))
-        : (tr ? 'Grup Sürüşünü Başlat' : (de ? 'Gruppenfahrt starten' : 'Start Group Ride'));
+        ? (tr
+              ? 'Grup Sürüşünü Durdur'
+              : (de ? 'Gruppenfahrt beenden' : 'Stop Group Ride'))
+        : (tr
+              ? 'Grup Sürüşünü Başlat'
+              : (de ? 'Gruppenfahrt starten' : 'Start Group Ride'));
 
     return GestureDetector(
       onTapDown: (_) => setState(() => _isGroupRidePressed = true),
@@ -1471,16 +1468,29 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
               opacity: _isGroupRidePressed ? 0.0 : 1.0,
               duration: const Duration(milliseconds: 280),
               child: AnimatedSlide(
-                offset: _isGroupRidePressed ? const Offset(0.3, 0) : Offset.zero,
+                offset: _isGroupRidePressed
+                    ? const Offset(0.3, 0)
+                    : Offset.zero,
                 duration: const Duration(milliseconds: 350),
                 curve: Curves.easeOutCubic,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(buttonText, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+                    Text(
+                      buttonText,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                     if (!_isRideActive) ...[
                       const SizedBox(width: 8),
-                      const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 18),
+                      const Icon(
+                        Icons.arrow_forward_rounded,
+                        color: Colors.white,
+                        size: 18,
+                      ),
                     ],
                   ],
                 ),
@@ -1491,15 +1501,28 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
               duration: const Duration(milliseconds: 320),
               curve: Curves.easeOut,
               child: AnimatedSlide(
-                offset: _isGroupRidePressed ? Offset.zero : const Offset(-0.2, 0),
+                offset: _isGroupRidePressed
+                    ? Offset.zero
+                    : const Offset(-0.2, 0),
                 duration: const Duration(milliseconds: 380),
                 curve: Curves.easeOutCubic,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(buttonText, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+                    Text(
+                      buttonText,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                     const SizedBox(width: 8),
-                    const Icon(Icons.arrow_forward, color: Colors.white, size: 18),
+                    const Icon(
+                      Icons.arrow_forward,
+                      color: Colors.white,
+                      size: 18,
+                    ),
                   ],
                 ),
               ),
