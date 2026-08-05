@@ -707,7 +707,7 @@ class WeatherSheetContentState extends ConsumerState<WeatherSheetContent> {
   @override
   Widget build(BuildContext context) {
     final tr = widget.tr;
-    final strings = AppStrings(ref.read(appSettingsProvider).locale);
+    final strings = AppStrings(ref.watch(appSettingsProvider).locale);
     final filterText = _normalizeTurkish(_query);
     final isSearching = filterText.isNotEmpty;
 
