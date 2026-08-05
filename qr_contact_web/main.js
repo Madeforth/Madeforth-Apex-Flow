@@ -1,6 +1,6 @@
 import './style.css'
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, addDoc, serverTimestamp, doc, getDoc } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, serverTimestamp, doc, getDoc, onSnapshot } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: "AIzaSyDxClr18Z0pme38vsrs8KWpyIwKfurZ5eE",
@@ -188,6 +188,7 @@ if (!vehicleId) {
       <svg class="success-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
       <div class="title">${t.successTitle}</div>
       <div class="subtitle">${t.successSubtitle}</div>
+      <div id="reply-container"></div>
     </div>
     
     <div class="card error-message" id="error-card" style="display: none; color: var(--accent-color);">
@@ -258,9 +259,10 @@ window.sendNotification = async (reason) => {
       });
       // Update local storage to prevent spam
       localStorage.setItem(`apex_last_sent_${vehicleId}`, Date.now().toString());
-      
+
       mainCard.style.display = 'none';
       successCard.style.display = 'flex';
+      watchForOwnerReply(Date.now());
     } catch (e) {
       console.error("Error adding document: ", e);
       mainCard.style.display = 'none';
@@ -276,7 +278,24 @@ window.sendNotification = async (reason) => {
   }
 };
 
-// Fetch Driver Note if vehicleId exists
+function buildNoteCard(noteText) {
+  const noteCard = document.createElement('div');
+  noteCard.className = 'driver-note-card';
+
+  const noteLabel = document.createElement('div');
+  noteLabel.className = 'driver-note-label';
+  noteLabel.textContent = t.driverNoteLabel;
+
+  const noteBody = document.createElement('div');
+  noteBody.className = 'driver-note-text';
+  noteBody.textContent = `"${noteText}"`;
+
+  noteCard.appendChild(noteLabel);
+  noteCard.appendChild(noteBody);
+  return noteCard;
+}
+
+// Fetch Driver Note if vehicleId exists (pre-send: any note from the last 3h)
 if (vehicleId && db) {
   const noteContainer = document.createElement('div');
   noteContainer.id = 'driver-note-container';
@@ -292,21 +311,29 @@ if (vehicleId && db) {
       const noteAt = data.driverNoteAtIso ? Date.parse(data.driverNoteAtIso) : null;
       const noteIsFresh = noteAt && (Date.now() - noteAt) < 3 * 60 * 60 * 1000;
       if (data.driverNote && noteIsFresh) {
-        const noteCard = document.createElement('div');
-        noteCard.className = 'driver-note-card';
-
-        const noteLabel = document.createElement('div');
-        noteLabel.className = 'driver-note-label';
-        noteLabel.textContent = t.driverNoteLabel;
-
-        const noteText = document.createElement('div');
-        noteText.className = 'driver-note-text';
-        noteText.textContent = `"${data.driverNote}"`;
-
-        noteCard.appendChild(noteLabel);
-        noteCard.appendChild(noteText);
-        noteContainer.replaceChildren(noteCard);
+        noteContainer.replaceChildren(buildNoteCard(data.driverNote));
       }
     }
   }).catch(e => console.log("Error fetching note:", e));
+}
+
+// After sending an alert, live-watch for the owner's reply while the
+// "Notification Sent" screen is showing, so the sender sees it without
+// having to reload the page.
+function watchForOwnerReply(sentAtMs) {
+  if (!db || !vehicleId) return;
+  const replyContainer = document.getElementById('reply-container');
+  if (!replyContainer) return;
+
+  const docRef = doc(db, "rider_tags", vehicleId.toLowerCase());
+  onSnapshot(docRef, (docSnap) => {
+    if (!docSnap.exists()) return;
+    const data = docSnap.data();
+    const noteAt = data.driverNoteAtIso ? Date.parse(data.driverNoteAtIso) : null;
+    // Only show replies written after we sent this alert, so we don't
+    // surface a stale note left over from someone else's earlier scan.
+    if (data.driverNote && noteAt && noteAt >= sentAtMs) {
+      replyContainer.replaceChildren(buildNoteCard(data.driverNote));
+    }
+  }, (e) => console.log("Error watching for reply:", e));
 }
