@@ -25,13 +25,19 @@ Task: user asked for a full-project scan (functional + design bugs), done via 3 
 15. Insights cost ledger no longer shows a hardcoded fake date ("11 Jul 2026") on every entry — `CostEntry` now has a real `dateIso` field
 16. `ServiceRecord.cost`'s currency-blind regex ($/€ treated as TRY) — documented as a known limitation inline, full fix (needs a currency field) explicitly out of scope for this pass
 
-**Not yet done (Group C, tasks #17-20 in the task list):**
-17. `TextEditingController` leaks in Add/Edit Motorcycle bottom sheets (`garage_screen.dart` `_showAddBikeSheet`/`_showEditBikeSheet`) — investigation started, no edit made yet
-18. Short/slow rides silently discarded with no user feedback (`ride_state.dart` `endRide`)
-19. Hardcoded colors bypassing `ApexColors` tokens (Insights screen ~20+ spots, nav bar, 2 spots in garage_screen.dart)
-20. `ApexBreakpoints` defined but unused anywhere (confirmed — `insights_screen.dart` imports it but doesn't use it either, flagged as unused-import by analyze); shell hardcodes 430px instead of `ApexBreakpoints.compact` (420)
+**Done (commits `329e390`, `fa5f2f2`, `bbb33e6`), all verified with `flutter analyze` (0 errors, 324 issues) + `flutter test` (93/93):**
+17. `TextEditingController`s in `_showAddBikeSheet`/`_showEditBikeSheet` (`garage_screen.dart`) now disposed on sheet close (`.then()` for the fire-and-forget add sheet; inline after `await` for the edit sheet).
+18. `RideStateNotifier.endRide()` now returns `bool` (saved/discarded) instead of `void`. All 4 call sites (`rides_screen.dart`, `apex_dashboard_screen.dart`, `group_ride_lobby_screen.dart` x2) now show a snackbar when a ride is silently discarded as too short/slow — previously one group-ride path could show a false "completed" success message even when the ride was discarded internally, and a zero-duration/≤0.05km edge case wasn't covered by any caller's own pre-check.
 
-**Side task, same session:** built a debug APK (`flutter build apk --debug`) and installed it on the user's connected LG G5 (`LGH85092a403f4`, `com.apexflow.app`) for manual testing, at the user's request when they had to leave for work — this used the code state as of commit `f1c0120` (through item #16), items 17-20 not yet included in that install.
+**Skipped, by explicit user decision (not a false positive — deliberately deferred):**
+19. Hardcoded colors bypassing `ApexColors` tokens. Investigation found most of `insights_screen.dart`'s ~90 hardcoded `Color(0xFF...)` values do NOT exactly match `ApexColors.dark`'s hex values (e.g. `0xFF1E293B` vs the token's `0xFF1F2937`) — this looks like a deliberate separate "slate" visual language, not simple oversight, and part of the file also uses a third distinct near-black/OLED palette. Converting either risks a real visual regression with no way to screenshot-verify in this environment. User was asked how to proceed (exact-match-only vs. nearest-token-for-everything vs. skip) and chose **skip for now** — revisit in a session where visual verification (device/emulator) is available. `apex_limelight_navigation_bar.dart:53` and the 2 spots in `garage_screen.dart` are in the same boat, untouched.
+
+**Done (commit `bbb33e6`):**
+20. `apex_app_shell.dart`'s `compactNavigation` now uses `ApexBreakpoints.compact` (420) instead of a hardcoded `430`, resolving the constant/behavior drift. `insights_screen.dart`'s unused `apex_breakpoints.dart` import (no breakpoint logic in that file to wire it to) was removed rather than given speculative usage.
+
+**Second-pass audit is now closed out**: 19 of 20 items fixed and committed; #19 explicitly deferred by user choice, not forgotten — see above for exactly what to ask before touching it again.
+
+**Side task, same session:** built a debug APK (`flutter build apk --debug`) and installed it on the user's connected LG G5 (`LGH85092a403f4`, `com.apexflow.app`) for manual testing, at the user's request when they had to leave for work — this used the code state as of commit `f1c0120` (through item #16 only); items 17/18/20 (post-#16 fixes) are NOT yet on that installed build.
 
 ---
 
@@ -100,9 +106,11 @@ Recorded in case this needs revisiting — e.g. adding the iOS app, redoing perm
 - Skipped by user's choice: "Google developer notifications" (Pub/Sub real-time purchase events) — the topic-ID field requires a pre-existing Pub/Sub topic and the "Connect to Google" button stayed disabled when typing a new name; not investigated further since it's optional.
 
 ## Next Step
-**Immediate**: resume the second-pass bug audit plan at item #17 (`C:\Users\onyed\.claude\plans\stateful-swimming-fern.md` has the full original list; tasks #17-20 above are the live remainder). First re-check `git branch --show-current` — confirm still on `agent/fix-safety-persistence-maps` and whether the other concurrent session added anything new before touching the same files (`garage_screen.dart` for #17, `insights_screen.dart`/`apex_limelight_navigation_bar.dart` for #19, `apex_app_shell.dart` for #20).
+The second-pass bug audit (`C:\Users\onyed\.claude\plans\stateful-swimming-fern.md`) is now closed out: 19/20 fixed and committed, #19 (hardcoded colors bypassing ApexColors in Insights/nav bar/garage) deliberately deferred per user choice — see above for what to ask before resuming it (needs real visual verification, not available this session).
 
-After #17-20: this branch needs to be merged/rebased into `main` at some point (never done this session) — ask the user how they want that handled given the other concurrent session's commit is also on it.
+Two things remain open:
+1. This branch needs to be merged/rebased into `main` at some point (never done this session) — ask the user how they want that handled given the other concurrent session's commit (`8bcf84e`) is also on it.
+2. The LG G5 install (`com.apexflow.app`) only reflects code through commit `f1c0120` (item #16) — items #17/#18/#20's fixes are not on the installed build; rebuild+reinstall if the user wants to test them physically.
 
 Longer-term deferred item (separate from the above): a full `lib/` sweep for unused/dead Dart files (not just assets) — explicitly postponed in an earlier session under a tight time budget, not started.
 
