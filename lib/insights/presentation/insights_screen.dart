@@ -1,5 +1,4 @@
 import 'package:apexflow/core/design/apex_colors.dart';
-import 'package:apexflow/core/design/apex_breakpoints.dart';
 import 'package:apexflow/core/design/apex_spacing.dart';
 import 'package:apexflow/core/i18n/app_strings.dart';
 import 'package:apexflow/insights/application/insights_state.dart';
