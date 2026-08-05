@@ -56,7 +56,6 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
   StreamSubscription<DocumentSnapshot>? _lobbySubscription;
   final TextEditingController _lobbyCodeController = TextEditingController();
   bool _isLoadingLobby = false;
-  bool _isGroupRidePressed = false;
 
   @override
   void initState() {
@@ -1441,97 +1440,28 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
               ? 'Grup Sürüşünü Başlat'
               : (de ? 'Gruppenfahrt starten' : 'Start Group Ride'));
 
-    return GestureDetector(
-      onTapDown: (_) => setState(() => _isGroupRidePressed = true),
-      onTapUp: (_) {
-        Future.delayed(const Duration(milliseconds: 200), () {
-          if (mounted) {
-            _handleGroupRideToggle();
-            Future.delayed(const Duration(milliseconds: 150), () {
-              if (mounted) setState(() => _isGroupRidePressed = false);
-            });
-          }
-        });
+    // Matches the "Send Invite" button's exact style (same screen, just
+    // above) so the two feel like one consistent action group instead of
+    // two different button languages sitting next to each other.
+    return ElevatedButton.icon(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: buttonColor,
+        foregroundColor: Colors.white,
+        elevation: 0,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        padding: const EdgeInsets.symmetric(vertical: 14),
+      ),
+      onPressed: () {
+        HapticFeedback.mediumImpact();
+        _handleGroupRideToggle();
       },
-      onTapCancel: () => setState(() => _isGroupRidePressed = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 420),
-        curve: Curves.easeOutCubic,
-        height: 52,
-        decoration: BoxDecoration(
-          color: buttonColor,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: buttonColor, width: 1),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            AnimatedOpacity(
-              opacity: _isGroupRidePressed ? 0.0 : 1.0,
-              duration: const Duration(milliseconds: 280),
-              child: AnimatedSlide(
-                offset: _isGroupRidePressed
-                    ? const Offset(0.3, 0)
-                    : Offset.zero,
-                duration: const Duration(milliseconds: 350),
-                curve: Curves.easeOutCubic,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      buttonText,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    if (!_isRideActive) ...[
-                      const SizedBox(width: 8),
-                      const Icon(
-                        Icons.arrow_forward_rounded,
-                        color: Colors.white,
-                        size: 18,
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-            ),
-            AnimatedOpacity(
-              opacity: _isGroupRidePressed ? 1.0 : 0.0,
-              duration: const Duration(milliseconds: 320),
-              curve: Curves.easeOut,
-              child: AnimatedSlide(
-                offset: _isGroupRidePressed
-                    ? Offset.zero
-                    : const Offset(-0.2, 0),
-                duration: const Duration(milliseconds: 380),
-                curve: Curves.easeOutCubic,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      buttonText,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    const Icon(
-                      Icons.arrow_forward,
-                      color: Colors.white,
-                      size: 18,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+      icon: Icon(
+        _isRideActive ? Icons.stop_circle_outlined : Icons.play_arrow_rounded,
+        size: 18,
+      ),
+      label: Text(
+        buttonText,
+        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
       ),
     );
   }

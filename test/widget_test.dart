@@ -1,7 +1,6 @@
 import 'package:apexflow/main.dart';
 import 'package:apexflow/onboarding/presentation/onboarding_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:apexflow/settings/application/user_profile_state.dart';
@@ -21,13 +20,15 @@ Future<void> _completeOnboarding(WidgetTester tester) async {
   final element = tester.element(find.byType(MaterialApp));
   final container = ProviderScope.containerOf(element);
   if (container.read(garageStateProvider).motorcycles.isEmpty) {
-    container.read(garageStateProvider.notifier).addMotorcycle(
-      name: 'NIGHT VECTOR',
-      model: 'Yamaha MT-07',
-      odometerKm: 18420,
-      lastServiceKm: 18000,
-      serviceIntervalKm: 5000,
-    );
+    container
+        .read(garageStateProvider.notifier)
+        .addMotorcycle(
+          name: 'NIGHT VECTOR',
+          model: 'Yamaha MT-07',
+          odometerKm: 18420,
+          lastServiceKm: 18000,
+          serviceIntervalKm: 5000,
+        );
   }
   container.read(appSettingsProvider.notifier).completeOnboarding();
   await tester.pumpAndSettle();
@@ -438,12 +439,7 @@ void main() {
     await tester.drag(lobbyList, const Offset(0, -600));
     await tester.pumpAndSettle();
 
-    final detectorFinder = find.ancestor(
-      of: find.text('Start Group Ride').first,
-      matching: find.byType(GestureDetector),
-    );
-    final detector = tester.widget<GestureDetector>(detectorFinder);
-    detector.onTapUp!(TapUpDetails(kind: PointerDeviceKind.touch));
+    await tester.tap(find.text('Start Group Ride').first);
     await tester.pump(const Duration(seconds: 1));
     await tester.pumpAndSettle();
 
