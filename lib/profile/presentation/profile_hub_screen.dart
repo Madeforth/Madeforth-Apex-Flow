@@ -95,7 +95,7 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                     top: 72, // 16 top + 38 height + 18 spacing
                     left: ApexSpacing.x2,
                     right: ApexSpacing.x2,
-                    bottom: ApexSpacing.x1,
+                    bottom: 80,
                   ),
                   children: [
                     // Scrollable Top Bar
@@ -3318,7 +3318,7 @@ class _FriendsListState extends ConsumerState<_FriendsList> {
         top: widget.topPadding + 12,
         left: 16,
         right: 16,
-        bottom: 12,
+        bottom: 80,
       ),
       children: [
         // Friends Title & Badge Count
@@ -4221,7 +4221,7 @@ class _LeaderboardListState extends State<_LeaderboardList> {
         top: widget.topPadding + 8,
         left: 16,
         right: 16,
-        bottom: 8,
+        bottom: 80,
       ),
       children: [
         // Header

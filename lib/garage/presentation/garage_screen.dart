@@ -801,7 +801,7 @@ void _showEditIntervalDialog(
                           Navigator.pop(context);
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF06B6D4),
+                          backgroundColor: context.colors.cyan,
                           foregroundColor: Colors.black,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(6),
@@ -1661,11 +1661,15 @@ class _MotorcycleRow extends StatelessWidget {
                 children: [
                   Text(
                     bike.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(fontWeight: FontWeight.w800),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     bike.model,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       color: context.colors.textSecondary,
                       fontSize: 12,

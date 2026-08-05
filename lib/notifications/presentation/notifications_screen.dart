@@ -152,7 +152,7 @@ class NotificationsScreen extends ConsumerWidget {
               child: notifications.isEmpty
                   ? _EmptyState(tr: tr)
                   : ListView.separated(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      padding: const EdgeInsets.fromLTRB(0, 8, 0, 96),
                       itemCount: notifications.length,
                       separatorBuilder: (_, __) => Divider(
                         color: context.colors.border,
