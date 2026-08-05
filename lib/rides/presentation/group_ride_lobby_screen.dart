@@ -381,6 +381,7 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
     };
 
     await FirebaseService.instance.joinLobby(targetLobbyId, myProfileMap);
+    if (!mounted) return;
 
     setState(() {
       _activeLobbyId = targetLobbyId;
@@ -1299,6 +1300,7 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
                                   builder: (context) => MapPickerDialog(tr: tr),
                                 ),
                               );
+                              if (!mounted) return;
                               if (result != null) {
                                 setState(() {
                                   _meetingPoint = result;

@@ -1,5 +1,6 @@
 import 'package:apexflow/core/design/apex_colors.dart';
 import 'package:apexflow/core/design/apex_spacing.dart';
+import 'package:apexflow/core/i18n/app_settings_state.dart';
 import 'package:apexflow/core/i18n/app_strings.dart';
 import 'package:apexflow/insights/application/insights_state.dart';
 import 'package:apexflow/garage/application/garage_state.dart';
@@ -29,6 +30,7 @@ class InsightsScreen extends ConsumerWidget {
     final garageState = ref.watch(garageStateProvider);
     final dashboard = ref.watch(dashboardStateProvider);
     final rideState = ref.watch(rideStateProvider);
+    final currencySymbol = ref.watch(appSettingsProvider).currencySymbol;
     final tr = strings.locale.languageCode == 'tr';
 
     return Scaffold(
@@ -263,7 +265,8 @@ class InsightsScreen extends ConsumerWidget {
                       'Total recorded',
                       'Insgesamt erfasst',
                     ),
-                    value: '₺${state.totalCostTry.toStringAsFixed(0)}',
+                    value:
+                        '$currencySymbol${state.totalCostTry.toStringAsFixed(0)}',
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -402,6 +405,7 @@ class InsightsScreen extends ConsumerWidget {
                         _WishlistRow(
                           part: part,
                           tr: tr,
+                          currencySymbol: currencySymbol,
                           onDelete: () {
                             ref
                                 .read(insightsStateProvider.notifier)
@@ -1489,6 +1493,7 @@ class _CostLedgerCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final currencySymbol = ref.watch(appSettingsProvider).currencySymbol;
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFF0A0A0A),
@@ -1523,7 +1528,7 @@ class _CostLedgerCard extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '₺${state.totalCostTry.toStringAsFixed(0)}',
+                        '$currencySymbol${state.totalCostTry.toStringAsFixed(0)}',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 20,
@@ -1547,7 +1552,8 @@ class _CostLedgerCard extends ConsumerWidget {
                   ),
                 ),
                 GestureDetector(
-                  onTap: () => _showLedgerSheet(context, state, tr),
+                  onTap: () =>
+                      _showLedgerSheet(context, state, tr, currencySymbol),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12,
@@ -1637,7 +1643,7 @@ class _CostLedgerCard extends ConsumerWidget {
                           ),
                         ),
                         Text(
-                          '₺${entry.amountTry.toStringAsFixed(0)}',
+                          '$currencySymbol${entry.amountTry.toStringAsFixed(0)}',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 14,
@@ -1705,7 +1711,12 @@ void _showSnack(BuildContext context, String msg) {
 }
 
 // Cost ledger bottom sheet — shows all entries
-void _showLedgerSheet(BuildContext context, InsightsState state, bool tr) {
+void _showLedgerSheet(
+  BuildContext context,
+  InsightsState state,
+  bool tr,
+  String currencySymbol,
+) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -1767,7 +1778,7 @@ void _showLedgerSheet(BuildContext context, InsightsState state, bool tr) {
                       ),
                       const Spacer(),
                       Text(
-                        '₺${state.totalCostTry.toStringAsFixed(0)}',
+                        '$currencySymbol${state.totalCostTry.toStringAsFixed(0)}',
                         style: const TextStyle(
                           color: Color(0xFF06B6D4),
                           fontSize: 15,
@@ -1837,7 +1848,7 @@ void _showLedgerSheet(BuildContext context, InsightsState state, bool tr) {
                                 ),
                               ),
                               trailing: Text(
-                                '₺${e.amountTry.toStringAsFixed(0)}',
+                                '$currencySymbol${e.amountTry.toStringAsFixed(0)}',
                                 style: const TextStyle(
                                   color: Color(0xFFF5F5F5),
                                   fontSize: 14,
@@ -1863,6 +1874,7 @@ Future<void> _showAddCostSheet(
   WidgetRef ref,
   AppStrings strings,
 ) async {
+  final currencySymbol = ref.read(appSettingsProvider).currencySymbol;
   final descCtrl = TextEditingController();
   final amountCtrl = TextEditingController();
   String selectedCategory = 'Fuel';
@@ -2034,10 +2046,10 @@ Future<void> _showAddCostSheet(
                     ),
                     decoration: InputDecoration(
                       hintText:
-                          '${tInline(AppStrings.currentLanguageCode, 'Tutar', 'Amount', 'Betrag')} (₺)',
+                          '${tInline(AppStrings.currentLanguageCode, 'Tutar', 'Amount', 'Betrag')} ($currencySymbol)',
                       filled: true,
                       fillColor: Color(0xFF0A0A0A),
-                      prefixText: '₺ ',
+                      prefixText: '$currencySymbol ',
                       prefixStyle: TextStyle(
                         color: Color(0xFF06B6D4),
                         fontWeight: FontWeight.w700,
@@ -2200,11 +2212,13 @@ class _WishlistRow extends StatelessWidget {
     required this.part,
     required this.tr,
     required this.onDelete,
+    required this.currencySymbol,
   });
 
   final WishlistPart part;
   final bool tr;
   final VoidCallback onDelete;
+  final String currencySymbol;
 
   @override
   Widget build(BuildContext context) {
@@ -2242,7 +2256,7 @@ class _WishlistRow extends StatelessWidget {
           ),
           if (part.priceTry != null && part.priceTry! > 0) ...[
             Text(
-              '₺${part.priceTry!.toStringAsFixed(0)}',
+              '$currencySymbol${part.priceTry!.toStringAsFixed(0)}',
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,

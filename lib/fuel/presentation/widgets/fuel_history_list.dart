@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:apexflow/core/design/apex_theme.dart';
 import 'package:apexflow/core/design/apex_spacing.dart';
+import 'package:apexflow/core/i18n/app_settings_state.dart';
 import 'package:apexflow/core/i18n/app_strings.dart';
 import 'package:apexflow/fuel/application/fuel_state.dart';
 import 'package:intl/intl.dart';
@@ -16,6 +17,7 @@ class FuelHistoryList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(fuelStateProvider);
+    final currencySymbol = ref.watch(appSettingsProvider).currencySymbol;
     final tr = strings.locale.languageCode == 'tr';
 
     final ranges = [
@@ -126,7 +128,11 @@ class FuelHistoryList extends ConsumerWidget {
                 Divider(color: context.colors.border, height: 24),
             itemBuilder: (context, index) {
               final entry = entries[index];
-              return _FuelHistoryItem(entry: entry, strings: strings);
+              return _FuelHistoryItem(
+                entry: entry,
+                strings: strings,
+                currencySymbol: currencySymbol,
+              );
             },
           ),
       ],
@@ -135,10 +141,15 @@ class FuelHistoryList extends ConsumerWidget {
 }
 
 class _FuelHistoryItem extends StatelessWidget {
-  const _FuelHistoryItem({required this.entry, required this.strings});
+  const _FuelHistoryItem({
+    required this.entry,
+    required this.strings,
+    required this.currencySymbol,
+  });
 
   final FuelEntry entry;
   final AppStrings strings;
+  final String currencySymbol;
 
   @override
   Widget build(BuildContext context) {
@@ -187,7 +198,7 @@ class _FuelHistoryItem extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    '${entry.totalTry.toStringAsFixed(2)} ₺',
+                    '${entry.totalTry.toStringAsFixed(2)} $currencySymbol',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
