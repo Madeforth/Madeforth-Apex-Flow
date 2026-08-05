@@ -2,7 +2,26 @@
 
 ## Current Task
 
-**2026-08-05, THIS session — second-pass bug audit, in progress on branch `agent/fix-safety-persistence-maps` (not `main`):**
+**2026-08-05, THIRD-PASS audit — park/QR system + i18n + layout, DONE, branch `agent/fix-safety-persistence-maps`:**
+User asked specifically for a deep audit of: the parking-warning/QR-contact system (`qr_contact_web/` + Firestore), in-app QR generation/scanning, app-wide design/workflow bugs, and i18n/language inconsistencies. 3 parallel Explore agents scanned each area; the most critical findings were verified directly in code before fixing (`smart_park_alert_handler_screen.dart`, `global_notification_overlay.dart`, `parking_notification_state.dart`, `qr_contact_web/main.js`, `firestore.rules`, `qr_scanner_screen.dart`, `main.dart`, `AndroidManifest.xml`). Plan at `C:\Users\onyed\.claude\plans\stateful-swimming-fern.md` (overwrote the prior 20-item plan — that one's done). All 24 items (A1-A10, B1-B10, C1-C3) fixed and committed across 8 commits (`0770a74`, `992f090`, `71d1e3e`, `6d3f6c3`, `2dd4c0e`, `3cb3d46`, `1d680a6`, plus the profile_hub tag-warning edit folded into `71d1e3e`), each verified with `flutter analyze` (0 errors, 324 issues) + `flutter test` (93/93).
+
+**Highest-severity fix (A1)**: the in-app QR-scan "Send Smart Park Alert" flow (`smart_park_alert_handler_screen.dart`) previously only fired a *local* notification on the scanning device and then displayed "Notification sent successfully to the owner!" — a direct violation of CLAUDE.md's "do not show success before durable completion" invariant, since the owner received literally nothing. Fixed by writing to the real `parking_notifications` Firestore collection (same one `qr_contact_web/main.js` already used), reusing existing rules/stream-provider infra — no new backend needed.
+
+**Other real fixes worth remembering**:
+- `reason` sent to Firestore is now a translation key (`blocked`/`fallen`/`crash`/`towed`) instead of raw Turkish text, mapped to 3 languages in `global_notification_overlay.dart` (fallback to raw text for legacy docs).
+- `firestore.rules` now requires `parking_notifications.vehicleId` to reference an existing `rider_tags` doc via `exists()` — **prepared but NOT deployed this session** (no local Firestore emulator; user must verify in Rules Playground before `firebase deploy --only firestore:rules`).
+- `replyToNotification` wrapped in try/catch; the full-screen parking-alert overlay gained a "Not Now" local-dismiss so a failed/offline write can no longer trap the user behind an unclosable overlay.
+- `driverNote` now timestamped and expires after ~3h in the web view (was showing indefinitely / cross-contaminating between unrelated alerts).
+- QR scanner (`qr_scanner_screen.dart`) tightened to require the real host before routing into the alert flow (was matching bare `?id=`), added `mounted` guards, replaced raw exception text with friendly translated errors.
+- Currency displays (Insights, Fuel history, wishlist, manual cost entry) now use `AppSettingsState.currencySymbol` instead of hardcoded `₺` — this field already existed and auto-detected from device locale, it just wasn't wired to these screens.
+- **Explicitly investigated and confirmed NOT a bug**: the TR/EU accident-report wizards' hardcoded language (Turkish KTT form vs. English EU accident statement) — these are jurisdiction-locked official legal documents, correctly independent of the app's UI language setting. User confirmed this reading before any plan was finalized.
+- Item **#19 from the prior pass (hardcoded colors bypassing ApexColors in Insights) remains deferred** — same reasoning applies to a new batch of similar findings from this pass (nav bar color duplicated across ~10 files, a "wrong cyan" `0xFF0EA5E9` used ~15 places, `profile_hub_screen.dart`'s own slate palette) — all explicitly left untouched pending a session with real visual verification (device/emulator screenshots), not guessed at.
+
+**Deferred, larger-scope items (not bugs to silently carry, but out of this pass's scope by design):** real FCM push notifications for parking alerts when the owner's app is backgrounded/killed (needs a Cloud Function trigger — new server infra); notification dedup/local history; AndroidManifest App Links host correction + `assetlinks.json` hosting-side verification for the QR deep link (`main.dart`'s handler now reads both `rider` and `id` params defensively, but is still unreachable until the manifest/hosting side is fixed, which needs the user's own action).
+
+---
+
+**2026-08-05, second-pass bug audit — DONE (19/20, #19 deferred), branch `agent/fix-safety-persistence-maps`:**
 Mid-session discovery: the working directory was found checked out to `agent/fix-safety-persistence-maps` instead of `main`, with a commit (`8bcf84e`) from what appears to be a **different, concurrent Claude Code session/window** working in this same repo directory (see the line below this one — that's its own note about its own commit, left as-is). Confirmed no file/content conflicts before continuing; user was asked and explicitly said to continue on this branch rather than move to `main`. **Before merging this branch to `main`, re-verify no further divergence happened from that other session.**
 
 Task: user asked for a full-project scan (functional + design bugs), done via 3 parallel Explore agents (`isolation: "worktree"`) covering (a) core/services/storage/sync/settings/profile/onboarding/notifications, (b) garage/rides/rituals/harmony_engine/fuel/shared, (c) documents/insights/dashboard/features + design tokens. Plan approved via ExitPlanMode, saved at `C:\Users\onyed\.claude\plans\stateful-swimming-fern.md`. 20 findings total; **every finding was spot-checked directly in code before any fix was applied** (not blindly trusted) — this caught 2 false positives from the Explore agents (item #7 Insights cost-entry — already correctly implemented, turned out to be the *other concurrent session's* `8bcf84e` fix, which is why it looked "already fixed" when checked; item #12 addServiceRecord/lastServiceKm — the agent misunderstood `type: 'diy'` as "non-service", but it means rider-self-performed service, a real service event, so the flagged behavior is actually correct).
@@ -106,11 +125,13 @@ Recorded in case this needs revisiting — e.g. adding the iOS app, redoing perm
 - Skipped by user's choice: "Google developer notifications" (Pub/Sub real-time purchase events) — the topic-ID field requires a pre-existing Pub/Sub topic and the "Connect to Google" button stayed disabled when typing a new name; not investigated further since it's optional.
 
 ## Next Step
-The second-pass bug audit (`C:\Users\onyed\.claude\plans\stateful-swimming-fern.md`) is now closed out: 19/20 fixed and committed, #19 (hardcoded colors bypassing ApexColors in Insights/nav bar/garage) deliberately deferred per user choice — see above for what to ask before resuming it (needs real visual verification, not available this session).
+Both the second-pass (19/20) and third-pass (24/24) audits are closed out on `agent/fix-safety-persistence-maps`. Two color/design-token findings remain deliberately deferred (prior #19 in Insights, plus this pass's nav-bar-color/wrong-cyan/profile_hub-slate findings) — both need real visual verification (device/emulator) not available in this environment; do not guess-fix them without that.
 
-Two things remain open:
+Remaining open items:
 1. This branch needs to be merged/rebased into `main` at some point (never done this session) — ask the user how they want that handled given the other concurrent session's commit (`8bcf84e`) is also on it.
-2. The LG G5 install (`com.apexflow.app`) only reflects code through commit `f1c0120` (item #16) — items #17/#18/#20's fixes are not on the installed build; rebuild+reinstall if the user wants to test them physically.
+2. `firestore.rules`' new `exists()` check on `parking_notifications` create (this pass's A3) is prepared but **not deployed** — needs Rules Playground verification first, same caveat as the earlier `firestore.rules` changes (no local Java 21+ for the emulator).
+3. The LG G5 install (`com.apexflow.app`) only reflects code through commit `f1c0120` (second-pass item #16) — none of this session's later fixes (second-pass #17-20, all of third-pass A/B/C) are on the installed build; rebuild+reinstall if the user wants to test them physically.
+4. Real FCM push notifications for parking alerts (owner's app backgrounded/killed) is a known, explicitly out-of-scope gap — needs a Cloud Function trigger, new server-side work, not a quick fix.
 
 Longer-term deferred item (separate from the above): a full `lib/` sweep for unused/dead Dart files (not just assets) — explicitly postponed in an earlier session under a tight time budget, not started.
 

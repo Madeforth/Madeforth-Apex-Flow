@@ -2,6 +2,17 @@
 
 Status recorded 2026-08-04, from repo inspection (not from README claims alone unless marked as such).
 
+## 2026-08-05 — Third-Pass Audit: Parking/QR System + i18n + Layout (24/24 done, on branch `agent/fix-safety-persistence-maps`)
+User asked for a deep audit specifically of the parking-warning/QR-contact system (`qr_contact_web/` + Firestore), QR generation/scanning, and app-wide i18n/layout inconsistencies. 3 parallel Explore agents scanned each area; critical findings verified directly in code. Plan at `C:\Users\onyed\.claude\plans\stateful-swimming-fern.md` (replaced the prior 20-item plan file). All 24 items fixed and committed across 8 commits (`0770a74`, `992f090`, `71d1e3e`, `6d3f6c3`, `2dd4c0e`, `3cb3d46`, `1d680a6`).
+
+**Most important fix**: the in-app QR-scan "Send Smart Park Alert" flow only posted a local notification on the scanning device while claiming "Notification sent successfully to the owner!" — the owner received nothing. Now writes to the real `parking_notifications` Firestore collection (same infra `qr_contact_web/main.js` already used). See `activeContext.md` for the full list of related fixes (reason-key translation, `firestore.rules` ownership check — prepared, **not deployed**, ties to notification delivery integrity, currency-symbol correctness, QR-scanner host-matching, bottom-nav clearance, etc.).
+
+**Confirmed not a bug** (investigated, user concurred): TR/EU accident-report wizard hardcoded language — these are jurisdiction-locked legal document formats, correctly independent of app UI language.
+
+**Deferred, needs real visual verification**: a second batch of hardcoded-color findings (nav bar color duplicated ~10x, a "wrong cyan" `0xFF0EA5E9` used ~15 places, `profile_hub_screen.dart`'s own slate palette) — same reasoning as the prior pass's #19, explicitly left untouched.
+
+**Deferred, needs bigger infra**: real FCM push for parking alerts when the owner's app is backgrounded (needs a Cloud Function trigger — new server-side work, not in scope for a bug-fix pass).
+
 ## 2026-08-05 — Second-Pass Bug Audit (19/20 done, 1 deliberately deferred, on branch `agent/fix-safety-persistence-maps`)
 Full-project scan (3 parallel Explore agents + direct code verification of every finding before fixing) found 20 issues beyond the original 6-item list. Plan at `C:\Users\onyed\.claude\plans\stateful-swimming-fern.md`. Items #1-18 and #20 fixed and committed (`134c2f2`, `f1c0120`, `329e390`, `fa5f2f2`, `bbb33e6`). Item #19 (hardcoded colors bypassing ApexColors tokens in Insights/nav bar/garage) was investigated but not changed — most of the hardcoded hex values do not exactly match `ApexColors.dark`, suggesting a deliberate separate "slate" visual language rather than an oversight; converting risks a real visual regression with no way to screenshot-verify in this environment. User was asked and chose to defer it to a session with visual verification available — see `activeContext.md` for the exact options presented. Two findings (#7, #12) were investigated earlier and found to be false positives — no change made, documented in `activeContext.md` rather than "fixed."
 
