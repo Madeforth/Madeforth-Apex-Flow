@@ -1,4 +1,4 @@
-﻿import 'dart:ui';
+import 'dart:ui';
 import 'package:apexflow/rides/presentation/widgets/start_ride_sheet.dart';
 import 'package:apexflow/rituals/application/rituals_state.dart';
 import 'package:apexflow/rituals/presentation/ride_readiness_screen.dart';
@@ -670,7 +670,7 @@ class _StartRidePanelState extends ConsumerState<_StartRidePanel> {
             'Fahrt starten',
           ),
           activeColor: const Color(0xFFEF4444),
-          inactiveColor: const Color(0xFF0EA5E9),
+          inactiveColor: context.colors.cyan,
           inactiveIcon: Icons.arrow_forward_rounded,
           onTap: isActive ? widget.onEnd : widget.onStart,
         ),
@@ -1108,7 +1108,7 @@ class _StatRowMini extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: const Color(0xFF0EA5E9), size: 18),
+          Icon(icon, color: context.colors.cyan, size: 18),
           const SizedBox(width: 8),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1137,7 +1137,9 @@ class _MiniRouteGraphPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFF0EA5E9)
+      // CustomPainter has no BuildContext, so this can't reference the
+      // theme token directly — kept in sync with ApexColors.dark.cyan.
+      ..color = const Color(0xFF06B6D4)
       ..strokeWidth = 3
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
@@ -1344,16 +1346,16 @@ class _RideMemoryPanel extends StatelessWidget {
                           'View all rides',
                           'Alle Fahrten anzeigen',
                         ),
-                        style: const TextStyle(
-                          color: Color(0xFF0EA5E9),
+                        style: TextStyle(
+                          color: context.colors.cyan,
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                       const SizedBox(width: 4),
-                      const Icon(
+                      Icon(
                         Icons.chevron_right,
-                        color: Color(0xFF0EA5E9),
+                        color: context.colors.cyan,
                         size: 16,
                       ),
                     ],
@@ -1406,7 +1408,7 @@ class _RideMemoryRow extends StatelessWidget {
             // Left Cyan Border Indicator
             Container(
               width: 3,
-              color: isFirst ? const Color(0xFF0EA5E9) : Colors.transparent,
+              color: isFirst ? context.colors.cyan : Colors.transparent,
             ),
             Expanded(
               child: Padding(
@@ -1425,9 +1427,9 @@ class _RideMemoryRow extends StatelessWidget {
                           color: Colors.white.withValues(alpha: 0.05),
                         ),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.route_outlined,
-                        color: Color(0xFF0EA5E9),
+                        color: context.colors.cyan,
                         size: 16,
                       ),
                     ),
@@ -2058,14 +2060,12 @@ class AllRidesScreen extends ConsumerWidget {
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: const Color(
-                                0xFF0EA5E9,
-                              ).withValues(alpha: 0.1),
+                              color: context.colors.cyan.withValues(alpha: 0.1),
                               shape: BoxShape.circle,
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.route_outlined,
-                              color: Color(0xFF0EA5E9),
+                              color: context.colors.cyan,
                               size: 24,
                             ),
                           ),

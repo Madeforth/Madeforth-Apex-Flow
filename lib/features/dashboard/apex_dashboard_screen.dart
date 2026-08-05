@@ -1,4 +1,4 @@
-import 'dart:math' as math;
+﻿import 'dart:math' as math;
 import 'package:apexflow/rides/presentation/widgets/start_ride_sheet.dart';
 import 'package:apexflow/core/design/apex_colors.dart';
 import 'package:apexflow/core/design/apex_breakpoints.dart';
@@ -766,7 +766,7 @@ class _StartRideActionState extends State<_StartRideAction>
   Widget build(BuildContext context) {
     final buttonColor = widget.isRideActive
         ? const Color(0xFFEF4444)
-        : const Color(0xFF0EA5E9);
+        : context.colors.cyan;
 
     final buttonText = widget.isRideActive
         ? widget.strings.t(

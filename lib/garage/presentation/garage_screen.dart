@@ -3861,8 +3861,8 @@ class _CostAnalyticsPanelInner extends ConsumerWidget {
                       const SizedBox(height: 16),
                       Text(
                         '${totalService.toStringAsFixed(0)} TL',
-                        style: const TextStyle(
-                          color: Color(0xFF0EA5E9),
+                        style: TextStyle(
+                          color: context.colors.cyan,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
@@ -3929,7 +3929,7 @@ class _CostAnalyticsPanelInner extends ConsumerWidget {
                   ),
                   const SizedBox(width: 16),
                   _LegendItem(
-                    color: const Color(0xFF0EA5E9),
+                    color: context.colors.cyan,
                     label: tr
                         ? 'Bakım'
                         : (AppStrings.currentLanguageCode == 'de'

@@ -1,4 +1,4 @@
-import 'dart:ui' as ui;
+﻿import 'dart:ui' as ui;
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
@@ -896,7 +896,7 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
                               flex: 3,
                               child: ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF0EA5E9),
+                                  backgroundColor: context.colors.cyan,
                                   foregroundColor: Colors.white,
                                   elevation: 0,
                                   shape: RoundedRectangleBorder(
@@ -955,7 +955,7 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
                             vertical: 2,
                           ),
                           collapsedIconColor: Colors.white54,
-                          iconColor: const Color(0xFF0EA5E9),
+                          iconColor: context.colors.cyan,
                           title: Text(
                             tr
                                 ? 'Arkadaşlardan Davet Et (${friends.length})'
@@ -1000,9 +1000,9 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
                                 ),
                               ),
                               trailing: IconButton(
-                                icon: const Icon(
+                                icon: Icon(
                                   Icons.send,
-                                  color: Color(0xFF0EA5E9),
+                                  color: context.colors.cyan,
                                   size: 18,
                                 ),
                                 onPressed: () {
@@ -1064,9 +1064,9 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
                                 enabledBorder: const UnderlineInputBorder(
                                   borderSide: BorderSide(color: Colors.white24),
                                 ),
-                                focusedBorder: const UnderlineInputBorder(
+                                focusedBorder: UnderlineInputBorder(
                                   borderSide: BorderSide(
-                                    color: Color(0xFF0EA5E9),
+                                    color: context.colors.cyan,
                                   ),
                                 ),
                               ),
@@ -1103,9 +1103,7 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
                                   tr
                                       ? 'QR Okut'
                                       : (de ? 'QR scannen' : 'Scan QR'),
-                                  style: const TextStyle(
-                                    color: Color(0xFF0EA5E9),
-                                  ),
+                                  style: TextStyle(color: context.colors.cyan),
                                 ),
                               ),
                               TextButton(
@@ -1117,9 +1115,7 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
                                 },
                                 child: Text(
                                   tr ? 'Katıl' : (de ? 'Beitreten' : 'Join'),
-                                  style: const TextStyle(
-                                    color: Color(0xFF0EA5E9),
-                                  ),
+                                  style: TextStyle(color: context.colors.cyan),
                                 ),
                               ),
                             ],
@@ -1437,7 +1433,7 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
           ? 'Grup Sürüşünü Başlat'
           : (de ? 'Gruppenfahrt starten' : 'Start Group Ride'),
       activeColor: const Color(0xFFEF4444),
-      inactiveColor: const Color(0xFF0EA5E9),
+      inactiveColor: context.colors.cyan,
       inactiveIcon: Icons.arrow_forward_rounded,
       height: 52,
       onTap: () {
