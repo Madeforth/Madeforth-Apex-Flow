@@ -1949,6 +1949,24 @@ class RiderIdCard extends StatelessWidget {
                                         'maintenance_master') {
                                       icon = PhosphorIconsFill.wrench;
                                       bg = Colors.teal;
+                                    } else if (badgeId == 'discovery_compass') {
+                                      icon = PhosphorIconsFill.compass;
+                                      bg = Colors.lightBlue;
+                                    } else if (badgeId == 'regular_rider') {
+                                      icon = PhosphorIconsFill.calendarBlank;
+                                      bg = Colors.deepPurple;
+                                    } else if (badgeId == 'safe_start') {
+                                      icon = PhosphorIconsFill.shieldCheck;
+                                      bg = Colors.green;
+                                    } else if (badgeId == 'community_support') {
+                                      icon = PhosphorIconsFill.usersThree;
+                                      bg = Colors.pink;
+                                    } else if (badgeId == 'sunrise_route') {
+                                      icon = PhosphorIconsFill.sun;
+                                      bg = Colors.deepOrange;
+                                    } else if (badgeId == 'ride_log') {
+                                      icon = PhosphorIconsFill.notebook;
+                                      bg = Colors.brown;
                                     }
 
                                     return Container(
@@ -8428,8 +8446,9 @@ class _ProfileAppearanceScreenState
                                 ),
                               ),
                             Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.start,
                               children: [
+                                const SizedBox(height: 10),
                                 Icon(
                                   badge['icon'] as IconData,
                                   size: 24,
