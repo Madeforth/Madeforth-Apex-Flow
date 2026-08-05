@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-enum AchievementRewardType {
-  badge,
-  ridingStyle,
-  premiumVault,
-  none,
-}
+enum AchievementRewardType { badge, ridingStyle, premiumVault, none }
 
 class AchievementReward {
   final AchievementRewardType type;
@@ -39,8 +35,9 @@ class ApexAchievement {
   final String descriptionTr;
   final String descriptionEn;
   final String descriptionDe;
-  final String icon;
-  final String category; // 'all', 'km', 'ride', 'maintenance', 'harmony', 'social'
+  final IconData icon;
+  final String
+  category; // 'all', 'km', 'ride', 'maintenance', 'harmony', 'social'
   final int requiredCount;
   final AchievementReward reward;
   final int xpReward;
@@ -89,9 +86,46 @@ class AchievementCatalog {
 
     // 1. KM CATEGORY (40 Achievements)
     final kmMilestones = [
-      10, 25, 50, 100, 200, 300, 500, 750, 1000, 1500, 2000, 2500, 3000, 4000, 5000,
-      6000, 7000, 8000, 9000, 10000, 12000, 15000, 20000, 25000, 30000, 40000, 50000,
-      60000, 70000, 80000, 90000, 100000, 120000, 150000, 200000, 250000, 300000, 400000, 500000, 1000000
+      10,
+      25,
+      50,
+      100,
+      200,
+      300,
+      500,
+      750,
+      1000,
+      1500,
+      2000,
+      2500,
+      3000,
+      4000,
+      5000,
+      6000,
+      7000,
+      8000,
+      9000,
+      10000,
+      12000,
+      15000,
+      20000,
+      25000,
+      30000,
+      40000,
+      50000,
+      60000,
+      70000,
+      80000,
+      90000,
+      100000,
+      120000,
+      150000,
+      200000,
+      250000,
+      300000,
+      400000,
+      500000,
+      1000000,
     ];
     for (int i = 0; i < kmMilestones.length; i++) {
       final km = kmMilestones[i];
@@ -130,30 +164,79 @@ class AchievementCatalog {
       }
 
       int xp = 50 + (i * 25);
-      if (km >= 100000) xp = 1500;
-      else if (km >= 10000) xp = 800;
-      else if (km >= 1000) xp = 300;
+      if (km >= 100000)
+        xp = 1500;
+      else if (km >= 10000)
+        xp = 800;
+      else if (km >= 1000)
+        xp = 300;
 
-      list.add(ApexAchievement(
-        id: 'km_$km',
-        titleTr: '$km KM Sürücüsü',
-        titleEn: '$km KM Rider',
-        titleDe: '$km KM Fahrer',
-        descriptionTr: 'Toplamda $km kilometre mesafe kat et.',
-        descriptionEn: 'Cover a total distance of $km kilometers.',
-        descriptionDe: 'Laufe insgesamt $km Kilometer.',
-        icon: km >= 100000 ? '👑' : (km >= 10000 ? '🏆' : (km >= 1000 ? '⚡' : '🛣️')),
-        category: 'km',
-        requiredCount: km,
-        reward: reward,
-        xpReward: xp,
-      ));
+      list.add(
+        ApexAchievement(
+          id: 'km_$km',
+          titleTr: '$km KM Sürücüsü',
+          titleEn: '$km KM Rider',
+          titleDe: '$km KM Fahrer',
+          descriptionTr: 'Toplamda $km kilometre mesafe kat et.',
+          descriptionEn: 'Cover a total distance of $km kilometers.',
+          descriptionDe: 'Laufe insgesamt $km Kilometer.',
+          icon: km >= 100000
+              ? PhosphorIconsFill.crown
+              : (km >= 10000
+                    ? PhosphorIconsFill.trophy
+                    : (km >= 1000
+                          ? PhosphorIconsFill.lightning
+                          : PhosphorIconsFill.roadHorizon)),
+          category: 'km',
+          requiredCount: km,
+          reward: reward,
+          xpReward: xp,
+        ),
+      );
     }
 
     // 2. RIDE COUNT CATEGORY (40 Achievements)
     final rideMilestones = [
-      1, 3, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200,
-      250, 300, 350, 400, 450, 500, 600, 700, 800, 900, 1000, 1200, 1500, 2000, 2500, 3000, 4000, 5000, 7500, 10000
+      1,
+      3,
+      5,
+      10,
+      15,
+      20,
+      25,
+      30,
+      40,
+      50,
+      60,
+      70,
+      80,
+      90,
+      100,
+      120,
+      140,
+      160,
+      180,
+      200,
+      250,
+      300,
+      350,
+      400,
+      450,
+      500,
+      600,
+      700,
+      800,
+      900,
+      1000,
+      1200,
+      1500,
+      2000,
+      2500,
+      3000,
+      4000,
+      5000,
+      7500,
+      10000,
     ];
     for (int i = 0; i < rideMilestones.length; i++) {
       final count = rideMilestones[i];
@@ -200,29 +283,75 @@ class AchievementCatalog {
       }
 
       int xp = 40 + (i * 20);
-      if (count >= 1000) xp = 1200;
-      else if (count >= 100) xp = 500;
+      if (count >= 1000)
+        xp = 1200;
+      else if (count >= 100)
+        xp = 500;
 
-      list.add(ApexAchievement(
-        id: 'ride_count_$count',
-        titleTr: '$count. Sürüş Kaydı',
-        titleEn: '$count Rides Logged',
-        titleDe: '$count Fahrten Erfasst',
-        descriptionTr: 'Toplam $count adet sürüş oturumu tamamla.',
-        descriptionEn: 'Complete a total of $count ride sessions.',
-        descriptionDe: 'Absolviere insgesamt $count Fahrten.',
-        icon: count >= 1000 ? '🥇' : (count >= 100 ? '🏁' : '🏍️'),
-        category: 'ride',
-        requiredCount: count,
-        reward: reward,
-        xpReward: xp,
-      ));
+      list.add(
+        ApexAchievement(
+          id: 'ride_count_$count',
+          titleTr: '$count. Sürüş Kaydı',
+          titleEn: '$count Rides Logged',
+          titleDe: '$count Fahrten Erfasst',
+          descriptionTr: 'Toplam $count adet sürüş oturumu tamamla.',
+          descriptionEn: 'Complete a total of $count ride sessions.',
+          descriptionDe: 'Absolviere insgesamt $count Fahrten.',
+          icon: count >= 1000
+              ? PhosphorIconsFill.medal
+              : (count >= 100
+                    ? PhosphorIconsFill.flagCheckered
+                    : PhosphorIconsFill.motorcycle),
+          category: 'ride',
+          requiredCount: count,
+          reward: reward,
+          xpReward: xp,
+        ),
+      );
     }
 
     // 3. MAINTENANCE & SERVICE CATEGORY (40 Achievements)
     final serviceMilestones = [
-      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 25, 30, 35, 40, 45, 50,
-      55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 110, 120, 130, 140, 150, 175, 200, 250, 300
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      12,
+      14,
+      16,
+      18,
+      20,
+      25,
+      30,
+      35,
+      40,
+      45,
+      50,
+      55,
+      60,
+      65,
+      70,
+      75,
+      80,
+      85,
+      90,
+      95,
+      100,
+      110,
+      120,
+      130,
+      140,
+      150,
+      175,
+      200,
+      250,
+      300,
     ];
     for (int i = 0; i < serviceMilestones.length; i++) {
       final count = serviceMilestones[i];
@@ -252,28 +381,40 @@ class AchievementCatalog {
         );
       }
 
-      list.add(ApexAchievement(
-        id: 'maint_$count',
-        titleTr: 'Bakım Ustası Level ${i + 1}',
-        titleEn: 'Maintenance Master Lvl ${i + 1}',
-        titleDe: 'Wartungsmeister Stufe ${i + 1}',
-        descriptionTr: 'Motosikletin için $count kez servis veya günlük kontrol kaydı oluştur.',
-        descriptionEn: 'Log $count maintenance or daily check entries for your bike.',
-        descriptionDe: 'Trage $count Wartungen oder Tages-Checks ein.',
-        icon: count >= 50 ? '💎' : (count >= 10 ? '🛠️' : '🔧'),
-        category: 'maintenance',
-        requiredCount: count,
-        reward: reward,
-        xpReward: 50 + (i * 20),
-      ));
+      list.add(
+        ApexAchievement(
+          id: 'maint_$count',
+          titleTr: 'Bakım Ustası Level ${i + 1}',
+          titleEn: 'Maintenance Master Lvl ${i + 1}',
+          titleDe: 'Wartungsmeister Stufe ${i + 1}',
+          descriptionTr:
+              'Motosikletin için $count kez servis veya günlük kontrol kaydı oluştur.',
+          descriptionEn:
+              'Log $count maintenance or daily check entries for your bike.',
+          descriptionDe: 'Trage $count Wartungen oder Tages-Checks ein.',
+          icon: count >= 50
+              ? PhosphorIconsFill.diamond
+              : (count >= 10
+                    ? PhosphorIconsFill.wrench
+                    : PhosphorIconsFill.screwdriver),
+          category: 'maintenance',
+          requiredCount: count,
+          reward: reward,
+          xpReward: 50 + (i * 20),
+        ),
+      );
     }
 
     // 4. HARMONY & MOOD CATEGORY (40 Achievements)
-    final moodTypes = [
-      {'nameTr': 'Odaklı', 'nameEn': 'Focused', 'icon': '🎯'},
-      {'nameTr': 'Sakin', 'nameEn': 'Calm', 'icon': '🧘'},
-      {'nameTr': 'Spor', 'nameEn': 'Sporty', 'icon': '🔥'},
-      {'nameTr': 'Gece', 'nameEn': 'Night', 'icon': '🌙'},
+    final moodTypes = <Map<String, Object>>[
+      {
+        'nameTr': 'Odaklı',
+        'nameEn': 'Focused',
+        'icon': PhosphorIconsFill.target,
+      },
+      {'nameTr': 'Sakin', 'nameEn': 'Calm', 'icon': PhosphorIconsFill.yinYang},
+      {'nameTr': 'Spor', 'nameEn': 'Sporty', 'icon': PhosphorIconsFill.fire},
+      {'nameTr': 'Gece', 'nameEn': 'Night', 'icon': PhosphorIconsFill.moon},
     ];
     for (var mood in moodTypes) {
       for (int level = 1; level <= 10; level++) {
@@ -299,9 +440,9 @@ class AchievementCatalog {
           reward = AchievementReward(
             type: AchievementRewardType.ridingStyle,
             rewardId: '${mood['nameEn']} Legend',
-            titleTr: '${mood['icon']} "${mood['nameEn']} Legend" Sürüş Tipi',
-            titleEn: '${mood['icon']} "${mood['nameEn']} Legend" Riding Style',
-            titleDe: '${mood['icon']} "${mood['nameEn']} Legend" Fahrstil',
+            titleTr: '"${mood['nameEn']} Legend" Sürüş Tipi',
+            titleEn: '"${mood['nameEn']} Legend" Riding Style',
+            titleDe: '"${mood['nameEn']} Legend" Fahrstil',
           );
         } else {
           reward = AchievementReward(
@@ -312,36 +453,67 @@ class AchievementCatalog {
           );
         }
 
-        list.add(ApexAchievement(
-          id: 'harmony_${mood['nameEn']}_$level',
-          titleTr: '${mood['nameTr']} Sürüş Ruhu #$level',
-          titleEn: '${mood['nameEn']} Ride Spirit #$level',
-          titleDe: '${mood['nameEn']} Fahrgeist #$level',
-          descriptionTr: '${mood['nameTr']} modunda $req sürüş gerçekleştir.',
-          descriptionEn: 'Complete $req rides in ${mood['nameEn']} mood.',
-          descriptionDe: 'Fahre $req Mal im Modus ${mood['nameEn']}.',
-          icon: mood['icon']!,
-          category: 'harmony',
-          requiredCount: req,
-          reward: reward,
-          xpReward: level * 35,
-        ));
+        list.add(
+          ApexAchievement(
+            id: 'harmony_${mood['nameEn']}_$level',
+            titleTr: '${mood['nameTr']} Sürüş Ruhu #$level',
+            titleEn: '${mood['nameEn']} Ride Spirit #$level',
+            titleDe: '${mood['nameEn']} Fahrgeist #$level',
+            descriptionTr: '${mood['nameTr']} modunda $req sürüş gerçekleştir.',
+            descriptionEn: 'Complete $req rides in ${mood['nameEn']} mood.',
+            descriptionDe: 'Fahre $req Mal im Modus ${mood['nameEn']}.',
+            icon: mood['icon']! as IconData,
+            category: 'harmony',
+            requiredCount: req,
+            reward: reward,
+            xpReward: level * 35,
+          ),
+        );
       }
     }
 
     // 5. SOCIAL & COMMUNITY & SPECIAL (40 Achievements)
     final socialTitles = [
-      'İlk Yol Arkadaşı (1 Arkadaş)', '3 Sürücü Dostu (3 Arkadaş)', '5 Motorcu Çetesi (5 Arkadaş)',
-      '10 Asfalt Kardeşliği (10 Arkadaş)', '25 Sürüş Kulübü (25 Arkadaş)', '50 Topluluk Lideri (50 Arkadaş)',
-      '100 Yol Efsanesi (100 Arkadaş)', 'Profil Özelleştirici',
-      'Kilit Ekranı Ustası', 'Rider Tag Oluşturucu', 'Gece Yıldızı', 'Erken Kuş',
-      'Hafta Sonu Gezgini', 'Yağmurlu Sürüş Ustası', 'Uzun Yol Kampçısı', 'Garaj Koleksiyoneri',
-      'Akü Dostu', 'Zincir Titizliği', 'Lastik Uzmanı', 'Yakıt Ekonomisti',
-      'Pist Tutkunu', 'Viraj Avcısı', 'Dağ Sürücüsü', 'Sahil Gezgini',
-      'Apex Efsanesi', 'Şehir Kaşifi', 'Harita Fatihi', 'Sosyal Sürücü',
-      'QR İletişim', 'Sticker Üreticisi', 'Grup Lideri', 'Rozet Avcısı',
-      'Harmoni Ustası', 'Mekanik Gözlemci', 'Servis Defteri Dostu', 'Sıfır Hata',
-      'Güvenlik Odaklı', 'Apex Üyesi', 'Apex Destekçisi', 'Kıdemli Sürücü'
+      'İlk Yol Arkadaşı (1 Arkadaş)',
+      '3 Sürücü Dostu (3 Arkadaş)',
+      '5 Motorcu Çetesi (5 Arkadaş)',
+      '10 Asfalt Kardeşliği (10 Arkadaş)',
+      '25 Sürüş Kulübü (25 Arkadaş)',
+      '50 Topluluk Lideri (50 Arkadaş)',
+      '100 Yol Efsanesi (100 Arkadaş)',
+      'Profil Özelleştirici',
+      'Kilit Ekranı Ustası',
+      'Rider Tag Oluşturucu',
+      'Gece Yıldızı',
+      'Erken Kuş',
+      'Hafta Sonu Gezgini',
+      'Yağmurlu Sürüş Ustası',
+      'Uzun Yol Kampçısı',
+      'Garaj Koleksiyoneri',
+      'Akü Dostu',
+      'Zincir Titizliği',
+      'Lastik Uzmanı',
+      'Yakıt Ekonomisti',
+      'Pist Tutkunu',
+      'Viraj Avcısı',
+      'Dağ Sürücüsü',
+      'Sahil Gezgini',
+      'Apex Efsanesi',
+      'Şehir Kaşifi',
+      'Harita Fatihi',
+      'Sosyal Sürücü',
+      'QR İletişim',
+      'Sticker Üreticisi',
+      'Grup Lideri',
+      'Rozet Avcısı',
+      'Harmoni Ustası',
+      'Mekanik Gözlemci',
+      'Servis Defteri Dostu',
+      'Sıfır Hata',
+      'Güvenlik Odaklı',
+      'Apex Üyesi',
+      'Apex Destekçisi',
+      'Kıdemli Sürücü',
     ];
     final friendCounts = [1, 3, 5, 10, 25, 50, 100];
     for (int i = 0; i < socialTitles.length; i++) {
@@ -375,26 +547,36 @@ class AchievementCatalog {
         );
       }
 
-      list.add(ApexAchievement(
-        id: i < friendCounts.length ? 'friend_count_$reqCount' : 'special_${i + 1}',
-        titleTr: socialTitles[i],
-        titleEn: '${socialTitles[i]} Badge',
-        titleDe: '${socialTitles[i]} Abzeichen',
-        descriptionTr: i < friendCounts.length
-            ? 'Apex Flow topluluğuna $reqCount motorcu arkadaş ekle.'
-            : '${socialTitles[i]} başarım kilitlerini açarak topluluk gücünü kanıtla.',
-        descriptionEn: i < friendCounts.length
-            ? 'Add $reqCount rider friends to your Apex Flow circle.'
-            : 'Unlock ${socialTitles[i]} achievement.',
-        descriptionDe: i < friendCounts.length
-            ? 'Füge $reqCount Motorrad-Freunde hinzu.'
-            : 'Schalte das Abzeichen ${socialTitles[i]} frei.',
-        icon: i < friendCounts.length ? '🤝' : (i % 5 == 0 ? '✨' : (i % 3 == 0 ? '🎖️' : '🏷️')),
-        category: 'social',
-        requiredCount: reqCount,
-        reward: reward,
-        xpReward: xp,
-      ));
+      list.add(
+        ApexAchievement(
+          id: i < friendCounts.length
+              ? 'friend_count_$reqCount'
+              : 'special_${i + 1}',
+          titleTr: socialTitles[i],
+          titleEn: '${socialTitles[i]} Badge',
+          titleDe: '${socialTitles[i]} Abzeichen',
+          descriptionTr: i < friendCounts.length
+              ? 'Apex Flow topluluğuna $reqCount motorcu arkadaş ekle.'
+              : '${socialTitles[i]} başarım kilitlerini açarak topluluk gücünü kanıtla.',
+          descriptionEn: i < friendCounts.length
+              ? 'Add $reqCount rider friends to your Apex Flow circle.'
+              : 'Unlock ${socialTitles[i]} achievement.',
+          descriptionDe: i < friendCounts.length
+              ? 'Füge $reqCount Motorrad-Freunde hinzu.'
+              : 'Schalte das Abzeichen ${socialTitles[i]} frei.',
+          icon: i < friendCounts.length
+              ? PhosphorIconsFill.handshake
+              : (i % 5 == 0
+                    ? PhosphorIconsFill.sparkle
+                    : (i % 3 == 0
+                          ? PhosphorIconsFill.medalMilitary
+                          : PhosphorIconsFill.tag)),
+          category: 'social',
+          requiredCount: reqCount,
+          reward: reward,
+          xpReward: xp,
+        ),
+      );
     }
 
     return list;

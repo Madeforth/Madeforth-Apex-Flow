@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/services.dart';
 import 'dart:math' as math;
@@ -1930,23 +1931,23 @@ class RiderIdCard extends StatelessWidget {
                                   children: selectedBadges.take(5).map((
                                     badgeId,
                                   ) {
-                                    String icon = '🏆';
+                                    IconData icon = PhosphorIconsFill.trophy;
                                     Color bg = Colors.amber;
                                     if (badgeId == 'first_ride') {
-                                      icon = '🏁';
+                                      icon = PhosphorIconsFill.flagCheckered;
                                       bg = Colors.blueGrey;
                                     } else if (badgeId == 'mileage_100') {
-                                      icon = '🌟';
+                                      icon = PhosphorIconsFill.star;
                                       bg = Colors.orange;
                                     } else if (badgeId == 'speed_demon') {
-                                      icon = '🔥';
+                                      icon = PhosphorIconsFill.fire;
                                       bg = Colors.redAccent;
                                     } else if (badgeId == 'night_rider') {
-                                      icon = '🌙';
+                                      icon = PhosphorIconsFill.moon;
                                       bg = Colors.indigo;
                                     } else if (badgeId ==
                                         'maintenance_master') {
-                                      icon = '🛠️';
+                                      icon = PhosphorIconsFill.wrench;
                                       bg = Colors.teal;
                                     }
 
@@ -1968,9 +1969,10 @@ class RiderIdCard extends StatelessWidget {
                                           ),
                                         ],
                                       ),
-                                      child: Text(
+                                      child: Icon(
                                         icon,
-                                        style: const TextStyle(fontSize: 11),
+                                        size: 11,
+                                        color: Colors.white,
                                       ),
                                     );
                                   }).toList(),
@@ -5761,18 +5763,17 @@ class RiderAvatarWidget extends StatelessWidget {
             left: 0,
             right: 0,
             child: Center(
-              child: Text(
-                '👑',
-                style: TextStyle(
-                  fontSize: radius * 0.7,
-                  shadows: const [
-                    Shadow(
-                      color: Colors.black45,
-                      offset: Offset(0, 1),
-                      blurRadius: 3,
-                    ),
-                  ],
-                ),
+              child: Icon(
+                PhosphorIconsFill.crown,
+                size: radius * 0.7,
+                color: const Color(0xFFFFD700),
+                shadows: const [
+                  Shadow(
+                    color: Colors.black45,
+                    offset: Offset(0, 1),
+                    blurRadius: 3,
+                  ),
+                ],
               ),
             ),
           ),
@@ -7286,46 +7287,46 @@ class _ProfileAppearanceScreenState
     final allBadges = [
       {
         'id': 'first_ride',
-        'icon': '🏁',
+        'icon': PhosphorIconsFill.flagCheckered,
         'name': _t('İlk Sürüş', 'First Ride', 'Erste Fahrt'),
         'status': 'won',
       },
       {
         'id': 'mileage_100',
-        'icon': '🌟',
+        'icon': PhosphorIconsFill.star,
         'name': _t('100 KM Yolcu', '100 KM Rider', '100 KM Fahrer'),
         'status': 'won',
       },
       {
         'id': 'maintenance_master',
-        'icon': '🛠️',
+        'icon': PhosphorIconsFill.wrench,
         'name': _t('Bakım Ustası', 'Maintenance Master', 'Wartungsmeister'),
         'status': 'progress',
         'progress': 72,
       },
       {
         'id': 'discovery_compass',
-        'icon': '🧭',
+        'icon': PhosphorIconsFill.compass,
         'name': _t('Keşif Pusulası', 'Discovery Compass', 'Entdecker-Kompass'),
         'status': 'won',
         'isNew': true,
       },
       {
         'id': 'regular_rider',
-        'icon': '📅',
+        'icon': PhosphorIconsFill.calendarBlank,
         'name': _t('Düzenli Sürücü', 'Regular Rider', 'Regelmäßiger Fahrer'),
         'status': 'progress',
         'progress': 45,
       },
       {
         'id': 'safe_start',
-        'icon': '🛡️',
+        'icon': PhosphorIconsFill.shieldCheck,
         'name': _t('Güvenli Başlangıç', 'Safe Start', 'Sicherer Start'),
         'status': 'won',
       },
       {
         'id': 'community_support',
-        'icon': '👥',
+        'icon': PhosphorIconsFill.usersThree,
         'name': _t(
           'Topluluk Desteği',
           'Community Support',
@@ -7335,13 +7336,13 @@ class _ProfileAppearanceScreenState
       },
       {
         'id': 'sunrise_route',
-        'icon': '☀️',
+        'icon': PhosphorIconsFill.sun,
         'name': _t('Gün Doğumu Rotası', 'Sunrise Route', 'Sonnenaufgangsroute'),
         'status': 'locked',
       },
       {
         'id': 'ride_log',
-        'icon': '📓',
+        'icon': PhosphorIconsFill.notebook,
         'name': _t('Sürüş Günlüğü', 'Ride Log', 'Fahrtenbuch'),
         'status': 'locked',
       },
@@ -8429,14 +8430,12 @@ class _ProfileAppearanceScreenState
                             Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text(
-                                  badge['icon'] as String,
-                                  style: TextStyle(
-                                    fontSize: 24,
-                                    color: isLocked
-                                        ? Colors.white24
-                                        : Colors.white,
-                                  ),
+                                Icon(
+                                  badge['icon'] as IconData,
+                                  size: 24,
+                                  color: isLocked
+                                      ? Colors.white24
+                                      : Colors.white,
                                 ),
                                 const SizedBox(height: 6),
                                 Text(
@@ -9156,13 +9155,25 @@ class _AchievementOverviewCard extends StatelessWidget {
                     physics: const BouncingScrollPhysics(),
                     child: Row(
                       children: const [
-                        _MiniBadgeChip(icon: '🏁', label: 'İlk Sürüş'),
+                        _MiniBadgeChip(
+                          icon: PhosphorIconsFill.flagCheckered,
+                          label: 'İlk Sürüş',
+                        ),
                         SizedBox(width: 6),
-                        _MiniBadgeChip(icon: '🌟', label: '100 KM'),
+                        _MiniBadgeChip(
+                          icon: PhosphorIconsFill.star,
+                          label: '100 KM',
+                        ),
                         SizedBox(width: 6),
-                        _MiniBadgeChip(icon: '🔥', label: 'Hız Canavarı'),
+                        _MiniBadgeChip(
+                          icon: PhosphorIconsFill.fire,
+                          label: 'Hız Canavarı',
+                        ),
                         SizedBox(width: 6),
-                        _MiniBadgeChip(icon: '🛠️', label: 'Bakım'),
+                        _MiniBadgeChip(
+                          icon: PhosphorIconsFill.wrench,
+                          label: 'Bakım',
+                        ),
                       ],
                     ),
                   ),
@@ -9187,7 +9198,7 @@ class _AchievementOverviewCard extends StatelessWidget {
 
 class _MiniBadgeChip extends StatelessWidget {
   const _MiniBadgeChip({required this.icon, required this.label});
-  final String icon;
+  final IconData icon;
   final String label;
 
   @override
@@ -9202,7 +9213,7 @@ class _MiniBadgeChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(icon, style: const TextStyle(fontSize: 11)),
+          Icon(icon, size: 11, color: context.colors.textSecondary),
           const SizedBox(width: 4),
           Text(
             label,
@@ -9263,12 +9274,32 @@ class _AchievementSheetWidgetState
     final all = AchievementCatalog.allAchievements;
 
     final categories = [
-      {'id': 'all', 'label': tr ? 'Tümü' : (de ? 'Alle' : 'All'), 'icon': '🎯'},
-      {'id': 'km', 'label': 'KM', 'icon': '🛣️'},
-      {'id': 'ride', 'label': tr ? 'Sürüş' : 'Rides', 'icon': '🏍️'},
-      {'id': 'maintenance', 'label': tr ? 'Bakım' : 'Service', 'icon': '🛠️'},
-      {'id': 'harmony', 'label': tr ? 'Uyum' : 'Harmony', 'icon': '🧘'},
-      {'id': 'social', 'label': tr ? 'Sosyal' : 'Social', 'icon': '🤝'},
+      {
+        'id': 'all',
+        'label': tr ? 'Tümü' : (de ? 'Alle' : 'All'),
+        'icon': PhosphorIconsFill.target,
+      },
+      {'id': 'km', 'label': 'KM', 'icon': PhosphorIconsFill.roadHorizon},
+      {
+        'id': 'ride',
+        'label': tr ? 'Sürüş' : 'Rides',
+        'icon': PhosphorIconsFill.motorcycle,
+      },
+      {
+        'id': 'maintenance',
+        'label': tr ? 'Bakım' : 'Service',
+        'icon': PhosphorIconsFill.wrench,
+      },
+      {
+        'id': 'harmony',
+        'label': tr ? 'Uyum' : 'Harmony',
+        'icon': PhosphorIconsFill.yinYang,
+      },
+      {
+        'id': 'social',
+        'label': tr ? 'Sosyal' : 'Social',
+        'icon': PhosphorIconsFill.handshake,
+      },
     ];
 
     final filtered = _selectedCategory == 'all'
@@ -9371,9 +9402,12 @@ class _AchievementSheetWidgetState
                             label: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text(
-                                  cat['icon'] as String,
-                                  style: const TextStyle(fontSize: 12),
+                                Icon(
+                                  cat['icon'] as IconData,
+                                  size: 12,
+                                  color: isSelected
+                                      ? Colors.black
+                                      : Colors.white,
                                 ),
                                 const SizedBox(width: 6),
                                 Text(
@@ -9576,9 +9610,14 @@ class _AchievementSheetWidgetState
                                               : SlatePalette.surface),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
-                                  child: Text(
-                                    isUnlocked ? item.icon : '🔒',
-                                    style: const TextStyle(fontSize: 22),
+                                  child: Icon(
+                                    isUnlocked
+                                        ? item.icon
+                                        : PhosphorIconsFill.lock,
+                                    size: 22,
+                                    color: isUnlocked
+                                        ? Colors.white
+                                        : Colors.white38,
                                   ),
                                 ),
                                 const SizedBox(width: 12),

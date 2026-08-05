@@ -73,6 +73,7 @@ dependencies:
   google_mlkit_barcode_scanning: ^0.14.2
   flutter_native_splash: ^2.4.1
   flutter_timezone: ^5.1.0
+  phosphor_flutter: ^2.1.0
 
 dev_dependencies:
   flutter_test:
