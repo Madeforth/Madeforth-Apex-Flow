@@ -17,6 +17,7 @@ import 'package:apexflow/rides/application/ride_state.dart';
 import 'package:apexflow/profile/application/friends_state.dart';
 import 'package:apexflow/profile/domain/friend_profile.dart';
 import 'package:apexflow/shared/widgets/apex_panel.dart';
+import 'package:apexflow/shared/widgets/flip_state_button.dart';
 import 'package:apexflow/core/services/firebase_service.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -1029,10 +1030,7 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
                   // 4c. Start/Stop Group Ride — pinned between the invite
                   // actions above and the "join another lobby" tile below.
                   if (_isHost) ...[
-                    SizedBox(
-                      width: double.infinity,
-                      child: _buildGroupRideButton(),
-                    ),
+                    _buildGroupRideButton(),
                     const SizedBox(height: 16),
                   ],
 
@@ -1429,40 +1427,23 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
   Widget _buildGroupRideButton() {
     final tr = widget.strings.locale.languageCode == 'tr';
     final de = widget.strings.locale.languageCode == 'de';
-    final buttonColor = _isRideActive
-        ? const Color(0xFFEF4444)
-        : const Color(0xFF0EA5E9);
-    final buttonText = _isRideActive
-        ? (tr
-              ? 'Grup Sürüşünü Durdur'
-              : (de ? 'Gruppenfahrt beenden' : 'Stop Group Ride'))
-        : (tr
-              ? 'Grup Sürüşünü Başlat'
-              : (de ? 'Gruppenfahrt starten' : 'Start Group Ride'));
 
-    // Matches the "Send Invite" button's exact style (same screen, just
-    // above) so the two feel like one consistent action group instead of
-    // two different button languages sitting next to each other.
-    return ElevatedButton.icon(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: buttonColor,
-        foregroundColor: Colors.white,
-        elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        padding: const EdgeInsets.symmetric(vertical: 14),
-      ),
-      onPressed: () {
+    return FlipStateButton(
+      isActive: _isRideActive,
+      activeLabel: tr
+          ? 'Grup Sürüşünü Durdur'
+          : (de ? 'Gruppenfahrt beenden' : 'Stop Group Ride'),
+      inactiveLabel: tr
+          ? 'Grup Sürüşünü Başlat'
+          : (de ? 'Gruppenfahrt starten' : 'Start Group Ride'),
+      activeColor: const Color(0xFFEF4444),
+      inactiveColor: const Color(0xFF0EA5E9),
+      inactiveIcon: Icons.arrow_forward_rounded,
+      height: 52,
+      onTap: () {
         HapticFeedback.mediumImpact();
         _handleGroupRideToggle();
       },
-      icon: Icon(
-        _isRideActive ? Icons.stop_circle_outlined : Icons.play_arrow_rounded,
-        size: 18,
-      ),
-      label: Text(
-        buttonText,
-        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-      ),
     );
   }
 

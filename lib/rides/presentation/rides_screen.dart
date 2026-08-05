@@ -13,6 +13,7 @@ import 'package:apexflow/rides/application/ride_invite_pdf.dart';
 import 'package:apexflow/settings/application/user_profile_state.dart';
 import 'package:apexflow/rides/presentation/group_ride_lobby_screen.dart';
 import 'package:apexflow/profile/presentation/premium_paywall_screen.dart';
+import 'package:apexflow/shared/widgets/flip_state_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:apexflow/core/design/theme_extensions.dart';
@@ -551,43 +552,11 @@ class _StartRidePanel extends ConsumerStatefulWidget {
 }
 
 class _StartRidePanelState extends ConsumerState<_StartRidePanel> {
-  bool _isPressed = false;
-
-  void _handleTapDown(TapDownDetails _) => setState(() => _isPressed = true);
-  void _handleTapUp(TapUpDetails _) {
-    Future.delayed(const Duration(milliseconds: 200), () {
-      if (mounted) {
-        widget.isActive ? widget.onEnd() : widget.onStart();
-        Future.delayed(const Duration(milliseconds: 150), () {
-          if (mounted) setState(() => _isPressed = false);
-        });
-      }
-    });
-  }
-
-  void _handleTapCancel() => setState(() => _isPressed = false);
-
   @override
   Widget build(BuildContext context) {
     final weather = ref.watch(ritualsStateProvider).weather;
     final lang = AppStrings.currentLanguageCode;
     final isActive = widget.isActive;
-    final buttonColor = isActive
-        ? const Color(0xFFEF4444)
-        : const Color(0xFF0EA5E9);
-    final buttonText = isActive
-        ? tInline(
-            AppStrings.currentLanguageCode,
-            'Sürüşü Bitir',
-            'End Ride',
-            'Fahrt beenden',
-          )
-        : tInline(
-            AppStrings.currentLanguageCode,
-            'Sürüşü Başlat',
-            'Start Ride',
-            'Fahrt starten',
-          );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -686,88 +655,24 @@ class _StartRidePanelState extends ConsumerState<_StartRidePanel> {
           ],
         ),
         const SizedBox(height: 16),
-        GestureDetector(
-          onTapDown: _handleTapDown,
-          onTapUp: _handleTapUp,
-          onTapCancel: _handleTapCancel,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 420),
-            curve: Curves.easeOutCubic,
-            width: double.infinity,
-            height: 56,
-            decoration: BoxDecoration(
-              color: buttonColor,
-              borderRadius: BorderRadius.circular(28),
-              border: Border.all(color: buttonColor, width: 1),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                // Idle state: text + arrow on right
-                AnimatedOpacity(
-                  opacity: _isPressed ? 0.0 : 1.0,
-                  duration: const Duration(milliseconds: 280),
-                  child: AnimatedSlide(
-                    offset: _isPressed ? const Offset(0.3, 0) : Offset.zero,
-                    duration: const Duration(milliseconds: 350),
-                    curve: Curves.easeOutCubic,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          buttonText,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        if (!isActive) ...[
-                          const SizedBox(width: 8),
-                          const Icon(
-                            Icons.arrow_forward_rounded,
-                            color: Colors.white,
-                            size: 18,
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                ),
-                // Pressed state: text + arrow slides in
-                AnimatedOpacity(
-                  opacity: _isPressed ? 1.0 : 0.0,
-                  duration: const Duration(milliseconds: 320),
-                  curve: Curves.easeOut,
-                  child: AnimatedSlide(
-                    offset: _isPressed ? Offset.zero : const Offset(-0.2, 0),
-                    duration: const Duration(milliseconds: 380),
-                    curve: Curves.easeOutCubic,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          buttonText,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        const Icon(
-                          Icons.arrow_forward,
-                          color: Colors.white,
-                          size: 18,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
+        FlipStateButton(
+          isActive: isActive,
+          activeLabel: tInline(
+            AppStrings.currentLanguageCode,
+            'Sürüşü Bitir',
+            'End Ride',
+            'Fahrt beenden',
           ),
+          inactiveLabel: tInline(
+            AppStrings.currentLanguageCode,
+            'Sürüşü Başlat',
+            'Start Ride',
+            'Fahrt starten',
+          ),
+          activeColor: const Color(0xFFEF4444),
+          inactiveColor: const Color(0xFF0EA5E9),
+          inactiveIcon: Icons.arrow_forward_rounded,
+          onTap: isActive ? widget.onEnd : widget.onStart,
         ),
         const SizedBox(height: 12),
         Center(
