@@ -1457,10 +1457,10 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 420),
         curve: Curves.easeOutCubic,
-        height: 56,
+        height: 52,
         decoration: BoxDecoration(
           color: buttonColor,
-          borderRadius: BorderRadius.circular(28),
+          borderRadius: BorderRadius.circular(12),
           border: Border.all(color: buttonColor, width: 1),
         ),
         clipBehavior: Clip.antiAlias,

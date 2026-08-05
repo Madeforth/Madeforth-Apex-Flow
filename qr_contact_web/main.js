@@ -262,7 +262,7 @@ window.sendNotification = async (reason) => {
 
       mainCard.style.display = 'none';
       successCard.style.display = 'flex';
-      watchForOwnerReply(Date.now());
+      watchForOwnerReply();
     } catch (e) {
       console.error("Error adding document: ", e);
       mainCard.style.display = 'none';
@@ -320,20 +320,38 @@ if (vehicleId && db) {
 // After sending an alert, live-watch for the owner's reply while the
 // "Notification Sent" screen is showing, so the sender sees it without
 // having to reload the page.
-function watchForOwnerReply(sentAtMs) {
+//
+// We deliberately do NOT compare driverNoteAtIso (set on the owner's
+// device) against a timestamp captured on the sender's device — two
+// different phones' clocks can disagree by seconds or minutes, and that
+// mismatch was silently hiding genuine replies. Instead we record
+// whatever note/timestamp is already on the doc the moment we start
+// watching (which may be an old, unrelated note) as a baseline, and only
+// render when a *later* snapshot reports a value different from that
+// baseline — i.e. the doc actually changed while we were watching.
+function watchForOwnerReply() {
   if (!db || !vehicleId) return;
   const replyContainer = document.getElementById('reply-container');
   if (!replyContainer) return;
+
+  let baselineNoteAtIso = undefined; // undefined = not yet captured
 
   const docRef = doc(db, "rider_tags", vehicleId.toLowerCase());
   onSnapshot(docRef, (docSnap) => {
     if (!docSnap.exists()) return;
     const data = docSnap.data();
-    const noteAt = data.driverNoteAtIso ? Date.parse(data.driverNoteAtIso) : null;
-    // Only show replies written after we sent this alert, so we don't
-    // surface a stale note left over from someone else's earlier scan.
-    if (data.driverNote && noteAt && noteAt >= sentAtMs) {
+    const currentNoteAtIso = data.driverNoteAtIso || null;
+
+    if (baselineNoteAtIso === undefined) {
+      // First snapshot after we started watching — just the doc's
+      // current state, not necessarily a reply to this alert.
+      baselineNoteAtIso = currentNoteAtIso;
+      return;
+    }
+
+    if (data.driverNote && currentNoteAtIso !== baselineNoteAtIso) {
       replyContainer.replaceChildren(buildNoteCard(data.driverNote));
+      baselineNoteAtIso = currentNoteAtIso;
     }
   }, (e) => console.log("Error watching for reply:", e));
 }
