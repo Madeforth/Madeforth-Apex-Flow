@@ -143,7 +143,7 @@ Both the second-pass (19/20) and third-pass (24/24, now effectively 26/26 with t
 Remaining open items:
 1. This branch needs to be merged/rebased into `main` at some point (never done this session) — ask the user how they want that handled given the other concurrent session's commit (`8bcf84e`) is also on it.
 2. `firestore.rules`' new `exists()` check on `parking_notifications` create (this pass's A3) is prepared but **not deployed** — needs Rules Playground verification first, same caveat as the earlier `firestore.rules` changes (no local Java 21+ for the emulator).
-3. The LG G5 install (`com.apexflow.app`) only reflects code through commit `f1c0120` (second-pass item #16) — none of this session's later fixes (second-pass #17-20, all of third-pass A/B/C) are on the installed build; rebuild+reinstall if the user wants to test them physically.
+3. ~~The LG G5 install only reflects code through commit `f1c0120`~~ — **updated**: rebuilt and reinstalled at commit `b401c32` (`flutter build apk --debug` + `flutter install -d LGH85092a403f4 --debug`), confirmed via `adb shell pm list packages`. The installed build now includes everything through this session (second-pass #17-20, all of third-pass A/B/C, the deferred color-token conversions, weather German support, and the deployed Cloud Function fix).
 4. Real FCM push notifications for parking alerts (owner's app backgrounded/killed) is a known, explicitly out-of-scope gap — needs a Cloud Function trigger, new server-side work, not a quick fix.
 
 Longer-term deferred item (separate from the above): a full `lib/` sweep for unused/dead Dart files (not just assets) — explicitly postponed in an earlier session under a tight time budget, not started.
