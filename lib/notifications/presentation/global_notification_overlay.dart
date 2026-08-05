@@ -4,12 +4,50 @@ import 'package:apexflow/core/design/apex_colors.dart';
 import 'package:apexflow/core/i18n/app_settings_state.dart';
 import 'package:apexflow/notifications/application/parking_notification_state.dart';
 
+/// Maps a `parking_notifications.reason` key to localized text. Unrecognized
+/// values (e.g. legacy raw-Turkish-text documents written before reason keys
+/// existed) are shown as-is so old/in-flight documents don't break.
+String _reasonText(
+  String reasonKey,
+  String Function(String, String, String) t,
+) {
+  switch (reasonKey) {
+    case 'blocked':
+      return t(
+        'Aracınız kapıyı / yolu kapatıyor',
+        'Your vehicle is blocking the door / way',
+        'Ihr Fahrzeug blockiert den Weg',
+      );
+    case 'fallen':
+      return t(
+        'Aracınız Devrildi!',
+        'Your vehicle has fallen over!',
+        'Ihr Fahrzeug ist umgefallen!',
+      );
+    case 'crash':
+      return t(
+        'Aracınıza Çarpıldı / Hasar var',
+        'Your vehicle has been hit / damaged',
+        'Ihr Fahrzeug wurde beschädigt',
+      );
+    case 'towed':
+      return t(
+        'Aracınız çekiciyle çekilecektir',
+        'Your vehicle is about to be towed',
+        'Ihr Fahrzeug wird abgeschleppt',
+      );
+    default:
+      return reasonKey;
+  }
+}
+
 class GlobalNotificationOverlay extends ConsumerWidget {
   const GlobalNotificationOverlay({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notificationAsync = ref.watch(parkingNotificationStreamProvider);
+    final notifierState = ref.watch(parkingNotificationProvider);
     final lang = ref.watch(appSettingsProvider).locale.languageCode;
     final tr = lang == 'tr';
     final de = lang == 'de';
@@ -21,7 +59,8 @@ class GlobalNotificationOverlay extends ConsumerWidget {
         if (data == null)
           return const SizedBox.shrink(); // No unread notification
 
-        final reason = data['reason'] as String? ?? 'Acil Durum';
+        final reasonRaw = data['reason'] as String? ?? 'blocked';
+        final reason = _reasonText(reasonRaw, t);
         final docId = data['id'] as String;
 
         return Positioned.fill(
@@ -30,114 +69,148 @@ class GlobalNotificationOverlay extends ConsumerWidget {
             child: Container(
               color: Colors.black.withOpacity(0.90),
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.warning_amber_rounded,
-                    color: Colors.redAccent,
-                    size: 80,
-                  ),
-                  const SizedBox(height: 24),
-                  Text(
-                    t(
-                      'ACİL PARK BİLDİRİMİ',
-                      'EMERGENCY PARKING ALERT',
-                      'NOTFALL-PARKBENACHRICHTIGUNG',
-                    ),
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: Colors.redAccent,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    reason,
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    t(
-                      'Aracınızın QR kodunu okutan bir kişi az önce bu bildirimi gönderdi.',
-                      'Someone just scanned your vehicle\'s QR code and sent this alert.',
-                      'Jemand hat gerade den QR-Code Ihres Fahrzeugs gescannt und diesen Alarm gesendet.',
-                    ),
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodyMedium?.copyWith(color: Colors.white70),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 48),
-                  Text(
-                    t(
-                      'CANLI CEVAP GÖNDER',
-                      'SEND LIVE REPLY',
-                      'LIVE-ANTWORT SENDEN',
-                    ),
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: Theme.of(context).colorScheme.primary,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  _ReplyButton(
-                    text: t(
-                      'Hemen Geliyorum',
-                      'I am coming right now',
-                      'Ich komme sofort',
-                    ),
-                    onPressed: () => ref
-                        .read(parkingNotificationProvider.notifier)
-                        .replyToNotification(
-                          docId,
+              child: Center(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.warning_amber_rounded,
+                        color: Colors.redAccent,
+                        size: 80,
+                      ),
+                      const SizedBox(height: 24),
+                      Text(
+                        t(
+                          'ACİL PARK BİLDİRİMİ',
+                          'EMERGENCY PARKING ALERT',
+                          'NOTFALL-PARKBENACHRICHTIGUNG',
+                        ),
+                        style: Theme.of(context).textTheme.headlineSmall
+                            ?.copyWith(
+                              color: Colors.redAccent,
+                              fontWeight: FontWeight.bold,
+                            ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        reason,
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        t(
+                          'Aracınızın QR kodunu okutan bir kişi az önce bu bildirimi gönderdi.',
+                          'Someone just scanned your vehicle\'s QR code and sent this alert.',
+                          'Jemand hat gerade den QR-Code Ihres Fahrzeugs gescannt und diesen Alarm gesendet.',
+                        ),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodyMedium?.copyWith(color: Colors.white70),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 48),
+                      Text(
+                        t(
+                          'CANLI CEVAP GÖNDER',
+                          'SEND LIVE REPLY',
+                          'LIVE-ANTWORT SENDEN',
+                        ),
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      _ReplyButton(
+                        text: t(
+                          'Hemen Geliyorum',
+                          'I am coming right now',
+                          'Ich komme sofort',
+                        ),
+                        onPressed: () => ref
+                            .read(parkingNotificationProvider.notifier)
+                            .replyToNotification(
+                              docId,
+                              t(
+                                'Hemen Geliyorum',
+                                'I am coming right now',
+                                'Ich komme sofort',
+                              ),
+                            ),
+                      ),
+                      const SizedBox(height: 12),
+                      _ReplyButton(
+                        text: t(
+                          'Haberim Var, Teşekkürler',
+                          'I am aware, thanks',
+                          'Ich weiß Bescheid, danke',
+                        ),
+                        onPressed: () => ref
+                            .read(parkingNotificationProvider.notifier)
+                            .replyToNotification(
+                              docId,
+                              t(
+                                'Haberim Var',
+                                'I am aware',
+                                'Ich weiß Bescheid',
+                              ),
+                            ),
+                      ),
+                      const SizedBox(height: 12),
+                      _ReplyButton(
+                        text: t(
+                          'Aracı Çekmeyin, Yoldayum',
+                          'Do not tow, on my way',
+                          'Nicht abschleppen, ich bin unterwegs',
+                        ),
+                        onPressed: () => ref
+                            .read(parkingNotificationProvider.notifier)
+                            .replyToNotification(
+                              docId,
+                              t(
+                                'Çekmeyin, Yoldayum',
+                                'Do not tow, on my way',
+                                'Nicht abschleppen',
+                              ),
+                            ),
+                        isUrgent: true,
+                      ),
+                      if (notifierState.error != null) ...[
+                        const SizedBox(height: 16),
+                        Text(
                           t(
-                            'Hemen Geliyorum',
-                            'I am coming right now',
-                            'Ich komme sofort',
+                            'Gönderilemedi, tekrar deneyin.',
+                            'Could not send, please try again.',
+                            'Senden fehlgeschlagen, bitte erneut versuchen.',
                           ),
-                        ),
-                  ),
-                  const SizedBox(height: 12),
-                  _ReplyButton(
-                    text: t(
-                      'Haberim Var, Teşekkürler',
-                      'I am aware, thanks',
-                      'Ich weiß Bescheid, danke',
-                    ),
-                    onPressed: () => ref
-                        .read(parkingNotificationProvider.notifier)
-                        .replyToNotification(
-                          docId,
-                          t('Haberim Var', 'I am aware', 'Ich weiß Bescheid'),
-                        ),
-                  ),
-                  const SizedBox(height: 12),
-                  _ReplyButton(
-                    text: t(
-                      'Aracı Çekmeyin, Yoldayum',
-                      'Do not tow, on my way',
-                      'Nicht abschleppen, ich bin unterwegs',
-                    ),
-                    onPressed: () => ref
-                        .read(parkingNotificationProvider.notifier)
-                        .replyToNotification(
-                          docId,
-                          t(
-                            'Çekmeyin, Yoldayum',
-                            'Do not tow, on my way',
-                            'Nicht abschleppen',
+                          style: const TextStyle(
+                            color: Colors.redAccent,
+                            fontSize: 13,
                           ),
+                          textAlign: TextAlign.center,
                         ),
-                    isUrgent: true,
+                      ],
+                      const SizedBox(height: 16),
+                      TextButton(
+                        onPressed: () => ref
+                            .read(parkingNotificationProvider.notifier)
+                            .dismissLocally(docId),
+                        child: Text(
+                          t('Şimdi Değil', 'Not Now', 'Nicht jetzt'),
+                          style: const TextStyle(color: Colors.white54),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),

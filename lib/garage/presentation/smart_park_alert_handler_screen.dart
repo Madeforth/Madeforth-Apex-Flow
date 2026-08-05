@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:apexflow/core/design/apex_colors.dart';
@@ -44,6 +45,15 @@ class _SmartParkAlertHandlerScreenState
     final body = tr ? bodyTr : bodyEn;
 
     try {
+      await FirebaseFirestore.instance.collection('parking_notifications').add({
+        'vehicleId': widget.riderTag.toLowerCase(),
+        'reason': type,
+        'timestamp': FieldValue.serverTimestamp(),
+        'read': false,
+      });
+
+      // Best-effort local confirmation for the scanner's own device; the
+      // real delivery to the owner is the Firestore write above.
       await ApexNotificationService.instance.showNotification(
         id: DateTime.now().millisecondsSinceEpoch % 100000,
         title: title,
@@ -208,7 +218,7 @@ class _SmartParkAlertHandlerScreenState
                       icon: Icons.error_outline,
                       isSending: _isSending,
                       onTap: () => _sendAlert(
-                        'tipped_over',
+                        'fallen',
                         'Apex Flow Akıllı Park: Biri motorunuzun devrildiğini bildirdi!',
                         'Apex Flow Smart Park: Someone reported your bike is tipped over!',
                       ),
@@ -231,7 +241,7 @@ class _SmartParkAlertHandlerScreenState
                       icon: Icons.warning_amber_outlined,
                       isSending: _isSending,
                       onTap: () => _sendAlert(
-                        'bad_parking',
+                        'blocked',
                         'Apex Flow Akıllı Park: Biri hatalı park uyarısı gönderdi!',
                         'Apex Flow Smart Park: Someone sent a bad parking warning!',
                       ),
@@ -254,7 +264,7 @@ class _SmartParkAlertHandlerScreenState
                       icon: Icons.local_shipping_outlined,
                       isSending: _isSending,
                       onTap: () => _sendAlert(
-                        'towing',
+                        'towed',
                         'Apex Flow Akıllı Park: Motorunuzun çekilmek üzere olduğunu bildiren acil uyarı!',
                         'Apex Flow Smart Park: Emergency warning that your bike is about to be towed!',
                       ),

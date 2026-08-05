@@ -165,19 +165,19 @@ if (!vehicleId) {
       <div class="subtitle">${t.mainSubtitle}</div>
       
       <div class="button-grid">
-        <button onclick="sendNotification('Yolu Kapattı')">
+        <button onclick="sendNotification('blocked')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
           ${t.btnBlocked}
         </button>
-        <button onclick="sendNotification('Devrildi')" class="urgent">
+        <button onclick="sendNotification('fallen')" class="urgent">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
           ${t.btnFallen}
         </button>
-        <button onclick="sendNotification('Çarpıldı')" class="urgent">
+        <button onclick="sendNotification('crash')" class="urgent">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
           ${t.btnCrash}
         </button>
-        <button onclick="sendNotification('Çekici')" class="urgent">
+        <button onclick="sendNotification('towed')" class="urgent">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
           ${t.btnTowed}
         </button>
