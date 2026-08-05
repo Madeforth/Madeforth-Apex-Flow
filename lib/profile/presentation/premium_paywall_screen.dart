@@ -391,7 +391,7 @@ class _PremiumPaywallScreenState extends ConsumerState<PremiumPaywallScreen> {
                                             widget.strings.languageCode,
                                             '₺14,99',
                                             '\$4.99',
-                                            '\$4,99',
+                                            '4,99 €',
                                           ),
                                           style: TextStyle(
                                             fontSize: 20,
@@ -494,7 +494,7 @@ class _PremiumPaywallScreenState extends ConsumerState<PremiumPaywallScreen> {
                                             widget.strings.languageCode,
                                             '₺99,99',
                                             '\$29.99',
-                                            '\$29,99',
+                                            '29,99 €',
                                           ),
                                           style: TextStyle(
                                             fontSize: 20,

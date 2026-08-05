@@ -252,7 +252,7 @@ class RideVibePdf {
                           AppStrings.currentLanguageCode,
                           'Sürüş Modu',
                           'Ride Vibe',
-                          'Ride Vibe',
+                          'Fahrstimmung',
                         ),
                         title.split(' ').first,
                         accentColor,

@@ -4228,9 +4228,9 @@ class _LeaderboardListState extends State<_LeaderboardList> {
         Text(
           tInline(
             AppStrings.currentLanguageCode,
+            'Liderlik',
             'Leaderboard',
-            'Leaderboard',
-            'Leaderboard',
+            'Bestenliste',
           ),
           style: const TextStyle(
             fontSize: 28,
@@ -9513,7 +9513,7 @@ class _AchievementSheetWidgetState
                             SnackBar(
                               backgroundColor: const Color(0xFFD97706),
                               content: Text(
-                                '✨ +${item.xpReward} Rider XP Kazandın! Ödül: ${item.reward.title(langCode)}',
+                                '✨ ${tInline(langCode, '+${item.xpReward} Rider XP Kazandın! Ödül', '+${item.xpReward} Rider XP earned! Reward', '+${item.xpReward} Rider XP erhalten! Belohnung')}: ${item.reward.title(langCode)}',
                               ),
                               duration: const Duration(seconds: 2),
                             ),

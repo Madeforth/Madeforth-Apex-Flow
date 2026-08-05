@@ -1887,7 +1887,12 @@ class _LobbyRiderCardState extends State<_LobbyRiderCard>
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          'LOBİ SAHİBİ / HOST',
+                          tInline(
+                            AppStrings.currentLanguageCode,
+                            'LOBİ SAHİBİ',
+                            'HOST',
+                            'GASTGEBER',
+                          ),
                           style: TextStyle(
                             color: context.colors.cyan,
                             fontSize: 8,

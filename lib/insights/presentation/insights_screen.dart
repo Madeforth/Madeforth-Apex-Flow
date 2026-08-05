@@ -2416,9 +2416,14 @@ void _showRecentRideImpactDetails(
                   ),
                 ),
                 onPressed: () => Navigator.pop(ctx),
-                child: const Text(
-                  'KAPAT / CLOSE',
-                  style: TextStyle(
+                child: Text(
+                  tInline(
+                    AppStrings.currentLanguageCode,
+                    'KAPAT',
+                    'CLOSE',
+                    'SCHLIESSEN',
+                  ),
+                  style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.5,

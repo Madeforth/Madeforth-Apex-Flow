@@ -318,7 +318,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       AppStrings.currentLanguageCode,
                       'Destek ve Madeforth QA',
                       'Support & Madeforth QA',
-                      'Support & Madeforth QA',
+                      'Support & Madeforth-QA',
                     ),
                     style: const TextStyle(
                       fontSize: 14,
