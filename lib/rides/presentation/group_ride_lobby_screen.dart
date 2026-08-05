@@ -1027,6 +1027,16 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
                   ),
                   const SizedBox(height: 16),
 
+                  // 4c. Start/Stop Group Ride — pinned between the invite
+                  // actions above and the "join another lobby" tile below.
+                  if (_isHost) ...[
+                    SizedBox(
+                      width: double.infinity,
+                      child: _buildGroupRideButton(),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+
                   // 5. Join Another Lobby Tile
                   InkWell(
                     onTap: () async {
@@ -1340,15 +1350,6 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
                 ],
               ),
             ),
-
-            // 10. Bottom Fixed Button
-            if (_isHost)
-              Positioned(
-                bottom: 96,
-                left: 16,
-                right: 16,
-                child: _buildGroupRideButton(),
-              ),
           ],
         ),
       ),
