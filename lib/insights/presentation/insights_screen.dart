@@ -294,7 +294,11 @@ class InsightsScreen extends ConsumerWidget {
                 'Auswirkungen der letzten Fahrt',
               ),
             ),
-            _RecentRideImpactCard(state: state, tr: tr, sessions: rideState.sessions),
+            _RecentRideImpactCard(
+              state: state,
+              tr: tr,
+              sessions: rideState.sessions,
+            ),
             const SizedBox(height: 24),
 
             // Upcoming maintenance
@@ -1134,14 +1138,18 @@ class _RecentRideImpactCard extends StatelessWidget {
             'Keine Fahrten',
           );
 
-    final iconColor = hasPattern ? const Color(0xFFef4444) : context.colors.healthy;
+    final iconColor = hasPattern
+        ? const Color(0xFFef4444)
+        : context.colors.healthy;
     final iconBgColor = hasPattern
         ? const Color(0xFF450a0a).withValues(alpha: 0.5)
         : const Color(0xFF064e3b).withValues(alpha: 0.5);
     final iconBorderColor = hasPattern
         ? const Color(0xFFdc2626).withValues(alpha: 0.5)
         : const Color(0xFF059669).withValues(alpha: 0.5);
-    final iconData = hasPattern ? Icons.settings_backup_restore : Icons.check_circle_outline;
+    final iconData = hasPattern
+        ? Icons.settings_backup_restore
+        : Icons.check_circle_outline;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -1161,15 +1169,9 @@ class _RecentRideImpactCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: iconBgColor,
                   shape: BoxShape.circle,
-                  border: Border.all(
-                    color: iconBorderColor,
-                  ),
+                  border: Border.all(color: iconBorderColor),
                 ),
-                child: Icon(
-                  iconData,
-                  color: iconColor,
-                  size: 20,
-                ),
+                child: Icon(iconData, color: iconColor, size: 20),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -1627,7 +1629,7 @@ class _CostLedgerCard extends ConsumerWidget {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            '${_translateLine(entry.category, tr)} · 11 ${tInline(AppStrings.currentLanguageCode, 'Tem', 'Jul', 'Jul')} 2026', // Hardcoded date for visual match or we can parse from somewhere if date is added to entry
+                            '${_translateLine(entry.category, tr)} · ${_formatCostEntryDate(entry.dateIso)}',
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 14,
@@ -2121,6 +2123,44 @@ Future<void> _showAddCostSheet(
   );
   descCtrl.dispose();
   amountCtrl.dispose();
+}
+
+const _costEntryMonthsTr = [
+  'Oca',
+  'Şub',
+  'Mar',
+  'Nis',
+  'May',
+  'Haz',
+  'Tem',
+  'Ağu',
+  'Eyl',
+  'Eki',
+  'Kas',
+  'Ara',
+];
+const _costEntryMonthsEn = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
+
+String _formatCostEntryDate(String dateIso) {
+  final date = DateTime.tryParse(dateIso);
+  if (date == null) return '';
+  final months = AppStrings.currentLanguageCode == 'tr'
+      ? _costEntryMonthsTr
+      : _costEntryMonthsEn;
+  return '${date.day} ${months[date.month - 1]} ${date.year}';
 }
 
 String _translateLine(String line, bool tr) {

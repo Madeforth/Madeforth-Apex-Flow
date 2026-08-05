@@ -25,6 +25,14 @@ class MotorcycleEntity {
   late int serviceIntervalKm;
   late bool archived;
 
+  // Fractional wear carry — see MotorcycleProfile for why this exists.
+  // Defaults to 0 for records written before this field existed.
+  double chainWearCarry = 0;
+  double tireWearCarry = 0;
+  double brakeWearCarry = 0;
+  double oilWearCarry = 0;
+  String? wearUpdatedAtIso;
+
   MotorcycleProfile toDomain() {
     return MotorcycleProfile(
       id: stableId,
@@ -39,6 +47,11 @@ class MotorcycleEntity {
       batteryHealthPercent: batteryHealthPercent,
       serviceIntervalKm: serviceIntervalKm,
       archived: archived,
+      chainWearCarry: chainWearCarry,
+      tireWearCarry: tireWearCarry,
+      brakeWearCarry: brakeWearCarry,
+      oilWearCarry: oilWearCarry,
+      wearUpdatedAtIso: wearUpdatedAtIso,
     );
   }
 
@@ -59,6 +72,11 @@ class MotorcycleEntity {
       ..oilHealthPercent = domain.oilHealthPercent
       ..batteryHealthPercent = domain.batteryHealthPercent
       ..serviceIntervalKm = domain.serviceIntervalKm
-      ..archived = domain.archived;
+      ..archived = domain.archived
+      ..chainWearCarry = domain.chainWearCarry
+      ..tireWearCarry = domain.tireWearCarry
+      ..brakeWearCarry = domain.brakeWearCarry
+      ..oilWearCarry = domain.oilWearCarry
+      ..wearUpdatedAtIso = domain.wearUpdatedAtIso;
   }
 }

@@ -17,7 +17,9 @@ class TaxRecord {
   final String currency;
   final bool isPaid;
 
-  DateTime get dueDate => DateTime.parse(dueDateIso);
+  // tryParse + fallback rather than parse(): a malformed/corrupted
+  // dueDateIso must not crash the Documents vault or Insights screens.
+  DateTime get dueDate => DateTime.tryParse(dueDateIso) ?? DateTime.now();
 
   TaxRecord copyWith({
     String? id,

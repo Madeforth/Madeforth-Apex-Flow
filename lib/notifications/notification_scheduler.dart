@@ -78,26 +78,40 @@ class NotificationScheduler {
     );
   }
 
-  /// Schedules a reminder for document expiration (30 days before expiry)
+  /// Schedules a reminder for document expiration (30 days before expiry).
+  /// If the document expires in under 30 days, falls back to a near-term
+  /// reminder (1 hour from now, or 1 day before expiry if that's later)
+  /// rather than silently scheduling nothing.
   static Future<void> scheduleDocumentExpiryReminder({
     required String docId,
     required String title,
     required DateTime expirationDate,
     required AppStrings strings,
   }) async {
-    final reminderDate = expirationDate.subtract(const Duration(days: 30));
-    if (reminderDate.isBefore(DateTime.now())) return;
+    final now = DateTime.now();
+    var reminderDate = expirationDate.subtract(const Duration(days: 30));
+    if (reminderDate.isBefore(now)) {
+      final oneDayBefore = expirationDate.subtract(const Duration(days: 1));
+      final soon = now.add(const Duration(hours: 1));
+      reminderDate = oneDayBefore.isAfter(soon) ? oneDayBefore : soon;
+      if (reminderDate.isBefore(now) || reminderDate.isAfter(expirationDate)) {
+        return; // Already expired or expiring within the hour — nothing meaningful to remind.
+      }
+    }
 
     final nTitle = strings.notifDocExpiryTitle;
     final nBody = strings.notifDocExpiryBody(title);
 
-    final id = docId.hashCode;
-
     await ApexNotificationService.instance.scheduleNotification(
-      id: id,
+      id: docId.hashCode,
       title: nTitle,
       body: nBody,
       scheduledDate: reminderDate,
     );
+  }
+
+  /// Cancels a previously scheduled document expiry reminder for [docId].
+  static Future<void> cancelDocumentExpiryReminder(String docId) async {
+    await ApexNotificationService.instance.cancelNotification(docId.hashCode);
   }
 }

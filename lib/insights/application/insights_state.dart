@@ -44,14 +44,21 @@ class CostEntry {
     required this.label,
     required this.category,
     required this.amountTry,
+    required this.dateIso,
   });
 
   final String label;
   final String category;
   final double amountTry;
+  final String dateIso;
 
   Map<String, dynamic> toJson() {
-    return {'label': label, 'category': category, 'amountTry': amountTry};
+    return {
+      'label': label,
+      'category': category,
+      'amountTry': amountTry,
+      'dateIso': dateIso,
+    };
   }
 
   factory CostEntry.fromJson(Map<String, dynamic> json) {
@@ -59,6 +66,8 @@ class CostEntry {
       label: json['label'] as String? ?? '',
       category: json['category'] as String? ?? '',
       amountTry: (json['amountTry'] as num?)?.toDouble() ?? 0,
+      // Fallback for entries persisted before this field existed.
+      dateIso: json['dateIso'] as String? ?? DateTime.now().toIso8601String(),
     );
   }
 }
@@ -321,6 +330,7 @@ class InsightsController extends Notifier<InsightsState> {
       label: normalizedLabel,
       category: category,
       amountTry: amountTry,
+      dateIso: DateTime.now().toIso8601String(),
     );
     final previousManualEntries = _manualCostEntries;
     final previousLedger = state.costLedger;
@@ -558,6 +568,7 @@ List<CostEntry> _deriveCostLedger(List<FuelEntry> fuelEntries) {
               '${tInline(AppStrings.currentLanguageCode, 'Yakıt alımı', 'Fuel refill', 'Tanken')} $date',
           category: 'Fuel',
           amountTry: entry.totalTry,
+          dateIso: entry.date.toIso8601String(),
         );
       })
       .toList(growable: false);

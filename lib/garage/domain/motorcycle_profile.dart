@@ -12,6 +12,11 @@ class MotorcycleProfile {
     required this.batteryHealthPercent,
     this.serviceIntervalKm = 6000,
     this.archived = false,
+    this.chainWearCarry = 0,
+    this.tireWearCarry = 0,
+    this.brakeWearCarry = 0,
+    this.oilWearCarry = 0,
+    this.wearUpdatedAtIso,
   });
 
   final String id;
@@ -26,6 +31,20 @@ class MotorcycleProfile {
   final int batteryHealthPercent;
   final int serviceIntervalKm;
   final bool archived;
+
+  // Fractional wear not yet large enough to move the integer *Percent
+  // fields above, carried across rides so short trips still accumulate
+  // real degradation over time instead of being discarded by rounding.
+  // See GarageController.applyRideImpact.
+  final double chainWearCarry;
+  final double tireWearCarry;
+  final double brakeWearCarry;
+  final double oilWearCarry;
+
+  // When wear/service state was last touched (component health update,
+  // ride impact, or a service record). Used as the calendar-based
+  // maintenance window's reference point instead of a hardcoded guess.
+  final String? wearUpdatedAtIso;
 
   int get kmSinceService {
     final delta = odometerKm - lastServiceKm;
@@ -68,6 +87,11 @@ class MotorcycleProfile {
     int? batteryHealthPercent,
     int? serviceIntervalKm,
     bool? archived,
+    double? chainWearCarry,
+    double? tireWearCarry,
+    double? brakeWearCarry,
+    double? oilWearCarry,
+    String? wearUpdatedAtIso,
   }) {
     return MotorcycleProfile(
       id: id ?? this.id,
@@ -82,6 +106,11 @@ class MotorcycleProfile {
       batteryHealthPercent: batteryHealthPercent ?? this.batteryHealthPercent,
       serviceIntervalKm: serviceIntervalKm ?? this.serviceIntervalKm,
       archived: archived ?? this.archived,
+      chainWearCarry: chainWearCarry ?? this.chainWearCarry,
+      tireWearCarry: tireWearCarry ?? this.tireWearCarry,
+      brakeWearCarry: brakeWearCarry ?? this.brakeWearCarry,
+      oilWearCarry: oilWearCarry ?? this.oilWearCarry,
+      wearUpdatedAtIso: wearUpdatedAtIso ?? this.wearUpdatedAtIso,
     );
   }
 
@@ -99,6 +128,11 @@ class MotorcycleProfile {
       'batteryHealthPercent': batteryHealthPercent,
       'serviceIntervalKm': serviceIntervalKm,
       'archived': archived,
+      'chainWearCarry': chainWearCarry,
+      'tireWearCarry': tireWearCarry,
+      'brakeWearCarry': brakeWearCarry,
+      'oilWearCarry': oilWearCarry,
+      'wearUpdatedAtIso': wearUpdatedAtIso,
     };
   }
 
@@ -119,6 +153,11 @@ class MotorcycleProfile {
       batteryHealthPercent: json['batteryHealthPercent'] as int? ?? 0,
       serviceIntervalKm: json['serviceIntervalKm'] as int? ?? 6000,
       archived: json['archived'] as bool? ?? false,
+      chainWearCarry: (json['chainWearCarry'] as num?)?.toDouble() ?? 0,
+      tireWearCarry: (json['tireWearCarry'] as num?)?.toDouble() ?? 0,
+      brakeWearCarry: (json['brakeWearCarry'] as num?)?.toDouble() ?? 0,
+      oilWearCarry: (json['oilWearCarry'] as num?)?.toDouble() ?? 0,
+      wearUpdatedAtIso: json['wearUpdatedAtIso'] as String?,
     );
   }
 }

@@ -355,6 +355,7 @@ class GarageController extends Notifier<GarageState> {
       brakeWearPercent: _clampPercent(brakeWearPercent),
       oilHealthPercent: _clampPercent(oilHealthPercent),
       batteryHealthPercent: _clampPercent(batteryHealthPercent),
+      wearUpdatedAtIso: DateTime.now().toUtc().toIso8601String(),
     );
     final nextMotorcycles = _replaceMotorcycle(nextBike);
 
@@ -416,11 +417,21 @@ class GarageController extends Notifier<GarageState> {
     // Odometer always increases.
     final nextOdometer = bike.odometerKm + distanceKm.round();
 
-    // Component wear degrades with distance.
-    final chainDelta = (0.05 * distanceKm * wearMultiplier).round();
-    final tireDelta = (0.03 * distanceKm * wearMultiplier).round();
-    final brakeDelta = (0.02 * distanceKm * brakeMultiplier).round();
-    final oilDelta = (0.02 * distanceKm).round();
+    // Component wear degrades with distance. Each ride's fractional wear is
+    // added to a persisted carry and only the whole-number part is applied
+    // to the integer *Percent fields — otherwise a ride under ~10-25 km
+    // (a typical daily commute) rounds its own delta down to zero and the
+    // rider's most common trips never register any wear at all.
+    final chainCarry = bike.chainWearCarry + 0.05 * distanceKm * wearMultiplier;
+    final tireCarry = bike.tireWearCarry + 0.03 * distanceKm * wearMultiplier;
+    final brakeCarry =
+        bike.brakeWearCarry + 0.02 * distanceKm * brakeMultiplier;
+    final oilCarry = bike.oilWearCarry + 0.02 * distanceKm;
+
+    final chainDelta = chainCarry.floor();
+    final tireDelta = tireCarry.floor();
+    final brakeDelta = brakeCarry.floor();
+    final oilDelta = oilCarry.floor();
 
     // Battery charges on rides > 10 km when under 95%.
     final batteryCharge = (distanceKm > 10 && bike.batteryHealthPercent < 95)
@@ -436,6 +447,11 @@ class GarageController extends Notifier<GarageState> {
       batteryHealthPercent: _clampPercent(
         bike.batteryHealthPercent + batteryCharge,
       ),
+      chainWearCarry: chainCarry - chainDelta,
+      tireWearCarry: tireCarry - tireDelta,
+      brakeWearCarry: brakeCarry - brakeDelta,
+      oilWearCarry: oilCarry - oilDelta,
+      wearUpdatedAtIso: DateTime.now().toUtc().toIso8601String(),
     );
     final nextMotorcycles = _replaceMotorcycle(nextBike);
 
@@ -704,7 +720,13 @@ List<GarageComponentStatus> _componentStatuses(MotorcycleProfile bike) {
 
   // Derive installed odometer from lastServiceKm (best available proxy)
   final installedOdo = bike.lastServiceKm.toDouble();
-  final installedAt = now.subtract(const Duration(days: 90)); // fallback
+  // Use the real last wear/service update when available; only fall back
+  // to "90 days ago" for a bike that has never had a wear update recorded
+  // (e.g. freshly added), rather than treating every bike as permanently
+  // 90 days old regardless of its actual service history.
+  final installedAt =
+      DateTime.tryParse(bike.wearUpdatedAtIso ?? '') ??
+      now.subtract(const Duration(days: 90));
 
   String _signal(ComponentType type, ServiceRule rule, int wearPercent) {
     if (wearPercent == -1) return 'Seçilmedi';

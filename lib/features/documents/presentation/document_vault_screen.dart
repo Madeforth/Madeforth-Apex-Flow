@@ -121,7 +121,9 @@ class _DocumentVaultScreenState extends ConsumerState<DocumentVaultScreen> {
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: context.colors.red.withValues(alpha: 0.1),
+                        backgroundColor: context.colors.red.withValues(
+                          alpha: 0.1,
+                        ),
                         foregroundColor: context.colors.red,
                         elevation: 0,
                       ),
@@ -413,7 +415,7 @@ class _DocumentVaultScreenState extends ConsumerState<DocumentVaultScreen> {
                       onPressed: () async {
                         final title = titleController.text.trim();
                         if (title.isEmpty) return;
-                        await ref
+                        final docId = await ref
                             .read(documentVaultProvider.notifier)
                             .addDocument(
                               bikeStableId: bikeId,
@@ -426,8 +428,7 @@ class _DocumentVaultScreenState extends ConsumerState<DocumentVaultScreen> {
                         if (selectedExpirationDate != null) {
                           unawaited(
                             NotificationScheduler.scheduleDocumentExpiryReminder(
-                              docId: DateTime.now().millisecondsSinceEpoch
-                                  .toString(),
+                              docId: docId,
                               title: title,
                               expirationDate: selectedExpirationDate!,
                               strings: AppStrings(
@@ -746,7 +747,9 @@ class _VaultTabSelector extends StatelessWidget {
             height: 38,
             constraints: const BoxConstraints(maxWidth: 270),
             decoration: BoxDecoration(
-              color: const Color(0xFF1A1F2B).withValues(alpha: 0.8), // Semi-transparent navbar background
+              color: const Color(
+                0xFF1A1F2B,
+              ).withValues(alpha: 0.8), // Semi-transparent navbar background
               border: Border.all(
                 color: Colors.white.withValues(alpha: 0.08),
                 width: 1,
@@ -765,7 +768,9 @@ class _VaultTabSelector extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 4),
                       decoration: BoxDecoration(
                         color: activeTab == 'docs'
-                            ? context.colors.cyan.withValues(alpha: 0.14) // Liquid-like highlight
+                            ? context.colors.cyan.withValues(
+                                alpha: 0.14,
+                              ) // Liquid-like highlight
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(17),
                       ),
@@ -778,7 +783,9 @@ class _VaultTabSelector extends StatelessWidget {
                               Icons.description_outlined,
                               size: 14, // Slimmer icon
                               color: activeTab == 'docs'
-                                  ? context.colors.cyan // Selected tab icon color
+                                  ? context
+                                        .colors
+                                        .cyan // Selected tab icon color
                                   : context.colors.textSecondary,
                             ),
                             const SizedBox(width: 6),
@@ -790,7 +797,9 @@ class _VaultTabSelector extends StatelessWidget {
                                     ? FontWeight.bold
                                     : FontWeight.normal,
                                 color: activeTab == 'docs'
-                                    ? context.colors.cyan // Selected tab text color
+                                    ? context
+                                          .colors
+                                          .cyan // Selected tab text color
                                     : context.colors.textSecondary,
                               ),
                             ),
@@ -809,7 +818,9 @@ class _VaultTabSelector extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 4),
                       decoration: BoxDecoration(
                         color: activeTab == 'tax'
-                            ? context.colors.cyan.withValues(alpha: 0.14) // Liquid-like highlight
+                            ? context.colors.cyan.withValues(
+                                alpha: 0.14,
+                              ) // Liquid-like highlight
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(17),
                       ),
@@ -822,7 +833,9 @@ class _VaultTabSelector extends StatelessWidget {
                               Icons.receipt_long_outlined,
                               size: 14, // Slimmer icon
                               color: activeTab == 'tax'
-                                  ? context.colors.cyan // Selected tab icon color
+                                  ? context
+                                        .colors
+                                        .cyan // Selected tab icon color
                                   : context.colors.textSecondary,
                             ),
                             const SizedBox(width: 6),
@@ -834,7 +847,9 @@ class _VaultTabSelector extends StatelessWidget {
                                     ? FontWeight.bold
                                     : FontWeight.normal,
                                 color: activeTab == 'tax'
-                                    ? context.colors.cyan // Selected tab text color
+                                    ? context
+                                          .colors
+                                          .cyan // Selected tab text color
                                     : context.colors.textSecondary,
                               ),
                             ),
