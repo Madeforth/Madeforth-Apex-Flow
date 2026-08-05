@@ -137,7 +137,9 @@ class GarageScreen extends ConsumerWidget {
                           ),
                           onPartStatus: () => onOpenPartStatus?.call(),
                           onAddBike: () {
-                            final isPremium = ref.read(userProfileProvider).isPremium;
+                            final isPremium = ref
+                                .read(userProfileProvider)
+                                .isPremium;
                             if (state.motorcycles.length >= 1 && !isPremium) {
                               Navigator.of(context).push(
                                 MaterialPageRoute<void>(
@@ -250,7 +252,9 @@ class GarageScreen extends ConsumerWidget {
                         height: 38,
                         constraints: const BoxConstraints(maxWidth: 270),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1A1F2B).withValues(alpha: 0.8), // Semi-transparent navbar background
+                          color: const Color(0xFF1A1F2B).withValues(
+                            alpha: 0.8,
+                          ), // Semi-transparent navbar background
                           borderRadius: BorderRadius.circular(19),
                           border: Border.all(
                             color: Colors.white.withValues(alpha: 0.08),
@@ -261,7 +265,9 @@ class GarageScreen extends ConsumerWidget {
                           dividerColor: Colors.transparent,
                           indicatorSize: TabBarIndicatorSize.tab,
                           indicator: BoxDecoration(
-                            color: context.colors.cyan.withValues(alpha: 0.14), // Liquid highlight
+                            color: context.colors.cyan.withValues(
+                              alpha: 0.14,
+                            ), // Liquid highlight
                             borderRadius: BorderRadius.circular(17),
                           ),
                           tabs: [
@@ -273,12 +279,14 @@ class GarageScreen extends ConsumerWidget {
                                   children: [
                                     const Icon(Icons.garage_outlined, size: 14),
                                     const SizedBox(width: 6),
-                                    Text(tInline(
-                                      AppStrings.currentLanguageCode,
-                                      'Garaj',
-                                      'Garage',
-                                      'Garage',
-                                    )),
+                                    Text(
+                                      tInline(
+                                        AppStrings.currentLanguageCode,
+                                        'Garaj',
+                                        'Garage',
+                                        'Garage',
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -289,14 +297,19 @@ class GarageScreen extends ConsumerWidget {
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    const Icon(Icons.folder_open_outlined, size: 14),
+                                    const Icon(
+                                      Icons.folder_open_outlined,
+                                      size: 14,
+                                    ),
                                     const SizedBox(width: 6),
-                                    Text(tInline(
-                                      AppStrings.currentLanguageCode,
-                                      'Belgeler',
-                                      'Documents',
-                                      'Dokumente',
-                                    )),
+                                    Text(
+                                      tInline(
+                                        AppStrings.currentLanguageCode,
+                                        'Belgeler',
+                                        'Documents',
+                                        'Dokumente',
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -307,20 +320,26 @@ class GarageScreen extends ConsumerWidget {
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    const Icon(Icons.local_gas_station_outlined, size: 14),
+                                    const Icon(
+                                      Icons.local_gas_station_outlined,
+                                      size: 14,
+                                    ),
                                     const SizedBox(width: 6),
-                                    Text(tInline(
-                                      AppStrings.currentLanguageCode,
-                                      'Yakıt',
-                                      'Fuel',
-                                      'Kraftstoff',
-                                    )),
+                                    Text(
+                                      tInline(
+                                        AppStrings.currentLanguageCode,
+                                        'Yakıt',
+                                        'Fuel',
+                                        'Kraftstoff',
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
                             ),
                           ],
-                          labelColor: context.colors.cyan, // Selected text/icon color
+                          labelColor:
+                              context.colors.cyan, // Selected text/icon color
                           unselectedLabelColor: context.colors.textSecondary,
                           labelStyle: const TextStyle(
                             fontWeight: FontWeight.w600,
@@ -546,7 +565,13 @@ class GarageScreen extends ConsumerWidget {
           ),
         );
       },
-    );
+    ).then((_) {
+      nameController.dispose();
+      modelController.dispose();
+      odometerController.dispose();
+      lastServiceController.dispose();
+      serviceIntervalController.dispose();
+    });
   }
 }
 
@@ -1494,6 +1519,9 @@ class _MotorcycleListPanel extends ConsumerWidget {
         );
       },
     );
+    name.dispose();
+    model.dispose();
+    odometer.dispose();
   }
 
   Future<void> _confirmDeleteBike(
