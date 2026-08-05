@@ -1059,9 +1059,19 @@ class _MachineHealthRow extends StatelessWidget {
               _HealthColumn(
                 icon: Icons.build_outlined,
                 label: strings.t(tr: 'Servis', en: 'Service', de: 'Service'),
-                value: '${state.bike.kmUntilService} ',
-                suffix: 'km',
-                valueColor: const Color(0xFFFACC15),
+                value: state.bike.kmUntilService < 0
+                    ? '${-state.bike.kmUntilService} '
+                    : '${state.bike.kmUntilService} ',
+                suffix: state.bike.kmUntilService < 0
+                    ? strings.t(
+                        tr: 'km gecikti',
+                        en: 'km overdue',
+                        de: 'km überfällig',
+                      )
+                    : 'km',
+                valueColor: state.bike.kmUntilService < 0
+                    ? const Color(0xFFEF4444)
+                    : const Color(0xFFFACC15),
               ),
             ],
           ),
