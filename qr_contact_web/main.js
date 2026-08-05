@@ -289,7 +289,9 @@ if (vehicleId && db) {
   getDoc(docRef).then((docSnap) => {
     if (docSnap.exists()) {
       const data = docSnap.data();
-      if (data.driverNote) {
+      const noteAt = data.driverNoteAtIso ? Date.parse(data.driverNoteAtIso) : null;
+      const noteIsFresh = noteAt && (Date.now() - noteAt) < 3 * 60 * 60 * 1000;
+      if (data.driverNote && noteIsFresh) {
         const noteCard = document.createElement('div');
         noteCard.className = 'driver-note-card';
 
