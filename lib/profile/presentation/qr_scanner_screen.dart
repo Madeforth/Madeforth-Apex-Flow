@@ -47,6 +47,7 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
       final status = await Permission.camera.status;
       if (!status.isGranted) {
         final result = await Permission.camera.request();
+        if (!mounted) return;
         if (!result.isGranted) {
           setState(() {
             _initializingCamera = false;
@@ -62,6 +63,7 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
       }
 
       final cameras = await availableCameras();
+      if (!mounted) return;
       if (cameras.isEmpty) {
         setState(() {
           _initializingCamera = false;
@@ -102,15 +104,25 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
         _onLatestFrame(image);
       });
     } catch (e) {
+      debugPrint('QR scanner camera init error: $e');
       if (!mounted) return;
+      final isPermissionIssue =
+          e is CameraException && e.code == 'CameraAccessDenied';
       setState(() {
         _initializingCamera = false;
-        _scanError = tInline(
-          widget.strings.languageCode,
-          'Kamera hatası: $e',
-          'Camera error: $e',
-          'Kamerafehler: $e',
-        );
+        _scanError = isPermissionIssue
+            ? tInline(
+                widget.strings.languageCode,
+                'Kamera izni verilmedi.',
+                'Camera permission denied.',
+                'Kameraberechtigung verweigert.',
+              )
+            : tInline(
+                widget.strings.languageCode,
+                'Kamera başlatılamadı. Lütfen tekrar deneyin.',
+                'Could not start the camera. Please try again.',
+                'Kamera konnte nicht gestartet werden. Bitte erneut versuchen.',
+              );
       });
     }
   }
@@ -179,11 +191,15 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
           if (text.isEmpty) continue;
 
           // Check if it is a Smart Park Alert QR code (URL)
-          if (text.contains('apex-flow-7baea.web.app') ||
-              text.contains('?id=')) {
+          if (text.contains('apex-flow-7baea.web.app')) {
             final tagRegex = RegExp(r'@?[a-zA-Z0-9_]+#[0-9]{4}');
             final match = tagRegex.firstMatch(Uri.decodeComponent(text));
-            final riderTag = match?.group(0) ?? 'Rider';
+            if (match == null) {
+              // Not a recognizable Apex Flow rider tag — ignore rather than
+              // routing into the Smart Park Alert flow with a bogus target.
+              continue;
+            }
+            final riderTag = match.group(0)!;
 
             if (mounted) {
               unawaited(_cameraController?.stopImageStream());

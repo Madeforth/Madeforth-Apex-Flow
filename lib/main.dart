@@ -171,7 +171,10 @@ class ApexFlowApp extends ConsumerWidget {
           String riderTag = 'Rider';
           try {
             final uri = Uri.parse(name);
-            riderTag = uri.queryParameters['rider'] ?? 'Rider';
+            riderTag =
+                uri.queryParameters['rider'] ??
+                uri.queryParameters['id'] ??
+                'Rider';
           } catch (_) {}
 
           return MaterialPageRoute<void>(
