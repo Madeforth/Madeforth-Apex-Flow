@@ -1,4 +1,4 @@
-import 'package:apexflow/core/design/apex_spacing.dart';
+﻿import 'package:apexflow/core/design/apex_spacing.dart';
 import 'package:apexflow/core/i18n/app_settings_state.dart';
 import 'package:apexflow/core/i18n/app_strings.dart';
 import 'package:apexflow/shared/widgets/apex_panel.dart';
@@ -678,7 +678,7 @@ class ApexSegmentedToggle extends StatelessWidget {
         height: 48,
         constraints: const BoxConstraints(maxWidth: 310),
         decoration: BoxDecoration(
-          color: const Color(0xFF1A1F2B), // Navbar background
+          color: context.colors.navChip, // Navbar background
           border: Border.all(
             color: Colors.white.withValues(alpha: 0.08),
             width: 1,

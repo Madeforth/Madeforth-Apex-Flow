@@ -17,6 +17,7 @@ class ApexColorsExtension extends ThemeExtension<ApexColorsExtension> {
     required this.inkSoft,
     required this.rail,
     required this.onAccent,
+    required this.navChip,
   });
 
   final Color background;
@@ -35,6 +36,13 @@ class ApexColorsExtension extends ThemeExtension<ApexColorsExtension> {
   final Color rail;
   final Color onAccent;
 
+  /// Background used by the floating glass nav bar and the "fake tab bar"
+  /// chips that mimic it (garage/rides/profile/settings tab strips). Was
+  /// copy-pasted as a raw hex (0xFF1A1F2B) across ~6 files; centralized here
+  /// so a future retint only needs one edit. Value unchanged — this is a
+  /// pure dedup, not a recolor.
+  final Color navChip;
+
   @override
   ApexColorsExtension copyWith({
     Color? background,
@@ -52,6 +60,7 @@ class ApexColorsExtension extends ThemeExtension<ApexColorsExtension> {
     Color? inkSoft,
     Color? rail,
     Color? onAccent,
+    Color? navChip,
   }) {
     return ApexColorsExtension(
       background: background ?? this.background,
@@ -69,6 +78,7 @@ class ApexColorsExtension extends ThemeExtension<ApexColorsExtension> {
       inkSoft: inkSoft ?? this.inkSoft,
       rail: rail ?? this.rail,
       onAccent: onAccent ?? this.onAccent,
+      navChip: navChip ?? this.navChip,
     );
   }
 
@@ -96,6 +106,7 @@ class ApexColorsExtension extends ThemeExtension<ApexColorsExtension> {
       inkSoft: Color.lerp(inkSoft, other.inkSoft, t)!,
       rail: Color.lerp(rail, other.rail, t)!,
       onAccent: Color.lerp(onAccent, other.onAccent, t)!,
+      navChip: Color.lerp(navChip, other.navChip, t)!,
     );
   }
 }

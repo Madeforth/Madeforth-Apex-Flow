@@ -50,7 +50,9 @@ class ApexLimelightNavigationBar extends StatelessWidget {
                 height: height,
                 constraints: const BoxConstraints(maxWidth: 310),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1A1F2B).withValues(alpha: 0.8), // Semi-transparent navbar background
+                  color: context.colors.navChip.withValues(
+                    alpha: 0.8,
+                  ), // Semi-transparent navbar background
                   borderRadius: BorderRadius.circular(28),
                   border: Border.all(
                     color: Colors.white.withValues(alpha: 0.08),
@@ -66,57 +68,57 @@ class ApexLimelightNavigationBar extends StatelessWidget {
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
                 child: LayoutBuilder(
-              builder: (context, constraints) {
-                final itemWidth = constraints.maxWidth / count;
-                final highlightWidth = itemWidth - 4;
-                final innerHeight = constraints.maxHeight - 8;
+                  builder: (context, constraints) {
+                    final itemWidth = constraints.maxWidth / count;
+                    final highlightWidth = itemWidth - 4;
+                    final innerHeight = constraints.maxHeight - 8;
 
-                return Stack(
-                  children: [
-                    // Liquid sliding highlight
-                    _LiquidHighlight(
-                      selectedIndex: selectedIndex,
-                      itemCount: count,
-                      itemWidth: itemWidth,
-                      highlightWidth: highlightWidth,
-                      innerHeight: innerHeight,
-                      color: primaryColor.withValues(alpha: 0.14),
-                    ),
-                    // Icon buttons row
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: List.generate(count, (index) {
-                        final isSelected = index == selectedIndex;
-                        final item = destinations[index];
+                    return Stack(
+                      children: [
+                        // Liquid sliding highlight
+                        _LiquidHighlight(
+                          selectedIndex: selectedIndex,
+                          itemCount: count,
+                          itemWidth: itemWidth,
+                          highlightWidth: highlightWidth,
+                          innerHeight: innerHeight,
+                          color: primaryColor.withValues(alpha: 0.14),
+                        ),
+                        // Icon buttons row
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: List.generate(count, (index) {
+                            final isSelected = index == selectedIndex;
+                            final item = destinations[index];
 
-                        return Expanded(
-                          child: GestureDetector(
-                            key: Key('nav_item_$index'),
-                            onTap: () => onDestinationSelected(index),
-                            behavior: HitTestBehavior.opaque,
-                            child: Center(
-                              child: Icon(
-                                isSelected ? item.selectedIcon : item.icon,
-                                size: isSelected ? 24 : 22,
-                                color: isSelected
-                                    ? primaryColor
-                                    : context.colors.textSecondary,
+                            return Expanded(
+                              child: GestureDetector(
+                                key: Key('nav_item_$index'),
+                                onTap: () => onDestinationSelected(index),
+                                behavior: HitTestBehavior.opaque,
+                                child: Center(
+                                  child: Icon(
+                                    isSelected ? item.selectedIcon : item.icon,
+                                    size: isSelected ? 24 : 22,
+                                    color: isSelected
+                                        ? primaryColor
+                                        : context.colors.textSecondary,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                        );
-                      }),
-                    ),
-                  ],
-                );
-              },
+                            );
+                          }),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
             ),
           ),
         ),
       ),
-    ),
-  ),
-);
+    );
   }
 }
 
@@ -202,18 +204,22 @@ class _LiquidHighlightState extends State<_LiquidHighlight>
 
         if (movingRight) {
           // Right edge leads (fast), left edge follows (delayed peel-off)
-          final leadT = Curves.easeOutCubic
-              .transform((t * 1.3).clamp(0.0, 1.0));
-          final trailT = Curves.easeOutCubic
-              .transform(((t - 0.2) * 1.25).clamp(0.0, 1.0));
+          final leadT = Curves.easeOutCubic.transform(
+            (t * 1.3).clamp(0.0, 1.0),
+          );
+          final trailT = Curves.easeOutCubic.transform(
+            ((t - 0.2) * 1.25).clamp(0.0, 1.0),
+          );
           right = _startRight + (_endRight - _startRight) * leadT;
           left = _startLeft + (_endLeft - _startLeft) * trailT;
         } else {
           // Left edge leads (fast), right edge follows (delayed peel-off)
-          final leadT = Curves.easeOutCubic
-              .transform((t * 1.3).clamp(0.0, 1.0));
-          final trailT = Curves.easeOutCubic
-              .transform(((t - 0.2) * 1.25).clamp(0.0, 1.0));
+          final leadT = Curves.easeOutCubic.transform(
+            (t * 1.3).clamp(0.0, 1.0),
+          );
+          final trailT = Curves.easeOutCubic.transform(
+            ((t - 0.2) * 1.25).clamp(0.0, 1.0),
+          );
           left = _startLeft + (_endLeft - _startLeft) * leadT;
           right = _startRight + (_endRight - _startRight) * trailT;
         }
@@ -221,7 +227,10 @@ class _LiquidHighlightState extends State<_LiquidHighlight>
         return Positioned(
           left: left,
           top: 4,
-          width: (right - left).clamp(widget.highlightWidth * 0.8, double.infinity),
+          width: (right - left).clamp(
+            widget.highlightWidth * 0.8,
+            double.infinity,
+          ),
           height: widget.innerHeight,
           child: Container(
             decoration: BoxDecoration(

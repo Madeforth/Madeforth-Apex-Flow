@@ -252,7 +252,7 @@ class GarageScreen extends ConsumerWidget {
                         height: 38,
                         constraints: const BoxConstraints(maxWidth: 270),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1A1F2B).withValues(
+                          color: context.colors.navChip.withValues(
                             alpha: 0.8,
                           ), // Semi-transparent navbar background
                           borderRadius: BorderRadius.circular(19),

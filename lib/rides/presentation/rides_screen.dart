@@ -1,4 +1,4 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 import 'package:apexflow/rides/presentation/widgets/start_ride_sheet.dart';
 import 'package:apexflow/rituals/application/rituals_state.dart';
 import 'package:apexflow/rituals/presentation/ride_readiness_screen.dart';
@@ -216,7 +216,7 @@ class _RidesScreenState extends ConsumerState<RidesScreen> {
                         height: 38,
                         constraints: const BoxConstraints(maxWidth: 270),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1A1F2B).withValues(
+                          color: context.colors.navChip.withValues(
                             alpha: 0.8,
                           ), // Semi-transparent navbar background
                           borderRadius: BorderRadius.circular(19),

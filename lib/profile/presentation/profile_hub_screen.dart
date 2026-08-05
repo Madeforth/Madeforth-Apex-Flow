@@ -606,7 +606,7 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                       height: 38,
                       constraints: const BoxConstraints(maxWidth: 270),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1A1F2B).withValues(
+                        color: context.colors.navChip.withValues(
                           alpha: 0.8,
                         ), // Semi-transparent navbar background
                         borderRadius: BorderRadius.circular(19),
@@ -6993,7 +6993,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       behavior: HitTestBehavior.opaque,
                       child: Container(
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1A1F2B).withValues(alpha: 0.6),
+                          color: context.colors.navChip.withValues(alpha: 0.6),
                           borderRadius: BorderRadius.circular(24),
                           border: Border.all(
                             color: Colors.white.withValues(alpha: 0.05),
@@ -7025,7 +7025,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       behavior: HitTestBehavior.opaque,
                       child: Container(
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1A1F2B).withValues(alpha: 0.8),
+                          color: context.colors.navChip.withValues(alpha: 0.8),
                           borderRadius: BorderRadius.circular(24),
                           border: Border.all(
                             color: Colors.white.withValues(alpha: 0.08),
@@ -8919,7 +8919,7 @@ class _ProfileAppearanceScreenState
                 behavior: HitTestBehavior.opaque,
                 child: Container(
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1A1F2B).withValues(alpha: 0.8),
+                    color: context.colors.navChip.withValues(alpha: 0.8),
                     borderRadius: BorderRadius.circular(24),
                     border: Border.all(
                       color: Colors.white.withValues(alpha: 0.08),
@@ -8976,7 +8976,7 @@ class _ProfileAppearanceScreenState
                       behavior: HitTestBehavior.opaque,
                       child: Container(
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1A1F2B).withValues(alpha: 0.6),
+                          color: context.colors.navChip.withValues(alpha: 0.6),
                           borderRadius: BorderRadius.circular(24),
                           border: Border.all(
                             color: Colors.white.withValues(alpha: 0.05),
@@ -9008,7 +9008,7 @@ class _ProfileAppearanceScreenState
                       behavior: HitTestBehavior.opaque,
                       child: Container(
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1A1F2B).withValues(alpha: 0.8),
+                          color: context.colors.navChip.withValues(alpha: 0.8),
                           borderRadius: BorderRadius.circular(24),
                           border: Border.all(
                             color: Colors.white.withValues(alpha: 0.08),
