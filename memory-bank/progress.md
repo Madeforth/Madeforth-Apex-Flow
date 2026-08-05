@@ -2,6 +2,13 @@
 
 Status recorded 2026-08-04, from repo inspection (not from README claims alone unless marked as such).
 
+## 2026-08-05 — Second-Pass Bug Audit (16/20 done, on branch `agent/fix-safety-persistence-maps`)
+Full-project scan (3 parallel Explore agents + direct code verification of every finding before fixing) found 20 issues beyond the original 6-item list. Plan at `C:\Users\onyed\.claude\plans\stateful-swimming-fern.md`. Items #1-16 fixed and committed (`134c2f2`, `f1c0120`); #17-20 (TextEditingController leaks, silent short-ride discard, hardcoded colors bypassing ApexColors, unused ApexBreakpoints) still pending — see `activeContext.md` for the full breakdown and exact resume point. Two findings (#7, #12) were investigated and found to be false positives — no change made, documented in `activeContext.md` rather than "fixed."
+
+**Important**: this work landed on branch `agent/fix-safety-persistence-maps`, not `main` — a different concurrent Claude Code session was found to be working in the same repo directory on that branch. See `activeContext.md` "Current Task" for full detail before assuming `main`'s state reflects this work, and before merging/pushing.
+
+A debug build was installed on the user's LG G5 (`com.apexflow.app`) for manual testing, reflecting code through item #16 only.
+
 ## Verified Working (evidence: code/rules present and consistent)
 - Firestore rules for `users`, `public_rider_cards`, `rider_tags`, `entitlements`, `notification_tokens`, `parking_requests`, `bug_reports` are defined with owner-scoping / backend-only-write patterns consistent with CLAUDE.md invariants (client cannot self-grant entitlements; PII-adjacent collections are not publicly readable).
 - Isar entity set exists for daily checks, documents, friends, motorcycles, ride sessions, service records, tax records, each with generated code — indicates schema is wired, not merely stubbed.

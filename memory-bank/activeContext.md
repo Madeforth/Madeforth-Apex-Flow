@@ -2,8 +2,40 @@
 
 ## Current Task
 
-**2026-08-05 task completed locally (uncommitted):** Removed debug TLS certificate bypasses, made Insights manual cost entries validate and persist durably with rollback on storage failure, declared directly imported packages, and replaced dummy Maps keys with external Android/iOS configuration. Added two Insights regression tests. Verification: `flutter test` 93/93 passed; `flutter analyze --no-pub` has 325 pre-existing warnings/info and 0 errors (down from 328, still exits non-zero); Android debug APK built successfully. iOS build not verified on Windows. A real `MAPS_API_KEY` / `GOOGLE_MAPS_API_KEY` is still required outside Git before map rendering works. `CLAUDE.md` remained untouched and is explicitly read-only per the user.
-**All 6 items on the user's issue list are now fixed and committed** (`ce6131b`, `443ea27`, `aece0d1`, `e107a75`, `5ba660d`, `e2eb1d0` — see `progress.md` for the full per-item detail). Two things remain genuinely open, both requiring the user's own action, not more code:
+**2026-08-05, THIS session — second-pass bug audit, in progress on branch `agent/fix-safety-persistence-maps` (not `main`):**
+Mid-session discovery: the working directory was found checked out to `agent/fix-safety-persistence-maps` instead of `main`, with a commit (`8bcf84e`) from what appears to be a **different, concurrent Claude Code session/window** working in this same repo directory (see the line below this one — that's its own note about its own commit, left as-is). Confirmed no file/content conflicts before continuing; user was asked and explicitly said to continue on this branch rather than move to `main`. **Before merging this branch to `main`, re-verify no further divergence happened from that other session.**
+
+Task: user asked for a full-project scan (functional + design bugs), done via 3 parallel Explore agents (`isolation: "worktree"`) covering (a) core/services/storage/sync/settings/profile/onboarding/notifications, (b) garage/rides/rituals/harmony_engine/fuel/shared, (c) documents/insights/dashboard/features + design tokens. Plan approved via ExitPlanMode, saved at `C:\Users\onyed\.claude\plans\stateful-swimming-fern.md`. 20 findings total; **every finding was spot-checked directly in code before any fix was applied** (not blindly trusted) — this caught 2 false positives from the Explore agents (item #7 Insights cost-entry — already correctly implemented, turned out to be the *other concurrent session's* `8bcf84e` fix, which is why it looked "already fixed" when checked; item #12 addServiceRecord/lastServiceKm — the agent misunderstood `type: 'diy'` as "non-service", but it means rider-self-performed service, a real service event, so the flagged behavior is actually correct).
+
+**Done (commits `134c2f2`, `f1c0120`), all verified with `flutter analyze` (0 errors) + `flutter test` (93/93) after each group:**
+1. Google sign-in broken tag interpolation (`@google_randomNum}` → `@google_$randomNum`)
+2. `loginUser()` (tag+password) now restores avatar/theme/XP/supporter/badges like the other login methods — was previously silently overwriting the user's real cloud profile with defaults on next auto-sync
+3. `logout()` now clears `_youtubeKey`/`_supporterTierKey`/`_unlockedSupporterTiersKey`/`_riderXpKey` (previously leaked across accounts on a shared device)
+4. `deleteAccount()` now returns success/failure instead of throwing uncaught; UI shows a retry-oriented error
+5. Bug reports use the real installation id instead of hardcoded `'tester_user_uid'`
+6. `LocalBugOutbox.saveReport()` rethrows on failure instead of swallowing it; UI shows an error snackbar on submit failure
+7. *(false positive — already fixed by the other session, no action)*
+8/8b. Document expiry reminder now scheduled against the document's real persisted id (`addDocument()` now returns it); `deleteDocument()` cancels the reminder
+9. Documents expiring in <30 days now get a near-term fallback reminder instead of none
+10. Wear-per-ride now accumulates via persisted fractional carry fields (`chainWearCarry` etc. on `MotorcycleProfile`/`MotorcycleEntity`) instead of each ride's delta being rounded to 0 for typical short/commute distances
+11. Maintenance calendar checks now use a real `wearUpdatedAtIso` timestamp (stamped on every wear-affecting change) instead of a permanently-fixed "installed 90 days ago"
+12. *(false positive, see above — no action)*
+13. Notification timezone was hardcoded to `Europe/Istanbul` for every user; added the `flutter_timezone` package (user confirmed the new dependency first) and now reads the real device IANA timezone
+14. `TaxRecord.dueDate` now uses `tryParse` + fallback instead of unguarded `parse` (could crash Documents/Insights on malformed data)
+15. Insights cost ledger no longer shows a hardcoded fake date ("11 Jul 2026") on every entry — `CostEntry` now has a real `dateIso` field
+16. `ServiceRecord.cost`'s currency-blind regex ($/€ treated as TRY) — documented as a known limitation inline, full fix (needs a currency field) explicitly out of scope for this pass
+
+**Not yet done (Group C, tasks #17-20 in the task list):**
+17. `TextEditingController` leaks in Add/Edit Motorcycle bottom sheets (`garage_screen.dart` `_showAddBikeSheet`/`_showEditBikeSheet`) — investigation started, no edit made yet
+18. Short/slow rides silently discarded with no user feedback (`ride_state.dart` `endRide`)
+19. Hardcoded colors bypassing `ApexColors` tokens (Insights screen ~20+ spots, nav bar, 2 spots in garage_screen.dart)
+20. `ApexBreakpoints` defined but unused anywhere (confirmed — `insights_screen.dart` imports it but doesn't use it either, flagged as unused-import by analyze); shell hardcodes 430px instead of `ApexBreakpoints.compact` (420)
+
+**Side task, same session:** built a debug APK (`flutter build apk --debug`) and installed it on the user's connected LG G5 (`LGH85092a403f4`, `com.apexflow.app`) for manual testing, at the user's request when they had to leave for work — this used the code state as of commit `f1c0120` (through item #16), items 17-20 not yet included in that install.
+
+---
+
+**All 6 items on the user's original issue list are fixed and committed** (`ce6131b`, `443ea27`, `aece0d1`, `e107a75`, `5ba660d`, `e2eb1d0` — see `progress.md` for the full per-item detail; this was a prior, separate pass, now superseded as "done" — the second-pass audit above is the current active work). Two things remain genuinely open from that pass, both requiring the user's own action, not more code:
 1. Deploy `firestore.rules` (items #3/#5) — never run this session; needs `firebase deploy --only firestore:rules` after the user verifies in Firebase Console Rules Playground (no local Java 21+ for the emulator).
 2. Swap the RevenueCat sandbox API key for the production key (item #2) before any real release build, and decide whether to add a "Restore Purchases" UI entry point and/or the optional Pub/Sub real-time notifications (both deferred, not blocking).
 
@@ -68,9 +100,11 @@ Recorded in case this needs revisiting — e.g. adding the iOS app, redoing perm
 - Skipped by user's choice: "Google developer notifications" (Pub/Sub real-time purchase events) — the topic-ID field requires a pre-existing Pub/Sub topic and the "Connect to Google" button stayed disabled when typing a new name; not investigated further since it's optional.
 
 ## Next Step
-No code work is currently planned — the user's issue list is fully addressed. If resuming a fresh session, check first whether the two open items above (Firestore rules deploy, RevenueCat production API key swap) have been actioned outside this tool before assuming they're still pending.
+**Immediate**: resume the second-pass bug audit plan at item #17 (`C:\Users\onyed\.claude\plans\stateful-swimming-fern.md` has the full original list; tasks #17-20 above are the live remainder). First re-check `git branch --show-current` — confirm still on `agent/fix-safety-persistence-maps` and whether the other concurrent session added anything new before touching the same files (`garage_screen.dart` for #17, `insights_screen.dart`/`apex_limelight_navigation_bar.dart` for #19, `apex_app_shell.dart` for #20).
 
-Deferred, likely the next thing the user asks for: a full `lib/` sweep for unused/dead Dart files (not just assets) — explicitly postponed rather than rushed under a tight time budget. Do this carefully (grep every file's class/function usage before removing, watch for reflection-free but provider/route-registered files) since incorrectly removing a live file is a real regression risk, unlike the asset cleanup already done.
+After #17-20: this branch needs to be merged/rebased into `main` at some point (never done this session) — ask the user how they want that handled given the other concurrent session's commit is also on it.
 
-Several local commits may still be unpushed — check `git status` / `git log origin/main..HEAD`. Push only when the user asks, per this session's established pattern.
+Longer-term deferred item (separate from the above): a full `lib/` sweep for unused/dead Dart files (not just assets) — explicitly postponed in an earlier session under a tight time budget, not started.
+
+Several local commits may be unpushed on whichever branch is current — check `git status` / `git log origin/<branch>..HEAD`. Push only when the user asks, per this session's established pattern; this applies doubly now given the shared-branch situation — do not push without confirming the other session isn't also mid-commit.
 Read only the Memory Bank / source files relevant to the active step — this file plus `progress.md` should be sufficient to resume; `projectbrief.md`/`productContext.md`/`systemPatterns.md`/`techContext.md` are reference, not required reading every session.
