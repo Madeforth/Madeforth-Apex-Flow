@@ -519,6 +519,7 @@ class GarageController extends Notifier<GarageState> {
     final avgDistance = totalRides > 0 ? totalDistance / totalRides : 0.0;
 
     final harmony = const HarmonyEngine().evaluate(bike, state.latestRide);
+    final languageCode = ref.read(appSettingsProvider).locale.languageCode;
 
     return GaragePassport(
       bike: bike,
@@ -527,8 +528,8 @@ class GarageController extends Notifier<GarageState> {
       totalDistanceKm: totalDistance,
       averageRideDistanceKm: avgDistance,
       harmonyScore: harmony.score,
-      harmonyLevel: harmony.level.label,
-      harmonyInsight: harmony.insight,
+      harmonyLevel: harmony.level.localizedLabel(languageCode),
+      harmonyInsight: harmonyInsightText(harmony.insightKey, languageCode),
       generatedAtIso: DateTime.now().toUtc().toIso8601String(),
     );
   }

@@ -1,3 +1,4 @@
+import 'package:apexflow/core/i18n/app_strings.dart';
 import 'package:apexflow/garage/domain/motorcycle_profile.dart';
 import 'package:apexflow/rides/domain/ride_session.dart';
 
@@ -9,19 +10,129 @@ enum HarmonyLevel {
   collapse('Collapse State');
 
   const HarmonyLevel(this.label);
+
+  /// Legacy English label — kept for anything not yet migrated to
+  /// [localizedLabel]. Prefer [localizedLabel] for any user-facing text.
   final String label;
+
+  String localizedLabel(String languageCode) {
+    switch (this) {
+      case HarmonyLevel.zen:
+        return tInline(languageCode, 'Zen Durumu', 'Zen State', 'Zen-Zustand');
+      case HarmonyLevel.stable:
+        return tInline(
+          languageCode,
+          'Stabil Durum',
+          'Stable State',
+          'Stabiler Zustand',
+        );
+      case HarmonyLevel.drift:
+        return tInline(
+          languageCode,
+          'Mekanik Sapma',
+          'Mechanical Drift',
+          'Mechanische Drift',
+        );
+      case HarmonyLevel.critical:
+        return tInline(
+          languageCode,
+          'Kritik Dengesizlik',
+          'Critical Instability',
+          'Kritische Instabilität',
+        );
+      case HarmonyLevel.collapse:
+        return tInline(
+          languageCode,
+          'Çöküş Durumu',
+          'Collapse State',
+          'Kollapszustand',
+        );
+    }
+  }
+}
+
+enum HarmonyInsightKey {
+  overdue,
+  dueSoon,
+  chainWear,
+  brakeWear,
+  tireWear,
+  oilHealth,
+  clean,
+  stableWithWearSignals,
+}
+
+String harmonyInsightText(HarmonyInsightKey key, String languageCode) {
+  switch (key) {
+    case HarmonyInsightKey.overdue:
+      return tInline(
+        languageCode,
+        'Servis penceresi gecikti. Uzun sürüşten önce bu aralığı kapatın.',
+        'Service window is overdue. Close the interval before the next long ride.',
+        'Das Servicefenster ist überfällig. Schließen Sie das Intervall vor der nächsten langen Fahrt ab.',
+      );
+    case HarmonyInsightKey.dueSoon:
+      return tInline(
+        languageCode,
+        'Servis penceresi yaklaşıyor. Bir sonraki kontrolü yakın tutun.',
+        'Service window is approaching. Keep the next check close.',
+        'Das Servicefenster naht. Behalten Sie die nächste Kontrolle im Blick.',
+      );
+    case HarmonyInsightKey.chainWear:
+      return tInline(
+        languageCode,
+        'Zincir sinyali aktif. Önce yağlama ve boşluk kontrolü yapılmalı.',
+        'Chain signal is active. Lubrication and slack check should come first.',
+        'Kettensignal aktiv. Schmierung und Spielkontrolle sollten zuerst erfolgen.',
+      );
+    case HarmonyInsightKey.brakeWear:
+      return tInline(
+        languageCode,
+        'Fren hissi dikkat gerektiriyor. Balata ve kol tepkisini inceleyin.',
+        'Brake feel needs attention. Inspect pads and lever response.',
+        'Das Bremsgefühl braucht Aufmerksamkeit. Beläge und Hebelreaktion prüfen.',
+      );
+    case HarmonyInsightKey.tireWear:
+      return tInline(
+        languageCode,
+        'Lastik aşınması bir sonraki bakım işlemini şekillendiriyor.',
+        'Tire wear is shaping the next maintenance action.',
+        'Der Reifenverschleiß bestimmt die nächste Wartungsmaßnahme.',
+      );
+    case HarmonyInsightKey.oilHealth:
+      return tInline(
+        languageCode,
+        'Yağ sağlığı düşüyor. Aralık genişlemeden servis planlayın.',
+        'Oil health is drifting. Plan service before the interval expands.',
+        'Der Ölzustand verschlechtert sich. Planen Sie den Service, bevor sich das Intervall verlängert.',
+      );
+    case HarmonyInsightKey.clean:
+      return tInline(
+        languageCode,
+        'Makine ritmi temiz. Mevcut ritüel temposunu koruyun.',
+        'Machine rhythm is clean. Maintain current ritual cadence.',
+        'Der Maschinenrhythmus ist sauber. Behalten Sie das aktuelle Ritualtempo bei.',
+      );
+    case HarmonyInsightKey.stableWithWearSignals:
+      return tInline(
+        languageCode,
+        'Bakım tutarlılığı stabil, ancak aşınma sinyalleri izlenmeli.',
+        'Maintenance consistency is stable, but wear signals need monitoring.',
+        'Die Wartungskonsistenz ist stabil, aber Verschleißsignale müssen beobachtet werden.',
+      );
+  }
 }
 
 class HarmonySnapshot {
   const HarmonySnapshot({
     required this.score,
     required this.level,
-    required this.insight,
+    required this.insightKey,
   });
 
   final int score;
   final HarmonyLevel level;
-  final String insight;
+  final HarmonyInsightKey insightKey;
 }
 
 class HarmonyEngine {
@@ -47,7 +158,7 @@ class HarmonyEngine {
     return HarmonySnapshot(
       score: score,
       level: _levelFor(score),
-      insight: _insightFor(score, bike, latestRide),
+      insightKey: _insightKeyFor(score, bike, latestRide),
     );
   }
 
@@ -129,33 +240,33 @@ class HarmonyEngine {
     return HarmonyLevel.collapse;
   }
 
-  String _insightFor(
+  HarmonyInsightKey _insightKeyFor(
     int score,
     MotorcycleProfile bike,
     RideSession latestRide,
   ) {
     final note = latestRide.mechanicalObservation.toLowerCase();
     if (bike.serviceWindowState == ServiceWindowState.overdue) {
-      return 'Service window is overdue. Close the interval before the next long ride.';
+      return HarmonyInsightKey.overdue;
     }
     if (bike.serviceWindowState == ServiceWindowState.dueSoon) {
-      return 'Service window is approaching. Keep the next check close.';
+      return HarmonyInsightKey.dueSoon;
     }
     if (bike.chainWearPercent > 44 || note.contains('chain')) {
-      return 'Chain signal is active. Lubrication and slack check should come first.';
+      return HarmonyInsightKey.chainWear;
     }
     if (bike.brakeWearPercent > 50 || note.contains('brake')) {
-      return 'Brake feel needs attention. Inspect pads and lever response.';
+      return HarmonyInsightKey.brakeWear;
     }
     if (bike.tireWearPercent > 55 || note.contains('tire')) {
-      return 'Tire wear is shaping the next maintenance action.';
+      return HarmonyInsightKey.tireWear;
     }
     if (bike.oilHealthPercent < 64 || note.contains('oil')) {
-      return 'Oil health is drifting. Plan service before the interval expands.';
+      return HarmonyInsightKey.oilHealth;
     }
     if (score >= 90) {
-      return 'Machine rhythm is clean. Maintain current ritual cadence.';
+      return HarmonyInsightKey.clean;
     }
-    return 'Maintenance consistency is stable, but wear signals need monitoring.';
+    return HarmonyInsightKey.stableWithWearSignals;
   }
 }
