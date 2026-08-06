@@ -3,9 +3,11 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>29839209813-lha2bm8pqmo53fs09jj0gtct8c5jrbru.apps.googleusercontent.com</string>
+	<string>29839209813-vn573s42fhmbm69ejf6lal4e6fi32ahk.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.29839209813-lha2bm8pqmo53fs09jj0gtct8c5jrbru</string>
+	<string>com.googleusercontent.apps.29839209813-vn573s42fhmbm69ejf6lal4e6fi32ahk</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>29839209813-ut8ad4vnuutc71uepdk0o700lk7f5bq9.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
 	<string>AIzaSyDKgscj4FChM7qcdE0eSX3YMNz9CYH_aDk</string>
 	<key>GCM_SENDER_ID</key>
@@ -13,22 +15,22 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.example.apexflow</string>
+	<string>com.apexflow.app</string>
 	<key>PROJECT_ID</key>
 	<string>apex-flow-7baea</string>
 	<key>STORAGE_BUCKET</key>
 	<string>apex-flow-7baea.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
-	<false/>
+	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
-	<false/>
+	<false></false>
 	<key>IS_APPINVITE_ENABLED</key>
-	<true/>
+	<true></true>
 	<key>IS_GCM_ENABLED</key>
-	<true/>
+	<true></true>
 	<key>IS_SIGNIN_ENABLED</key>
-	<true/>
+	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:29839209813:ios:10670feb478f51b2796bdc</string>
+	<string>1:29839209813:ios:d5ddb728b3ba9723796bdc</string>
 </dict>
 </plist>
