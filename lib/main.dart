@@ -104,13 +104,13 @@ void main() async {
     if (!kIsWeb && Platform.isIOS) {
       options = const FirebaseOptions(
         apiKey: "AIzaSyDKgscj4FChM7qcdE0eSX3YMNz9CYH_aDk",
-        appId: "1:29839209813:ios:10670feb478f51b2796bdc",
+        appId: "1:29839209813:ios:d5ddb728b3ba9723796bdc",
         messagingSenderId: "29839209813",
         projectId: "apex-flow-7baea",
         storageBucket: "apex-flow-7baea.firebasestorage.app",
-        iosBundleId: "com.example.apexflow",
+        iosBundleId: "com.apexflow.app",
         iosClientId:
-            "29839209813-lha2bm8pqmo53fs09jj0gtct8c5jrbru.apps.googleusercontent.com",
+            "29839209813-vn573s42fhmbm69ejf6lal4e6fi32ahk.apps.googleusercontent.com",
       );
     } else {
       options = const FirebaseOptions(
