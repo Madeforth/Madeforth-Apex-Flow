@@ -1,8 +1,9 @@
 import 'package:apexflow/core/design/apex_colors.dart';
-import 'package:apexflow/core/design/apex_breakpoints.dart';
 import 'package:apexflow/core/design/apex_spacing.dart';
+import 'package:apexflow/core/i18n/app_settings_state.dart';
 import 'package:apexflow/core/i18n/app_strings.dart';
 import 'package:apexflow/insights/application/insights_state.dart';
+import 'package:apexflow/shared/design/slate_palette.dart';
 import 'package:apexflow/garage/application/garage_state.dart';
 import 'package:apexflow/rides/application/ride_state.dart';
 import 'package:apexflow/rides/domain/ride_session.dart';
@@ -30,12 +31,12 @@ class InsightsScreen extends ConsumerWidget {
     final garageState = ref.watch(garageStateProvider);
     final dashboard = ref.watch(dashboardStateProvider);
     final rideState = ref.watch(rideStateProvider);
+    final currencySymbol = ref.watch(appSettingsProvider).currencySymbol;
     final tr = strings.locale.languageCode == 'tr';
 
     return Scaffold(
-      backgroundColor: const Color(
-        0xFF0F172A,
-      ), // Very dark background matching the image
+      backgroundColor:
+          SlatePalette.surfaceDeep, // Very dark background matching the image
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
@@ -87,9 +88,9 @@ class InsightsScreen extends ConsumerWidget {
                           vertical: 8,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1E293B),
+                          color: SlatePalette.surface,
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: const Color(0xFF334155)),
+                          border: Border.all(color: SlatePalette.border),
                         ),
                         child: Row(
                           children: [
@@ -125,9 +126,9 @@ class InsightsScreen extends ConsumerWidget {
                       child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1E293B),
+                          color: SlatePalette.surface,
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: const Color(0xFF334155)),
+                          border: Border.all(color: SlatePalette.border),
                         ),
                         child: const Icon(
                           Icons.badge_outlined,
@@ -146,9 +147,9 @@ class InsightsScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFF1E293B),
+                color: SlatePalette.surface,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFF334155)),
+                border: Border.all(color: SlatePalette.border),
               ),
               child: Row(
                 children: [
@@ -197,9 +198,9 @@ class InsightsScreen extends ConsumerWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF0F172A),
+                      color: SlatePalette.surfaceDeep,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: const Color(0xFF334155)),
+                      border: Border.all(color: SlatePalette.border),
                     ),
                     child: Text(
                       tInline(
@@ -264,7 +265,8 @@ class InsightsScreen extends ConsumerWidget {
                       'Total recorded',
                       'Insgesamt erfasst',
                     ),
-                    value: '₺${state.totalCostTry.toStringAsFixed(0)}',
+                    value:
+                        '$currencySymbol${state.totalCostTry.toStringAsFixed(0)}',
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -294,7 +296,11 @@ class InsightsScreen extends ConsumerWidget {
                 'Auswirkungen der letzten Fahrt',
               ),
             ),
-            _RecentRideImpactCard(state: state, tr: tr, sessions: rideState.sessions),
+            _RecentRideImpactCard(
+              state: state,
+              tr: tr,
+              sessions: rideState.sessions,
+            ),
             const SizedBox(height: 24),
 
             // Upcoming maintenance
@@ -322,7 +328,7 @@ class InsightsScreen extends ConsumerWidget {
                 'Kostenbuch',
               ),
             ),
-            _CostLedgerCard(state: state, tr: tr),
+            _CostLedgerCard(state: state, tr: tr, strings: strings),
             const SizedBox(height: 40),
 
             // Parts Wishlist (Kept from original design logic but updated styling)
@@ -385,9 +391,9 @@ class InsightsScreen extends ConsumerWidget {
             else
               Container(
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1E293B),
+                  color: SlatePalette.surface,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFF334155)),
+                  border: Border.all(color: SlatePalette.border),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -399,6 +405,7 @@ class InsightsScreen extends ConsumerWidget {
                         _WishlistRow(
                           part: part,
                           tr: tr,
+                          currencySymbol: currencySymbol,
                           onDelete: () {
                             ref
                                 .read(insightsStateProvider.notifier)
@@ -415,7 +422,7 @@ class InsightsScreen extends ConsumerWidget {
                           },
                         ),
                         if (index < state.partsWishlist.length - 1)
-                          Divider(color: const Color(0xFF334155), height: 1),
+                          Divider(color: SlatePalette.border, height: 1),
                       ],
                     );
                   }).toList(),
@@ -449,7 +456,7 @@ class InsightsScreen extends ConsumerWidget {
       builder: (context) {
         return Container(
           decoration: const BoxDecoration(
-            color: Color(0xFF0F172A), // Dark surface
+            color: SlatePalette.surfaceDeep, // Dark surface
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
           padding: EdgeInsets.fromLTRB(
@@ -484,9 +491,9 @@ class InsightsScreen extends ConsumerWidget {
                     child: Container(
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1E293B),
+                        color: SlatePalette.surface,
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: const Color(0xFF334155)),
+                        border: Border.all(color: SlatePalette.border),
                       ),
                       child: const Icon(
                         Icons.close,
@@ -609,7 +616,7 @@ class InsightsScreen extends ConsumerWidget {
                       'Teil speichern',
                     ),
                     style: const TextStyle(
-                      color: Color(0xFF0F172A),
+                      color: SlatePalette.surfaceDeep,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -631,9 +638,9 @@ class InsightsScreen extends ConsumerWidget {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
+        color: SlatePalette.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF334155)),
+        border: Border.all(color: SlatePalette.border),
       ),
       child: TextField(
         controller: controller,
@@ -641,8 +648,11 @@ class InsightsScreen extends ConsumerWidget {
         style: const TextStyle(color: Colors.white, fontSize: 14),
         decoration: InputDecoration(
           hintText: label,
-          hintStyle: const TextStyle(color: Color(0xFF94A3B8), fontSize: 14),
-          prefixIcon: Icon(icon, color: const Color(0xFF94A3B8), size: 18),
+          hintStyle: const TextStyle(
+            color: SlatePalette.mutedText,
+            fontSize: 14,
+          ),
+          prefixIcon: Icon(icon, color: SlatePalette.mutedText, size: 18),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 16,
@@ -701,9 +711,9 @@ class _MaintenanceOverviewCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
+        color: SlatePalette.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF334155)),
+        border: Border.all(color: SlatePalette.border),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -720,13 +730,13 @@ class _MaintenanceOverviewCard extends StatelessWidget {
                     CircularProgressIndicator(
                       value: 1.0,
                       strokeWidth: 8,
-                      color: const Color(0xFF334155),
+                      color: SlatePalette.border,
                       strokeCap: StrokeCap.round,
                     ),
                     CircularProgressIndicator(
                       value: harmonyScore / 100,
                       strokeWidth: 8,
-                      color: const Color(0xFFEAB308), // Yellow-ish
+                      color: SlatePalette.caution, // Yellow-ish
                       strokeCap: StrokeCap.round,
                     ),
                     Center(
@@ -770,15 +780,15 @@ class _MaintenanceOverviewCard extends StatelessWidget {
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF422006), // Dark yellow bg
+                  color: SlatePalette.cautionBackground, // Dark yellow bg
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFEAB308), width: 1),
+                  border: Border.all(color: SlatePalette.caution, width: 1),
                 ),
                 child: Row(
                   children: [
                     const Icon(
                       Icons.error_outline,
-                      color: Color(0xFFEAB308),
+                      color: SlatePalette.caution,
                       size: 12,
                     ),
                     const SizedBox(width: 4),
@@ -790,7 +800,7 @@ class _MaintenanceOverviewCard extends StatelessWidget {
                         'Achtung',
                       ),
                       style: const TextStyle(
-                        color: Color(0xFFEAB308),
+                        color: SlatePalette.caution,
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
                       ),
@@ -846,8 +856,8 @@ class _MaintenanceOverviewCard extends StatelessWidget {
                   child: LinearProgressIndicator(
                     value: clampedProgress,
                     minHeight: 6,
-                    backgroundColor: const Color(0xFF334155),
-                    color: const Color(0xFFEAB308),
+                    backgroundColor: SlatePalette.border,
+                    color: SlatePalette.caution,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -872,7 +882,7 @@ class _MaintenanceOverviewCard extends StatelessWidget {
                             return StatefulBuilder(
                               builder: (ctx, setState) {
                                 return AlertDialog(
-                                  backgroundColor: const Color(0xFF1E293B),
+                                  backgroundColor: SlatePalette.surface,
                                   title: Text(
                                     tInline(
                                       AppStrings.currentLanguageCode,
@@ -1055,9 +1065,9 @@ class _StatCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: const Color(0xFF1E293B),
+          color: SlatePalette.surface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFF334155)),
+          border: Border.all(color: SlatePalette.border),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1134,21 +1144,23 @@ class _RecentRideImpactCard extends StatelessWidget {
             'Keine Fahrten',
           );
 
-    final iconColor = hasPattern ? const Color(0xFFef4444) : context.colors.healthy;
+    final iconColor = hasPattern ? SlatePalette.danger : context.colors.healthy;
     final iconBgColor = hasPattern
-        ? const Color(0xFF450a0a).withValues(alpha: 0.5)
-        : const Color(0xFF064e3b).withValues(alpha: 0.5);
+        ? SlatePalette.dangerBackground.withValues(alpha: 0.5)
+        : SlatePalette.successBackground.withValues(alpha: 0.5);
     final iconBorderColor = hasPattern
-        ? const Color(0xFFdc2626).withValues(alpha: 0.5)
-        : const Color(0xFF059669).withValues(alpha: 0.5);
-    final iconData = hasPattern ? Icons.settings_backup_restore : Icons.check_circle_outline;
+        ? SlatePalette.dangerDeep.withValues(alpha: 0.5)
+        : SlatePalette.successDeep.withValues(alpha: 0.5);
+    final iconData = hasPattern
+        ? Icons.settings_backup_restore
+        : Icons.check_circle_outline;
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
+        color: SlatePalette.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF334155)),
+        border: Border.all(color: SlatePalette.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1161,15 +1173,9 @@ class _RecentRideImpactCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: iconBgColor,
                   shape: BoxShape.circle,
-                  border: Border.all(
-                    color: iconBorderColor,
-                  ),
+                  border: Border.all(color: iconBorderColor),
                 ),
-                child: Icon(
-                  iconData,
-                  color: iconColor,
-                  size: 20,
-                ),
+                child: Icon(iconData, color: iconColor, size: 20),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -1218,7 +1224,7 @@ class _RecentRideImpactCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Colors.transparent,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0xFFdc2626)),
+                    border: Border.all(color: SlatePalette.dangerDeep),
                   ),
                   child: Text(
                     tInline(
@@ -1228,7 +1234,7 @@ class _RecentRideImpactCard extends StatelessWidget {
                       'Überprüfen',
                     ),
                     style: const TextStyle(
-                      color: Color(0xFFef4444),
+                      color: SlatePalette.danger,
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                     ),
@@ -1251,7 +1257,7 @@ class _RecentRideImpactCard extends StatelessWidget {
             children: List.generate(20, (index) {
               // Creating a simple pattern similar to the image
               double height = 2;
-              Color color = const Color(0xFF334155);
+              Color color = SlatePalette.border;
 
               if (index >= 5 && index <= 15) {
                 height = (index == 9 || index == 13)
@@ -1260,9 +1266,9 @@ class _RecentRideImpactCard extends StatelessWidget {
                 if (index < 9)
                   color = context.colors.cyan;
                 else if (index < 13)
-                  color = const Color(0xFFeab308); // yellow
+                  color = SlatePalette.caution; // yellow
                 else
-                  color = const Color(0xFFef4444); // red
+                  color = SlatePalette.danger; // red
               }
 
               return Container(
@@ -1276,7 +1282,7 @@ class _RecentRideImpactCard extends StatelessWidget {
             }),
           ),
           const SizedBox(height: 16),
-          Divider(color: const Color(0xFF334155), height: 1),
+          Divider(color: SlatePalette.border, height: 1),
           const SizedBox(height: 12),
           Row(
             children: [
@@ -1350,9 +1356,9 @@ class _UpcomingMaintenanceCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
+        color: SlatePalette.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF334155)),
+        border: Border.all(color: SlatePalette.border),
       ),
       child: Column(
         children: [
@@ -1364,17 +1370,17 @@ class _UpcomingMaintenanceCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: const Color(
-                      0xFF422006,
-                    ).withValues(alpha: 0.5), // dark yellow
+                    color: SlatePalette.cautionBackground.withValues(
+                      alpha: 0.5,
+                    ), // dark yellow
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: const Color(0xFFeab308).withValues(alpha: 0.5),
+                      color: SlatePalette.caution.withValues(alpha: 0.5),
                     ),
                   ),
                   child: const Icon(
                     Icons.schedule,
-                    color: Color(0xFFeab308),
+                    color: SlatePalette.caution,
                     size: 20,
                   ),
                 ),
@@ -1421,7 +1427,7 @@ class _UpcomingMaintenanceCard extends StatelessWidget {
               ],
             ),
           ),
-          Divider(color: const Color(0xFF334155), height: 1),
+          Divider(color: SlatePalette.border, height: 1),
           // Dynamic items
           ...items.map((item) {
             return Padding(
@@ -1431,9 +1437,9 @@ class _UpcomingMaintenanceCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF0F172A).withValues(alpha: 0.5),
+                      color: SlatePalette.surfaceDeep.withValues(alpha: 0.5),
                       shape: BoxShape.circle,
-                      border: Border.all(color: const Color(0xFF334155)),
+                      border: Border.all(color: SlatePalette.border),
                     ),
                     child: Icon(
                       Icons.settings_suggest_outlined,
@@ -1475,19 +1481,25 @@ class _UpcomingMaintenanceCard extends StatelessWidget {
   }
 }
 
-class _CostLedgerCard extends StatelessWidget {
+class _CostLedgerCard extends ConsumerWidget {
   final InsightsState state;
   final bool tr;
+  final AppStrings strings;
 
-  const _CostLedgerCard({required this.state, required this.tr});
+  const _CostLedgerCard({
+    required this.state,
+    required this.tr,
+    required this.strings,
+  });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currencySymbol = ref.watch(appSettingsProvider).currencySymbol;
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF0A0A0A),
+        color: SlatePalette.oledBackground,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFF2D2D2F), width: 0.5),
+        border: Border.all(color: SlatePalette.oledBorder, width: 0.5),
       ),
       child: Column(
         children: [
@@ -1498,10 +1510,10 @@ class _CostLedgerCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1C1C1E),
+                    color: context.colors.rail,
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: const Color(0xFF2D2D2F),
+                      color: SlatePalette.oledBorder,
                       width: 0.5,
                     ),
                   ),
@@ -1517,7 +1529,7 @@ class _CostLedgerCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '₺${state.totalCostTry.toStringAsFixed(0)}',
+                        '$currencySymbol${state.totalCostTry.toStringAsFixed(0)}',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 20,
@@ -1541,7 +1553,8 @@ class _CostLedgerCard extends StatelessWidget {
                   ),
                 ),
                 GestureDetector(
-                  onTap: () => _showLedgerSheet(context, state, tr),
+                  onTap: () =>
+                      _showLedgerSheet(context, state, tr, currencySymbol),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12,
@@ -1573,7 +1586,7 @@ class _CostLedgerCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 GestureDetector(
-                  onTap: () => _showAddCostSheet(context),
+                  onTap: () => _showAddCostSheet(context, ref, strings),
                   child: Container(
                     padding: const EdgeInsets.all(7),
                     decoration: BoxDecoration(
@@ -1596,7 +1609,7 @@ class _CostLedgerCard extends StatelessWidget {
           ),
           if (state.costLedger.isNotEmpty) ...[
             Divider(
-              color: const Color(0xFF2D2D2F),
+              color: SlatePalette.oledBorder,
               height: 0.5,
               thickness: 0.5,
             ),
@@ -1622,7 +1635,7 @@ class _CostLedgerCard extends StatelessWidget {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            '${_translateLine(entry.category, tr)} · 11 ${tInline(AppStrings.currentLanguageCode, 'Tem', 'Jul', 'Jul')} 2026', // Hardcoded date for visual match or we can parse from somewhere if date is added to entry
+                            '${_translateLine(entry.category, tr)} · ${_formatCostEntryDate(entry.dateIso)}',
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 14,
@@ -1631,7 +1644,7 @@ class _CostLedgerCard extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          '₺${entry.amountTry.toStringAsFixed(0)}',
+                          '$currencySymbol${entry.amountTry.toStringAsFixed(0)}',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 14,
@@ -1666,7 +1679,7 @@ class _CostLedgerCard extends StatelessWidget {
                       child: LinearProgressIndicator(
                         value: percent,
                         minHeight: 3,
-                        backgroundColor: const Color(0xFF2D2D2F),
+                        backgroundColor: SlatePalette.oledBorder,
                         color: context.colors.cyan,
                       ),
                     ),
@@ -1699,7 +1712,12 @@ void _showSnack(BuildContext context, String msg) {
 }
 
 // Cost ledger bottom sheet — shows all entries
-void _showLedgerSheet(BuildContext context, InsightsState state, bool tr) {
+void _showLedgerSheet(
+  BuildContext context,
+  InsightsState state,
+  bool tr,
+  String currencySymbol,
+) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -1730,7 +1748,7 @@ void _showLedgerSheet(BuildContext context, InsightsState state, bool tr) {
                   width: 36,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF636366),
+                    color: context.colors.muted,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -1739,9 +1757,9 @@ void _showLedgerSheet(BuildContext context, InsightsState state, bool tr) {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.account_balance_wallet_outlined,
-                        color: Color(0xFF06B6D4),
+                        color: context.colors.cyan,
                         size: 18,
                       ),
                       const SizedBox(width: 10),
@@ -1752,8 +1770,8 @@ void _showLedgerSheet(BuildContext context, InsightsState state, bool tr) {
                           'Cost Ledger',
                           'Kostenbuch',
                         ),
-                        style: const TextStyle(
-                          color: Color(0xFFF5F5F5),
+                        style: TextStyle(
+                          color: context.colors.white,
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 0.3,
@@ -1761,9 +1779,9 @@ void _showLedgerSheet(BuildContext context, InsightsState state, bool tr) {
                       ),
                       const Spacer(),
                       Text(
-                        '₺${state.totalCostTry.toStringAsFixed(0)}',
-                        style: const TextStyle(
-                          color: Color(0xFF06B6D4),
+                        '$currencySymbol${state.totalCostTry.toStringAsFixed(0)}',
+                        style: TextStyle(
+                          color: context.colors.cyan,
                           fontSize: 15,
                           fontWeight: FontWeight.w900,
                         ),
@@ -1773,7 +1791,7 @@ void _showLedgerSheet(BuildContext context, InsightsState state, bool tr) {
                 ),
                 const SizedBox(height: 8),
                 const Divider(
-                  color: Color(0xFF2D2D2F),
+                  color: SlatePalette.oledBorder,
                   height: 0.5,
                   thickness: 0.5,
                 ),
@@ -1787,8 +1805,8 @@ void _showLedgerSheet(BuildContext context, InsightsState state, bool tr) {
                               'No entries yet.',
                               'Noch keine Einträge.',
                             ),
-                            style: const TextStyle(
-                              color: Color(0xFF8E8E93),
+                            style: TextStyle(
+                              color: context.colors.textSecondary,
                               fontSize: 13,
                             ),
                           ),
@@ -1797,7 +1815,7 @@ void _showLedgerSheet(BuildContext context, InsightsState state, bool tr) {
                           controller: scrollCtrl,
                           itemCount: state.costLedger.length,
                           separatorBuilder: (_, __) => const Divider(
-                            color: Color(0xFF2D2D2F),
+                            color: SlatePalette.oledBorder,
                             height: 0.5,
                             thickness: 0.5,
                           ),
@@ -1807,10 +1825,10 @@ void _showLedgerSheet(BuildContext context, InsightsState state, bool tr) {
                               leading: Container(
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF0A0A0A),
+                                  color: SlatePalette.oledBackground,
                                   borderRadius: BorderRadius.circular(8),
                                   border: Border.all(
-                                    color: const Color(0xFF2D2D2F),
+                                    color: SlatePalette.oledBorder,
                                     width: 0.5,
                                   ),
                                 ),
@@ -1818,22 +1836,22 @@ void _showLedgerSheet(BuildContext context, InsightsState state, bool tr) {
                                   e.category.toLowerCase().contains('fuel')
                                       ? Icons.water_drop_outlined
                                       : Icons.settings_outlined,
-                                  color: const Color(0xFF06B6D4),
+                                  color: context.colors.cyan,
                                   size: 16,
                                 ),
                               ),
                               title: Text(
                                 _translateLine(e.category, tr),
-                                style: const TextStyle(
-                                  color: Color(0xFFF5F5F5),
+                                style: TextStyle(
+                                  color: context.colors.white,
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
                               trailing: Text(
-                                '₺${e.amountTry.toStringAsFixed(0)}',
-                                style: const TextStyle(
-                                  color: Color(0xFFF5F5F5),
+                                '$currencySymbol${e.amountTry.toStringAsFixed(0)}',
+                                style: TextStyle(
+                                  color: context.colors.white,
                                   fontSize: 14,
                                   fontWeight: FontWeight.w900,
                                 ),
@@ -1852,13 +1870,18 @@ void _showLedgerSheet(BuildContext context, InsightsState state, bool tr) {
 }
 
 // Add cost entry bottom sheet
-void _showAddCostSheet(BuildContext context) {
+Future<void> _showAddCostSheet(
+  BuildContext context,
+  WidgetRef ref,
+  AppStrings strings,
+) async {
+  final currencySymbol = ref.read(appSettingsProvider).currencySymbol;
   final descCtrl = TextEditingController();
   final amountCtrl = TextEditingController();
   String selectedCategory = 'Fuel';
   final categories = ['Fuel', 'Service', 'Tyre', 'Insurance', 'Other'];
 
-  showModalBottomSheet(
+  await showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
@@ -1891,7 +1914,7 @@ void _showAddCostSheet(BuildContext context) {
                       width: 36,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF636366),
+                        color: context.colors.muted,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -1904,8 +1927,8 @@ void _showAddCostSheet(BuildContext context) {
                       'NEW COST ENTRY',
                       'NEUER KOSTENEINTRAG',
                     ),
-                    style: const TextStyle(
-                      color: Color(0xFF8E8E93),
+                    style: TextStyle(
+                      color: context.colors.textSecondary,
                       fontSize: 10,
                       fontWeight: FontWeight.w600,
                       letterSpacing: 1.5,
@@ -1935,12 +1958,12 @@ void _showAddCostSheet(BuildContext context) {
                                   ? const Color(
                                       0xFF06B6D4,
                                     ).withValues(alpha: 0.12)
-                                  : const Color(0xFF0A0A0A),
+                                  : SlatePalette.oledBackground,
                               borderRadius: BorderRadius.circular(6),
                               border: Border.all(
                                 color: sel
-                                    ? const Color(0xFF06B6D4)
-                                    : const Color(0xFF2D2D2F),
+                                    ? context.colors.cyan
+                                    : SlatePalette.oledBorder,
                                 width: 0.8,
                               ),
                             ),
@@ -1981,8 +2004,8 @@ void _showAddCostSheet(BuildContext context) {
                                     ),
                               style: TextStyle(
                                 color: sel
-                                    ? const Color(0xFF06B6D4)
-                                    : const Color(0xFF8E8E93),
+                                    ? context.colors.cyan
+                                    : context.colors.textSecondary,
                                 fontSize: 12,
                                 fontWeight: sel
                                     ? FontWeight.w600
@@ -1997,10 +2020,7 @@ void _showAddCostSheet(BuildContext context) {
                   const SizedBox(height: 12),
                   TextField(
                     controller: descCtrl,
-                    style: const TextStyle(
-                      color: Color(0xFFF5F5F5),
-                      fontSize: 13,
-                    ),
+                    style: TextStyle(color: context.colors.white, fontSize: 13),
                     decoration: InputDecoration(
                       hintText: tInline(
                         AppStrings.currentLanguageCode,
@@ -2009,7 +2029,7 @@ void _showAddCostSheet(BuildContext context) {
                         'Beschreibung',
                       ),
                       filled: true,
-                      fillColor: Color(0xFF0A0A0A),
+                      fillColor: SlatePalette.oledBackground,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -2018,18 +2038,15 @@ void _showAddCostSheet(BuildContext context) {
                     keyboardType: const TextInputType.numberWithOptions(
                       decimal: true,
                     ),
-                    style: const TextStyle(
-                      color: Color(0xFFF5F5F5),
-                      fontSize: 13,
-                    ),
+                    style: TextStyle(color: context.colors.white, fontSize: 13),
                     decoration: InputDecoration(
                       hintText:
-                          '${tInline(AppStrings.currentLanguageCode, 'Tutar', 'Amount', 'Betrag')} (₺)',
+                          '${tInline(AppStrings.currentLanguageCode, 'Tutar', 'Amount', 'Betrag')} ($currencySymbol)',
                       filled: true,
-                      fillColor: Color(0xFF0A0A0A),
-                      prefixText: '₺ ',
+                      fillColor: SlatePalette.oledBackground,
+                      prefixText: '$currencySymbol ',
                       prefixStyle: TextStyle(
-                        color: Color(0xFF06B6D4),
+                        color: context.colors.cyan,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -2040,27 +2057,51 @@ void _showAddCostSheet(BuildContext context) {
                     height: 48,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF06B6D4),
+                        backgroundColor: context.colors.cyan,
                         foregroundColor: Colors.black,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(6),
                         ),
                       ),
-                      onPressed: () {
-                        // TODO: wire to InsightsNotifier when cost ledger persistence is added
+                      onPressed: () async {
+                        final amount = double.tryParse(
+                          amountCtrl.text.trim().replaceAll(',', '.'),
+                        );
+                        if (descCtrl.text.trim().isEmpty ||
+                            amount == null ||
+                            !amount.isFinite ||
+                            amount <= 0) {
+                          ScaffoldMessenger.of(ctx).showSnackBar(
+                            SnackBar(
+                              content: Text(strings.insightsCostInvalid),
+                            ),
+                          );
+                          return;
+                        }
+
+                        try {
+                          await ref
+                              .read(insightsStateProvider.notifier)
+                              .addCostEntry(
+                                label: descCtrl.text,
+                                category: selectedCategory,
+                                amountTry: amount,
+                              );
+                        } catch (_) {
+                          if (!ctx.mounted) return;
+                          ScaffoldMessenger.of(ctx).showSnackBar(
+                            SnackBar(
+                              content: Text(strings.insightsCostSaveFailed),
+                            ),
+                          );
+                          return;
+                        }
+
+                        if (!ctx.mounted || !context.mounted) return;
                         Navigator.of(ctx).pop();
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              tInline(
-                                AppStrings.currentLanguageCode,
-                                'Kayıt eklendi (yakında kaydedilecek)',
-                                'Entry added (will be saved soon)',
-                                'Eintrag hinzugefügt (wird bald gespeichert)',
-                              ),
-                            ),
-                          ),
+                          SnackBar(content: Text(strings.insightsCostSaved)),
                         );
                       },
                       child: Text(
@@ -2086,6 +2127,46 @@ void _showAddCostSheet(BuildContext context) {
       );
     },
   );
+  descCtrl.dispose();
+  amountCtrl.dispose();
+}
+
+const _costEntryMonthsTr = [
+  'Oca',
+  'Şub',
+  'Mar',
+  'Nis',
+  'May',
+  'Haz',
+  'Tem',
+  'Ağu',
+  'Eyl',
+  'Eki',
+  'Kas',
+  'Ara',
+];
+const _costEntryMonthsEn = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
+
+String _formatCostEntryDate(String dateIso) {
+  final date = DateTime.tryParse(dateIso);
+  if (date == null) return '';
+  final months = AppStrings.currentLanguageCode == 'tr'
+      ? _costEntryMonthsTr
+      : _costEntryMonthsEn;
+  return '${date.day} ${months[date.month - 1]} ${date.year}';
 }
 
 String _translateLine(String line, bool tr) {
@@ -2126,11 +2207,13 @@ class _WishlistRow extends StatelessWidget {
     required this.part,
     required this.tr,
     required this.onDelete,
+    required this.currencySymbol,
   });
 
   final WishlistPart part;
   final bool tr;
   final VoidCallback onDelete;
+  final String currencySymbol;
 
   @override
   Widget build(BuildContext context) {
@@ -2168,7 +2251,7 @@ class _WishlistRow extends StatelessWidget {
           ),
           if (part.priceTry != null && part.priceTry! > 0) ...[
             Text(
-              '₺${part.priceTry!.toStringAsFixed(0)}',
+              '$currencySymbol${part.priceTry!.toStringAsFixed(0)}',
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -2180,7 +2263,7 @@ class _WishlistRow extends StatelessWidget {
             onPressed: onDelete,
             icon: const Icon(
               Icons.delete_outline,
-              color: Color(0xFFef4444),
+              color: SlatePalette.danger,
               size: 18,
             ),
             padding: EdgeInsets.zero,
@@ -2202,13 +2285,13 @@ void _showRecentRideImpactDetails(
     backgroundColor: Colors.transparent,
     builder: (ctx) {
       return Container(
-        decoration: const BoxDecoration(
-          color: Color(0xFF1F2937),
+        decoration: BoxDecoration(
+          color: context.colors.surface,
           borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
           border: Border(
-            top: BorderSide(color: Color(0xFF4B5563), width: 0.5),
-            left: BorderSide(color: Color(0xFF4B5563), width: 0.5),
-            right: BorderSide(color: Color(0xFF4B5563), width: 0.5),
+            top: BorderSide(color: context.colors.border, width: 0.5),
+            left: BorderSide(color: context.colors.border, width: 0.5),
+            right: BorderSide(color: context.colors.border, width: 0.5),
           ),
         ),
         padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
@@ -2221,7 +2304,7 @@ void _showRecentRideImpactDetails(
                 width: 36,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF9CA3AF),
+                  color: SlatePalette.oledMutedText,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -2231,7 +2314,7 @@ void _showRecentRideImpactDetails(
               children: [
                 const Icon(
                   Icons.settings_backup_restore,
-                  color: Color(0xFFef4444),
+                  color: SlatePalette.danger,
                   size: 20,
                 ),
                 const SizedBox(width: 10),
@@ -2243,7 +2326,7 @@ void _showRecentRideImpactDetails(
                     'LETZTE FAHRTWIRKUNGSDETAILS',
                   ),
                   style: const TextStyle(
-                    color: Color(0xFF9CA3AF),
+                    color: SlatePalette.oledMutedText,
                     fontSize: 10,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 1.5,
@@ -2263,14 +2346,13 @@ void _showRecentRideImpactDetails(
             const SizedBox(height: 8),
             Text(
               _translateLine(pattern.recommendation, tr),
-              style: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 13),
+              style: const TextStyle(
+                color: SlatePalette.oledMutedText,
+                fontSize: 13,
+              ),
             ),
             const SizedBox(height: 20),
-            const Divider(
-              color: Color(0xFF4B5563),
-              height: 0.5,
-              thickness: 0.5,
-            ),
+            Divider(color: context.colors.border, height: 0.5, thickness: 0.5),
             const SizedBox(height: 16),
             _buildDetailRow(
               tInline(
@@ -2308,7 +2390,7 @@ void _showRecentRideImpactDetails(
               ),
               '+1.5%',
               context,
-              valColor: const Color(0xFFef4444),
+              valColor: SlatePalette.danger,
             ),
             const SizedBox(height: 24),
             SizedBox(
@@ -2316,21 +2398,23 @@ void _showRecentRideImpactDetails(
               height: 48,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF374151),
+                  backgroundColor: context.colors.elevated,
                   foregroundColor: Colors.white,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(6),
-                    side: const BorderSide(
-                      color: Color(0xFF4B5563),
-                      width: 0.5,
-                    ),
+                    side: BorderSide(color: context.colors.border, width: 0.5),
                   ),
                 ),
                 onPressed: () => Navigator.pop(ctx),
-                child: const Text(
-                  'KAPAT / CLOSE',
-                  style: TextStyle(
+                child: Text(
+                  tInline(
+                    AppStrings.currentLanguageCode,
+                    'KAPAT',
+                    'CLOSE',
+                    'SCHLIESSEN',
+                  ),
+                  style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.5,
@@ -2356,7 +2440,7 @@ Widget _buildDetailRow(
     children: [
       Text(
         label,
-        style: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 13),
+        style: const TextStyle(color: SlatePalette.oledMutedText, fontSize: 13),
       ),
       Text(
         value,

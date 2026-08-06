@@ -65,7 +65,22 @@ class _BugReportScreenState extends ConsumerState<BugReportScreen> {
         ),
       );
       Navigator.pop(context);
+      return;
     }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          tInline(
+            AppStrings.currentLanguageCode,
+            'Rapor gönderilemedi. Lütfen tekrar deneyin.',
+            'Report could not be submitted. Please try again.',
+            'Bericht konnte nicht gesendet werden. Bitte versuchen Sie es erneut.',
+          ),
+        ),
+        backgroundColor: Colors.redAccent,
+      ),
+    );
   }
 
   @override

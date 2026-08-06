@@ -48,6 +48,7 @@ app.*.map.json
 key.properties
 *.jks
 *.keystore
+/ios/Flutter/Secrets.xcconfig
 venv/
 
 # Node dependencies — install via package-lock.json instead of committing

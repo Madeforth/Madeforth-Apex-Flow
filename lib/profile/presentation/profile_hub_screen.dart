@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/services.dart';
 import 'dart:math' as math;
@@ -17,6 +18,7 @@ import 'package:apexflow/garage/application/garage_state.dart';
 import 'package:apexflow/rides/application/ride_state.dart';
 import 'package:apexflow/profile/application/friends_state.dart';
 import 'package:apexflow/profile/domain/friend_profile.dart';
+import 'package:apexflow/shared/design/slate_palette.dart';
 import 'package:apexflow/shared/widgets/apex_panel.dart';
 import 'package:apexflow/notifications/application/notification_state.dart';
 import 'package:apexflow/notifications/domain/app_notification.dart';
@@ -84,607 +86,605 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
 
     return Scaffold(
       body: SafeArea(
-          child: Stack(
-            children: [
-              TabBarView(
-                controller: _tabController,
-                children: [
-                  // Tab 1: PROFILE
-                  ListView(
-                    padding: const EdgeInsets.only(
-                      top: 72, // 16 top + 38 height + 18 spacing
-                      left: ApexSpacing.x2,
-                      right: ApexSpacing.x2,
-                      bottom: ApexSpacing.x1,
-                    ),
-                    children: [
-                      // Scrollable Top Bar
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                      userProfile.name.isEmpty
-                                          ? _t('Rider', 'Rider', 'Fahrer')
-                                          : userProfile.name,
-                                      style: const TextStyle(
-                                        fontSize: 28,
-                                        fontWeight: FontWeight.w900,
-                                        color: Colors.white,
-                                        letterSpacing: -0.5,
+        child: Stack(
+          children: [
+            TabBarView(
+              controller: _tabController,
+              children: [
+                // Tab 1: PROFILE
+                ListView(
+                  padding: const EdgeInsets.only(
+                    top: 72, // 16 top + 38 height + 18 spacing
+                    left: ApexSpacing.x2,
+                    right: ApexSpacing.x2,
+                    bottom: 80,
+                  ),
+                  children: [
+                    // Scrollable Top Bar
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    userProfile.name.isEmpty
+                                        ? _t('Rider', 'Rider', 'Fahrer')
+                                        : userProfile.name,
+                                    style: const TextStyle(
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.w900,
+                                      color: Colors.white,
+                                      letterSpacing: -0.5,
+                                    ),
+                                  ),
+                                  if (userProfile.isPremium) ...[
+                                    const SizedBox(width: 6),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 6,
+                                        vertical: 2,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: context.colors.caution
+                                            .withValues(alpha: 0.15),
+                                        borderRadius: BorderRadius.circular(4),
+                                        border: Border.all(
+                                          color: context.colors.caution
+                                              .withValues(alpha: 0.3),
+                                          width: 1,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        _t('PREMİUM', 'PREMIUM', 'PREMIUM'),
+                                        style: TextStyle(
+                                          color: context.colors.caution,
+                                          fontSize: 9,
+                                          fontWeight: FontWeight.w900,
+                                          letterSpacing: 0.5,
+                                        ),
                                       ),
                                     ),
-                                    if (userProfile.isPremium) ...[
-                                      const SizedBox(width: 6),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 6,
-                                          vertical: 2,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: context.colors.caution
-                                              .withValues(alpha: 0.15),
-                                          borderRadius:
-                                              BorderRadius.circular(4),
-                                          border: Border.all(
-                                            color: context.colors.caution
-                                                .withValues(alpha: 0.3),
-                                            width: 1,
+                                  ],
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                _t(
+                                  'Sürücü profiliniz ve sosyal garajınız.',
+                                  'Your rider profile and social garage.',
+                                  'Dein Fahrerprofil und soziale Garage.',
+                                ),
+                                style: TextStyle(
+                                  color: context.colors.textSecondary,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            if (widget.onOpenNotifications != null) ...[
+                              IconButton(
+                                icon: Badge(
+                                  isLabelVisible:
+                                      ref.watch(
+                                        unreadNotificationCountProvider,
+                                      ) >
+                                      0,
+                                  label: Text(
+                                    ref
+                                        .watch(unreadNotificationCountProvider)
+                                        .toString(),
+                                    style: const TextStyle(fontSize: 9),
+                                  ),
+                                  child: Icon(
+                                    Icons.notifications_outlined,
+                                    color: context.colors.cyan,
+                                  ),
+                                ),
+                                onPressed: widget.onOpenNotifications,
+                              ),
+                            ],
+                            IconButton(
+                              icon: Icon(
+                                Icons.person_add_alt_1_outlined,
+                                color: context.colors.cyan,
+                              ),
+                              onPressed: () =>
+                                  _showAddFriendSheet(context, tr, de),
+                            ),
+                            IconButton(
+                              icon: Icon(
+                                Icons.settings_outlined,
+                                color: context.colors.cyan,
+                              ),
+                              onPressed: widget.onOpenSettings,
+                            ),
+                            IconButton(
+                              icon: Icon(
+                                Icons.logout,
+                                color: context.colors.red,
+                              ),
+                              onPressed: () async {
+                                final confirm = await showDialog<bool>(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    backgroundColor: context.colors.surface,
+                                    title: Text(
+                                      tInline(
+                                        AppStrings.currentLanguageCode,
+                                        'Çıkış Yap',
+                                        'Log Out',
+                                        'Abmelden',
+                                      ),
+                                    ),
+                                    content: Text(
+                                      tInline(
+                                        AppStrings.currentLanguageCode,
+                                        'Hesabınızdan çıkış yapmak istediğinize emin misiniz?',
+                                        'Are you sure you want to log out?',
+                                        'Möchten Sie sich wirklich abmelden?',
+                                      ),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        child: Text(
+                                          tInline(
+                                            AppStrings.currentLanguageCode,
+                                            'İptal',
+                                            'Cancel',
+                                            'Stornieren',
+                                          ),
+                                          style: TextStyle(
+                                            color: context.colors.textSecondary,
                                           ),
                                         ),
+                                        onPressed: () =>
+                                            Navigator.pop(context, false),
+                                      ),
+                                      TextButton(
                                         child: Text(
-                                          _t('PREMİUM', 'PREMIUM', 'PREMIUM'),
+                                          _t(
+                                            'Çıkış Yap',
+                                            'Log Out',
+                                            'Abmelden',
+                                          ),
                                           style: TextStyle(
-                                            color: context.colors.caution,
-                                            fontSize: 9,
-                                            fontWeight: FontWeight.w900,
-                                            letterSpacing: 0.5,
+                                            color: context.colors.red,
+                                          ),
+                                        ),
+                                        onPressed: () =>
+                                            Navigator.pop(context, true),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                                if (confirm == true) {
+                                  await ref
+                                      .read(userProfileProvider.notifier)
+                                      .logout();
+                                  if (context.mounted) {
+                                    Navigator.of(
+                                      context,
+                                      rootNavigator: true,
+                                    ).pushAndRemoveUntil(
+                                      MaterialPageRoute(
+                                        builder: (context) => OnboardingScreen(
+                                          strings: AppStrings(
+                                            ref
+                                                .read(appSettingsProvider)
+                                                .locale,
                                           ),
                                         ),
                                       ),
-                                    ],
+                                      (route) => false,
+                                    );
+                                  }
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    // Compact Rider ID Card      // Compact Rider ID Card
+                    RiderIdCard(
+                      name: userProfile.name.isEmpty
+                          ? (tInline(
+                              AppStrings.currentLanguageCode,
+                              'Sürücü',
+                              'Rider',
+                              'Fahrer',
+                            ))
+                          : userProfile.name,
+                      riderTag: userProfile.riderTag.isEmpty
+                          ? '@rider'
+                          : userProfile.riderTag,
+                      ridingStyle: userProfile.ridingStyle,
+                      bloodType: userProfile.bloodType.isEmpty
+                          ? '—'
+                          : userProfile.bloodType,
+                      phoneNumber: userProfile.phoneNumber,
+                      emergencyContactName: userProfile.emergencyContactName,
+                      emergencyContactPhone: userProfile.emergencyContactPhone,
+                      activeBike: garageState.activeBike.name != '—'
+                          ? '${garageState.activeBike.name} ${garageState.activeBike.model}'
+                          : (tInline(
+                              AppStrings.currentLanguageCode,
+                              'Motosiklet Yok',
+                              'No Motorcycle',
+                              'Kein Motorrad',
+                            )),
+                      totalRides: totalRides,
+                      totalKm: totalKm,
+                      harmonyScore: garageState.activeBike.name != '—' ? 95 : 0,
+                      avatarIndex: userProfile.avatarIndex,
+                      tr: tr,
+                      de: AppStrings.currentLanguageCode == 'de',
+                      onTap: () =>
+                          _showEditProfileSheet(context, tr, de, userProfile),
+                      themeIndex: userProfile.cardThemeIndex,
+                      selectedFrameIndex: userProfile.selectedFrameIndex,
+                      city: userProfile.city,
+                      instagram: userProfile.instagram,
+                      tiktok: userProfile.tiktok,
+                      youtube: userProfile.youtube,
+                      licensePlate: userProfile.licensePlate,
+                      selectedBadges: userProfile.selectedBadges,
+                      supporterTier: userProfile.supporterTier,
+                      riderXp: userProfile.riderXp,
+                      compact: false,
+                      hideActiveBike: true,
+                      isViewedBySelf: true,
+                      sharePhone: userProfile.sharePhone,
+                      shareEmergency: userProfile.shareEmergency,
+                    ),
+                    const SizedBox(height: ApexSpacing.x2),
+
+                    // Achievement & Badges Entrance Card
+                    _AchievementOverviewCard(
+                      tr: tr,
+                      de: AppStrings.currentLanguageCode == 'de',
+                      onTap: () => _showAchievementsModal(
+                        context,
+                        tr,
+                        AppStrings.currentLanguageCode == 'de',
+                        userProfile,
+                      ),
+                    ),
+                    const SizedBox(height: ApexSpacing.x2),
+
+                    // Premium Vault Button
+                    _PremiumVaultButton(
+                      tr: tr,
+                      de: AppStrings.currentLanguageCode == 'de',
+                      onTap: () => _showPremiumVaultModal(
+                        context,
+                        tr,
+                        AppStrings.currentLanguageCode == 'de',
+                        userProfile,
+                      ),
+                    ),
+                    const SizedBox(height: ApexSpacing.x2),
+
+                    if (userProfile.riderTag.startsWith('@rider#')) ...[
+                      GestureDetector(
+                        onTap: () =>
+                            _showEditProfileSheet(context, tr, de, userProfile),
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: context.colors.cyan.withValues(alpha: 0.08),
+                            borderRadius: BorderRadius.circular(
+                              ApexSpacing.radius,
+                            ),
+                            border: Border.all(
+                              color: context.colors.cyan.withValues(alpha: 0.3),
+                              width: 1.5,
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.alternate_email,
+                                color: context.colors.cyan,
+                                size: 24,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      _t(
+                                        'Kendi Rider Tag\'ini Oluştur! ⚡',
+                                        'Create Your Rider Tag! ⚡',
+                                        'Erstelle dein Rider-Tag! ⚡',
+                                      ),
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.bold,
+                                        color: context.colors.cyan,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      tInline(
+                                        AppStrings.currentLanguageCode,
+                                        'Şu an geçici bir etiket kullanıyorsun. Kendine özel bir Rider Tag oluşturarak arkadaş ekleyebilir ve telefon numarası / acil durum bilgilerini arkadaşlarınla paylaşabilirsin.',
+                                        'You are currently using a temporary tag. Create your custom Rider Tag to add friends and share phone number / emergency contact info with friends.',
+                                        'Sie verwenden derzeit ein temporäres Tag. Erstellen Sie Ihren benutzerdefinierten Fahrer-Tag, um Freunde hinzuzufügen und Telefonnummern/Notfallkontaktinformationen mit Freunden zu teilen.',
+                                      ),
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: context.colors.textSecondary,
+                                        height: 1.3,
+                                      ),
+                                    ),
                                   ],
                                 ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  _t(
-                                    'Sürücü profiliniz ve sosyal garajınız.',
-                                    'Your rider profile and social garage.',
-                                    'Dein Fahrerprofil und soziale Garage.',
-                                  ),
-                                  style: TextStyle(
-                                    color: context.colors.textSecondary,
-                                    fontSize: 13,
-                                  ),
+                              ),
+                              Icon(
+                                Icons.chevron_right,
+                                color: context.colors.cyan,
+                                size: 20,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: ApexSpacing.x2),
+                    ],
+
+                    // 1. Minimal Social Sharing Settings
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      decoration: BoxDecoration(
+                        color: context.colors.surface,
+                        borderRadius: BorderRadius.circular(ApexSpacing.radius),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.share_outlined,
+                                color: context.colors.cyan,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                tInline(
+                                  AppStrings.currentLanguageCode,
+                                  'SOSYAL PAYLAŞIM',
+                                  'SOCIAL SHARING',
+                                  'SOZIALES TEILEN',
                                 ),
-                              ],
-                            ),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w900,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
                           ),
                           Row(
                             children: [
-                              if (widget.onOpenNotifications != null) ...[
-                                IconButton(
-                                  icon: Badge(
-                                    isLabelVisible:
-                                        ref.watch(
-                                          unreadNotificationCountProvider,
-                                        ) >
-                                        0,
-                                    label: Text(
-                                      ref
-                                          .watch(
-                                            unreadNotificationCountProvider,
-                                          )
-                                          .toString(),
-                                      style: const TextStyle(fontSize: 9),
-                                    ),
-                                    child: Icon(
-                                      Icons.notifications_outlined,
-                                      color: context.colors.cyan,
-                                    ),
-                                  ),
-                                  onPressed: widget.onOpenNotifications,
-                                ),
-                              ],
-                              IconButton(
-                                icon: Icon(
-                                  Icons.person_add_alt_1_outlined,
-                                  color: context.colors.cyan,
-                                ),
-                                onPressed: () =>
-                                    _showAddFriendSheet(context, tr, de),
-                              ),
-                              IconButton(
-                                icon: Icon(
-                                  Icons.settings_outlined,
-                                  color: context.colors.cyan,
-                                ),
-                                onPressed: widget.onOpenSettings,
-                              ),
-                              IconButton(
-                                icon: Icon(
-                                  Icons.logout,
-                                  color: context.colors.red,
-                                ),
-                                onPressed: () async {
-                                  final confirm = await showDialog<bool>(
-                                    context: context,
-                                    builder: (context) => AlertDialog(
-                                      backgroundColor: context.colors.surface,
-                                      title: Text(
-                                        tInline(
-                                          AppStrings.currentLanguageCode,
-                                          'Çıkış Yap',
-                                          'Log Out',
-                                          'Abmelden',
-                                        ),
-                                      ),
-                                      content: Text(
-                                        tInline(
-                                          AppStrings.currentLanguageCode,
-                                          'Hesabınızdan çıkış yapmak istediğinize emin misiniz?',
-                                          'Are you sure you want to log out?',
-                                          'Möchten Sie sich wirklich abmelden?',
-                                        ),
-                                      ),
-                                      actions: [
-                                        TextButton(
-                                          child: Text(
-                                            tInline(
-                                              AppStrings.currentLanguageCode,
-                                              'İptal',
-                                              'Cancel',
-                                              'Stornieren',
-                                            ),
-                                            style: TextStyle(
-                                              color:
-                                                  context.colors.textSecondary,
-                                            ),
-                                          ),
-                                          onPressed: () =>
-                                              Navigator.pop(context, false),
-                                        ),
-                                        TextButton(
-                                          child: Text(
-                                            _t(
-                                              'Çıkış Yap',
-                                              'Log Out',
-                                              'Abmelden',
-                                            ),
-                                            style: TextStyle(
-                                              color: context.colors.red,
-                                            ),
-                                          ),
-                                          onPressed: () =>
-                                              Navigator.pop(context, true),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                  if (confirm == true) {
-                                    await ref
+                              _CompactShareToggle(
+                                icon: Icons.phone_android,
+                                isActive:
+                                    userProfile.isPremium &&
+                                    userProfile.sharePhone,
+                                onToggle: (val) {
+                                  if (!userProfile.isPremium) {
+                                    _showPaywall(context);
+                                  } else {
+                                    ref
                                         .read(userProfileProvider.notifier)
-                                        .logout();
-                                    if (context.mounted) {
-                                      Navigator.of(
-                                        context,
-                                        rootNavigator: true,
-                                      ).pushAndRemoveUntil(
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              OnboardingScreen(
-                                                strings: AppStrings(
-                                                  ref
-                                                      .read(appSettingsProvider)
-                                                      .locale,
-                                                ),
-                                              ),
-                                        ),
-                                        (route) => false,
-                                      );
-                                    }
+                                        .updateProfile(
+                                          name: userProfile.name,
+                                          phoneNumber: userProfile.phoneNumber,
+                                          bloodType: userProfile.bloodType,
+                                          emergencyContactName:
+                                              userProfile.emergencyContactName,
+                                          emergencyContactPhone:
+                                              userProfile.emergencyContactPhone,
+                                          sharePhone: val,
+                                          shareEmergency:
+                                              userProfile.shareEmergency,
+                                        );
                                   }
                                 },
+                                color: context.colors.cyan,
+                              ),
+                              const SizedBox(width: 12),
+                              _CompactShareToggle(
+                                icon: Icons.local_hospital_outlined,
+                                isActive:
+                                    userProfile.isPremium &&
+                                    userProfile.shareEmergency,
+                                onToggle: (val) {
+                                  if (!userProfile.isPremium) {
+                                    _showPaywall(context);
+                                  } else {
+                                    ref
+                                        .read(userProfileProvider.notifier)
+                                        .updateProfile(
+                                          name: userProfile.name,
+                                          phoneNumber: userProfile.phoneNumber,
+                                          bloodType: userProfile.bloodType,
+                                          emergencyContactName:
+                                              userProfile.emergencyContactName,
+                                          emergencyContactPhone:
+                                              userProfile.emergencyContactPhone,
+                                          sharePhone: userProfile.sharePhone,
+                                          shareEmergency: val,
+                                        );
+                                  }
+                                },
+                                color: context.colors.red,
                               ),
                             ],
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
-                      // Compact Rider ID Card      // Compact Rider ID Card
-                      RiderIdCard(
-                        name: userProfile.name.isEmpty
-                            ? (tInline(
-                                AppStrings.currentLanguageCode,
-                                'Sürücü',
-                                'Rider',
-                                'Fahrer',
-                              ))
-                            : userProfile.name,
-                        riderTag: userProfile.riderTag.isEmpty
-                            ? '@rider'
-                            : userProfile.riderTag,
-                        ridingStyle: userProfile.ridingStyle,
-                        bloodType: userProfile.bloodType.isEmpty
-                            ? '—'
-                            : userProfile.bloodType,
-                        phoneNumber: userProfile.phoneNumber,
-                        emergencyContactName: userProfile.emergencyContactName,
-                        emergencyContactPhone:
-                            userProfile.emergencyContactPhone,
-                        activeBike: garageState.activeBike.name != '—'
-                            ? '${garageState.activeBike.name} ${garageState.activeBike.model}'
-                            : (tInline(
-                                AppStrings.currentLanguageCode,
-                                'Motosiklet Yok',
-                                'No Motorcycle',
-                                'Kein Motorrad',
-                              )),
-                        totalRides: totalRides,
-                        totalKm: totalKm,
-                        harmonyScore: garageState.activeBike.name != '—'
-                            ? 95
-                            : 0,
-                        avatarIndex: userProfile.avatarIndex,
-                        tr: tr,
-                        de: AppStrings.currentLanguageCode == 'de',
-                        onTap: () =>
-                            _showEditProfileSheet(context, tr, de, userProfile),
-                        themeIndex: userProfile.cardThemeIndex,
-                        selectedFrameIndex: userProfile.selectedFrameIndex,
-                        city: userProfile.city,
-                        instagram: userProfile.instagram,
-                        tiktok: userProfile.tiktok,
-                        youtube: userProfile.youtube,
-                        licensePlate: userProfile.licensePlate,
-                        selectedBadges: userProfile.selectedBadges,
-                        supporterTier: userProfile.supporterTier,
-                        riderXp: userProfile.riderXp,
-                        compact: false,
-                        hideActiveBike: true,
-                        isViewedBySelf: true,
-                        sharePhone: userProfile.sharePhone,
-                        shareEmergency: userProfile.shareEmergency,
-                      ),
-                      const SizedBox(height: ApexSpacing.x2),
+                    ),
+                    const SizedBox(height: ApexSpacing.x2),
 
-                      // Achievement & Badges Entrance Card
-                      _AchievementOverviewCard(
-                        tr: tr,
-                        de: AppStrings.currentLanguageCode == 'de',
-                        onTap: () => _showAchievementsModal(context, tr, AppStrings.currentLanguageCode == 'de', userProfile),
-                      ),
-                      const SizedBox(height: ApexSpacing.x2),
-
-                      // Premium Vault Button
-                      _PremiumVaultButton(
-                        tr: tr,
-                        de: AppStrings.currentLanguageCode == 'de',
-                        onTap: () => _showPremiumVaultModal(context, tr, AppStrings.currentLanguageCode == 'de', userProfile),
-                      ),
-                      const SizedBox(height: ApexSpacing.x2),
-
-                      if (userProfile.riderTag.startsWith('@rider#')) ...[
-                        GestureDetector(
-                          onTap: () => _showEditProfileSheet(
-                            context,
-                            tr,
-                            de,
-                            userProfile,
+                    // 2. Support Developer Tile
+                    _ProfileSupportDeveloperTile(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                SupporterPaywallScreen(strings: widget.strings),
                           ),
-                          child: Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: context.colors.cyan.withValues(
-                                alpha: 0.08,
-                              ),
-                              borderRadius: BorderRadius.circular(
-                                ApexSpacing.radius,
-                              ),
-                              border: Border.all(
-                                color: context.colors.cyan.withValues(
-                                  alpha: 0.3,
-                                ),
-                                width: 1.5,
-                              ),
-                            ),
+                        );
+                      },
+                      tr: tr,
+                      de: AppStrings.currentLanguageCode == 'de',
+                    ),
+                    const SizedBox(height: ApexSpacing.x3),
+                  ],
+                ),
+
+                // Tab 2: Friends List
+                _FriendsList(
+                  friends: friends,
+                  tr: tr,
+                  de: AppStrings.currentLanguageCode == 'de',
+                  onFriendTap: (friend) =>
+                      _showFriendShowcaseGarage(context, friend, tr, de),
+                  strings: widget.strings,
+                  onAddFriend: () => _showAddFriendSheet(context, tr, de),
+                  topPadding: 64,
+                ),
+
+                // Tab 3: Leaderboard
+                _LeaderboardList(
+                  friends: friends,
+                  userKm: totalKm,
+                  userName: userProfile.name.isEmpty
+                      ? (tInline(
+                          AppStrings.currentLanguageCode,
+                          'Siz',
+                          'You',
+                          'Du',
+                        ))
+                      : userProfile.name,
+                  tr: tr,
+                  userSupporterTier: userProfile.supporterTier,
+                  userAvatarIndex: userProfile.avatarIndex,
+                  onOpenFriendProfile: (f) =>
+                      _showFriendShowcaseGarage(context, f, tr, de),
+                  onAddFriend: () => _showAddFriendSheet(context, tr, de),
+                  topPadding: 64,
+                ),
+              ],
+            ),
+            Positioned(
+              top: 16,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(19),
+                  child: BackdropFilter(
+                    filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                    child: Container(
+                      height: 38,
+                      constraints: const BoxConstraints(maxWidth: 270),
+                      decoration: BoxDecoration(
+                        color: context.colors.navChip.withValues(
+                          alpha: 0.8,
+                        ), // Semi-transparent navbar background
+                        borderRadius: BorderRadius.circular(19),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.08),
+                          width: 1,
+                        ),
+                      ),
+                      child: TabBar(
+                        controller: _tabController,
+                        dividerColor: Colors.transparent,
+                        indicatorSize: TabBarIndicatorSize.tab,
+                        indicator: BoxDecoration(
+                          color: context.colors.cyan.withValues(
+                            alpha: 0.14,
+                          ), // Liquid highlight
+                          borderRadius: BorderRadius.circular(17),
+                        ),
+                        tabs: [
+                          Tab(
                             child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(
-                                  Icons.alternate_email,
-                                  color: context.colors.cyan,
-                                  size: 24,
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        _t(
-                                          'Kendi Rider Tag\'ini Oluştur! ⚡',
-                                          'Create Your Rider Tag! ⚡',
-                                          'Erstelle dein Rider-Tag! ⚡',
-                                        ),
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.bold,
-                                          color: context.colors.cyan,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        tInline(
-                                          AppStrings.currentLanguageCode,
-                                          'Şu an geçici bir etiket kullanıyorsun. Kendine özel bir Rider Tag oluşturarak arkadaş ekleyebilir ve telefon numarası / acil durum bilgilerini arkadaşlarınla paylaşabilirsin.',
-                                          'You are currently using a temporary tag. Create your custom Rider Tag to add friends and share phone number / emergency contact info with friends.',
-                                          'Sie verwenden derzeit ein temporäres Tag. Erstellen Sie Ihren benutzerdefinierten Fahrer-Tag, um Freunde hinzuzufügen und Telefonnummern/Notfallkontaktinformationen mit Freunden zu teilen.',
-                                        ),
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          color: context.colors.textSecondary,
-                                          height: 1.3,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Icon(
-                                  Icons.chevron_right,
-                                  color: context.colors.cyan,
-                                  size: 20,
-                                ),
+                                const Icon(Icons.person_outline, size: 13),
+                                const SizedBox(width: 4),
+                                Text(_t('Profil', 'Profile', 'Profil')),
                               ],
                             ),
                           ),
-                        ),
-                        const SizedBox(height: ApexSpacing.x2),
-                      ],
-
-                      // 1. Minimal Social Sharing Settings
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
-                        decoration: BoxDecoration(
-                          color: context.colors.surface,
-                          borderRadius: BorderRadius.circular(
-                            ApexSpacing.radius,
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
+                          Tab(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(
-                                  Icons.share_outlined,
-                                  color: context.colors.cyan,
-                                  size: 20,
+                                const Icon(Icons.people_outline, size: 13),
+                                const SizedBox(width: 4),
+                                Text(_t('Arkadaşlar', 'Friends', 'Freunde')),
+                              ],
+                            ),
+                          ),
+                          Tab(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.leaderboard_outlined,
+                                  size: 13,
                                 ),
-                                const SizedBox(width: 8),
+                                const SizedBox(width: 4),
                                 Text(
-                                  tInline(
-                                    AppStrings.currentLanguageCode,
-                                    'SOSYAL PAYLAŞIM',
-                                    'SOCIAL SHARING',
-                                    'SOZIALES TEILEN',
-                                  ),
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w900,
-                                    color: Colors.white,
-                                  ),
+                                  _t('Liderlik', 'Leaderboard', 'Bestenliste'),
                                 ),
                               ],
                             ),
-                            Row(
-                              children: [
-                                _CompactShareToggle(
-                                  icon: Icons.phone_android,
-                                  isActive:
-                                      userProfile.isPremium &&
-                                      userProfile.sharePhone,
-                                  onToggle: (val) {
-                                    if (!userProfile.isPremium) {
-                                      _showPaywall(context);
-                                    } else {
-                                      ref
-                                          .read(userProfileProvider.notifier)
-                                          .updateProfile(
-                                            name: userProfile.name,
-                                            phoneNumber:
-                                                userProfile.phoneNumber,
-                                            bloodType: userProfile.bloodType,
-                                            emergencyContactName: userProfile
-                                                .emergencyContactName,
-                                            emergencyContactPhone: userProfile
-                                                .emergencyContactPhone,
-                                            sharePhone: val,
-                                            shareEmergency:
-                                                userProfile.shareEmergency,
-                                          );
-                                    }
-                                  },
-                                  color: context.colors.cyan,
-                                ),
-                                const SizedBox(width: 12),
-                                _CompactShareToggle(
-                                  icon: Icons.local_hospital_outlined,
-                                  isActive:
-                                      userProfile.isPremium &&
-                                      userProfile.shareEmergency,
-                                  onToggle: (val) {
-                                    if (!userProfile.isPremium) {
-                                      _showPaywall(context);
-                                    } else {
-                                      ref
-                                          .read(userProfileProvider.notifier)
-                                          .updateProfile(
-                                            name: userProfile.name,
-                                            phoneNumber:
-                                                userProfile.phoneNumber,
-                                            bloodType: userProfile.bloodType,
-                                            emergencyContactName: userProfile
-                                                .emergencyContactName,
-                                            emergencyContactPhone: userProfile
-                                                .emergencyContactPhone,
-                                            sharePhone: userProfile.sharePhone,
-                                            shareEmergency: val,
-                                          );
-                                    }
-                                  },
-                                  color: context.colors.red,
-                                ),
-                              ],
-                            ),
-                          ],
+                          ),
+                        ],
+                        labelColor:
+                            context.colors.cyan, // Selected text/icon color
+                        unselectedLabelColor: context.colors.textSecondary,
+                        labelStyle: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 10,
                         ),
-                      ),
-                      const SizedBox(height: ApexSpacing.x2),
-
-                      // 2. Support Developer Tile
-                      _ProfileSupportDeveloperTile(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => SupporterPaywallScreen(
-                                strings: widget.strings,
-                              ),
-                            ),
-                          );
-                        },
-                        tr: tr,
-                        de: AppStrings.currentLanguageCode == 'de',
-                      ),
-                      const SizedBox(height: ApexSpacing.x3),
-                    ],
-                  ),
-
-                  // Tab 2: Friends List
-                  _FriendsList(
-                    friends: friends,
-                    tr: tr,
-                    de: AppStrings.currentLanguageCode == 'de',
-                    onFriendTap: (friend) =>
-                        _showFriendShowcaseGarage(context, friend, tr, de),
-                    strings: widget.strings,
-                    onAddFriend: () => _showAddFriendSheet(context, tr, de),
-                    topPadding: 64,
-                  ),
-
-                  // Tab 3: Leaderboard
-                  _LeaderboardList(
-                    friends: friends,
-                    userKm: totalKm,
-                    userName: userProfile.name.isEmpty
-                        ? (tInline(
-                            AppStrings.currentLanguageCode,
-                            'Siz',
-                            'You',
-                            'Du',
-                          ))
-                        : userProfile.name,
-                    tr: tr,
-                    userSupporterTier: userProfile.supporterTier,
-                    userAvatarIndex: userProfile.avatarIndex,
-                    onOpenFriendProfile: (f) =>
-                        _showFriendShowcaseGarage(context, f, tr, de),
-                    onAddFriend: () => _showAddFriendSheet(context, tr, de),
-                    topPadding: 64,
-                  ),
-                ],
-              ),
-              Positioned(
-                top: 16,
-                left: 0,
-                right: 0,
-                child: Center(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(19),
-                    child: BackdropFilter(
-                      filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                      child: Container(
-                        height: 38,
-                        constraints: const BoxConstraints(maxWidth: 270),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1A1F2B).withValues(alpha: 0.8), // Semi-transparent navbar background
-                          borderRadius: BorderRadius.circular(19),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.08),
-                            width: 1,
-                          ),
-                        ),
-                        child: TabBar(
-                          controller: _tabController,
-                          dividerColor: Colors.transparent,
-                          indicatorSize: TabBarIndicatorSize.tab,
-                          indicator: BoxDecoration(
-                            color: context.colors.cyan.withValues(alpha: 0.14), // Liquid highlight
-                            borderRadius: BorderRadius.circular(17),
-                          ),
-                          tabs: [
-                            Tab(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Icon(Icons.person_outline, size: 13),
-                                  const SizedBox(width: 4),
-                                  Text(_t('Profil', 'Profile', 'Profil')),
-                                ],
-                              ),
-                            ),
-                            Tab(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Icon(Icons.people_outline, size: 13),
-                                  const SizedBox(width: 4),
-                                  Text(_t('Arkadaşlar', 'Friends', 'Freunde')),
-                                ],
-                              ),
-                            ),
-                            Tab(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Icon(Icons.leaderboard_outlined, size: 13),
-                                  const SizedBox(width: 4),
-                                  Text(_t('Liderlik', 'Leaderboard', 'Bestenliste')),
-                                ],
-                              ),
-                            ),
-                          ],
-                          labelColor: context.colors.cyan, // Selected text/icon color
-                          unselectedLabelColor: context.colors.textSecondary,
-                          labelStyle: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 10,
-                          ),
-                          unselectedLabelStyle: const TextStyle(
-                            fontWeight: FontWeight.w400,
-                            fontSize: 10,
-                          ),
+                        unselectedLabelStyle: const TextStyle(
+                          fontWeight: FontWeight.w400,
+                          fontSize: 10,
                         ),
                       ),
                     ),
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-      );
+      ),
+    );
   }
 
   void _showPaywall(BuildContext context) {
@@ -759,7 +759,7 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                         ), // Slate 200 (slightly darker than off-white)
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: const Color(0xFF0F172A),
+                          color: SlatePalette.surfaceDeep,
                           width: 2,
                         ), // Slate 900
                         boxShadow: [
@@ -783,7 +783,7 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                             style: TextStyle(
                               fontSize: 8.5,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF0F172A),
+                              color: SlatePalette.surfaceDeep,
                               letterSpacing: 0.8,
                             ),
                           ),
@@ -838,7 +838,7 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                               vertical: 3,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF0F172A),
+                              color: SlatePalette.surfaceDeep,
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
@@ -1540,8 +1540,8 @@ class _CardThemeSelectorPanel extends ConsumerWidget {
                                 ? FontWeight.w700
                                 : FontWeight.w400,
                             color: isSelected
-                                ? const Color(0xFFF5F5F5)
-                                : const Color(0xFF8E8E93),
+                                ? context.colors.white
+                                : context.colors.textSecondary,
                           ),
                           textAlign: TextAlign.center,
                           maxLines: 1,
@@ -1906,13 +1906,17 @@ class RiderIdCard extends StatelessWidget {
                                     Icon(
                                       Icons.location_on,
                                       size: 10,
-                                      color: Colors.white.withValues(alpha: 0.8),
+                                      color: Colors.white.withValues(
+                                        alpha: 0.8,
+                                      ),
                                     ),
                                     const SizedBox(width: 3),
                                     Text(
                                       city,
                                       style: TextStyle(
-                                        color: Colors.white.withValues(alpha: 0.8),
+                                        color: Colors.white.withValues(
+                                          alpha: 0.8,
+                                        ),
                                         fontSize: 11,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -1924,24 +1928,45 @@ class RiderIdCard extends StatelessWidget {
                                 const SizedBox(height: 6),
                                 Row(
                                   mainAxisSize: MainAxisSize.min,
-                                  children: selectedBadges.take(5).map((badgeId) {
-                                    String icon = '🏆';
+                                  children: selectedBadges.take(5).map((
+                                    badgeId,
+                                  ) {
+                                    IconData icon = PhosphorIconsFill.trophy;
                                     Color bg = Colors.amber;
                                     if (badgeId == 'first_ride') {
-                                      icon = '🏁';
+                                      icon = PhosphorIconsFill.flagCheckered;
                                       bg = Colors.blueGrey;
                                     } else if (badgeId == 'mileage_100') {
-                                      icon = '🌟';
+                                      icon = PhosphorIconsFill.star;
                                       bg = Colors.orange;
                                     } else if (badgeId == 'speed_demon') {
-                                      icon = '🔥';
+                                      icon = PhosphorIconsFill.fire;
                                       bg = Colors.redAccent;
                                     } else if (badgeId == 'night_rider') {
-                                      icon = '🌙';
+                                      icon = PhosphorIconsFill.moon;
                                       bg = Colors.indigo;
-                                    } else if (badgeId == 'maintenance_master') {
-                                      icon = '🛠️';
+                                    } else if (badgeId ==
+                                        'maintenance_master') {
+                                      icon = PhosphorIconsFill.wrench;
                                       bg = Colors.teal;
+                                    } else if (badgeId == 'discovery_compass') {
+                                      icon = PhosphorIconsFill.compass;
+                                      bg = Colors.lightBlue;
+                                    } else if (badgeId == 'regular_rider') {
+                                      icon = PhosphorIconsFill.calendarBlank;
+                                      bg = Colors.deepPurple;
+                                    } else if (badgeId == 'safe_start') {
+                                      icon = PhosphorIconsFill.shieldCheck;
+                                      bg = Colors.green;
+                                    } else if (badgeId == 'community_support') {
+                                      icon = PhosphorIconsFill.usersThree;
+                                      bg = Colors.pink;
+                                    } else if (badgeId == 'sunrise_route') {
+                                      icon = PhosphorIconsFill.sun;
+                                      bg = Colors.deepOrange;
+                                    } else if (badgeId == 'ride_log') {
+                                      icon = PhosphorIconsFill.notebook;
+                                      bg = Colors.brown;
                                     }
 
                                     return Container(
@@ -1962,9 +1987,10 @@ class RiderIdCard extends StatelessWidget {
                                           ),
                                         ],
                                       ),
-                                      child: Text(
+                                      child: Icon(
                                         icon,
-                                        style: const TextStyle(fontSize: 11),
+                                        size: 11,
+                                        color: Colors.white,
                                       ),
                                     );
                                   }).toList(),
@@ -2036,73 +2062,88 @@ class RiderIdCard extends StatelessWidget {
                   const SizedBox(height: ApexSpacing.x2),
 
                   // MOTORCYCLE CULTURE RIDER LEVEL & RANK & XP BAR (XP Bar only visible to self)
-                  Builder(builder: (context) {
-                    final currentLevel = RiderXpSystem.getLevelForXp(riderXp);
-                    final langCode = tr ? 'tr' : (de ? 'de' : 'en');
-                    final rankTitle = RiderXpSystem.getRankTitle(currentLevel, langCode);
-                    final progressData = RiderXpSystem.getLevelProgress(riderXp);
+                  Builder(
+                    builder: (context) {
+                      final currentLevel = RiderXpSystem.getLevelForXp(riderXp);
+                      final langCode = tr ? 'tr' : (de ? 'de' : 'en');
+                      final rankTitle = RiderXpSystem.getRankTitle(
+                        currentLevel,
+                        langCode,
+                      );
+                      final progressData = RiderXpSystem.getLevelProgress(
+                        riderXp,
+                      );
 
-                    return Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                  decoration: BoxDecoration(
-                                    gradient: const LinearGradient(
-                                      colors: [Color(0xFFF59E0B), Color(0xFFD97706)],
+                      return Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 3,
                                     ),
-                                    borderRadius: BorderRadius.circular(6),
+                                    decoration: BoxDecoration(
+                                      gradient: const LinearGradient(
+                                        colors: [
+                                          Color(0xFFF59E0B),
+                                          Color(0xFFD97706),
+                                        ],
+                                      ),
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: Text(
+                                      'LVL $currentLevel',
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w900,
+                                      ),
+                                    ),
                                   ),
-                                  child: Text(
-                                    'LVL $currentLevel',
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    rankTitle,
                                     style: const TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w900,
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                ),
-                                const SizedBox(width: 8),
+                                ],
+                              ),
+                              if (isViewedBySelf)
                                 Text(
-                                  rankTitle,
+                                  '${progressData.xpInCurrentLevel} / ${progressData.xpRequiredForNextLevel} XP',
                                   style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12,
+                                    color: Color(0xFF94A3B8),
+                                    fontSize: 10,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                              ],
-                            ),
-                            if (isViewedBySelf)
-                              Text(
-                                '${progressData.xpInCurrentLevel} / ${progressData.xpRequiredForNextLevel} XP',
-                                style: const TextStyle(
-                                  color: Color(0xFF94A3B8),
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
+                            ],
+                          ),
+                          if (isViewedBySelf) ...[
+                            const SizedBox(height: 6),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(4),
+                              child: LinearProgressIndicator(
+                                value: progressData.progress,
+                                minHeight: 6,
+                                backgroundColor: Colors.white12,
+                                valueColor: const AlwaysStoppedAnimation<Color>(
+                                  Color(0xFFF59E0B),
                                 ),
                               ),
-                          ],
-                        ),
-                        if (isViewedBySelf) ...[
-                          const SizedBox(height: 6),
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(4),
-                            child: LinearProgressIndicator(
-                              value: progressData.progress,
-                              minHeight: 6,
-                              backgroundColor: Colors.white12,
-                              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFF59E0B)),
                             ),
-                          ),
+                          ],
                         ],
-                      ],
-                    );
-                  }),
+                      );
+                    },
+                  ),
                   const SizedBox(height: ApexSpacing.x2),
                   const Divider(color: Colors.white24, height: 1),
                   const SizedBox(height: ApexSpacing.x2),
@@ -3298,7 +3339,7 @@ class _FriendsListState extends ConsumerState<_FriendsList> {
         top: widget.topPadding + 12,
         left: 16,
         right: 16,
-        bottom: 12,
+        bottom: 80,
       ),
       children: [
         // Friends Title & Badge Count
@@ -3317,7 +3358,7 @@ class _FriendsListState extends ConsumerState<_FriendsList> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: const Color(0xFF1E293B),
+                color: SlatePalette.surface,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
@@ -3346,7 +3387,7 @@ class _FriendsListState extends ConsumerState<_FriendsList> {
         Container(
           height: 44,
           decoration: BoxDecoration(
-            color: const Color(0xFF0F172A),
+            color: SlatePalette.surfaceDeep,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
           ),
@@ -3397,7 +3438,7 @@ class _FriendsListState extends ConsumerState<_FriendsList> {
           child: Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFF1E293B),
+              color: SlatePalette.surface,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: Colors.white.withValues(alpha: 0.03)),
             ),
@@ -3474,7 +3515,7 @@ class _FriendsListState extends ConsumerState<_FriendsList> {
           child: Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFF1E293B),
+              color: SlatePalette.surface,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: Colors.white.withValues(alpha: 0.03)),
             ),
@@ -3549,23 +3590,23 @@ class _FriendsListState extends ConsumerState<_FriendsList> {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF06B6D4).withValues(alpha: 0.15),
-                  border: Border.all(color: const Color(0xFF06B6D4)),
+                  color: context.colors.cyan.withValues(alpha: 0.15),
+                  border: Border.all(color: context.colors.cyan),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.person_add_outlined,
                       size: 13,
-                      color: Color(0xFF06B6D4),
+                      color: context.colors.cyan,
                     ),
                     const SizedBox(width: 4),
                     Text(
                       _t('Arkadaş Ekle', 'Add Friend', 'Freund hinzufügen'),
-                      style: const TextStyle(
-                        color: Color(0xFF06B6D4),
+                      style: TextStyle(
+                        color: context.colors.cyan,
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
                       ),
@@ -3656,7 +3697,7 @@ class _PendingRequestsScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: const Color(0xFF0B1528),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0F172A),
+        backgroundColor: SlatePalette.surfaceDeep,
         elevation: 0,
         title: Text(
           tr
@@ -3695,7 +3736,7 @@ class _PendingRequestsScreen extends ConsumerWidget {
                   margin: const EdgeInsets.only(bottom: 12),
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1E293B),
+                    color: SlatePalette.surface,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: Colors.white.withValues(alpha: 0.05),
@@ -3720,8 +3761,8 @@ class _PendingRequestsScreen extends ConsumerWidget {
                                       )
                                       .toUpperCase();
                           })(),
-                          style: const TextStyle(
-                            color: Color(0xFF06B6D4),
+                          style: TextStyle(
+                            color: context.colors.cyan,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -3862,7 +3903,7 @@ class _NearbyRidersScreenState extends ConsumerState<_NearbyRidersScreen>
     return Scaffold(
       backgroundColor: const Color(0xFF0B1528),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0F172A),
+        backgroundColor: SlatePalette.surfaceDeep,
         elevation: 0,
         title: Text(
           _t('Yakınındaki Kişiler', 'Nearby Riders', 'Fahrer in der Nähe'),
@@ -3890,7 +3931,7 @@ class _NearbyRidersScreenState extends ConsumerState<_NearbyRidersScreen>
                         height: 120 + (_pulseController.value * 40),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: const Color(0xFF06B6D4).withValues(
+                          color: context.colors.cyan.withValues(
                             alpha: 0.1 * (1.0 - _pulseController.value),
                           ),
                           border: Border.all(
@@ -3900,10 +3941,10 @@ class _NearbyRidersScreenState extends ConsumerState<_NearbyRidersScreen>
                             width: 2 + 3 * _pulseController.value,
                           ),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.radar,
                           size: 48,
-                          color: Color(0xFF06B6D4),
+                          color: context.colors.cyan,
                         ),
                       );
                     },
@@ -3986,7 +4027,7 @@ class _NearbyRidersScreenState extends ConsumerState<_NearbyRidersScreen>
                 return Container(
                   margin: const EdgeInsets.only(bottom: 12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF0F172A),
+                    color: SlatePalette.surfaceDeep,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: Colors.white.withValues(alpha: 0.05),
@@ -4097,14 +4138,14 @@ class _NearbyRidersScreenState extends ConsumerState<_NearbyRidersScreen>
                                   ),
                                   decoration: BoxDecoration(
                                     color: isAlreadyFriend
-                                        ? const Color(0xFF1E293B)
+                                        ? SlatePalette.surface
                                         : const Color(
                                             0xFF06B6D4,
                                           ).withValues(alpha: 0.15),
                                     border: Border.all(
                                       color: isAlreadyFriend
                                           ? Colors.white24
-                                          : const Color(0xFF06B6D4),
+                                          : context.colors.cyan,
                                     ),
                                     borderRadius: BorderRadius.circular(6),
                                   ),
@@ -4115,7 +4156,7 @@ class _NearbyRidersScreenState extends ConsumerState<_NearbyRidersScreen>
                                     style: TextStyle(
                                       color: isAlreadyFriend
                                           ? Colors.white38
-                                          : const Color(0xFF06B6D4),
+                                          : context.colors.cyan,
                                       fontSize: 11,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -4201,16 +4242,16 @@ class _LeaderboardListState extends State<_LeaderboardList> {
         top: widget.topPadding + 8,
         left: 16,
         right: 16,
-        bottom: 8,
+        bottom: 80,
       ),
       children: [
         // Header
         Text(
           tInline(
             AppStrings.currentLanguageCode,
+            'Liderlik',
             'Leaderboard',
-            'Leaderboard',
-            'Leaderboard',
+            'Bestenliste',
           ),
           style: const TextStyle(
             fontSize: 28,
@@ -4605,7 +4646,12 @@ class _LeaderboardListState extends State<_LeaderboardList> {
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
-                            tInline(AppStrings.currentLanguageCode, 'SEN', 'YOU', 'DU'),
+                            tInline(
+                              AppStrings.currentLanguageCode,
+                              'SEN',
+                              'YOU',
+                              'DU',
+                            ),
                             style: const TextStyle(
                               fontSize: 8,
                               fontWeight: FontWeight.bold,
@@ -5735,18 +5781,17 @@ class RiderAvatarWidget extends StatelessWidget {
             left: 0,
             right: 0,
             child: Center(
-              child: Text(
-                '👑',
-                style: TextStyle(
-                  fontSize: radius * 0.7,
-                  shadows: const [
-                    Shadow(
-                      color: Colors.black45,
-                      offset: Offset(0, 1),
-                      blurRadius: 3,
-                    ),
-                  ],
-                ),
+              child: Icon(
+                PhosphorIconsFill.crown,
+                size: radius * 0.7,
+                color: const Color(0xFFFFD700),
+                shadows: const [
+                  Shadow(
+                    color: Colors.black45,
+                    offset: Offset(0, 1),
+                    blurRadius: 3,
+                  ),
+                ],
               ),
             ),
           ),
@@ -6518,7 +6563,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     final bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', '0+', '0-', '—'];
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF1E293B),
+      backgroundColor: SlatePalette.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -6561,12 +6606,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       decoration: BoxDecoration(
                         color: isSelected
                             ? context.colors.cyan
-                            : const Color(0xFF0F172A),
+                            : SlatePalette.surfaceDeep,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: isSelected
                               ? context.colors.cyan
-                              : const Color(0xFF334155),
+                              : SlatePalette.border,
                         ),
                       ),
                       child: Text(
@@ -6604,12 +6649,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: const Color(0xFF1E293B),
+          color: SlatePalette.surface,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: const Color(0xFF334155),
-            width: 1,
-          ),
+          border: Border.all(color: SlatePalette.border, width: 1),
         ),
         child: Row(
           children: [
@@ -6713,7 +6755,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               padding: const EdgeInsets.only(top: 16, bottom: 120),
               children: [
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   child: ElevatedButton.icon(
                     onPressed: () {
                       Navigator.push(
@@ -6747,7 +6792,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 ),
                 const SizedBox(height: 16),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   child: Text(
                     _t('KİŞİSEL BİLGİLER', 'PERSONAL INFO', 'PERSÖNLICHE INFO'),
                     style: TextStyle(
@@ -6774,13 +6822,31 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   ),
                   child: _buildTextField(riderTagCtrl, '@tag', isLocked: false),
                 ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                  child: Text(
+                    _t(
+                      'Etiketinizi değiştirmek, önceden bastırdığınız park QR sticker\'larını geçersiz kılar.',
+                      'Changing your tag invalidates any parking QR stickers you already printed.',
+                      'Das Ändern Ihres Tags macht bereits gedruckte Park-QR-Aufkleber ungültig.',
+                    ),
+                    style: TextStyle(
+                      color: context.colors.textSecondary,
+                      fontSize: 11,
+                    ),
+                  ),
+                ),
                 _buildFieldRow(
                   icon: Icons.phone_outlined,
                   iconColor: Colors.blue,
                   label: _t('Telefon', 'Phone', 'Telefon'),
                   child: _buildTextField(
                     phoneCtrl,
-                    _t('Örn: +90 555 123 4567', 'e.g. +44 555 123 4567', 'z.B. +49 555 123 4567'),
+                    _t(
+                      'Örn: +90 555 123 4567',
+                      'e.g. +44 555 123 4567',
+                      'z.B. +49 555 123 4567',
+                    ),
                     keyboardType: TextInputType.phone,
                     inputFormatters: [PhoneInputFormatter()],
                   ),
@@ -6812,7 +6878,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
                 const SizedBox(height: 24),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   child: Text(
                     _t('ACİL DURUM', 'EMERGENCY', 'NOTFALL'),
                     style: TextStyle(
@@ -6826,16 +6895,31 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 _buildFieldRow(
                   icon: Icons.health_and_safety_outlined,
                   iconColor: Colors.red,
-                  label: _t('Acil Kişi Adı', 'Emergency Contact', 'Notfallkontakt'),
-                  child: _buildTextField(emNameCtrl, _t('İsim', 'Name', 'Name')),
+                  label: _t(
+                    'Acil Kişi Adı',
+                    'Emergency Contact',
+                    'Notfallkontakt',
+                  ),
+                  child: _buildTextField(
+                    emNameCtrl,
+                    _t('İsim', 'Name', 'Name'),
+                  ),
                 ),
                 _buildFieldRow(
                   icon: Icons.phone_in_talk_outlined,
                   iconColor: Colors.orangeAccent,
-                  label: _t('Acil Kişi Telefon', 'Emergency Phone', 'Notfalltelefon'),
+                  label: _t(
+                    'Acil Kişi Telefon',
+                    'Emergency Phone',
+                    'Notfalltelefon',
+                  ),
                   child: _buildTextField(
                     emPhoneCtrl,
-                    _t('Örn: +90 555 987 6543', 'e.g. +44 555 987 6543', 'z.B. +49 555 987 6543'),
+                    _t(
+                      'Örn: +90 555 987 6543',
+                      'e.g. +44 555 987 6543',
+                      'z.B. +49 555 987 6543',
+                    ),
                     keyboardType: TextInputType.phone,
                     inputFormatters: [PhoneInputFormatter()],
                   ),
@@ -6843,7 +6927,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
                 const SizedBox(height: 24),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   child: Text(
                     _t('EKSTRA BİLGİLER', 'EXTRA INFO', 'ZUSATZINFO'),
                     style: TextStyle(
@@ -6889,7 +6976,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             child: _buildBottomDoubleButton(
               leftLabel: _t('Vazgeç', 'Cancel', 'Abbrechen'),
               onLeftPressed: () => Navigator.pop(context),
-              rightLabel: _t('Değişiklikleri Kaydet', 'Save Changes', 'Änderungen speichern'),
+              rightLabel: _t(
+                'Değişiklikleri Kaydet',
+                'Save Changes',
+                'Änderungen speichern',
+              ),
               onRightPressed: _save,
             ),
           ),
@@ -6922,7 +7013,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       behavior: HitTestBehavior.opaque,
                       child: Container(
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1A1F2B).withValues(alpha: 0.6),
+                          color: context.colors.navChip.withValues(alpha: 0.6),
                           borderRadius: BorderRadius.circular(24),
                           border: Border.all(
                             color: Colors.white.withValues(alpha: 0.05),
@@ -6954,7 +7045,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       behavior: HitTestBehavior.opaque,
                       child: Container(
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1A1F2B).withValues(alpha: 0.8),
+                          color: context.colors.navChip.withValues(alpha: 0.8),
                           borderRadius: BorderRadius.circular(24),
                           border: Border.all(
                             color: Colors.white.withValues(alpha: 0.08),
@@ -7139,7 +7230,10 @@ class _ProfileAppearanceScreenState
       ? trStr
       : ((AppStrings.currentLanguageCode == 'de') ? deStr : enStr);
 
-  String _translateRidingStyle(String style, String Function(String, String, String) t) {
+  String _translateRidingStyle(
+    String style,
+    String Function(String, String, String) t,
+  ) {
     return t(
       switch (style) {
         'Focused' => 'Odaklı',
@@ -7211,58 +7305,62 @@ class _ProfileAppearanceScreenState
     final allBadges = [
       {
         'id': 'first_ride',
-        'icon': '🏁',
+        'icon': PhosphorIconsFill.flagCheckered,
         'name': _t('İlk Sürüş', 'First Ride', 'Erste Fahrt'),
         'status': 'won',
       },
       {
         'id': 'mileage_100',
-        'icon': '🌟',
+        'icon': PhosphorIconsFill.star,
         'name': _t('100 KM Yolcu', '100 KM Rider', '100 KM Fahrer'),
         'status': 'won',
       },
       {
         'id': 'maintenance_master',
-        'icon': '🛠️',
+        'icon': PhosphorIconsFill.wrench,
         'name': _t('Bakım Ustası', 'Maintenance Master', 'Wartungsmeister'),
         'status': 'progress',
         'progress': 72,
       },
       {
         'id': 'discovery_compass',
-        'icon': '🧭',
+        'icon': PhosphorIconsFill.compass,
         'name': _t('Keşif Pusulası', 'Discovery Compass', 'Entdecker-Kompass'),
         'status': 'won',
         'isNew': true,
       },
       {
         'id': 'regular_rider',
-        'icon': '📅',
+        'icon': PhosphorIconsFill.calendarBlank,
         'name': _t('Düzenli Sürücü', 'Regular Rider', 'Regelmäßiger Fahrer'),
         'status': 'progress',
         'progress': 45,
       },
       {
         'id': 'safe_start',
-        'icon': '🛡️',
+        'icon': PhosphorIconsFill.shieldCheck,
         'name': _t('Güvenli Başlangıç', 'Safe Start', 'Sicherer Start'),
         'status': 'won',
       },
       {
         'id': 'community_support',
-        'icon': '👥',
-        'name': _t('Topluluk Desteği', 'Community Support', 'Community-Unterstützung'),
+        'icon': PhosphorIconsFill.usersThree,
+        'name': _t(
+          'Topluluk Desteği',
+          'Community Support',
+          'Community-Unterstützung',
+        ),
         'status': 'locked',
       },
       {
         'id': 'sunrise_route',
-        'icon': '☀️',
+        'icon': PhosphorIconsFill.sun,
         'name': _t('Gün Doğumu Rotası', 'Sunrise Route', 'Sonnenaufgangsroute'),
         'status': 'locked',
       },
       {
         'id': 'ride_log',
-        'icon': '📓',
+        'icon': PhosphorIconsFill.notebook,
         'name': _t('Sürüş Günlüğü', 'Ride Log', 'Fahrtenbuch'),
         'status': 'locked',
       },
@@ -7283,7 +7381,8 @@ class _ProfileAppearanceScreenState
   }
 
   Widget _buildMainStudio(BuildContext context, UserProfile profile) {
-    final currentTheme = riderCardThemes[localThemeIndex.clamp(0, riderCardThemes.length - 1)];
+    final currentTheme =
+        riderCardThemes[localThemeIndex.clamp(0, riderCardThemes.length - 1)];
 
     return Scaffold(
       backgroundColor: context.colors.background,
@@ -7295,7 +7394,11 @@ class _ProfileAppearanceScreenState
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          _t('Sürücü Kartı Stüdyosu', 'Rider Card Studio', 'Fahrerkarte-Studio'),
+          _t(
+            'Sürücü Kartı Stüdyosu',
+            'Rider Card Studio',
+            'Fahrerkarte-Studio',
+          ),
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -7308,12 +7411,20 @@ class _ProfileAppearanceScreenState
         children: [
           Positioned.fill(
             child: ListView(
-              padding: const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 120),
+              padding: const EdgeInsets.only(
+                left: 16,
+                right: 16,
+                top: 16,
+                bottom: 120,
+              ),
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1E293B),
+                    color: SlatePalette.surface,
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
                       color: context.colors.cyan.withValues(alpha: 0.15),
@@ -7322,14 +7433,22 @@ class _ProfileAppearanceScreenState
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.layers_outlined, color: context.colors.cyan, size: 18),
+                      Icon(
+                        Icons.layers_outlined,
+                        color: context.colors.cyan,
+                        size: 18,
+                      ),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              _t('Katalog güncellendi', 'Catalog updated', 'Katalog aktualisiert'),
+                              _t(
+                                'Katalog güncellendi',
+                                'Catalog updated',
+                                'Katalog aktualisiert',
+                              ),
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 13,
@@ -7338,7 +7457,11 @@ class _ProfileAppearanceScreenState
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              _t('3 yeni içerik keşfedilmeyi bekliyor', '3 new items waiting to be discovered', '3 neue Elemente warten darauf, entdeckt zu werden'),
+                              _t(
+                                '3 yeni içerik keşfedilmeyi bekliyor',
+                                '3 new items waiting to be discovered',
+                                '3 neue Elemente warten darauf, entdeckt zu werden',
+                              ),
                               style: TextStyle(
                                 color: context.colors.textSecondary,
                                 fontSize: 11,
@@ -7348,7 +7471,10 @@ class _ProfileAppearanceScreenState
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: context.colors.cyan,
                           borderRadius: BorderRadius.circular(4),
@@ -7399,7 +7525,11 @@ class _ProfileAppearanceScreenState
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      _t('KİMLİK AYARLARI', 'IDENTITY SETTINGS', 'IDENTITÄTSEINSTELLUNGEN'),
+                      _t(
+                        'KİMLİK AYARLARI',
+                        'IDENTITY SETTINGS',
+                        'IDENTITÄTSEINSTELLUNGEN',
+                      ),
                       style: TextStyle(
                         color: context.colors.textSecondary,
                         fontSize: 11,
@@ -7432,28 +7562,36 @@ class _ProfileAppearanceScreenState
                 ),
                 const SizedBox(height: 12),
                 _buildMenuTile(
-                  title: _t('Kart Arka Planı', 'Card Background', 'Kartenhintergrund'),
-                  subtitle: currentTheme.getLocalizedName(AppStrings.currentLanguageCode),
+                  title: _t(
+                    'Kart Arka Planı',
+                    'Card Background',
+                    'Kartenhintergrund',
+                  ),
+                  subtitle: currentTheme.getLocalizedName(
+                    AppStrings.currentLanguageCode,
+                  ),
                   hasNew: true,
-                  onTap: () => setState(() => _currentPanel = StudioPanel.backgroundGallery),
+                  onTap: () => setState(
+                    () => _currentPanel = StudioPanel.backgroundGallery,
+                  ),
                 ),
                 _buildMenuTile(
                   title: _t('Sürüş Tipi', 'Riding Style', 'Fahrstil'),
                   subtitle: _translateRidingStyle(localRidingStyle, _t),
-                  onTap: () => setState(() => _currentPanel = StudioPanel.rideTypeCatalog),
+                  onTap: () => setState(
+                    () => _currentPanel = StudioPanel.rideTypeCatalog,
+                  ),
                 ),
                 _buildMenuTile(
-                  title: _t('Avatar ve Çerçeve', 'Avatar and Frame', 'Avatar und Rahmen'),
-                  subtitle: '${_t('Kask', 'Helmet', 'Helm')} 0${localAvatarIndex + 1} - ${
-                    localSelectedFrameIndex == 0
-                        ? 'Standart'
-                        : (localSelectedFrameIndex == 1
-                            ? 'Premium'
-                            : (localSelectedFrameIndex == 2
-                                ? 'Founder'
-                                : 'Apex Supporter'))
-                  }',
-                  onTap: () => setState(() => _currentPanel = StudioPanel.avatarFrame),
+                  title: _t(
+                    'Avatar ve Çerçeve',
+                    'Avatar and Frame',
+                    'Avatar und Rahmen',
+                  ),
+                  subtitle:
+                      '${_t('Kask', 'Helmet', 'Helm')} 0${localAvatarIndex + 1} - ${localSelectedFrameIndex == 0 ? 'Standart' : (localSelectedFrameIndex == 1 ? 'Premium' : (localSelectedFrameIndex == 2 ? 'Founder' : 'Apex Supporter'))}',
+                  onTap: () =>
+                      setState(() => _currentPanel = StudioPanel.avatarFrame),
                 ),
                 _buildMenuTile(
                   title: _t('Rozetler', 'Badges', 'Abzeichen'),
@@ -7463,14 +7601,17 @@ class _ProfileAppearanceScreenState
                     '${localSelectedBadges.length} ausgewählt',
                   ),
                   actionLabel: _t('Yönet', 'Manage', 'Verwalten'),
-                  onTap: () => setState(() => _currentPanel = StudioPanel.badgeLibrary),
+                  onTap: () =>
+                      setState(() => _currentPanel = StudioPanel.badgeLibrary),
                 ),
                 const SizedBox(height: 16),
                 Center(
                   child: Text(
-                    _t('Seçimler profil kimliğine kaydedilir. Sürüş verilerin değişmez.',
-                        'Selections are saved to profile identity. Ride data is unaffected.',
-                        'Auswahlen werden im Profil gespeichert. Fahrdaten bleiben unverändert.'),
+                    _t(
+                      'Seçimler profil kimliğine kaydedilir. Sürüş verilerin değişmez.',
+                      'Selections are saved to profile identity. Ride data is unaffected.',
+                      'Auswahlen werden im Profil gespeichert. Fahrdaten bleiben unverändert.',
+                    ),
                     style: TextStyle(
                       color: context.colors.textSecondary,
                       fontSize: 11,
@@ -7486,7 +7627,11 @@ class _ProfileAppearanceScreenState
             left: 0,
             right: 0,
             child: _buildBottomButton(
-              label: _t('Değişiklikleri Kaydet', 'Save Changes', 'Änderungen speichern'),
+              label: _t(
+                'Değişiklikleri Kaydet',
+                'Save Changes',
+                'Änderungen speichern',
+              ),
               onPressed: _save,
             ),
           ),
@@ -7512,7 +7657,8 @@ class _ProfileAppearanceScreenState
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => setState(() => _currentPanel = StudioPanel.mainStudio),
+          onPressed: () =>
+              setState(() => _currentPanel = StudioPanel.mainStudio),
         ),
         title: Text(
           _t('Kart Arka Planı', 'Card Background', 'Kartenhintergrund'),
@@ -7528,182 +7674,229 @@ class _ProfileAppearanceScreenState
         children: [
           Column(
             children: [
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              children: filterChips.map((chip) {
-                final isSelected = _backgroundFilter == chip;
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: ChoiceChip(
-                    label: Text(chip),
-                    selected: isSelected,
-                    onSelected: (val) {
-                      if (val) setState(() => _backgroundFilter = chip);
-                    },
-                    backgroundColor: const Color(0xFF1E293B),
-                    selectedColor: context.colors.cyan.withValues(alpha: 0.15),
-                    labelStyle: TextStyle(
-                      color: isSelected ? context.colors.cyan : context.colors.textSecondary,
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      side: BorderSide(
-                        color: isSelected ? context.colors.cyan : const Color(0xFF334155),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                child: Row(
+                  children: filterChips.map((chip) {
+                    final isSelected = _backgroundFilter == chip;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: ChoiceChip(
+                        label: Text(chip),
+                        selected: isSelected,
+                        onSelected: (val) {
+                          if (val) setState(() => _backgroundFilter = chip);
+                        },
+                        backgroundColor: SlatePalette.surface,
+                        selectedColor: context.colors.cyan.withValues(
+                          alpha: 0.15,
+                        ),
+                        labelStyle: TextStyle(
+                          color: isSelected
+                              ? context.colors.cyan
+                              : context.colors.textSecondary,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          side: BorderSide(
+                            color: isSelected
+                                ? context.colors.cyan
+                                : SlatePalette.border,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.fromLTRB(16, 4, 16, 12),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: const Color(0xFF1E293B),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: context.colors.cyan.withValues(alpha: 0.15),
-                width: 1,
+                    );
+                  }).toList(),
+                ),
               ),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.info_outline, color: context.colors.cyan, size: 16),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    _t('Yeni temalar uygulama güncellemeleriyle eklenir. Mevcut seçiminiz korunur.',
-                        'New themes are added with app updates. Current selection will be saved.',
-                        'Neue Designs werden mit App-Updates hinzugefügt. Aktuelle Auswahl wird gespeichert.'),
-                    style: TextStyle(color: context.colors.textSecondary, fontSize: 11, fontWeight: FontWeight.w500),
+              Container(
+                margin: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: SlatePalette.surface,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: context.colors.cyan.withValues(alpha: 0.15),
+                    width: 1,
                   ),
                 ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: GridView.builder(
-              padding: const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 140),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisSpacing: 14,
-                crossAxisSpacing: 14,
-                childAspectRatio: 0.85,
-              ),
-              itemCount: themeIndexes.length,
-              itemBuilder: (context, gridIdx) {
-                final index = themeIndexes[gridIdx];
-                final theme = riderCardThemes[index];
-                final isSelected = localThemeIndex == index;
-
-                var isUnlocked = true;
-                if (theme.isPremiumOnly && !profile.isPremium) {
-                  isUnlocked = false;
-                } else if (theme.isPaid && !profile.purchasedThemes.contains(index)) {
-                  isUnlocked = false;
-                } else if (theme.requiredSupporterTier > 0 && profile.supporterTier < theme.requiredSupporterTier) {
-                  isUnlocked = false;
-                }
-
-                return GestureDetector(
-                  onTap: () {
-                    if (isUnlocked) {
-                      setState(() => localThemeIndex = index);
-                    } else {
-                      if (theme.requiredSupporterTier > 0) {
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => SupporterPaywallScreen(strings: widget.strings)));
-                      } else if (theme.isPremiumOnly) {
-                        _showPaywall(context);
-                      } else {
-                        _showPurchaseDialog(context, ref, index, theme);
-                      }
-                    }
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: isSelected ? context.colors.cyan : const Color(0xFF334155),
-                        width: isSelected ? 2 : 1,
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.info_outline,
+                      color: context.colors.cyan,
+                      size: 16,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        _t(
+                          'Yeni temalar uygulama güncellemeleriyle eklenir. Mevcut seçiminiz korunur.',
+                          'New themes are added with app updates. Current selection will be saved.',
+                          'Neue Designs werden mit App-Updates hinzugefügt. Aktuelle Auswahl wird gespeichert.',
+                        ),
+                        style: TextStyle(
+                          color: context.colors.textSecondary,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                      borderRadius: BorderRadius.circular(10),
-                      color: const Color(0xFF1E293B),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Expanded(
-                          child: Container(
-                            margin: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: theme.colors,
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Stack(
-                              children: [
-                                Positioned.fill(
-                                  child: CustomPaint(
-                                    painter: CardVectorOverlayPainter(themeIndex: index),
-                                  ),
-                                ),
-                                if (isSelected)
-                                  const Center(
-                                    child: Icon(
-                                      Icons.check_circle_outline_rounded,
-                                      color: Colors.white,
-                                      size: 32,
-                                    ),
-                                  )
-                                else if (!isUnlocked)
-                                  Center(
-                                    child: Icon(
-                                      theme.isPremiumOnly
-                                          ? Icons.star_rounded
-                                          : Icons.lock_outline_rounded,
-                                      color: Colors.white70,
-                                      size: 24,
-                                    ),
-                                  )
-                              ],
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0),
-                          child: Text(
-                            theme.getLocalizedName(AppStrings.currentLanguageCode),
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                              color: isSelected ? Colors.white : context.colors.textSecondary,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ],
-                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: GridView.builder(
+                  padding: const EdgeInsets.only(
+                    left: 16,
+                    right: 16,
+                    top: 16,
+                    bottom: 140,
                   ),
-                );
-              },
-            ),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 14,
+                    crossAxisSpacing: 14,
+                    childAspectRatio: 0.85,
+                  ),
+                  itemCount: themeIndexes.length,
+                  itemBuilder: (context, gridIdx) {
+                    final index = themeIndexes[gridIdx];
+                    final theme = riderCardThemes[index];
+                    final isSelected = localThemeIndex == index;
+
+                    var isUnlocked = true;
+                    if (theme.isPremiumOnly && !profile.isPremium) {
+                      isUnlocked = false;
+                    } else if (theme.isPaid &&
+                        !profile.purchasedThemes.contains(index)) {
+                      isUnlocked = false;
+                    } else if (theme.requiredSupporterTier > 0 &&
+                        profile.supporterTier < theme.requiredSupporterTier) {
+                      isUnlocked = false;
+                    }
+
+                    return GestureDetector(
+                      onTap: () {
+                        if (isUnlocked) {
+                          setState(() => localThemeIndex = index);
+                        } else {
+                          if (theme.requiredSupporterTier > 0) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => SupporterPaywallScreen(
+                                  strings: widget.strings,
+                                ),
+                              ),
+                            );
+                          } else if (theme.isPremiumOnly) {
+                            _showPaywall(context);
+                          } else {
+                            _showPurchaseDialog(context, ref, index, theme);
+                          }
+                        }
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: isSelected
+                                ? context.colors.cyan
+                                : SlatePalette.border,
+                            width: isSelected ? 2 : 1,
+                          ),
+                          borderRadius: BorderRadius.circular(10),
+                          color: SlatePalette.surface,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Expanded(
+                              child: Container(
+                                margin: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: theme.colors,
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Stack(
+                                  children: [
+                                    Positioned.fill(
+                                      child: CustomPaint(
+                                        painter: CardVectorOverlayPainter(
+                                          themeIndex: index,
+                                        ),
+                                      ),
+                                    ),
+                                    if (isSelected)
+                                      const Center(
+                                        child: Icon(
+                                          Icons.check_circle_outline_rounded,
+                                          color: Colors.white,
+                                          size: 32,
+                                        ),
+                                      )
+                                    else if (!isUnlocked)
+                                      Center(
+                                        child: Icon(
+                                          theme.isPremiumOnly
+                                              ? Icons.star_rounded
+                                              : Icons.lock_outline_rounded,
+                                          color: Colors.white70,
+                                          size: 24,
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 8.0),
+                              child: Text(
+                                theme.getLocalizedName(
+                                  AppStrings.currentLanguageCode,
+                                ),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: isSelected
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                  color: isSelected
+                                      ? Colors.white
+                                      : context.colors.textSecondary,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
           Positioned(
             bottom: 0,
             left: 0,
             right: 0,
             child: _buildBottomButton(
               label: _t('Temayı Uygula', 'Apply Theme', 'Design anwenden'),
-              onPressed: () => setState(() => _currentPanel = StudioPanel.mainStudio),
+              onPressed: () =>
+                  setState(() => _currentPanel = StudioPanel.mainStudio),
             ),
           ),
         ],
@@ -7716,38 +7909,62 @@ class _ProfileAppearanceScreenState
       {
         'id': 'Focused',
         'title': _t('Odaklı', 'Focused', 'Fokussiert'),
-        'desc': _t('Temiz çizgi, dengeli tempo.', 'Clean line, balanced tempo.', 'Saubere Linie, ausgewogenes Tempo.'),
+        'desc': _t(
+          'Temiz çizgi, dengeli tempo.',
+          'Clean line, balanced tempo.',
+          'Saubere Linie, ausgewogenes Tempo.',
+        ),
         'icon': Icons.track_changes_outlined,
       },
       {
         'id': 'Touring',
         'title': _t('Gezgin', 'Explorer', 'Entdecker'),
-        'desc': _t('Yeni yolların ve küçük keşiflerin peşinde.', 'Pursuing new roads and small discoveries.', 'Auf der Suche nach neuen Wegen und Entdeckungen.'),
+        'desc': _t(
+          'Yeni yolların ve küçük keşiflerin peşinde.',
+          'Pursuing new roads and small discoveries.',
+          'Auf der Suche nach neuen Wegen und Entdeckungen.',
+        ),
         'icon': Icons.explore_outlined,
       },
       {
         'id': 'Commuter',
         'title': _t('Şehirli', 'Urban', 'Städtisch'),
-        'desc': _t('Şehrin akışını ve kısa rotaları iyi bilir.', 'Knows the city flow and short routes well.', 'Kennt den Stadtfluss und kurze Routen gut.'),
+        'desc': _t(
+          'Şehrin akışını ve kısa rotaları iyi bilir.',
+          'Knows the city flow and short routes well.',
+          'Kennt den Stadtfluss und kurze Routen gut.',
+        ),
         'icon': Icons.location_city_outlined,
       },
       {
         'id': 'Long Hauler',
         'title': _t('Uzun Yolcu', 'Long Hauler', 'Langstreckenfahrer'),
-        'desc': _t('Uzun mesafede sakin ve istikrarlı.', 'Calm and steady over long distances.', 'Ruhig und beständig auf langen Strecken.'),
+        'desc': _t(
+          'Uzun mesafede sakin ve istikrarlı.',
+          'Calm and steady over long distances.',
+          'Ruhig und beständig auf langen Strecken.',
+        ),
         'icon': Icons.alt_route_outlined,
       },
       {
         'id': 'Mechanic Mind',
         'title': _t('Mekanik Zihin', 'Mechanic Mind', 'Mechanikergeist'),
-        'desc': _t('Bakım ve makine detayına özen gösterir.', 'Pays close attention to maintenance and machine detail.', 'Achtet genau auf Wartung und Maschinendetails.'),
+        'desc': _t(
+          'Bakım ve makine detayına özen gösterir.',
+          'Pays close attention to maintenance and machine detail.',
+          'Achtet genau auf Wartung und Maschinendetails.',
+        ),
         'icon': Icons.handyman_outlined,
         'isLocked': true,
       },
       {
         'id': 'Night Legend',
         'title': _t('Gece Yolcusu', 'Night Legend', 'Nachtlegende'),
-        'desc': _t('Gece rotalarının sakin atmosferini sever.', 'Loves the calm atmosphere of night routes.', 'Liebt die ruhige Atmosphäre von Nachtrouten.'),
+        'desc': _t(
+          'Gece rotalarının sakin atmosferini sever.',
+          'Loves the calm atmosphere of night routes.',
+          'Liebt die ruhige Atmosphäre von Nachtrouten.',
+        ),
         'icon': Icons.nights_stay_outlined,
         'isNew': true,
       },
@@ -7760,7 +7977,8 @@ class _ProfileAppearanceScreenState
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => setState(() => _currentPanel = StudioPanel.mainStudio),
+          onPressed: () =>
+              setState(() => _currentPanel = StudioPanel.mainStudio),
         ),
         title: Text(
           _t('Sürüş Tipi', 'Riding Style', 'Fahrstil'),
@@ -7776,19 +7994,29 @@ class _ProfileAppearanceScreenState
         children: [
           Positioned.fill(
             child: ListView(
-              padding: const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 120),
+              padding: const EdgeInsets.only(
+                left: 16,
+                right: 16,
+                top: 16,
+                bottom: 120,
+              ),
               children: [
                 Text(
-                  _t('Seni en iyi anlatan birincil sürüş kimliğini seç.',
-                      'Choose the primary riding identity that represents you best.',
-                      'Wähle die primäre Fahridentität, die dich am besten beschreibt.'),
-                  style: TextStyle(color: context.colors.textSecondary, fontSize: 13),
+                  _t(
+                    'Seni en iyi anlatan birincil sürüş kimliğini seç.',
+                    'Choose the primary riding identity that represents you best.',
+                    'Wähle die primäre Fahridentität, die dich am besten beschreibt.',
+                  ),
+                  style: TextStyle(
+                    color: context.colors.textSecondary,
+                    fontSize: 13,
+                  ),
                 ),
                 const SizedBox(height: 14),
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1E293B),
+                    color: SlatePalette.surface,
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
                       color: Colors.amber.withValues(alpha: 0.2),
@@ -7798,17 +8026,25 @@ class _ProfileAppearanceScreenState
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(Icons.info_outline, color: Colors.amber, size: 18),
+                      const Icon(
+                        Icons.info_outline,
+                        color: Colors.amber,
+                        size: 18,
+                      ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          _t('Bu seçim öz tanımdır; telemetri tarafından atanmaz. İstediğin zaman değiştirebilirsin.',
-                              'This selection is a self-definition; it is not assigned by telemetry. You can change it anytime.',
-                              'Diese Auswahl ist eine Selbstdefinition; sie wird nicht per Telemetrie zugewiesen. Du kannst sie jederzeit ändern.') +
-                          '\n\n' +
-                          _t('Güvenli kimlik ilkesi / Hız veya yatış derecesi sürüş tipi açmaz.',
-                              'Safe identity policy / Top speed or lean angle degree does not unlock riding types.',
-                              'Sichere Identitätsrichtlinie / Höchstgeschwindigkeit oder Schräglage schaltet keine Fahrstile frei.'),
+                          _t(
+                                'Bu seçim öz tanımdır; telemetri tarafından atanmaz. İstediğin zaman değiştirebilirsin.',
+                                'This selection is a self-definition; it is not assigned by telemetry. You can change it anytime.',
+                                'Diese Auswahl ist eine Selbstdefinition; sie wird nicht per Telemetrie zugewiesen. Du kannst sie jederzeit ändern.',
+                              ) +
+                              '\n\n' +
+                              _t(
+                                'Güvenli kimlik ilkesi / Hız veya yatış derecesi sürüş tipi açmaz.',
+                                'Safe identity policy / Top speed or lean angle degree does not unlock riding types.',
+                                'Sichere Identitätsrichtlinie / Höchstgeschwindigkeit oder Schräglage schaltet keine Fahrstile frei.',
+                              ),
                           style: TextStyle(
                             color: Colors.amber.withValues(alpha: 0.9),
                             fontSize: 11,
@@ -7839,9 +8075,11 @@ class _ProfileAppearanceScreenState
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
-                                _t('Bu sürüş tipi achievement ile açılır.',
-                                    'This riding style unlocks with achievement.',
-                                    'Dieser Fahrstil wird durch Errungenschaften freigeschaltet.'),
+                                _t(
+                                  'Bu sürüş tipi achievement ile açılır.',
+                                  'This riding style unlocks with achievement.',
+                                  'Dieser Fahrstil wird durch Errungenschaften freigeschaltet.',
+                                ),
                               ),
                             ),
                           );
@@ -7849,14 +8087,19 @@ class _ProfileAppearanceScreenState
                       },
                       child: Container(
                         margin: const EdgeInsets.only(bottom: 12),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
                         decoration: BoxDecoration(
                           color: isSelected
                               ? context.colors.cyan.withValues(alpha: 0.1)
-                              : const Color(0xFF1E293B),
+                              : SlatePalette.surface,
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
-                            color: isSelected ? context.colors.cyan : const Color(0xFF334155),
+                            color: isSelected
+                                ? context.colors.cyan
+                                : SlatePalette.border,
                             width: isSelected ? 1.5 : 1,
                           ),
                         ),
@@ -7864,7 +8107,9 @@ class _ProfileAppearanceScreenState
                           children: [
                             Icon(
                               item['icon'] as IconData,
-                              color: isSelected ? context.colors.cyan : context.colors.textSecondary,
+                              color: isSelected
+                                  ? context.colors.cyan
+                                  : context.colors.textSecondary,
                               size: 20,
                             ),
                             const SizedBox(width: 14),
@@ -7885,14 +8130,23 @@ class _ProfileAppearanceScreenState
                                       if (isNew) ...[
                                         const SizedBox(width: 6),
                                         Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 4,
+                                            vertical: 1,
+                                          ),
                                           decoration: BoxDecoration(
                                             color: context.colors.cyan,
-                                            borderRadius: BorderRadius.circular(4),
+                                            borderRadius: BorderRadius.circular(
+                                              4,
+                                            ),
                                           ),
                                           child: Text(
                                             _t('YENİ', 'NEW', 'NEU'),
-                                            style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold),
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 8,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
                                         ),
                                       ],
@@ -7910,9 +8164,17 @@ class _ProfileAppearanceScreenState
                               ),
                             ),
                             if (isSelected)
-                              Icon(Icons.check_circle, color: context.colors.cyan, size: 20)
+                              Icon(
+                                Icons.check_circle,
+                                color: context.colors.cyan,
+                                size: 20,
+                              )
                             else if (isLocked)
-                              const Icon(Icons.lock_outline, color: Colors.white60, size: 16),
+                              const Icon(
+                                Icons.lock_outline,
+                                color: Colors.white60,
+                                size: 16,
+                              ),
                           ],
                         ),
                       ),
@@ -7927,8 +8189,13 @@ class _ProfileAppearanceScreenState
             left: 0,
             right: 0,
             child: _buildBottomButton(
-              label: _t('Sürüş Tipini Uygula', 'Apply Riding Style', 'Fahrstil anwenden'),
-              onPressed: () => setState(() => _currentPanel = StudioPanel.mainStudio),
+              label: _t(
+                'Sürüş Tipini Uygula',
+                'Apply Riding Style',
+                'Fahrstil anwenden',
+              ),
+              onPressed: () =>
+                  setState(() => _currentPanel = StudioPanel.mainStudio),
             ),
           ),
         ],
@@ -7936,7 +8203,10 @@ class _ProfileAppearanceScreenState
     );
   }
 
-  Widget _buildBadgeLibrary(BuildContext context, List<Map<String, dynamic>> allBadges) {
+  Widget _buildBadgeLibrary(
+    BuildContext context,
+    List<Map<String, dynamic>> allBadges,
+  ) {
     final filterChips = [
       _t('Tümü', 'All', 'Alle'),
       _t('Kazanıldı', 'Earned', 'Erhalten'),
@@ -7969,7 +8239,8 @@ class _ProfileAppearanceScreenState
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => setState(() => _currentPanel = StudioPanel.mainStudio),
+          onPressed: () =>
+              setState(() => _currentPanel = StudioPanel.mainStudio),
         ),
         title: Text(
           _t('Rozet Kütüphanesi', 'Badge Library', 'Abzeichen-Bibliothek'),
@@ -7985,218 +8256,283 @@ class _ProfileAppearanceScreenState
         children: [
           Column(
             children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  _t('Kartında en fazla üç rozet göster. Basılı tutup sırala.',
-                      'Show up to three badges on your card. Press and hold to sort.',
-                      'Zeige bis zu drei Abzeichen auf deiner Karte. Gedrückt halten zum Sortieren.'),
-                  style: TextStyle(color: context.colors.textSecondary, fontSize: 11),
-                ),
-                Text(
-                  '${localSelectedBadges.length}/3 SEÇİLİ',
-                  style: TextStyle(
-                    color: context.colors.cyan,
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              children: filterChips.map((chip) {
-                final isSelected = _badgeFilter == chip;
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: ChoiceChip(
-                    label: Text(chip),
-                    selected: isSelected,
-                    onSelected: (val) {
-                      if (val) setState(() => _badgeFilter = chip);
-                    },
-                    backgroundColor: const Color(0xFF1E293B),
-                    selectedColor: context.colors.cyan.withValues(alpha: 0.15),
-                    labelStyle: TextStyle(
-                      color: isSelected ? context.colors.cyan : context.colors.textSecondary,
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      side: BorderSide(
-                        color: isSelected ? context.colors.cyan : const Color(0xFF334155),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      _t(
+                        'Kartında en fazla üç rozet göster. Basılı tutup sırala.',
+                        'Show up to three badges on your card. Press and hold to sort.',
+                        'Zeige bis zu drei Abzeichen auf deiner Karte. Gedrückt halten zum Sortieren.',
+                      ),
+                      style: TextStyle(
+                        color: context.colors.textSecondary,
+                        fontSize: 11,
                       ),
                     ),
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.fromLTRB(16, 4, 16, 12),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: const Color(0xFF1E293B),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: context.colors.cyan.withValues(alpha: 0.15),
-                width: 1,
-              ),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.info_outline, color: context.colors.cyan, size: 16),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    _t('Güvenli achievement politikası / Maksimum hız ve yatış açısı rozet koşulu değildir. Konum ve rota kanıtı profilde paylaşılmaz.',
-                        'Safe achievement policy / Top speed or lean angle is not a requirement. Location or route evidence is not shared.',
-                        'Sichere Errungenschaftsrichtlinie / Höchstgeschwindigkeit oder Schräglage ist keine Voraussetzung. Standort- oder Routenbeweise werden nicht geteilt.'),
-                    style: TextStyle(color: context.colors.textSecondary, fontSize: 11, fontWeight: FontWeight.w500),
-                  ),
+                    Text(
+                      '${localSelectedBadges.length}/3 SEÇİLİ',
+                      style: TextStyle(
+                        color: context.colors.cyan,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: GridView.builder(
-              padding: const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 140),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
-                childAspectRatio: 0.85,
               ),
-              itemCount: filteredBadges.length,
-              itemBuilder: (context, index) {
-                final badge = filteredBadges[index];
-                final badgeId = badge['id'] as String;
-                final isSelected = localSelectedBadges.contains(badgeId);
-                final status = badge['status'] as String;
-                final isLocked = status == 'locked';
-                final isProgress = status == 'progress';
-                final progressVal = badge['progress'] as int? ?? 0;
-                final isNew = badge['isNew'] == true;
-
-                return GestureDetector(
-                  onTap: () {
-                    if (!isLocked) {
-                      _toggleBadge(badgeId);
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            _t('Bu rozet kilitli.', 'This badge is locked.', 'Dieses Abzeichen ist gesperrt.'),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                child: Row(
+                  children: filterChips.map((chip) {
+                    final isSelected = _badgeFilter == chip;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: ChoiceChip(
+                        label: Text(chip),
+                        selected: isSelected,
+                        onSelected: (val) {
+                          if (val) setState(() => _badgeFilter = chip);
+                        },
+                        backgroundColor: SlatePalette.surface,
+                        selectedColor: context.colors.cyan.withValues(
+                          alpha: 0.15,
+                        ),
+                        labelStyle: TextStyle(
+                          color: isSelected
+                              ? context.colors.cyan
+                              : context.colors.textSecondary,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          side: BorderSide(
+                            color: isSelected
+                                ? context.colors.cyan
+                                : SlatePalette.border,
                           ),
                         ),
-                      );
-                    }
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? context.colors.cyan.withValues(alpha: 0.1)
-                          : const Color(0xFF1E293B),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: isSelected ? context.colors.cyan : const Color(0xFF334155),
-                        width: isSelected ? 1.5 : 1,
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: SlatePalette.surface,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: context.colors.cyan.withValues(alpha: 0.15),
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.info_outline,
+                      color: context.colors.cyan,
+                      size: 16,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        _t(
+                          'Güvenli achievement politikası / Maksimum hız ve yatış açısı rozet koşulu değildir. Konum ve rota kanıtı profilde paylaşılmaz.',
+                          'Safe achievement policy / Top speed or lean angle is not a requirement. Location or route evidence is not shared.',
+                          'Sichere Errungenschaftsrichtlinie / Höchstgeschwindigkeit oder Schräglage ist keine Voraussetzung. Standort- oder Routenbeweise werden nicht geteilt.',
+                        ),
+                        style: TextStyle(
+                          color: context.colors.textSecondary,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
-                    padding: const EdgeInsets.all(8),
-                    child: Stack(
-                      children: [
-                        if (isNew)
-                          Positioned(
-                            right: 0,
-                            top: 0,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                              decoration: BoxDecoration(
-                                color: context.colors.cyan,
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: Text(
-                                _t('YENİ', 'NEW', 'NEU'),
-                                style: const TextStyle(color: Colors.white, fontSize: 7, fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              badge['icon'] as String,
-                              style: TextStyle(
-                                fontSize: 24,
-                                color: isLocked ? Colors.white24 : Colors.white,
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              badge['name'] as String,
-                              style: TextStyle(
-                                color: isLocked
-                                    ? context.colors.textSecondary.withValues(alpha: 0.5)
-                                    : Colors.white,
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              textAlign: TextAlign.center,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(height: 4),
-                            if (isProgress) ...[
-                              Text(
-                                '%$progressVal',
-                                style: TextStyle(color: context.colors.cyan, fontSize: 9, fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(height: 2),
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(2),
-                                child: LinearProgressIndicator(
-                                  value: progressVal / 100.0,
-                                  minHeight: 3,
-                                  backgroundColor: const Color(0xFF334155),
-                                  valueColor: AlwaysStoppedAnimation(context.colors.cyan),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: GridView.builder(
+                  padding: const EdgeInsets.only(
+                    left: 16,
+                    right: 16,
+                    top: 16,
+                    bottom: 140,
+                  ),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                    childAspectRatio: 0.85,
+                  ),
+                  itemCount: filteredBadges.length,
+                  itemBuilder: (context, index) {
+                    final badge = filteredBadges[index];
+                    final badgeId = badge['id'] as String;
+                    final isSelected = localSelectedBadges.contains(badgeId);
+                    final status = badge['status'] as String;
+                    final isLocked = status == 'locked';
+                    final isProgress = status == 'progress';
+                    final progressVal = badge['progress'] as int? ?? 0;
+                    final isNew = badge['isNew'] == true;
+
+                    return GestureDetector(
+                      onTap: () {
+                        if (!isLocked) {
+                          _toggleBadge(badgeId);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                _t(
+                                  'Bu rozet kilitli.',
+                                  'This badge is locked.',
+                                  'Dieses Abzeichen ist gesperrt.',
                                 ),
                               ),
-                            ] else if (isLocked) ...[
-                              Text(
-                                _t('KİLİTLİ', 'LOCKED', 'GESPERRT'),
-                                style: const TextStyle(color: Colors.white24, fontSize: 9, fontWeight: FontWeight.bold),
+                            ),
+                          );
+                        }
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? context.colors.cyan.withValues(alpha: 0.1)
+                              : SlatePalette.surface,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: isSelected
+                                ? context.colors.cyan
+                                : SlatePalette.border,
+                            width: isSelected ? 1.5 : 1,
+                          ),
+                        ),
+                        padding: const EdgeInsets.all(8),
+                        child: Stack(
+                          children: [
+                            if (isNew)
+                              Positioned(
+                                right: 0,
+                                top: 0,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 4,
+                                    vertical: 1,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: context.colors.cyan,
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Text(
+                                    _t('YENİ', 'NEW', 'NEU'),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 7,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ] else ...[
-                              Text(
-                                _t('KAZANILDI', 'EARNED', 'ERHALTEN'),
-                                style: const TextStyle(color: Colors.green, fontSize: 9, fontWeight: FontWeight.bold),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 10),
+                                Icon(
+                                  badge['icon'] as IconData,
+                                  size: 24,
+                                  color: isLocked
+                                      ? Colors.white24
+                                      : Colors.white,
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  badge['name'] as String,
+                                  style: TextStyle(
+                                    color: isLocked
+                                        ? context.colors.textSecondary
+                                              .withValues(alpha: 0.5)
+                                        : Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 4),
+                                if (isProgress) ...[
+                                  Text(
+                                    '%$progressVal',
+                                    style: TextStyle(
+                                      color: context.colors.cyan,
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(2),
+                                    child: LinearProgressIndicator(
+                                      value: progressVal / 100.0,
+                                      minHeight: 3,
+                                      backgroundColor: SlatePalette.border,
+                                      valueColor: AlwaysStoppedAnimation(
+                                        context.colors.cyan,
+                                      ),
+                                    ),
+                                  ),
+                                ] else if (isLocked) ...[
+                                  Text(
+                                    _t('KİLİTLİ', 'LOCKED', 'GESPERRT'),
+                                    style: const TextStyle(
+                                      color: Colors.white24,
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ] else ...[
+                                  Text(
+                                    _t('KAZANILDI', 'EARNED', 'ERHALTEN'),
+                                    style: const TextStyle(
+                                      color: Colors.green,
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                            if (isSelected)
+                              const Positioned(
+                                left: 0,
+                                top: 0,
+                                child: Icon(
+                                  Icons.check_circle,
+                                  color: Colors.green,
+                                  size: 14,
+                                ),
                               ),
-                            ],
                           ],
                         ),
-                        if (isSelected)
-                          const Positioned(
-                            left: 0,
-                            top: 0,
-                            child: Icon(Icons.check_circle, color: Colors.green, size: 14),
-                          ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
           Positioned(
             bottom: 0,
             left: 0,
@@ -8204,8 +8540,13 @@ class _ProfileAppearanceScreenState
             child: _buildBottomDoubleButton(
               leftLabel: _t('Sıfırla', 'Reset', 'Zurücksetzen'),
               onLeftPressed: () => setState(() => localSelectedBadges.clear()),
-              rightLabel: _t('Seçimleri Uygula', 'Apply Selection', 'Auswahl anwenden'),
-              onRightPressed: () => setState(() => _currentPanel = StudioPanel.mainStudio),
+              rightLabel: _t(
+                'Seçimleri Uygula',
+                'Apply Selection',
+                'Auswahl anwenden',
+              ),
+              onRightPressed: () =>
+                  setState(() => _currentPanel = StudioPanel.mainStudio),
             ),
           ),
         ],
@@ -8215,10 +8556,43 @@ class _ProfileAppearanceScreenState
 
   Widget _buildAvatarFrame(BuildContext context, UserProfile profile) {
     final frames = [
-      {'id': 0, 'name': 'Standart', 'desc': _t('İnce mat çerçeve', 'Thin matte frame', 'Dünner matter Rahmen')},
-      {'id': 1, 'name': 'Titanium', 'desc': _t('Dengeli metalik görünüm', 'Balanced metallic look', 'Ausgewogener Metallic-Look')},
-      {'id': 2, 'name': 'Apex Cyan', 'desc': _t('Marka vurgulu çerçeve', 'Brand accented frame', 'Markenakzentierter Rahmen')},
-      {'id': 3, 'name': 'Touring', 'desc': _t('Kilitli / Achievement ile açılır', 'Locked / Unlocks with achievement', 'Gesperrt / Wird durch Errungenschaften freigeschaltet'), 'locked': true},
+      {
+        'id': 0,
+        'name': 'Standart',
+        'desc': _t(
+          'İnce mat çerçeve',
+          'Thin matte frame',
+          'Dünner matter Rahmen',
+        ),
+      },
+      {
+        'id': 1,
+        'name': 'Titanium',
+        'desc': _t(
+          'Dengeli metalik görünüm',
+          'Balanced metallic look',
+          'Ausgewogener Metallic-Look',
+        ),
+      },
+      {
+        'id': 2,
+        'name': 'Apex Cyan',
+        'desc': _t(
+          'Marka vurgulu çerçeve',
+          'Brand accented frame',
+          'Markenakzentierter Rahmen',
+        ),
+      },
+      {
+        'id': 3,
+        'name': 'Touring',
+        'desc': _t(
+          'Kilitli / Achievement ile açılır',
+          'Locked / Unlocks with achievement',
+          'Gesperrt / Wird durch Errungenschaften freigeschaltet',
+        ),
+        'locked': true,
+      },
     ];
 
     return Scaffold(
@@ -8228,7 +8602,8 @@ class _ProfileAppearanceScreenState
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => setState(() => _currentPanel = StudioPanel.mainStudio),
+          onPressed: () =>
+              setState(() => _currentPanel = StudioPanel.mainStudio),
         ),
         title: Text(
           _t('Avatar ve Çerçeve', 'Avatar and Frame', 'Avatar und Rahmen'),
@@ -8244,7 +8619,12 @@ class _ProfileAppearanceScreenState
         children: [
           Positioned.fill(
             child: ListView(
-              padding: const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 120),
+              padding: const EdgeInsets.only(
+                left: 16,
+                right: 16,
+                top: 16,
+                bottom: 120,
+              ),
               children: [
                 Text(
                   _t('8 SEÇENEK', '8 OPTIONS', '8 OPTIONEN'),
@@ -8258,9 +8638,12 @@ class _ProfileAppearanceScreenState
                 const SizedBox(height: 12),
                 Container(
                   margin: const EdgeInsets.only(bottom: 16),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1E293B),
+                    color: SlatePalette.surface,
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
                       color: context.colors.cyan.withValues(alpha: 0.15),
@@ -8269,14 +8652,24 @@ class _ProfileAppearanceScreenState
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.info_outline, color: context.colors.cyan, size: 16),
+                      Icon(
+                        Icons.info_outline,
+                        color: context.colors.cyan,
+                        size: 16,
+                      ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          _t('Avatar ve çerçeve birbirinden bağımsız seçilir. Glow yerine ince halka ve onay işareti kullanılır.',
-                              'Avatar and frame are selected independently. A thin ring and checkmark are used instead of glow.',
-                              'Avatar und Rahmen werden unabhängig voneinander ausgewählt. Anstelle von Glow wird ein dünner Ring und ein Häkchen verwendet.'),
-                          style: TextStyle(color: context.colors.textSecondary, fontSize: 11, fontWeight: FontWeight.w500),
+                          _t(
+                            'Avatar ve çerçeve birbirinden bağımsız seçilir. Glow yerine ince halka ve onay işareti kullanılır.',
+                            'Avatar and frame are selected independently. A thin ring and checkmark are used instead of glow.',
+                            'Avatar und Rahmen werden unabhängig voneinander ausgewählt. Anstelle von Glow wird ein dünner Ring und ein Häkchen verwendet.',
+                          ),
+                          style: TextStyle(
+                            color: context.colors.textSecondary,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
                     ],
@@ -8300,11 +8693,16 @@ class _ProfileAppearanceScreenState
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: isSelected ? context.colors.cyan : Colors.transparent,
+                            color: isSelected
+                                ? context.colors.cyan
+                                : Colors.transparent,
                             width: 2,
                           ),
                         ),
-                        child: RiderAvatarWidget(avatarIndex: index, radius: 24),
+                        child: RiderAvatarWidget(
+                          avatarIndex: index,
+                          radius: 24,
+                        ),
                       ),
                     );
                   },
@@ -8338,7 +8736,11 @@ class _ProfileAppearanceScreenState
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
-                                _t('Bu çerçeve kilitli.', 'This frame is locked.', 'Dieser Rahmen ist gesperrt.'),
+                                _t(
+                                  'Bu çerçeve kilitli.',
+                                  'This frame is locked.',
+                                  'Dieser Rahmen ist gesperrt.',
+                                ),
                               ),
                             ),
                           );
@@ -8346,14 +8748,19 @@ class _ProfileAppearanceScreenState
                       },
                       child: Container(
                         margin: const EdgeInsets.only(bottom: 12),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
                         decoration: BoxDecoration(
                           color: isSelected
                               ? context.colors.cyan.withValues(alpha: 0.1)
-                              : const Color(0xFF1E293B),
+                              : SlatePalette.surface,
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
-                            color: isSelected ? context.colors.cyan : const Color(0xFF334155),
+                            color: isSelected
+                                ? context.colors.cyan
+                                : SlatePalette.border,
                             width: isSelected ? 1.5 : 1,
                           ),
                         ),
@@ -8363,9 +8770,13 @@ class _ProfileAppearanceScreenState
                               fid == 0
                                   ? Icons.circle_outlined
                                   : (fid == 1
-                                      ? Icons.stars
-                                      : (fid == 2 ? Icons.workspace_premium : Icons.diamond)),
-                              color: isSelected ? context.colors.cyan : context.colors.textSecondary,
+                                        ? Icons.stars
+                                        : (fid == 2
+                                              ? Icons.workspace_premium
+                                              : Icons.diamond)),
+                              color: isSelected
+                                  ? context.colors.cyan
+                                  : context.colors.textSecondary,
                               size: 20,
                             ),
                             const SizedBox(width: 14),
@@ -8393,9 +8804,17 @@ class _ProfileAppearanceScreenState
                               ),
                             ),
                             if (isSelected)
-                              Icon(Icons.check_circle, color: context.colors.cyan, size: 20)
+                              Icon(
+                                Icons.check_circle,
+                                color: context.colors.cyan,
+                                size: 20,
+                              )
                             else if (isLocked)
-                              const Icon(Icons.lock_outline, color: Colors.white60, size: 16),
+                              const Icon(
+                                Icons.lock_outline,
+                                color: Colors.white60,
+                                size: 16,
+                              ),
                           ],
                         ),
                       ),
@@ -8410,8 +8829,13 @@ class _ProfileAppearanceScreenState
             left: 0,
             right: 0,
             child: _buildBottomButton(
-              label: _t('Görünümü Uygula', 'Apply Appearance', 'Erscheinungsbild anwenden'),
-              onPressed: () => setState(() => _currentPanel = StudioPanel.mainStudio),
+              label: _t(
+                'Görünümü Uygula',
+                'Apply Appearance',
+                'Erscheinungsbild anwenden',
+              ),
+              onPressed: () =>
+                  setState(() => _currentPanel = StudioPanel.mainStudio),
             ),
           ),
         ],
@@ -8429,9 +8853,9 @@ class _ProfileAppearanceScreenState
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
+        color: SlatePalette.surface,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFF334155), width: 1),
+        border: Border.all(color: SlatePalette.border, width: 1),
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -8468,10 +8892,7 @@ class _ProfileAppearanceScreenState
         ),
         subtitle: Text(
           subtitle,
-          style: TextStyle(
-            color: context.colors.textSecondary,
-            fontSize: 12,
-          ),
+          style: TextStyle(color: context.colors.textSecondary, fontSize: 12),
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
@@ -8517,7 +8938,7 @@ class _ProfileAppearanceScreenState
                 behavior: HitTestBehavior.opaque,
                 child: Container(
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1A1F2B).withValues(alpha: 0.8),
+                    color: context.colors.navChip.withValues(alpha: 0.8),
                     borderRadius: BorderRadius.circular(24),
                     border: Border.all(
                       color: Colors.white.withValues(alpha: 0.08),
@@ -8574,7 +8995,7 @@ class _ProfileAppearanceScreenState
                       behavior: HitTestBehavior.opaque,
                       child: Container(
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1A1F2B).withValues(alpha: 0.6),
+                          color: context.colors.navChip.withValues(alpha: 0.6),
                           borderRadius: BorderRadius.circular(24),
                           border: Border.all(
                             color: Colors.white.withValues(alpha: 0.05),
@@ -8606,7 +9027,7 @@ class _ProfileAppearanceScreenState
                       behavior: HitTestBehavior.opaque,
                       child: Container(
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1A1F2B).withValues(alpha: 0.8),
+                          color: context.colors.navChip.withValues(alpha: 0.8),
                           borderRadius: BorderRadius.circular(24),
                           border: Border.all(
                             color: Colors.white.withValues(alpha: 0.08),
@@ -8698,7 +9119,11 @@ class _AchievementOverviewCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _t('BAŞARIMLAR & ROZETLER', 'ACHIEVEMENTS & BADGES', 'ERFOLGE & ABZEICHEN'),
+                        _t(
+                          'BAŞARIMLAR & ROZETLER',
+                          'ACHIEVEMENTS & BADGES',
+                          'ERFOLGE & ABZEICHEN',
+                        ),
                         style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w900,
@@ -8710,7 +9135,11 @@ class _AchievementOverviewCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        _t('Kazanılan: $unlockedCount / $allCount Başarım', 'Unlocked: $unlockedCount / $allCount Achievements', 'Freigeschaltet: $unlockedCount / $allCount Erfolge'),
+                        _t(
+                          'Kazanılan: $unlockedCount / $allCount Başarım',
+                          'Unlocked: $unlockedCount / $allCount Achievements',
+                          'Freigeschaltet: $unlockedCount / $allCount Erfolge',
+                        ),
                         style: TextStyle(
                           fontSize: 10,
                           color: context.colors.textSecondary,
@@ -8721,11 +9150,7 @@ class _AchievementOverviewCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                Icon(
-                  Icons.chevron_right,
-                  color: context.colors.cyan,
-                  size: 22,
-                ),
+                Icon(Icons.chevron_right, color: context.colors.cyan, size: 22),
               ],
             ),
             const SizedBox(height: 12),
@@ -8749,13 +9174,25 @@ class _AchievementOverviewCard extends StatelessWidget {
                     physics: const BouncingScrollPhysics(),
                     child: Row(
                       children: const [
-                        _MiniBadgeChip(icon: '🏁', label: 'İlk Sürüş'),
+                        _MiniBadgeChip(
+                          icon: PhosphorIconsFill.flagCheckered,
+                          label: 'İlk Sürüş',
+                        ),
                         SizedBox(width: 6),
-                        _MiniBadgeChip(icon: '🌟', label: '100 KM'),
+                        _MiniBadgeChip(
+                          icon: PhosphorIconsFill.star,
+                          label: '100 KM',
+                        ),
                         SizedBox(width: 6),
-                        _MiniBadgeChip(icon: '🔥', label: 'Hız Canavarı'),
+                        _MiniBadgeChip(
+                          icon: PhosphorIconsFill.fire,
+                          label: 'Hız Canavarı',
+                        ),
                         SizedBox(width: 6),
-                        _MiniBadgeChip(icon: '🛠️', label: 'Bakım'),
+                        _MiniBadgeChip(
+                          icon: PhosphorIconsFill.wrench,
+                          label: 'Bakım',
+                        ),
                       ],
                     ),
                   ),
@@ -8780,7 +9217,7 @@ class _AchievementOverviewCard extends StatelessWidget {
 
 class _MiniBadgeChip extends StatelessWidget {
   const _MiniBadgeChip({required this.icon, required this.label});
-  final String icon;
+  final IconData icon;
   final String label;
 
   @override
@@ -8795,11 +9232,15 @@ class _MiniBadgeChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(icon, style: const TextStyle(fontSize: 11)),
+          Icon(icon, size: 11, color: context.colors.textSecondary),
           const SizedBox(width: 4),
           Text(
             label,
-            style: TextStyle(fontSize: 9, color: context.colors.textSecondary, fontWeight: FontWeight.w600),
+            style: TextStyle(
+              fontSize: 9,
+              color: context.colors.textSecondary,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ],
       ),
@@ -8807,7 +9248,12 @@ class _MiniBadgeChip extends StatelessWidget {
   }
 }
 
-void _showAchievementsModal(BuildContext context, bool tr, bool de, UserProfile userProfile) {
+void _showAchievementsModal(
+  BuildContext context,
+  bool tr,
+  bool de,
+  UserProfile userProfile,
+) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -8830,10 +9276,12 @@ class _AchievementSheetWidget extends ConsumerStatefulWidget {
   final UserProfile userProfile;
 
   @override
-  ConsumerState<_AchievementSheetWidget> createState() => _AchievementSheetWidgetState();
+  ConsumerState<_AchievementSheetWidget> createState() =>
+      _AchievementSheetWidgetState();
 }
 
-class _AchievementSheetWidgetState extends ConsumerState<_AchievementSheetWidget> {
+class _AchievementSheetWidgetState
+    extends ConsumerState<_AchievementSheetWidget> {
   String _selectedCategory = 'all';
   final Set<String> _claimedRewards = {};
 
@@ -8845,12 +9293,32 @@ class _AchievementSheetWidgetState extends ConsumerState<_AchievementSheetWidget
     final all = AchievementCatalog.allAchievements;
 
     final categories = [
-      {'id': 'all', 'label': tr ? 'Tümü' : (de ? 'Alle' : 'All'), 'icon': '🎯'},
-      {'id': 'km', 'label': 'KM', 'icon': '🛣️'},
-      {'id': 'ride', 'label': tr ? 'Sürüş' : 'Rides', 'icon': '🏍️'},
-      {'id': 'maintenance', 'label': tr ? 'Bakım' : 'Service', 'icon': '🛠️'},
-      {'id': 'harmony', 'label': tr ? 'Uyum' : 'Harmony', 'icon': '🧘'},
-      {'id': 'social', 'label': tr ? 'Sosyal' : 'Social', 'icon': '🤝'},
+      {
+        'id': 'all',
+        'label': tr ? 'Tümü' : (de ? 'Alle' : 'All'),
+        'icon': PhosphorIconsFill.target,
+      },
+      {'id': 'km', 'label': 'KM', 'icon': PhosphorIconsFill.roadHorizon},
+      {
+        'id': 'ride',
+        'label': tr ? 'Sürüş' : 'Rides',
+        'icon': PhosphorIconsFill.motorcycle,
+      },
+      {
+        'id': 'maintenance',
+        'label': tr ? 'Bakım' : 'Service',
+        'icon': PhosphorIconsFill.wrench,
+      },
+      {
+        'id': 'harmony',
+        'label': tr ? 'Uyum' : 'Harmony',
+        'icon': PhosphorIconsFill.yinYang,
+      },
+      {
+        'id': 'social',
+        'label': tr ? 'Sosyal' : 'Social',
+        'icon': PhosphorIconsFill.handshake,
+      },
     ];
 
     final filtered = _selectedCategory == 'all'
@@ -8882,7 +9350,10 @@ class _AchievementSheetWidgetState extends ConsumerState<_AchievementSheetWidget
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -8890,7 +9361,11 @@ class _AchievementSheetWidgetState extends ConsumerState<_AchievementSheetWidget
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          tr ? 'BAŞARIM & RİDER XP' : (de ? 'ERFOLGE & FAHRER XP' : 'ACHIEVEMENT & RIDER XP'),
+                          tr
+                              ? 'BAŞARIM & RİDER XP'
+                              : (de
+                                    ? 'ERFOLGE & FAHRER XP'
+                                    : 'ACHIEVEMENT & RIDER XP'),
                           style: const TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.w900,
@@ -8899,7 +9374,9 @@ class _AchievementSheetWidgetState extends ConsumerState<_AchievementSheetWidget
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          tr ? 'Tamamlanan başarımlarla Rider XP ve seviye kazan' : 'Earn Rider XP & levels from completed achievements',
+                          tr
+                              ? 'Tamamlanan başarımlarla Rider XP ve seviye kazan'
+                              : 'Earn Rider XP & levels from completed achievements',
                           style: TextStyle(
                             fontSize: 11,
                             color: context.colors.textSecondary,
@@ -8908,7 +9385,10 @@ class _AchievementSheetWidgetState extends ConsumerState<_AchievementSheetWidget
                       ],
                     ),
                     IconButton(
-                      icon: Icon(Icons.close, color: context.colors.textSecondary),
+                      icon: Icon(
+                        Icons.close,
+                        color: context.colors.textSecondary,
+                      ),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ],
@@ -8934,18 +9414,29 @@ class _AchievementSheetWidgetState extends ConsumerState<_AchievementSheetWidget
                             selected: isSelected,
                             selectedColor: context.colors.cyan,
                             backgroundColor: context.colors.surface,
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
                             label: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text(cat['icon'] as String, style: const TextStyle(fontSize: 12)),
+                                Icon(
+                                  cat['icon'] as IconData,
+                                  size: 12,
+                                  color: isSelected
+                                      ? Colors.black
+                                      : Colors.white,
+                                ),
                                 const SizedBox(width: 6),
                                 Text(
                                   cat['label'] as String,
                                   style: TextStyle(
                                     fontSize: 11,
                                     fontWeight: FontWeight.bold,
-                                    color: isSelected ? Colors.black : Colors.white,
+                                    color: isSelected
+                                        ? Colors.black
+                                        : Colors.white,
                                   ),
                                 ),
                               ],
@@ -8970,7 +9461,9 @@ class _AchievementSheetWidgetState extends ConsumerState<_AchievementSheetWidget
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
-                                context.colors.background.withValues(alpha: 0.0),
+                                context.colors.background.withValues(
+                                  alpha: 0.0,
+                                ),
                                 context.colors.background,
                               ],
                               begin: Alignment.centerLeft,
@@ -8989,7 +9482,7 @@ class _AchievementSheetWidgetState extends ConsumerState<_AchievementSheetWidget
                 ),
               ),
               const SizedBox(height: 8),
-              const Divider(height: 1, color: Color(0xFF334155)),
+              const Divider(height: 1, color: SlatePalette.border),
 
               // ACHIEVEMENTS LIST
               Expanded(
@@ -9024,10 +9517,15 @@ class _AchievementSheetWidgetState extends ConsumerState<_AchievementSheetWidget
                     // 5. Harmony rides per mood
                     int realHarmonyCount = 0;
                     if (item.category == 'harmony') {
-                      final moodName = item.id.split('_').length > 1 ? item.id.split('_')[1] : '';
-                      realHarmonyCount = rideState.sessions.where(
-                        (s) => s.mood.toLowerCase() == moodName.toLowerCase(),
-                      ).length;
+                      final moodName = item.id.split('_').length > 1
+                          ? item.id.split('_')[1]
+                          : '';
+                      realHarmonyCount = rideState.sessions
+                          .where(
+                            (s) =>
+                                s.mood.toLowerCase() == moodName.toLowerCase(),
+                          )
+                          .length;
                     }
 
                     bool isUnlocked = false;
@@ -9045,7 +9543,8 @@ class _AchievementSheetWidgetState extends ConsumerState<_AchievementSheetWidget
                     } else if (item.category == 'harmony') {
                       currentProgress = realHarmonyCount;
                       isUnlocked = currentProgress >= item.requiredCount;
-                    } else if (item.category == 'social' || item.id.startsWith('friend_count_')) {
+                    } else if (item.category == 'social' ||
+                        item.id.startsWith('friend_count_')) {
                       currentProgress = realFriendsCount;
                       isUnlocked = currentProgress >= item.requiredCount;
                     } else {
@@ -9061,11 +9560,15 @@ class _AchievementSheetWidgetState extends ConsumerState<_AchievementSheetWidget
                             _claimedRewards.add(item.id);
                           });
                           // Add dynamic achievement XP to user profile
-                          ref.read(userProfileProvider.notifier).addXp(item.xpReward);
+                          ref
+                              .read(userProfileProvider.notifier)
+                              .addXp(item.xpReward);
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               backgroundColor: const Color(0xFFD97706),
-                              content: Text('✨ +${item.xpReward} Rider XP Kazandın! Ödül: ${item.reward.title(langCode)}'),
+                              content: Text(
+                                '✨ ${tInline(langCode, '+${item.xpReward} Rider XP Kazandın! Ödül', '+${item.xpReward} Rider XP earned! Reward', '+${item.xpReward} Rider XP erhalten! Belohnung')}: ${item.reward.title(langCode)}',
+                              ),
                               duration: const Duration(seconds: 2),
                             ),
                           );
@@ -9077,23 +9580,31 @@ class _AchievementSheetWidgetState extends ConsumerState<_AchievementSheetWidget
                         decoration: BoxDecoration(
                           color: isClaimed
                               ? const Color(0xFF78350F).withValues(alpha: 0.25)
-                              : (isUnlocked ? context.colors.surface : const Color(0xFF0F172A)),
+                              : (isUnlocked
+                                    ? context.colors.surface
+                                    : SlatePalette.surfaceDeep),
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(
                             color: isClaimed
-                                ? const Color(0xFFF59E0B) // Gold border when claimed
+                                ? const Color(
+                                    0xFFF59E0B,
+                                  ) // Gold border when claimed
                                 : (isUnlocked
-                                    ? context.colors.cyan.withValues(alpha: 0.5)
-                                    : const Color(0xFF1E293B)),
+                                      ? context.colors.cyan.withValues(
+                                          alpha: 0.5,
+                                        )
+                                      : SlatePalette.surface),
                             width: isClaimed ? 2.0 : 1.0,
                           ),
                           boxShadow: isClaimed
                               ? [
                                   BoxShadow(
-                                    color: const Color(0xFFF59E0B).withValues(alpha: 0.35),
+                                    color: const Color(
+                                      0xFFF59E0B,
+                                    ).withValues(alpha: 0.35),
                                     blurRadius: 10,
                                     spreadRadius: 1,
-                                  )
+                                  ),
                                 ]
                               : null,
                         ),
@@ -9108,21 +9619,31 @@ class _AchievementSheetWidgetState extends ConsumerState<_AchievementSheetWidget
                                   alignment: Alignment.center,
                                   decoration: BoxDecoration(
                                     color: isClaimed
-                                        ? const Color(0xFFF59E0B).withValues(alpha: 0.2)
+                                        ? const Color(
+                                            0xFFF59E0B,
+                                          ).withValues(alpha: 0.2)
                                         : (isUnlocked
-                                            ? context.colors.cyan.withValues(alpha: 0.15)
-                                            : const Color(0xFF1E293B)),
+                                              ? context.colors.cyan.withValues(
+                                                  alpha: 0.15,
+                                                )
+                                              : SlatePalette.surface),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
-                                  child: Text(
-                                    isUnlocked ? item.icon : '🔒',
-                                    style: const TextStyle(fontSize: 22),
+                                  child: Icon(
+                                    isUnlocked
+                                        ? item.icon
+                                        : PhosphorIconsFill.lock,
+                                    size: 22,
+                                    color: isUnlocked
+                                        ? Colors.white
+                                        : Colors.white38,
                                   ),
                                 ),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Row(
                                         children: [
@@ -9132,24 +9653,44 @@ class _AchievementSheetWidgetState extends ConsumerState<_AchievementSheetWidget
                                               style: TextStyle(
                                                 fontSize: 13,
                                                 fontWeight: FontWeight.bold,
-                                                color: isUnlocked ? Colors.white : context.colors.textSecondary,
+                                                color: isUnlocked
+                                                    ? Colors.white
+                                                    : context
+                                                          .colors
+                                                          .textSecondary,
                                               ),
                                             ),
                                           ),
                                           if (isClaimed)
                                             Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 8,
+                                                    vertical: 3,
+                                                  ),
                                               decoration: BoxDecoration(
-                                                color: const Color(0xFF78350F).withValues(alpha: 0.8),
-                                                borderRadius: BorderRadius.circular(6),
-                                                border: Border.all(color: const Color(0xFFF59E0B), width: 1.0),
+                                                color: const Color(
+                                                  0xFF78350F,
+                                                ).withValues(alpha: 0.8),
+                                                borderRadius:
+                                                    BorderRadius.circular(6),
+                                                border: Border.all(
+                                                  color: const Color(
+                                                    0xFFF59E0B,
+                                                  ),
+                                                  width: 1.0,
+                                                ),
                                               ),
                                               child: Text(
-                                                tr ? 'ÖDÜL ALINDI 👑' : 'CLAIMED 👑',
+                                                tr
+                                                    ? 'ÖDÜL ALINDI 👑'
+                                                    : 'CLAIMED 👑',
                                                 style: const TextStyle(
                                                   fontSize: 9,
                                                   fontWeight: FontWeight.w900,
-                                                  color: Color(0xFFFBBF24), // Gold Text
+                                                  color: Color(
+                                                    0xFFFBBF24,
+                                                  ), // Gold Text
                                                 ),
                                               ),
                                             ),
@@ -9169,7 +9710,10 @@ class _AchievementSheetWidgetState extends ConsumerState<_AchievementSheetWidget
                               ],
                             ),
                             const SizedBox(height: 10),
-                            const Divider(height: 1, color: Color(0xFF1E293B)),
+                            const Divider(
+                              height: 1,
+                              color: SlatePalette.surface,
+                            ),
                             const SizedBox(height: 8),
 
                             // REWARD CLAIM BAR
@@ -9183,7 +9727,9 @@ class _AchievementSheetWidgetState extends ConsumerState<_AchievementSheetWidget
                                       size: 14,
                                       color: isClaimed
                                           ? const Color(0xFFFBBF24)
-                                          : (isUnlocked ? context.colors.cyan : context.colors.textSecondary),
+                                          : (isUnlocked
+                                                ? context.colors.cyan
+                                                : context.colors.textSecondary),
                                     ),
                                     const SizedBox(width: 6),
                                     Text(
@@ -9193,20 +9739,29 @@ class _AchievementSheetWidgetState extends ConsumerState<_AchievementSheetWidget
                                         fontWeight: FontWeight.bold,
                                         color: isClaimed
                                             ? const Color(0xFFFBBF24)
-                                            : (isUnlocked ? context.colors.cyan : context.colors.textSecondary),
+                                            : (isUnlocked
+                                                  ? context.colors.cyan
+                                                  : context
+                                                        .colors
+                                                        .textSecondary),
                                       ),
                                     ),
                                   ],
                                 ),
                                 if (isUnlocked && !isClaimed)
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 4,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: const Color(0xFFD97706),
                                       borderRadius: BorderRadius.circular(6),
                                     ),
                                     child: Text(
-                                      tr ? 'Tıkla & Ödülü Al ✨' : 'Tap to Claim ✨',
+                                      tr
+                                          ? 'Tıkla & Ödülü Al ✨'
+                                          : 'Tap to Claim ✨',
                                       style: const TextStyle(
                                         fontSize: 10,
                                         fontWeight: FontWeight.w900,
@@ -9287,7 +9842,11 @@ class _PremiumVaultButton extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _t('ÖDÜL KASASI 🔐', 'REWARD VAULT 🔐', 'BELOHNUNGS TRESOR 🔐'),
+                    _t(
+                      'ÖDÜL KASASI 🔐',
+                      'REWARD VAULT 🔐',
+                      'BELOHNUNGS TRESOR 🔐',
+                    ),
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w900,
@@ -9297,7 +9856,11 @@ class _PremiumVaultButton extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    _t('Kazanılan ödülleri, temaları ve promo kodlarını yönet', 'Manage earned rewards, themes & promo codes', 'Verwalte deine Prämien, Themes & Codes'),
+                    _t(
+                      'Kazanılan ödülleri, temaları ve promo kodlarını yönet',
+                      'Manage earned rewards, themes & promo codes',
+                      'Verwalte deine Prämien, Themes & Codes',
+                    ),
                     style: const TextStyle(
                       fontSize: 10,
                       color: Color(0xFFC7D2FE),
@@ -9306,11 +9869,7 @@ class _PremiumVaultButton extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(
-              Icons.chevron_right,
-              color: Color(0xFFA5B4FC),
-              size: 22,
-            ),
+            const Icon(Icons.chevron_right, color: Color(0xFFA5B4FC), size: 22),
           ],
         ),
       ),
@@ -9329,11 +9888,7 @@ void _showPremiumVaultModal(
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     builder: (sheetContext) {
-      return _PremiumVaultSheetWidget(
-        tr: tr,
-        de: de,
-        userProfile: userProfile,
-      );
+      return _PremiumVaultSheetWidget(tr: tr, de: de, userProfile: userProfile);
     },
   );
 }
@@ -9406,7 +9961,9 @@ class _PremiumVaultSheetWidgetState
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    tr ? 'ÖDÜL KASASI 🔐' : (de ? 'BELOHNUNGS TRESOR 🔐' : 'REWARD VAULT 🔐'),
+                    tr
+                        ? 'ÖDÜL KASASI 🔐'
+                        : (de ? 'BELOHNUNGS TRESOR 🔐' : 'REWARD VAULT 🔐'),
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w900,
@@ -9414,7 +9971,10 @@ class _PremiumVaultSheetWidgetState
                     ),
                   ),
                   IconButton(
-                    icon: Icon(Icons.close, color: context.colors.textSecondary),
+                    icon: Icon(
+                      Icons.close,
+                      color: context.colors.textSecondary,
+                    ),
                     onPressed: () => Navigator.pop(context),
                   ),
                 ],
@@ -9423,7 +9983,9 @@ class _PremiumVaultSheetWidgetState
 
               // Vault Items Header
               Text(
-                tr ? 'KASADAKİ ÖDÜLLER' : (de ? 'TRESOR PRÄMIEN' : 'VAULT REWARDS'),
+                tr
+                    ? 'KASADAKİ ÖDÜLLER'
+                    : (de ? 'TRESOR PRÄMIEN' : 'VAULT REWARDS'),
                 style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
@@ -9452,7 +10014,9 @@ class _PremiumVaultSheetWidgetState
                         Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF6366F1).withValues(alpha: 0.25),
+                            color: const Color(
+                              0xFF6366F1,
+                            ).withValues(alpha: 0.25),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: const Icon(
@@ -9467,7 +10031,9 @@ class _PremiumVaultSheetWidgetState
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                tr ? 'Premium Sürücü Lisansı' : 'Premium Rider License',
+                                tr
+                                    ? 'Premium Sürücü Lisansı'
+                                    : 'Premium Rider License',
                                 style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
@@ -9477,11 +10043,17 @@ class _PremiumVaultSheetWidgetState
                               const SizedBox(height: 2),
                               Text(
                                 userProfile.isPremium
-                                    ? (tr ? '👑 Hesabınızda Aktif' : '👑 Active on Account')
-                                    : (tr ? '⚡ 24 Gün Kullanılabilir' : '⚡ 24 Days Available'),
+                                    ? (tr
+                                          ? '👑 Hesabınızda Aktif'
+                                          : '👑 Active on Account')
+                                    : (tr
+                                          ? '⚡ 24 Gün Kullanılabilir'
+                                          : '⚡ 24 Days Available'),
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: userProfile.isPremium ? const Color(0xFF10B981) : const Color(0xFFC7D2FE),
+                                  color: userProfile.isPremium
+                                      ? const Color(0xFF10B981)
+                                      : const Color(0xFFC7D2FE),
                                 ),
                               ),
                             ],
@@ -9489,9 +10061,14 @@ class _PremiumVaultSheetWidgetState
                         ),
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: userProfile.isPremium ? const Color(0xFF10B981) : const Color(0xFF6366F1),
+                            backgroundColor: userProfile.isPremium
+                                ? const Color(0xFF10B981)
+                                : const Color(0xFF6366F1),
                             foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
@@ -9499,7 +10076,9 @@ class _PremiumVaultSheetWidgetState
                           onPressed: () async {
                             if (!userProfile.isPremium) {
                               final messenger = ScaffoldMessenger.of(context);
-                              await ref.read(userProfileProvider.notifier).updatePremiumStatus(true);
+                              await ref
+                                  .read(userProfileProvider.notifier)
+                                  .updatePremiumStatus(true);
                               if (mounted) {
                                 messenger.showSnackBar(
                                   SnackBar(
@@ -9515,8 +10094,13 @@ class _PremiumVaultSheetWidgetState
                             }
                           },
                           child: Text(
-                            userProfile.isPremium ? (tr ? 'Aktif ⚡' : 'Active ⚡') : (tr ? 'Kullan ⚡' : 'Use ⚡'),
-                            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                            userProfile.isPremium
+                                ? (tr ? 'Aktif ⚡' : 'Active ⚡')
+                                : (tr ? 'Kullan ⚡' : 'Use ⚡'),
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ],
@@ -9530,18 +10114,16 @@ class _PremiumVaultSheetWidgetState
                 margin: const EdgeInsets.only(bottom: 12),
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF0F172A),
+                  color: SlatePalette.surfaceDeep,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: const Color(0xFF334155),
-                  ),
+                  border: Border.all(color: SlatePalette.border),
                 ),
                 child: Row(
                   children: [
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF334155),
+                        color: SlatePalette.border,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(
@@ -9556,7 +10138,9 @@ class _PremiumVaultSheetWidgetState
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            tr ? 'Özel Garaj Tema & Avatarlar' : 'Custom Garage Themes & Avatars',
+                            tr
+                                ? 'Özel Garaj Tema & Avatarlar'
+                                : 'Custom Garage Themes & Avatars',
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
@@ -9565,7 +10149,9 @@ class _PremiumVaultSheetWidgetState
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            tr ? 'Seviye atladıkça veya etkinliklerle kilit aç' : 'Unlock as you level up or via events',
+                            tr
+                                ? 'Seviye atladıkça veya etkinliklerle kilit aç'
+                                : 'Unlock as you level up or via events',
                             style: const TextStyle(
                               fontSize: 11,
                               color: Color(0xFF94A3B8),
@@ -9580,7 +10166,9 @@ class _PremiumVaultSheetWidgetState
 
               const SizedBox(height: 24),
               Text(
-                tr ? 'PROMO KOD VEYA YÖNETİCİ ÖDÜLÜ' : 'PROMO CODE OR ADMIN REWARD',
+                tr
+                    ? 'PROMO KOD VEYA YÖNETİCİ ÖDÜLÜ'
+                    : 'PROMO CODE OR ADMIN REWARD',
                 style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
@@ -9596,13 +10184,15 @@ class _PremiumVaultSheetWidgetState
                       controller: _promoController,
                       style: const TextStyle(color: Colors.white, fontSize: 14),
                       decoration: InputDecoration(
-                        hintText: tr ? 'Promo kodunuzu girin...' : 'Enter promo code...',
+                        hintText: tr
+                            ? 'Promo kodunuzu girin...'
+                            : 'Enter promo code...',
                         hintStyle: const TextStyle(
                           color: Color(0xFF64748B),
                           fontSize: 13,
                         ),
                         filled: true,
-                        fillColor: const Color(0xFF1E293B),
+                        fillColor: SlatePalette.surface,
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 14,
@@ -9610,7 +10200,7 @@ class _PremiumVaultSheetWidgetState
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide(
-                            color: Color(0xFF334155),
+                            color: SlatePalette.border,
                           ),
                         ),
                       ),
@@ -9634,10 +10224,16 @@ class _PremiumVaultSheetWidgetState
                       if (code.isNotEmpty) {
                         final messenger = ScaffoldMessenger.of(context);
                         // Aktif et ve bildirim yolla
-                        await ref.read(userProfileProvider.notifier).updatePremiumStatus(true);
+                        await ref
+                            .read(userProfileProvider.notifier)
+                            .updatePremiumStatus(true);
 
-                        ref.read(notificationsProvider.notifier).addNotification(
-                              title: tr ? '🎉 Yönetici / Promo Ödülü Tanımlandı' : '🎉 Admin / Promo Reward Granted',
+                        ref
+                            .read(notificationsProvider.notifier)
+                            .addNotification(
+                              title: tr
+                                  ? '🎉 Yönetici / Promo Ödülü Tanımlandı'
+                                  : '🎉 Admin / Promo Reward Granted',
                               body: tr
                                   ? '"$code" promo kodu ile hesabınıza özel premium hediye tanımlandı!'
                                   : 'Special premium reward code "$code" has been applied to your account!',
@@ -9685,14 +10281,14 @@ class PhoneInputFormatter extends TextInputFormatter {
     TextEditingValue newValue,
   ) {
     final text = newValue.text;
-    
+
     if (newValue.selection.baseOffset < oldValue.selection.baseOffset) {
       return newValue;
     }
 
     final cleanText = text.replaceAll(RegExp(r'[^\d+]'), '');
     String formatted = '';
-    
+
     if (cleanText.startsWith('+90')) {
       final digits = cleanText.substring(3);
       formatted = '+90';
@@ -9704,7 +10300,8 @@ class PhoneInputFormatter extends TextInputFormatter {
           formatted += '${digits.substring(0, 3)} ${digits.substring(3)}';
         } else {
           final maxLen = digits.length < 10 ? digits.length : 10;
-          formatted += '${digits.substring(0, 3)} ${digits.substring(3, 6)} ${digits.substring(6, maxLen)}';
+          formatted +=
+              '${digits.substring(0, 3)} ${digits.substring(3, 6)} ${digits.substring(6, maxLen)}';
         }
       }
     } else if (cleanText.startsWith('0') && cleanText.length <= 11) {
@@ -9718,7 +10315,8 @@ class PhoneInputFormatter extends TextInputFormatter {
           formatted += '${digits.substring(0, 3)} ${digits.substring(3)}';
         } else {
           final maxLen = digits.length < 10 ? digits.length : 10;
-          formatted += '${digits.substring(0, 3)} ${digits.substring(3, 6)} ${digits.substring(6, maxLen)}';
+          formatted +=
+              '${digits.substring(0, 3)} ${digits.substring(3, 6)} ${digits.substring(6, maxLen)}';
         }
       }
     } else if (cleanText.startsWith('5') && cleanText.length <= 10) {
@@ -9728,7 +10326,8 @@ class PhoneInputFormatter extends TextInputFormatter {
         formatted = '${cleanText.substring(0, 3)} ${cleanText.substring(3)}';
       } else {
         final maxLen = cleanText.length < 10 ? cleanText.length : 10;
-        formatted = '${cleanText.substring(0, 3)} ${cleanText.substring(3, 6)} ${cleanText.substring(6, maxLen)}';
+        formatted =
+            '${cleanText.substring(0, 3)} ${cleanText.substring(3, 6)} ${cleanText.substring(6, maxLen)}';
       }
     } else {
       if (cleanText.startsWith('+')) {
@@ -9737,10 +10336,12 @@ class PhoneInputFormatter extends TextInputFormatter {
         } else if (cleanText.length <= 6) {
           formatted = '${cleanText.substring(0, 3)} ${cleanText.substring(3)}';
         } else if (cleanText.length <= 9) {
-          formatted = '${cleanText.substring(0, 3)} ${cleanText.substring(3, 6)} ${cleanText.substring(6)}';
+          formatted =
+              '${cleanText.substring(0, 3)} ${cleanText.substring(3, 6)} ${cleanText.substring(6)}';
         } else {
           final maxLen = cleanText.length < 13 ? cleanText.length : 13;
-          formatted = '${cleanText.substring(0, 3)} ${cleanText.substring(3, 6)} ${cleanText.substring(6, 9)} ${cleanText.substring(9, maxLen)}';
+          formatted =
+              '${cleanText.substring(0, 3)} ${cleanText.substring(3, 6)} ${cleanText.substring(6, 9)} ${cleanText.substring(9, maxLen)}';
         }
       } else {
         formatted = cleanText;

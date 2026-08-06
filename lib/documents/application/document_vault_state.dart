@@ -6,6 +6,7 @@ import 'package:apexflow/core/services/firebase_service.dart';
 import 'package:apexflow/core/storage/db_provider.dart';
 import 'package:apexflow/documents/domain/motorcycle_document.dart';
 import 'package:apexflow/documents/domain/tax_record.dart';
+import 'package:apexflow/notifications/notification_scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class DocumentVaultState {
@@ -65,7 +66,10 @@ class DocumentVaultController extends Notifier<DocumentVaultState> {
     );
   }
 
-  Future<void> addDocument({
+  /// Returns the persisted document's id, so callers can schedule/cancel a
+  /// notification against the same id actually stored (rather than a
+  /// second, independently-generated timestamp that would never match).
+  Future<String> addDocument({
     required String bikeStableId,
     required String title,
     required String description,
@@ -109,6 +113,7 @@ class DocumentVaultController extends Notifier<DocumentVaultState> {
 
     final db = ref.read(dbServiceProvider);
     await db.saveDocument(doc, userId: _ownerId);
+    return doc.id;
   }
 
   Future<void> deleteDocument(String id) async {
@@ -117,6 +122,7 @@ class DocumentVaultController extends Notifier<DocumentVaultState> {
 
     final db = ref.read(dbServiceProvider);
     await db.deleteDocument(id);
+    unawaited(NotificationScheduler.cancelDocumentExpiryReminder(id));
   }
 
   Future<void> addTaxRecord({

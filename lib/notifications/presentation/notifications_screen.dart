@@ -152,7 +152,7 @@ class NotificationsScreen extends ConsumerWidget {
               child: notifications.isEmpty
                   ? _EmptyState(tr: tr)
                   : ListView.separated(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      padding: const EdgeInsets.fromLTRB(0, 8, 0, 96),
                       itemCount: notifications.length,
                       separatorBuilder: (_, __) => Divider(
                         color: context.colors.border,
@@ -375,6 +375,6 @@ class _NotificationTile extends StatelessWidget {
       return '${diff.inHours}${tInline(AppStrings.currentLanguageCode, ' sa', 'h', 'H')}';
     if (diff.inDays < 7)
       return '${diff.inDays}${tInline(AppStrings.currentLanguageCode, ' gün', 'd', 'D')}';
-    return '${(diff.inDays / 7).floor()}${tInline(AppStrings.currentLanguageCode, ' hf', 'w', 'w')}';
+    return '${(diff.inDays / 7).floor()}${tInline(AppStrings.currentLanguageCode, ' hf', 'w', 'W')}';
   }
 }

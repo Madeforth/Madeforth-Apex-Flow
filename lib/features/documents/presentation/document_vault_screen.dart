@@ -424,7 +424,7 @@ class _DocumentVaultScreenState extends ConsumerState<DocumentVaultScreen> {
                                 File(vaultImagePath),
                               );
                         }
-                        await ref
+                        final docId = await ref
                             .read(documentVaultProvider.notifier)
                             .addDocument(
                               bikeStableId: bikeId,
@@ -437,8 +437,7 @@ class _DocumentVaultScreenState extends ConsumerState<DocumentVaultScreen> {
                         if (selectedExpirationDate != null) {
                           unawaited(
                             NotificationScheduler.scheduleDocumentExpiryReminder(
-                              docId: DateTime.now().millisecondsSinceEpoch
-                                  .toString(),
+                              docId: docId,
                               title: title,
                               expirationDate: selectedExpirationDate!,
                               strings: AppStrings(
@@ -766,9 +765,9 @@ class _VaultTabSelector extends StatelessWidget {
             height: 38,
             constraints: const BoxConstraints(maxWidth: 270),
             decoration: BoxDecoration(
-              color: const Color(
-                0xFF1A1F2B,
-              ).withValues(alpha: 0.8), // Semi-transparent navbar background
+              color: context.colors.navChip.withValues(
+                alpha: 0.8,
+              ), // Semi-transparent navbar background
               border: Border.all(
                 color: Colors.white.withValues(alpha: 0.08),
                 width: 1,
@@ -975,7 +974,6 @@ class _DocCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final tr = strings.locale.languageCode == 'tr';
     final hasImage = doc.imagePath != null && doc.imagePath!.isNotEmpty;
 
     return ApexPanel(
@@ -1046,7 +1044,10 @@ class _DocCard extends ConsumerWidget {
                             const SizedBox(width: 4),
                             Expanded(
                               child: Text(
-                                _formatExpiryDate(doc.expirationDate, tr),
+                                _formatExpiryDate(
+                                  doc.expirationDate,
+                                  strings.locale.languageCode,
+                                ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
@@ -1128,12 +1129,17 @@ class _DocCard extends ConsumerWidget {
     return diff <= 30;
   }
 
-  String _formatExpiryDate(DateTime? date, bool tr) {
+  String _formatExpiryDate(DateTime? date, String languageCode) {
     if (date == null) return '';
-    if (tr) {
-      return 'Geçerlilik: ${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';
+    final dd = date.day.toString().padLeft(2, '0');
+    final mm = date.month.toString().padLeft(2, '0');
+    if (languageCode == 'tr') {
+      return 'Geçerlilik: $dd.$mm.${date.year}';
     }
-    return 'Expires: ${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}/${date.year}';
+    if (languageCode == 'de') {
+      return 'Läuft ab: $dd.$mm.${date.year}';
+    }
+    return 'Expires: $mm/$dd/${date.year}';
   }
 }
 

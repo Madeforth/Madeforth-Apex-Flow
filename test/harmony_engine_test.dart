@@ -30,10 +30,7 @@ void main() {
 
     expect(snapshot.score, greaterThanOrEqualTo(90));
     expect(snapshot.level, HarmonyLevel.zen);
-    expect(
-      snapshot.insight,
-      'Machine rhythm is clean. Maintain current ritual cadence.',
-    );
+    expect(snapshot.insightKey, HarmonyInsightKey.clean);
   });
 
   test('overdue service window lowers score and drives service insight', () {
@@ -44,7 +41,7 @@ void main() {
     final snapshot = const HarmonyEngine().evaluate(overdueBike, cleanRide);
 
     expect(snapshot.score, lessThan(80));
-    expect(snapshot.insight, contains('Service window is overdue'));
+    expect(snapshot.insightKey, HarmonyInsightKey.overdue);
   });
 
   test('ride observations influence the next harmony signal', () {
@@ -57,7 +54,7 @@ void main() {
     );
     final snapshot = const HarmonyEngine().evaluate(baseBike, chainRide);
 
-    expect(snapshot.insight, contains('Chain signal'));
+    expect(snapshot.insightKey, HarmonyInsightKey.chainWear);
     expect(snapshot.score, lessThan(100));
   });
 }

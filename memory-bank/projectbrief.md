@@ -16,7 +16,7 @@ Apex Flow is a Flutter "Machine Relationship OS" for motorcycle riders — a pre
 ## Approved Scope (current, per CLAUDE.md — supersedes older restrictive docs)
 Garage, maintenance, readiness/rituals, rides/telemetry, documents, weather, notifications, insights, rider identity/profile, friends, group rides, leaderboards, parking QR contact, premium/supporter flows.
 
-Note: `AGENTS.md` (older doc) explicitly excludes social/community, gamification, and limits scope to a smaller MVP feature set. **CLAUDE.md is the higher-authority, current source** — social/friends/leaderboard/group-ride features are in scope and must not be removed or reverted without explicit user approval, per CLAUDE.md's Design Authority section.
+Note: `AGENTS.md` (older doc, excluded social/community, gamification, and limited scope to a smaller MVP feature set) was deleted 2026-08-06 as part of a repo-cleanup pass — user explicitly approved its removal, its content was already stale/superseded, and CLAUDE.md was and remains the sole higher-authority current source. Social/friends/leaderboard/group-ride features are in scope and must not be removed or reverted without explicit user approval, per CLAUDE.md's Design Authority section.
 
 ## Non-Goals (still locked per `PHASE_LOCK.md`)
 - Advanced AI / predictive analytics beyond lightweight MVP signals.
@@ -34,4 +34,4 @@ Note: `AGENTS.md` (older doc) explicitly excludes social/community, gamification
 2. `CLAUDE.md` + `activeContext.md` decisions.
 3. Verified current code/tests/rules/manifests/runtime behavior.
 4. Remaining Memory Bank files.
-5. `AGENTS.md`, phase/spec docs, README, old logs/comments.
+5. Phase/spec docs, README, old logs/comments. (`AGENTS.md` deleted 2026-08-06, see note above.)

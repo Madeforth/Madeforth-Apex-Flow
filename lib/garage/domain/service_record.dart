@@ -19,6 +19,13 @@ class ServiceRecord {
   final String note;
   final String loggedAtIso;
 
+  // KNOWN LIMITATION: this regex captures only the numeric amount and
+  // ignores which currency suffix matched (tl/try/usd/$/lira are treated
+  // identically) — a note like "$150 oil change" is silently summed as if
+  // it were 150 TRY everywhere this cost is aggregated (Insights, etc.).
+  // Full multi-currency support needs a real currency field on
+  // ServiceRecord and is out of scope for this fix pass; flagged here so
+  // it isn't mistaken for correct behavior.
   double get cost {
     final noteLower = note.toLowerCase();
     final regExp = RegExp(r'(\d+)\s*(?:tl|try|usd|\$|lira)');

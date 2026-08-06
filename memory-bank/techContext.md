@@ -48,4 +48,4 @@ dart format <changed-dart-files>
 
 ## Repo Layout Notes
 - `lib/` mixes flat legacy feature folders and a newer `lib/features/` tree (see systemPatterns.md for the overlap caveat on `documents`).
-- Root-level docs of note: `AGENTS.md` (older/narrower scope doc, superseded by CLAUDE.md where they conflict), `PHASE_LOCK.md` (phase gating), `DESIGN_RULES.md`, `IOS_DEPLOYMENT_NOTES.md`, `AHRS_POCKET_MATH.md` (telemetry math), `docs/` (mission/vision, roadmap, rider card specs, devlog, Discord QA bug report master spec, `docs/google_closed_testing.md`).
+- Root-level docs of note: `PHASE_LOCK.md` (phase gating), `DESIGN_RULES.md`, `IOS_DEPLOYMENT_NOTES.md`, `AHRS_POCKET_MATH.md` (telemetry math), `docs/` (mission/vision, roadmap, rider card specs, devlog, Discord QA bug report master spec, `docs/google_closed_testing.md`). (`AGENTS.md`, an older/narrower-scope doc superseded by CLAUDE.md, was deleted 2026-08-06 as part of a repo-cleanup pass — see `activeContext.md`.)

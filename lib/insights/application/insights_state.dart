@@ -44,14 +44,21 @@ class CostEntry {
     required this.label,
     required this.category,
     required this.amountTry,
+    required this.dateIso,
   });
 
   final String label;
   final String category;
   final double amountTry;
+  final String dateIso;
 
   Map<String, dynamic> toJson() {
-    return {'label': label, 'category': category, 'amountTry': amountTry};
+    return {
+      'label': label,
+      'category': category,
+      'amountTry': amountTry,
+      'dateIso': dateIso,
+    };
   }
 
   factory CostEntry.fromJson(Map<String, dynamic> json) {
@@ -59,6 +66,8 @@ class CostEntry {
       label: json['label'] as String? ?? '',
       category: json['category'] as String? ?? '',
       amountTry: (json['amountTry'] as num?)?.toDouble() ?? 0,
+      // Fallback for entries persisted before this field existed.
+      dateIso: json['dateIso'] as String? ?? DateTime.now().toIso8601String(),
     );
   }
 }
@@ -238,6 +247,7 @@ class InsightsController extends Notifier<InsightsState> {
   static const _storageKey = 'insights.state.v1';
 
   bool _mounted = true;
+  List<CostEntry> _manualCostEntries = const [];
 
   @override
   InsightsState build() {
@@ -258,7 +268,7 @@ class InsightsController extends Notifier<InsightsState> {
         vault,
         isTurkish,
       ),
-      costLedger: _deriveCostLedger(fuel.entries),
+      costLedger: [..._manualCostEntries, ..._deriveCostLedger(fuel.entries)],
       patternSignals: _derivePatternSignals(rides),
       partsWishlist: const [],
       fuelSnapshot: _deriveFuelSnapshot(fuel.entries),
@@ -306,6 +316,35 @@ class InsightsController extends Notifier<InsightsState> {
     unawaited(_persist());
   }
 
+  Future<void> addCostEntry({
+    required String label,
+    required String category,
+    required double amountTry,
+  }) async {
+    final normalizedLabel = label.trim();
+    if (normalizedLabel.isEmpty || !amountTry.isFinite || amountTry <= 0) {
+      throw ArgumentError('A label and a positive amount are required.');
+    }
+
+    final entry = CostEntry(
+      label: normalizedLabel,
+      category: category,
+      amountTry: amountTry,
+      dateIso: DateTime.now().toIso8601String(),
+    );
+    final previousManualEntries = _manualCostEntries;
+    final previousLedger = state.costLedger;
+    _manualCostEntries = [entry, ..._manualCostEntries];
+    state = state.copyWith(costLedger: [entry, ...state.costLedger]);
+    try {
+      await _persist();
+    } catch (_) {
+      _manualCostEntries = previousManualEntries;
+      state = state.copyWith(costLedger: previousLedger);
+      rethrow;
+    }
+  }
+
   Future<void> _hydrate() async {
     final raw = await ApexKvStore.getString(_storageKey);
     if (!_mounted) {
@@ -317,8 +356,19 @@ class InsightsController extends Notifier<InsightsState> {
     }
     try {
       final json = jsonDecode(raw) as Map<String, dynamic>;
+      _manualCostEntries =
+          (json['manualCostLedger'] as List<dynamic>? ?? const [])
+              .map(
+                (item) =>
+                    CostEntry.fromJson(Map<String, dynamic>.from(item as Map)),
+              )
+              .toList();
       state = state.copyWith(
         isHydrating: false,
+        costLedger: [
+          ..._manualCostEntries,
+          ..._deriveCostLedger(ref.read(fuelStateProvider).entries),
+        ],
         partsWishlist: (json['partsWishlist'] as List<dynamic>? ?? [])
             .map(
               (item) =>
@@ -334,6 +384,9 @@ class InsightsController extends Notifier<InsightsState> {
 
   Future<void> _persist() async {
     final payload = {
+      'manualCostLedger': _manualCostEntries
+          .map((item) => item.toJson())
+          .toList(),
       'partsWishlist': state.partsWishlist
           .map((item) => item.toJson())
           .toList(),
@@ -515,6 +568,7 @@ List<CostEntry> _deriveCostLedger(List<FuelEntry> fuelEntries) {
               '${tInline(AppStrings.currentLanguageCode, 'Yakıt alımı', 'Fuel refill', 'Tanken')} $date',
           category: 'Fuel',
           amountTry: entry.totalTry,
+          dateIso: entry.date.toIso8601String(),
         );
       })
       .toList(growable: false);

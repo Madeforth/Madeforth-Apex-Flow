@@ -38,13 +38,30 @@ class _ApexSplashScreenState extends ConsumerState<ApexSplashScreen>
 
   late Animation<double> _statusOpacity;
 
-  String _statusText = "Bonding with machine...";
+  String _statusText = '';
   double _telemetryTime = 0.0;
   Timer? _telemetryTimer;
+
+  String get _languageCode => ref.read(appSettingsProvider).locale.languageCode;
+
+  String _bondingStatusText() => tInline(
+    _languageCode,
+    'Makineyle bağ kuruluyor...',
+    'Bonding with machine...',
+    'Verbindung zur Maschine wird hergestellt...',
+  );
+
+  String _readyStatusText() => tInline(
+    _languageCode,
+    'Harmony Motoru hazır.',
+    'Harmony Engine ready.',
+    'Harmony-Engine bereit.',
+  );
 
   @override
   void initState() {
     super.initState();
+    _statusText = _bondingStatusText();
     Future.microtask(
       () => ref.read(showThemeToggleProvider.notifier).state = false,
     );
@@ -140,7 +157,7 @@ class _ApexSplashScreenState extends ConsumerState<ApexSplashScreen>
     Future.delayed(const Duration(milliseconds: 1500), () {
       if (mounted) {
         setState(() {
-          _statusText = "Harmony Engine ready.";
+          _statusText = _readyStatusText();
         });
       }
     });
@@ -168,7 +185,9 @@ class _ApexSplashScreenState extends ConsumerState<ApexSplashScreen>
 
     final currentUser = FirebaseAuth.instance.currentUser;
     final Widget nextScreen;
-    if (currentUser != null && currentUser.emailVerified && !settings.onboardingDone) {
+    if (currentUser != null &&
+        currentUser.emailVerified &&
+        !settings.onboardingDone) {
       nextScreen = ProfileSetupWizardScreen(strings: strings);
     } else if (settings.onboardingDone) {
       nextScreen = const ApexAppShell();

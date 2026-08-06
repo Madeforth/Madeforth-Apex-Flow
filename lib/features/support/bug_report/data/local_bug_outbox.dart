@@ -21,23 +21,22 @@ class LocalBugOutbox {
     }
   }
 
+  /// Persists [report] to the local outbox. Rethrows on failure (e.g. the
+  /// underlying storage write fails) so callers can't treat a failed save
+  /// as a successful submission — see `BugReportController.submitReport`.
   static Future<void> saveReport(BugReport report) async {
-    try {
-      final current = await getQueuedReports();
-      final index = current.indexWhere(
-        (e) => e.internalBugId == report.internalBugId,
-      );
-      if (index >= 0) {
-        current[index] = report;
-      } else {
-        current.insert(0, report);
-      }
-      await ApexKvStore.init();
-      final jsonStr = jsonEncode(current.map((e) => e.toJson()).toList());
-      await ApexKvStore.setString(_outboxKey, jsonStr);
-    } catch (e) {
-      debugPrint('[LocalBugOutbox] Error saving report: $e');
+    final current = await getQueuedReports();
+    final index = current.indexWhere(
+      (e) => e.internalBugId == report.internalBugId,
+    );
+    if (index >= 0) {
+      current[index] = report;
+    } else {
+      current.insert(0, report);
     }
+    await ApexKvStore.init();
+    final jsonStr = jsonEncode(current.map((e) => e.toJson()).toList());
+    await ApexKvStore.setString(_outboxKey, jsonStr);
   }
 
   static Future<void> removeReport(String internalBugId) async {

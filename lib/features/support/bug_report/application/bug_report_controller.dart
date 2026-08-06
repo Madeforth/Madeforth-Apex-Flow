@@ -1,3 +1,4 @@
+import 'package:apexflow/core/services/firebase_service.dart';
 import 'package:apexflow/features/support/bug_report/application/diagnostic_collector.dart';
 import 'package:apexflow/features/support/bug_report/data/local_bug_outbox.dart';
 import 'package:apexflow/features/support/bug_report/domain/attachment_reference.dart';
@@ -55,10 +56,13 @@ class BugReportController extends StateNotifier<BugReportSubmissionState> {
           ? await DiagnosticCollector.collect(locale: locale)
           : null;
 
+      final reporterUid = await FirebaseService.instance
+          .getOrCreateInstallationId();
+
       final report = BugReport(
         internalBugId: internalBugId,
         humanBugId: humanBugId,
-        reporterUid: 'tester_user_uid',
+        reporterUid: reporterUid,
         category: category,
         priority: category == BugCategory.crashFreeze
             ? BugPriority.p1
@@ -75,7 +79,9 @@ class BugReportController extends StateNotifier<BugReportSubmissionState> {
         updatedAtIso: now.toIso8601String(),
       );
 
-      // Save locally to outbox
+      // Save locally to outbox — throws on failure (e.g. storage full),
+      // which the outer catch below turns into a surfaced error instead of
+      // a false "submitted" result.
       await LocalBugOutbox.saveReport(report);
 
       state = state.copyWith(isSubmitting: false, lastSubmittedReport: report);

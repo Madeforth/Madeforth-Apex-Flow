@@ -59,7 +59,8 @@ service cloud.firestore {
     // vehicle's registered owner via the rider_tags ownership lookup.)
     match /parking_notifications/{noteId} {
       allow create: if request.resource.data.vehicleId is string
-        && request.resource.data.read == false;
+        && request.resource.data.read == false
+        && exists(/databases/$(database)/documents/rider_tags/$(request.resource.data.vehicleId));
       allow read, update, delete: if signedIn()
         && get(/databases/$(database)/documents/rider_tags/$(resource.data.vehicleId)).data.ownerId == request.auth.uid;
     }

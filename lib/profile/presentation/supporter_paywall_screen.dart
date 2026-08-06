@@ -640,7 +640,7 @@ class _SupporterPaywallScreenState
                                     widget.strings.languageCode,
                                     'Destek Ol ($price)',
                                     'Support ($price)',
-                                    'Support ($price)',
+                                    'Unterstützen ($price)',
                                   )),
                       style: const TextStyle(fontWeight: FontWeight.w900),
                     ),

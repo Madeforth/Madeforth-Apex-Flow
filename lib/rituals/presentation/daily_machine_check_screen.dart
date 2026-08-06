@@ -126,9 +126,9 @@ class _DailyMachineCheckScreenState
             Text(
               tInline(
                 langCode,
+                'SÜRÜŞ ÖNCESİ RUTİN',
                 'PRE-RIDE ROUTINE',
-                'PRE-RIDE ROUTINE',
-                'PRE-RIDE ROUTINE',
+                'ROUTINE VOR DER FAHRT',
               ),
               style: TextStyle(
                 fontSize: 10,

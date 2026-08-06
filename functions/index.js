@@ -13,23 +13,29 @@ exports.onParkingNotificationCreated = onDocumentCreated("parking_notifications/
 
   const data = snap.data();
   const vehicleId = data.vehicleId; // This is the rider tag, e.g., @apex_dev#1881
-  const ALLOWED_REASONS = [
-    "Park Halindeki Aracınız Yolu Kapatıyor",
-    "Farlarınız Açık Kaldı",
-    "Cam veya Kapı Açık",
-    "Genel Sürücü Uyarısı",
-    "parking_block",
-    "lights_on",
-    "window_open",
-    "general_alert"
-  ];
 
-  let rawReason = String(data.reason || "Genel Uvarı").trim();
+  // Reason keys sent by the app (qr_contact_web/main.js and the in-app
+  // Smart Park Alert flow) since they were switched from raw Turkish text
+  // to translation keys. Legacy raw-Turkish values are kept as a fallback
+  // for any in-flight documents written before that change.
+  const REASON_TEXT_BY_KEY = {
+    blocked: "Aracınız yolu/kapıyı kapatıyor",
+    fallen: "Aracınız devrildi",
+    crash: "Aracınıza çarpıldı / hasar var",
+    towed: "Aracınız çekiliyor",
+    // Legacy raw-Turkish values (pre-key-based reason system)
+    "Yolu Kapattı": "Aracınız yolu/kapıyı kapatıyor",
+    "Devrildi": "Aracınız devrildi",
+    "Çarpıldı": "Aracınıza çarpıldı / hasar var",
+    "Çekici": "Aracınız çekiliyor",
+  };
+
+  let rawReason = String(data.reason || "").trim();
   if (rawReason.length > 100) {
     rawReason = rawReason.substring(0, 100);
   }
 
-  const safeReason = ALLOWED_REASONS.includes(rawReason) ? rawReason : "Araç güvenlik uyarısı";
+  const safeReason = REASON_TEXT_BY_KEY[rawReason] || "Araç güvenlik uyarısı";
 
   if (!vehicleId || typeof vehicleId !== "string" || vehicleId.length > 50) {
     console.error("Invalid vehicleId provided.");

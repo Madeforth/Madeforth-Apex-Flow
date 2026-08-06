@@ -2,6 +2,31 @@
 
 Status recorded 2026-08-04, from repo inspection (not from README claims alone unless marked as such).
 
+## 2026-08-06 — Bug Report → Discord pipeline: diagnosed, NOT fixed (known broken)
+User asked to check why in-app bug reports never show up in Discord. Root cause traced end-to-end, no code changed (user chose diagnosis-only for now):
+1. **Client never leaves the device.** `lib/features/support/bug_report/application/bug_report_controller.dart` (`submitReport`) only calls `LocalBugOutbox.saveReport(report)`, which writes to `ApexKvStore` (local SharedPreferences-backed storage). There is no Firestore write and no Cloud Functions call anywhere in `lib/` — confirmed via repo-wide grep for `createBugReportDraft`/`httpsCallable`/`bug_reports`, zero hits outside the local-outbox files. `my_bug_reports_screen.dart` / `my_bug_reports_controller.dart` only read back that same local queue, so the UI shows "submitted" reports that never actually transmitted anywhere.
+2. **Even the one Cloud Function that exists doesn't reach Discord.** `functions/index.js`'s `createBugReportDraft` (an `onCall` function, currently unused by the client per #1) only writes a doc to Firestore's `bug_reports` collection and returns — no Discord dispatch. The project's own spec (`docs/APEXFLOW_MADEFORTH_DISCORD_QA_BUG_REPORT_ENGINE_MASTER_SPEC.md`, ~line 1237) defines a separate `createDiscordBugThread()` function that POSTs to `discord.com/api/v10/channels/{forumId}/threads` using a bot token — that function does not exist in `functions/index.js` at all.
+3. **App Check also not enforced**: `createBugReportDraft` is declared with `enforceAppCheck: false`, contrary to CLAUDE.md's stated requirement that this feature use App Check.
+**Not fixed yet** — real fix needs (a) wiring `bug_report_controller.dart` to actually call the Cloud Function/Firestore, (b) writing the missing `createDiscordBugThread` function server-side, and (c) the user provisioning a Discord bot token + forum channel ID into Firebase Secret Manager (secrets this agent cannot generate). User deferred all of this pending a decision on scope.
+
+## 2026-08-05 — Third-Pass Audit: Parking/QR System + i18n + Layout (24/24 done, on branch `agent/fix-safety-persistence-maps`)
+User asked for a deep audit specifically of the parking-warning/QR-contact system (`qr_contact_web/` + Firestore), QR generation/scanning, and app-wide i18n/layout inconsistencies. 3 parallel Explore agents scanned each area; critical findings verified directly in code. Plan at `C:\Users\onyed\.claude\plans\stateful-swimming-fern.md` (replaced the prior 20-item plan file). All 24 items fixed and committed across 8 commits (`0770a74`, `992f090`, `71d1e3e`, `6d3f6c3`, `2dd4c0e`, `3cb3d46`, `1d680a6`).
+
+**Most important fix**: the in-app QR-scan "Send Smart Park Alert" flow only posted a local notification on the scanning device while claiming "Notification sent successfully to the owner!" — the owner received nothing. Now writes to the real `parking_notifications` Firestore collection (same infra `qr_contact_web/main.js` already used). See `activeContext.md` for the full list of related fixes (reason-key translation, `firestore.rules` ownership check — prepared, **not deployed**, ties to notification delivery integrity, currency-symbol correctness, QR-scanner host-matching, bottom-nav clearance, etc.).
+
+**Confirmed not a bug** (investigated, user concurred): TR/EU accident-report wizard hardcoded language — these are jurisdiction-locked legal document formats, correctly independent of app UI language.
+
+**Deferred, needs real visual verification**: a second batch of hardcoded-color findings (nav bar color duplicated ~10x, a "wrong cyan" `0xFF0EA5E9` used ~15 places, `profile_hub_screen.dart`'s own slate palette) — same reasoning as the prior pass's #19, explicitly left untouched.
+
+**CORRECTED (same session)**: FCM push for parking alerts is NOT missing infra — `functions/index.js`'s `onParkingNotificationCreated` is already live in production (confirmed via `firebase functions:list`) and does send a real push. The earlier "deferred, needs bigger infra" claim here was wrong (came from not checking `functions/`, which is skipped by default per this project's token-efficiency guidance). A real bug was found instead: the deployed function's reason-text allowlist never matched what any client sent, so push bodies always showed generic text — fixed (commit `4492226`), **not deployed**, needs user go-ahead for `firebase deploy --only functions`. See `activeContext.md` for full detail.
+
+## 2026-08-05 — Second-Pass Bug Audit (19/20 done, 1 deliberately deferred, on branch `agent/fix-safety-persistence-maps`)
+Full-project scan (3 parallel Explore agents + direct code verification of every finding before fixing) found 20 issues beyond the original 6-item list. Plan at `C:\Users\onyed\.claude\plans\stateful-swimming-fern.md`. Items #1-18 and #20 fixed and committed (`134c2f2`, `f1c0120`, `329e390`, `fa5f2f2`, `bbb33e6`). **Item #19 later closed out** (commits `c5980cf`, `afadd78`, `ab46749`, `d7fe736`) via a zero-visual-risk approach: fixed the one genuine mistake (wrong-cyan `0xFF0EA5E9`), and centralized the rest (nav-chip color, Insights + Profile Hub's shared "slate" palette) into named constants (`ApexColorsExtension.navChip`, `lib/shared/design/slate_palette.dart`) instead of guessing at a recolor — see `activeContext.md` for detail. Actually unifying the slate palette with the app's official tokens remains a real design decision needing visual verification, not a code task. Two findings (#7, #12) were investigated earlier and found to be false positives — no change made, documented in `activeContext.md` rather than "fixed."
+
+**Important**: this work landed on branch `agent/fix-safety-persistence-maps`, not `main` — a different concurrent Claude Code session was found to be working in the same repo directory on that branch. See `activeContext.md` "Current Task" for full detail before assuming `main`'s state reflects this work, and before merging/pushing.
+
+A debug build was installed on the user's LG G5 (`com.apexflow.app`) for manual testing, reflecting code through item #16 only.
+
 ## Verified Working (evidence: code/rules present and consistent)
 - Firestore rules for `users`, `public_rider_cards`, `rider_tags`, `entitlements`, `notification_tokens`, `parking_requests`, `bug_reports` are defined with owner-scoping / backend-only-write patterns consistent with CLAUDE.md invariants (client cannot self-grant entitlements; PII-adjacent collections are not publicly readable).
 - Isar entity set exists for daily checks, documents, friends, motorcycles, ride sessions, service records, tax records, each with generated code — indicates schema is wired, not merely stubbed.
@@ -162,3 +187,10 @@ These represent in-progress user work related to Closed Beta release; do not dis
 
 ## Next Step
 No active task in progress. When work begins, update `activeContext.md` with the specific task, branch/commit, and decisions before editing code.
+
+## 2026-08-05 — Safety and Broken-Flow Fixes (Local, Uncommitted)
+- Removed all repository occurrences of the debug TLS certificate bypass (`HttpOverrides.global` / `badCertificateCallback`) from app startup and Maps short-link resolution.
+- Replaced the Insights cost-entry fake-success action with validated, durable `ApexKvStore` persistence. Manual entries are kept separate from fuel-derived ledger rows, hydration restores them, and an unsuccessful write rolls state back before the UI reports failure. Added two regression tests.
+- Declared directly imported `crypto`, `path_provider_platform_interface`, and `plugin_platform_interface` packages in `pubspec.yaml`.
+- Removed Android/iOS dummy Google Maps keys. Android now reads `MAPS_API_KEY` from a Gradle property or environment variable. iOS reads `GOOGLE_MAPS_API_KEY` from a gitignored `ios/Flutter/Secrets.xcconfig`; an example file is tracked. No real key was added.
+- Verification: `flutter test --no-pub` passed 93/93; `flutter analyze --no-pub` reported 325 warnings/info and 0 errors (baseline was 328); `flutter build apk --debug --no-pub` succeeded. iOS build remains not verified because the current environment is Windows.

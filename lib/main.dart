@@ -65,22 +65,7 @@ class GlobalThemeToggle extends ConsumerWidget {
   }
 }
 
-class MyHttpOverrides extends HttpOverrides {
-  @override
-  HttpClient createHttpClient(SecurityContext? context) {
-    final client = super.createHttpClient(context);
-    if (!kReleaseMode) {
-      client.badCertificateCallback =
-          (X509Certificate cert, String host, int port) => true;
-    }
-    return client;
-  }
-}
-
 void main() async {
-  if (!kReleaseMode) {
-    HttpOverrides.global = MyHttpOverrides();
-  }
   WidgetsFlutterBinding.ensureInitialized();
 
   // All initialization wrapped in safety net — runApp() MUST always be reached
@@ -186,7 +171,10 @@ class ApexFlowApp extends ConsumerWidget {
           String riderTag = 'Rider';
           try {
             final uri = Uri.parse(name);
-            riderTag = uri.queryParameters['rider'] ?? 'Rider';
+            riderTag =
+                uri.queryParameters['rider'] ??
+                uri.queryParameters['id'] ??
+                'Rider';
           } catch (_) {}
 
           return MaterialPageRoute<void>(

@@ -19,6 +19,7 @@ abstract final class ApexColors {
     inkSoft: Color(0xFF374151),
     rail: Color(0xFFE5E7EB),
     onAccent: Color(0xFFFFFFFF),
+    navChip: Color(0xFFFFFFFF),
   );
 
   // Dark theme — restored original colors
@@ -38,5 +39,6 @@ abstract final class ApexColors {
     inkSoft: Color(0xFFAEAEB2), // iOS system label
     rail: Color(0xFF1C1C1E), // Navigation rail background
     onAccent: Color(0xFF000000), // Black text on cyan backgrounds
+    navChip: Color(0xFF1A1F2B), // Floating nav bar / fake tab-bar chip bg
   );
 }

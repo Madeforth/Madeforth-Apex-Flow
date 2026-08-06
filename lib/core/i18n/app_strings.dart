@@ -220,6 +220,21 @@ class AppStrings {
   );
   String get costLedger =>
       _t(tr: 'Maliyet Defteri', en: 'Cost Ledger', de: 'Kostenbuch');
+  String get insightsCostSaved => _t(
+    tr: 'Maliyet kaydı kaydedildi.',
+    en: 'Cost entry saved.',
+    de: 'Kosteneintrag gespeichert.',
+  );
+  String get insightsCostInvalid => _t(
+    tr: 'Açıklama ve sıfırdan büyük bir tutar girin.',
+    en: 'Enter a description and an amount greater than zero.',
+    de: 'Gib eine Beschreibung und einen Betrag größer als null ein.',
+  );
+  String get insightsCostSaveFailed => _t(
+    tr: 'Maliyet kaydı kaydedilemedi. Tekrar deneyin.',
+    en: 'The cost entry could not be saved. Please try again.',
+    de: 'Der Kosteneintrag konnte nicht gespeichert werden. Bitte erneut versuchen.',
+  );
   String get problemPatterns => _t(
     tr: 'Problem Örüntü Tespiti',
     en: 'Problem Pattern Detection',

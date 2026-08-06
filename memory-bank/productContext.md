@@ -30,4 +30,4 @@
 
 ## Product Logic Notes
 - Local-first is a hard requirement: network failure must never corrupt or falsely confirm state (relevant to sync coordinator, Firestore writes, purchase flows).
-- Social/community features (friends, group rides, leaderboards, location-based rider radar) are current approved scope per CLAUDE.md, despite `AGENTS.md` predating and excluding them — do not treat AGENTS.md restrictions as current truth for this axis.
+- Social/community features (friends, group rides, leaderboards, location-based rider radar) are current approved scope per CLAUDE.md. (`AGENTS.md`, an older doc that predated and excluded them, was deleted 2026-08-06 — see `projectbrief.md`.)

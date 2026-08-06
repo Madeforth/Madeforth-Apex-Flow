@@ -1,6 +1,6 @@
 import './style.css'
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, addDoc, serverTimestamp, doc, getDoc } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, serverTimestamp, doc, getDoc, onSnapshot } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: "AIzaSyDxClr18Z0pme38vsrs8KWpyIwKfurZ5eE",
@@ -165,19 +165,19 @@ if (!vehicleId) {
       <div class="subtitle">${t.mainSubtitle}</div>
       
       <div class="button-grid">
-        <button onclick="sendNotification('Yolu Kapattı')">
+        <button onclick="sendNotification('blocked')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
           ${t.btnBlocked}
         </button>
-        <button onclick="sendNotification('Devrildi')" class="urgent">
+        <button onclick="sendNotification('fallen')" class="urgent">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
           ${t.btnFallen}
         </button>
-        <button onclick="sendNotification('Çarpıldı')" class="urgent">
+        <button onclick="sendNotification('crash')" class="urgent">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
           ${t.btnCrash}
         </button>
-        <button onclick="sendNotification('Çekici')" class="urgent">
+        <button onclick="sendNotification('towed')" class="urgent">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
           ${t.btnTowed}
         </button>
@@ -188,6 +188,7 @@ if (!vehicleId) {
       <svg class="success-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
       <div class="title">${t.successTitle}</div>
       <div class="subtitle">${t.successSubtitle}</div>
+      <div id="reply-container"></div>
     </div>
     
     <div class="card error-message" id="error-card" style="display: none; color: var(--accent-color);">
@@ -258,9 +259,10 @@ window.sendNotification = async (reason) => {
       });
       // Update local storage to prevent spam
       localStorage.setItem(`apex_last_sent_${vehicleId}`, Date.now().toString());
-      
+
       mainCard.style.display = 'none';
       successCard.style.display = 'flex';
+      watchForOwnerReply();
     } catch (e) {
       console.error("Error adding document: ", e);
       mainCard.style.display = 'none';
@@ -276,7 +278,24 @@ window.sendNotification = async (reason) => {
   }
 };
 
-// Fetch Driver Note if vehicleId exists
+function buildNoteCard(noteText) {
+  const noteCard = document.createElement('div');
+  noteCard.className = 'driver-note-card';
+
+  const noteLabel = document.createElement('div');
+  noteLabel.className = 'driver-note-label';
+  noteLabel.textContent = t.driverNoteLabel;
+
+  const noteBody = document.createElement('div');
+  noteBody.className = 'driver-note-text';
+  noteBody.textContent = `"${noteText}"`;
+
+  noteCard.appendChild(noteLabel);
+  noteCard.appendChild(noteBody);
+  return noteCard;
+}
+
+// Fetch Driver Note if vehicleId exists (pre-send: any note from the last 3h)
 if (vehicleId && db) {
   const noteContainer = document.createElement('div');
   noteContainer.id = 'driver-note-container';
@@ -289,22 +308,50 @@ if (vehicleId && db) {
   getDoc(docRef).then((docSnap) => {
     if (docSnap.exists()) {
       const data = docSnap.data();
-      if (data.driverNote) {
-        const noteCard = document.createElement('div');
-        noteCard.className = 'driver-note-card';
-
-        const noteLabel = document.createElement('div');
-        noteLabel.className = 'driver-note-label';
-        noteLabel.textContent = t.driverNoteLabel;
-
-        const noteText = document.createElement('div');
-        noteText.className = 'driver-note-text';
-        noteText.textContent = `"${data.driverNote}"`;
-
-        noteCard.appendChild(noteLabel);
-        noteCard.appendChild(noteText);
-        noteContainer.replaceChildren(noteCard);
+      const noteAt = data.driverNoteAtIso ? Date.parse(data.driverNoteAtIso) : null;
+      const noteIsFresh = noteAt && (Date.now() - noteAt) < 3 * 60 * 60 * 1000;
+      if (data.driverNote && noteIsFresh) {
+        noteContainer.replaceChildren(buildNoteCard(data.driverNote));
       }
     }
   }).catch(e => console.log("Error fetching note:", e));
+}
+
+// After sending an alert, live-watch for the owner's reply while the
+// "Notification Sent" screen is showing, so the sender sees it without
+// having to reload the page.
+//
+// We deliberately do NOT compare driverNoteAtIso (set on the owner's
+// device) against a timestamp captured on the sender's device — two
+// different phones' clocks can disagree by seconds or minutes, and that
+// mismatch was silently hiding genuine replies. Instead we record
+// whatever note/timestamp is already on the doc the moment we start
+// watching (which may be an old, unrelated note) as a baseline, and only
+// render when a *later* snapshot reports a value different from that
+// baseline — i.e. the doc actually changed while we were watching.
+function watchForOwnerReply() {
+  if (!db || !vehicleId) return;
+  const replyContainer = document.getElementById('reply-container');
+  if (!replyContainer) return;
+
+  let baselineNoteAtIso = undefined; // undefined = not yet captured
+
+  const docRef = doc(db, "rider_tags", vehicleId.toLowerCase());
+  onSnapshot(docRef, (docSnap) => {
+    if (!docSnap.exists()) return;
+    const data = docSnap.data();
+    const currentNoteAtIso = data.driverNoteAtIso || null;
+
+    if (baselineNoteAtIso === undefined) {
+      // First snapshot after we started watching — just the doc's
+      // current state, not necessarily a reply to this alert.
+      baselineNoteAtIso = currentNoteAtIso;
+      return;
+    }
+
+    if (data.driverNote && currentNoteAtIso !== baselineNoteAtIso) {
+      replyContainer.replaceChildren(buildNoteCard(data.driverNote));
+      baselineNoteAtIso = currentNoteAtIso;
+    }
+  }, (e) => console.log("Error watching for reply:", e));
 }

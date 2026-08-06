@@ -1,4 +1,5 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter/foundation.dart';
@@ -17,13 +18,16 @@ class ApexNotificationService {
   Future<void> init() async {
     if (_isInitialized) return;
 
-    // Initialize Timezones and set default location
+    // Initialize Timezones and set the device's real local timezone.
     tz.initializeTimeZones();
     try {
-      tz.setLocalLocation(tz.getLocation('Europe/Istanbul'));
+      final deviceTimeZone = await FlutterTimezone.getLocalTimezone();
+      tz.setLocalLocation(tz.getLocation(deviceTimeZone.identifier));
     } catch (_) {
-      // Fallback if location lookup fails
-      tz.setLocalLocation(tz.getLocation('UTC'));
+      // Fallback if the platform lookup or the returned identifier fails.
+      try {
+        tz.setLocalLocation(tz.getLocation('UTC'));
+      } catch (_) {}
     }
 
     // Android Settings

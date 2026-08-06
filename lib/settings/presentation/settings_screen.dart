@@ -1,4 +1,4 @@
-import 'package:apexflow/core/design/apex_spacing.dart';
+﻿import 'package:apexflow/core/design/apex_spacing.dart';
 import 'package:apexflow/core/i18n/app_settings_state.dart';
 import 'package:apexflow/core/i18n/app_strings.dart';
 import 'package:apexflow/shared/widgets/apex_panel.dart';
@@ -318,7 +318,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       AppStrings.currentLanguageCode,
                       'Destek ve Madeforth QA',
                       'Support & Madeforth QA',
-                      'Support & Madeforth QA',
+                      'Support & Madeforth-QA',
                     ),
                     style: const TextStyle(
                       fontSize: 14,
@@ -436,10 +436,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     child: OutlinedButton.icon(
                       style: OutlinedButton.styleFrom(
                         foregroundColor: Colors.redAccent,
-                        side: BorderSide(color: Colors.redAccent.withValues(alpha: 0.5)),
+                        side: BorderSide(
+                          color: Colors.redAccent.withValues(alpha: 0.5),
+                        ),
                         padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
-                      onPressed: () => _showDeleteAccountConfirmationDialog(context, ref),
+                      onPressed: () =>
+                          _showDeleteAccountConfirmationDialog(context, ref),
                       icon: const Icon(Icons.delete_forever_outlined, size: 18),
                       label: Text(
                         tInline(
@@ -461,13 +464,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             Center(
               child: OutlinedButton.icon(
                 onPressed: () async {
-                  final uri = Uri.parse(
-                    'https://discord.gg/madeforth',
-                  );
-                  await launchUrl(
-                    uri,
-                    mode: LaunchMode.externalApplication,
-                  );
+                  final uri = Uri.parse('https://discord.gg/madeforth');
+                  await launchUrl(uri, mode: LaunchMode.externalApplication);
                 },
                 icon: const Icon(Icons.forum_outlined, size: 18),
                 label: Text(
@@ -522,23 +520,33 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ),
               ),
             ),
+            const SizedBox(height: 80),
           ],
         ),
       ),
     );
   }
 
-  void _showDeleteAccountConfirmationDialog(BuildContext context, WidgetRef ref) {
+  void _showDeleteAccountConfirmationDialog(
+    BuildContext context,
+    WidgetRef ref,
+  ) {
     showDialog<void>(
       context: context,
       barrierDismissible: false,
       builder: (dialogContext) {
         return AlertDialog(
           backgroundColor: const Color(0xFF1E293B),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           title: Row(
             children: [
-              const Icon(Icons.warning_amber_rounded, color: Colors.redAccent, size: 28),
+              const Icon(
+                Icons.warning_amber_rounded,
+                color: Colors.redAccent,
+                size: 28,
+              ),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -548,14 +556,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     'Are You Sure You Want to Delete Your Account?',
                     'Möchten Sie Ihr Konto wirklich löschen?',
                   ),
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ],
           ),
           content: Builder(
             builder: (context) {
-              final activeEmail = FirebaseAuth.instance.currentUser?.email ?? '';
+              final activeEmail =
+                  FirebaseAuth.instance.currentUser?.email ?? '';
               return Text(
                 tInline(
                   AppStrings.currentLanguageCode,
@@ -563,7 +576,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   'This action cannot be undone! Your currently logged in account ($activeEmail), Firebase cloud data, garage motorcycles, and ride history will be permanently deleted.',
                   'Diese Aktion kann nicht rückgängig gemacht werden! Ihr derzeit angemeldetes Konto ($activeEmail), Ihre Cloud-Daten und Ihr Verlauf werden dauerhaft gelöscht.',
                 ),
-                style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 13, height: 1.4),
+                style: const TextStyle(
+                  color: Color(0xFF94A3B8),
+                  fontSize: 13,
+                  height: 1.4,
+                ),
               );
             },
           ),
@@ -571,7 +588,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(),
               child: Text(
-                tInline(AppStrings.currentLanguageCode, 'Vazgeç', 'Cancel', 'Abbrechen'),
+                tInline(
+                  AppStrings.currentLanguageCode,
+                  'Vazgeç',
+                  'Cancel',
+                  'Abbrechen',
+                ),
                 style: const TextStyle(color: Colors.white70),
               ),
             ),
@@ -579,7 +601,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.redAccent,
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(6),
+                ),
               ),
               onPressed: () async {
                 Navigator.of(dialogContext).pop();
@@ -598,10 +622,33 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ),
                 );
 
-                await ref.read(userProfileProvider.notifier).deleteAccount();
+                final success = await ref
+                    .read(userProfileProvider.notifier)
+                    .deleteAccount();
+                if (!mounted) return;
+                if (success) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    backgroundColor: Colors.redAccent,
+                    content: Text(
+                      tInline(
+                        AppStrings.currentLanguageCode,
+                        'Hesap silinemedi. Lütfen çıkış yapıp tekrar giriş yaptıktan sonra tekrar deneyin.',
+                        'Account deletion failed. Please sign out, sign back in, and try again.',
+                        'Kontolöschung fehlgeschlagen. Bitte melden Sie sich ab, erneut an und versuchen Sie es erneut.',
+                      ),
+                    ),
+                    duration: const Duration(seconds: 5),
+                  ),
+                );
               },
               child: Text(
-                tInline(AppStrings.currentLanguageCode, 'Kalıcı Olarak Sil', 'Delete Permanently', 'Dauerhaft löschen'),
+                tInline(
+                  AppStrings.currentLanguageCode,
+                  'Kalıcı Olarak Sil',
+                  'Delete Permanently',
+                  'Dauerhaft löschen',
+                ),
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
@@ -631,7 +678,7 @@ class ApexSegmentedToggle extends StatelessWidget {
         height: 48,
         constraints: const BoxConstraints(maxWidth: 310),
         decoration: BoxDecoration(
-          color: const Color(0xFF1A1F2B), // Navbar background
+          color: context.colors.navChip, // Navbar background
           border: Border.all(
             color: Colors.white.withValues(alpha: 0.08),
             width: 1,
@@ -653,7 +700,9 @@ class ApexSegmentedToggle extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 6),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? context.colors.cyan.withValues(alpha: 0.14) // Liquid-like highlight
+                        ? context.colors.cyan.withValues(
+                            alpha: 0.14,
+                          ) // Liquid-like highlight
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(22),
                   ),
@@ -663,9 +712,13 @@ class ApexSegmentedToggle extends StatelessWidget {
                       entry.value,
                       style: TextStyle(
                         fontSize: 12,
-                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                        fontWeight: isSelected
+                            ? FontWeight.bold
+                            : FontWeight.normal,
                         color: isSelected
-                            ? context.colors.cyan // Selected tab text color
+                            ? context
+                                  .colors
+                                  .cyan // Selected tab text color
                             : context.colors.textSecondary,
                       ),
                     ),

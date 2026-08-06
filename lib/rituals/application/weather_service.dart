@@ -34,9 +34,18 @@ class WeatherLookupException implements Exception {
   String toString() => message;
 }
 
+const _categoryDeByEn = {
+  'Turkey': 'Türkei',
+  'Europe': 'Europa',
+  'America': 'Amerika',
+  'Balkans': 'Balkan',
+  'Arab World': 'Arabische Welt',
+};
+
 class PredefinedCity {
   final String nameTr;
   final String nameEn;
+  final String? nameDe;
   final String categoryTr;
   final String categoryEn;
   final double latitude;
@@ -46,6 +55,7 @@ class PredefinedCity {
   const PredefinedCity({
     required this.nameTr,
     required this.nameEn,
+    this.nameDe,
     required this.categoryTr,
     required this.categoryEn,
     required this.latitude,
@@ -53,8 +63,18 @@ class PredefinedCity {
     required this.countryCode,
   });
 
-  String displayName(bool tr) => tr ? nameTr : nameEn;
-  String displayCategory(bool tr) => tr ? categoryTr : categoryEn;
+  String displayName(String languageCode) {
+    if (languageCode == 'tr') return nameTr;
+    if (languageCode == 'de') return nameDe ?? nameEn;
+    return nameEn;
+  }
+
+  String displayCategory(String languageCode) {
+    if (languageCode == 'tr') return categoryTr;
+    if (languageCode == 'de') return _categoryDeByEn[categoryEn] ?? categoryEn;
+    return categoryEn;
+  }
+
   String get label => '$nameEn, $countryCode';
 }
 
@@ -407,6 +427,7 @@ const predefinedCities = [
   PredefinedCity(
     nameTr: 'Roma',
     nameEn: 'Rome',
+    nameDe: 'Rom',
     categoryTr: 'Avrupa',
     categoryEn: 'Europe',
     latitude: 41.9028,
@@ -425,6 +446,7 @@ const predefinedCities = [
   PredefinedCity(
     nameTr: 'Viyana',
     nameEn: 'Vienna',
+    nameDe: 'Wien',
     categoryTr: 'Avrupa',
     categoryEn: 'Europe',
     latitude: 48.2082,
@@ -443,6 +465,7 @@ const predefinedCities = [
   PredefinedCity(
     nameTr: 'Brüksel',
     nameEn: 'Brussels',
+    nameDe: 'Brüssel',
     categoryTr: 'Avrupa',
     categoryEn: 'Europe',
     latitude: 50.8503,
@@ -452,6 +475,7 @@ const predefinedCities = [
   PredefinedCity(
     nameTr: 'Münih',
     nameEn: 'Munich',
+    nameDe: 'München',
     categoryTr: 'Avrupa',
     categoryEn: 'Europe',
     latitude: 48.1351,
@@ -461,6 +485,7 @@ const predefinedCities = [
   PredefinedCity(
     nameTr: 'Prag',
     nameEn: 'Prague',
+    nameDe: 'Prag',
     categoryTr: 'Avrupa',
     categoryEn: 'Europe',
     latitude: 50.0755,
@@ -573,6 +598,7 @@ const predefinedCities = [
   PredefinedCity(
     nameTr: 'Belgrad',
     nameEn: 'Belgrade',
+    nameDe: 'Belgrad',
     categoryTr: 'Balkanlar',
     categoryEn: 'Balkans',
     latitude: 44.7872,
@@ -600,6 +626,7 @@ const predefinedCities = [
   PredefinedCity(
     nameTr: 'Atina',
     nameEn: 'Athens',
+    nameDe: 'Athen',
     categoryTr: 'Balkanlar',
     categoryEn: 'Balkans',
     latitude: 37.9838,
@@ -627,6 +654,7 @@ const predefinedCities = [
   PredefinedCity(
     nameTr: 'Bükreş',
     nameEn: 'Bucharest',
+    nameDe: 'Bukarest',
     categoryTr: 'Balkanlar',
     categoryEn: 'Balkans',
     latitude: 44.4268,
@@ -665,6 +693,7 @@ const predefinedCities = [
   PredefinedCity(
     nameTr: 'Riyad',
     nameEn: 'Riyadh',
+    nameDe: 'Riad',
     categoryTr: 'Arap Dünyası',
     categoryEn: 'Arab World',
     latitude: 24.7136,
@@ -674,6 +703,7 @@ const predefinedCities = [
   PredefinedCity(
     nameTr: 'Kahire',
     nameEn: 'Cairo',
+    nameDe: 'Kairo',
     categoryTr: 'Arap Dünyası',
     categoryEn: 'Arab World',
     latitude: 30.0444,
@@ -894,11 +924,20 @@ class WeatherService {
     }
   }
 
-  double _calculateDistanceKm(double lat1, double lon1, double lat2, double lon2) {
+  double _calculateDistanceKm(
+    double lat1,
+    double lon1,
+    double lat2,
+    double lon2,
+  ) {
     const p = 0.017453292519943295; // pi / 180
-    final a = 0.5 -
+    final a =
+        0.5 -
         math.cos((lat2 - lat1) * p) / 2 +
-        math.cos(lat1 * p) * math.cos(lat2 * p) * (1 - math.cos((lon2 - lon1) * p)) / 2;
+        math.cos(lat1 * p) *
+            math.cos(lat2 * p) *
+            (1 - math.cos((lon2 - lon1) * p)) /
+            2;
     return 12742 * math.asin(math.sqrt(a)); // 2 * R; R = 6371 km
   }
 
@@ -932,8 +971,11 @@ class WeatherService {
         final cachedData = jsonDecode(cachedString) as Map<String, dynamic>;
         final cachedLat = cachedData['latitude'] as double?;
         final cachedLon = cachedData['longitude'] as double?;
-        final cachedSnapshotMap = cachedData['snapshot'] as Map<String, dynamic>?;
-        if (cachedLat != null && cachedLon != null && cachedSnapshotMap != null) {
+        final cachedSnapshotMap =
+            cachedData['snapshot'] as Map<String, dynamic>?;
+        if (cachedLat != null &&
+            cachedLon != null &&
+            cachedSnapshotMap != null) {
           final snapshot = WeatherSnapshot.fromJson(cachedSnapshotMap);
           final observed = snapshot.observedAt;
           if (observed != null) {

@@ -48,9 +48,6 @@ class MapsLinkParser {
         trimmed.contains('goo.gl/maps')) {
       try {
         final client = HttpClient();
-        if (!kReleaseMode) {
-          client.badCertificateCallback = (cert, host, port) => true;
-        }
         client.connectionTimeout = const Duration(seconds: 6);
 
         String currentUrl = trimmed;

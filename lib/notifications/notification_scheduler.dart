@@ -83,8 +83,9 @@ class NotificationScheduler {
   static const List<int> reminderOffsetsDays = [30, 15, 1];
 
   /// Schedules up to 3 reminders (30/15/1 days before expiry) for a
-  /// document. Offsets already in the past are silently skipped (e.g. a
-  /// document expiring in 10 days only gets the 1-day reminder).
+  /// document. If every offset has already passed (e.g. expiring tomorrow),
+  /// falls back to a near-term reminder (1 hour from now, or 1 day before
+  /// expiry if that's later) rather than silently scheduling nothing.
   static Future<void> scheduleDocumentExpiryReminder({
     required String docId,
     required String title,
@@ -92,15 +93,32 @@ class NotificationScheduler {
     required AppStrings strings,
   }) async {
     final nTitle = strings.notifDocExpiryTitle;
+    var scheduledAny = false;
     for (final daysLeft in reminderOffsetsDays) {
       final reminderDate = expirationDate.subtract(Duration(days: daysLeft));
       if (reminderDate.isBefore(DateTime.now())) continue;
+      scheduledAny = true;
       await ApexNotificationService.instance.scheduleNotification(
         id: Object.hash(docId, daysLeft),
         title: nTitle,
         body: strings.notifDocExpiryBody(title, daysLeft),
         scheduledDate: reminderDate,
       );
+    }
+
+    if (!scheduledAny) {
+      final now = DateTime.now();
+      final oneDayBefore = expirationDate.subtract(const Duration(days: 1));
+      final soon = now.add(const Duration(hours: 1));
+      final fallbackDate = oneDayBefore.isAfter(soon) ? oneDayBefore : soon;
+      if (fallbackDate.isBefore(expirationDate)) {
+        await ApexNotificationService.instance.scheduleNotification(
+          id: Object.hash(docId, 0),
+          title: nTitle,
+          body: strings.notifDocExpiryBody(title, 0),
+          scheduledDate: fallbackDate,
+        );
+      }
     }
   }
 
@@ -123,5 +141,10 @@ class NotificationScheduler {
         scheduledDate: reminderDate,
       );
     }
+  }
+
+  /// Cancels a previously scheduled document expiry reminder for [docId].
+  static Future<void> cancelDocumentExpiryReminder(String docId) async {
+    await ApexNotificationService.instance.cancelNotification(docId.hashCode);
   }
 }

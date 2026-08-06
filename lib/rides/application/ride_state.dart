@@ -101,7 +101,9 @@ class RideController extends Notifier<RideState> {
     unawaited(ApexKvStore.setString('rides.started_at_iso', ''));
   }
 
-  void endRide({
+  /// Returns `true` if the ride was saved, `false` if it was discarded as
+  /// too short/slow to be a real ride (callers should inform the user).
+  bool endRide({
     required double distanceKm,
     required int durationMinutes,
     required double averageSpeedKmh,
@@ -118,7 +120,7 @@ class RideController extends Notifier<RideState> {
     if ((distanceKm < 0.1 && averageSpeedKmh < 1.0) ||
         (distanceKm <= 0.05 && durationMinutes == 0)) {
       cancelRide();
-      return;
+      return false;
     }
 
     // DOC 24 SECTION 37: Do not generate fake maxSpeed (average * 1.5) or fake maxLeanAngle when unmeasured!
@@ -184,6 +186,7 @@ class RideController extends Notifier<RideState> {
 
     // Check and unlock achievements
     ref.read(userProfileProvider.notifier).checkAndUnlockAchievements();
+    return true;
   }
 
   Future<void> _hydrate() async {

@@ -1,3 +1,4 @@
+import 'package:apexflow/core/design/apex_breakpoints.dart';
 import 'package:apexflow/core/i18n/app_settings_state.dart';
 import 'package:apexflow/core/i18n/app_strings.dart';
 import 'package:apexflow/features/dashboard/apex_dashboard_screen.dart';
@@ -30,7 +31,8 @@ class _ApexAppShellState extends ConsumerState<ApexAppShell> {
   Widget build(BuildContext context) {
     final locale = ref.watch(appSettingsProvider).locale;
     final strings = AppStrings(locale);
-    final compactNavigation = MediaQuery.sizeOf(context).width < 430;
+    final compactNavigation =
+        MediaQuery.sizeOf(context).width < ApexBreakpoints.compact;
     final pages = <Widget>[
       ApexDashboardScreen(
         strings: strings,
@@ -91,7 +93,9 @@ class _ApexAppShellState extends ConsumerState<ApexAppShell> {
               onDestinationSelected: (index) {
                 final targetIndex = index == 0
                     ? 0
-                    : (index == 1 ? 1 : (index == 2 ? 3 : (index == 3 ? 6 : 7)));
+                    : (index == 1
+                          ? 1
+                          : (index == 2 ? 3 : (index == 3 ? 6 : 7)));
                 setState(() => _index = targetIndex);
               },
               destinations: [

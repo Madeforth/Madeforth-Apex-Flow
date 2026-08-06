@@ -1,4 +1,4 @@
-import 'dart:math' as math;
+﻿import 'dart:math' as math;
 import 'package:apexflow/rides/presentation/widgets/start_ride_sheet.dart';
 import 'package:apexflow/core/design/apex_colors.dart';
 import 'package:apexflow/core/design/apex_breakpoints.dart';
@@ -164,7 +164,7 @@ class ApexDashboardScreen extends ConsumerWidget {
                   }
 
                   final telemetry = gpsResult.telemetry;
-                  ref
+                  final saved = ref
                       .read(rideStateProvider.notifier)
                       .endRide(
                         distanceKm: distanceKm,
@@ -186,6 +186,21 @@ class ApexDashboardScreen extends ConsumerWidget {
                         hardBrakes: telemetry?.hardBrakingEvents ?? 0,
                         harmonyScore: telemetry?.smoothnessScore ?? 0,
                       );
+                  if (!saved) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          tr
+                              ? 'Sürüş çok kısa veya hareket algılanmadı. Kaydedilmedi.'
+                              : de
+                              ? 'Fahrt zu kurz oder keine Bewegung erkannt. Nicht gespeichert.'
+                              : 'Ride too short or no movement detected. Not saved.',
+                        ),
+                        backgroundColor: context.colors.caution,
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                  }
                 } else {
                   showQuickStartRideSheet(context, ref, strings);
                 }
@@ -317,9 +332,9 @@ class _TopBar extends StatelessWidget {
         Text(
           'Apex Flow',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w800,
-                color: Colors.white,
-              ),
+            fontWeight: FontWeight.w800,
+            color: Colors.white,
+          ),
         ),
         if (onOpenNotifications != null)
           IconButton(
@@ -357,7 +372,9 @@ class _BikeSelectorDropdownState extends State<_BikeSelectorDropdown> {
   Widget build(BuildContext context) {
     return PopupMenuButton<String>(
       initialValue: widget.garage.activeBike.id,
-      color: const Color(0xFF0F172A), // Minimal dark slate, matches bg-background
+      color: const Color(
+        0xFF0F172A,
+      ), // Minimal dark slate, matches bg-background
       elevation: 8,
       shadowColor: Colors.black.withValues(alpha: 0.5),
       shape: RoundedRectangleBorder(
@@ -388,7 +405,8 @@ class _BikeSelectorDropdownState extends State<_BikeSelectorDropdown> {
           return PopupMenuItem<String>(
             value: bike.id,
             height: 48,
-            padding: EdgeInsets.zero, // Zero padding to let Container handle highlights
+            padding: EdgeInsets
+                .zero, // Zero padding to let Container handle highlights
             child: Container(
               width: double.infinity,
               height: 48,
@@ -410,9 +428,13 @@ class _BikeSelectorDropdownState extends State<_BikeSelectorDropdown> {
                     child: Text(
                       bike.model,
                       style: TextStyle(
-                        color: isSelected ? Colors.cyan : Colors.white70, // text-primary or white
+                        color: isSelected
+                            ? Colors.cyan
+                            : Colors.white70, // text-primary or white
                         fontSize: 14,
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                        fontWeight: isSelected
+                            ? FontWeight.w600
+                            : FontWeight.w400,
                         letterSpacing: 0.2,
                       ),
                     ),
@@ -436,7 +458,9 @@ class _BikeSelectorDropdownState extends State<_BikeSelectorDropdown> {
           borderRadius: BorderRadius.circular(6), // Design Rules: 4-6 radius
           border: Border.all(
             color: _isOpen
-                ? Colors.white.withValues(alpha: 0.25) // Highlighted border when open
+                ? Colors.white.withValues(
+                    alpha: 0.25,
+                  ) // Highlighted border when open
                 : Colors.white.withValues(alpha: 0.1),
             width: 1,
           ),
@@ -742,7 +766,7 @@ class _StartRideActionState extends State<_StartRideAction>
   Widget build(BuildContext context) {
     final buttonColor = widget.isRideActive
         ? const Color(0xFFEF4444)
-        : const Color(0xFF0EA5E9);
+        : context.colors.cyan;
 
     final buttonText = widget.isRideActive
         ? widget.strings.t(
@@ -770,10 +794,7 @@ class _StartRideActionState extends State<_StartRideAction>
             decoration: BoxDecoration(
               color: buttonColor,
               borderRadius: BorderRadius.circular(28),
-              border: Border.all(
-                color: buttonColor,
-                width: 1,
-              ),
+              border: Border.all(color: buttonColor, width: 1),
             ),
             clipBehavior: Clip.antiAlias,
             child: Stack(
@@ -784,9 +805,7 @@ class _StartRideActionState extends State<_StartRideAction>
                   opacity: _isPressed ? 0.0 : 1.0,
                   duration: const Duration(milliseconds: 280),
                   child: AnimatedSlide(
-                    offset: _isPressed
-                        ? const Offset(0.3, 0)
-                        : Offset.zero,
+                    offset: _isPressed ? const Offset(0.3, 0) : Offset.zero,
                     duration: const Duration(milliseconds: 350),
                     curve: Curves.easeOutCubic,
                     child: Row(
@@ -819,9 +838,7 @@ class _StartRideActionState extends State<_StartRideAction>
                   duration: const Duration(milliseconds: 320),
                   curve: Curves.easeOut,
                   child: AnimatedSlide(
-                    offset: _isPressed
-                        ? Offset.zero
-                        : const Offset(-0.2, 0),
+                    offset: _isPressed ? Offset.zero : const Offset(-0.2, 0),
                     duration: const Duration(milliseconds: 380),
                     curve: Curves.easeOutCubic,
                     child: Row(
@@ -1042,9 +1059,19 @@ class _MachineHealthRow extends StatelessWidget {
               _HealthColumn(
                 icon: Icons.build_outlined,
                 label: strings.t(tr: 'Servis', en: 'Service', de: 'Service'),
-                value: '${state.bike.kmUntilService} ',
-                suffix: 'km',
-                valueColor: const Color(0xFFFACC15),
+                value: state.bike.kmUntilService < 0
+                    ? '${-state.bike.kmUntilService} '
+                    : '${state.bike.kmUntilService} ',
+                suffix: state.bike.kmUntilService < 0
+                    ? strings.t(
+                        tr: 'km gecikti',
+                        en: 'km overdue',
+                        de: 'km überfällig',
+                      )
+                    : 'km',
+                valueColor: state.bike.kmUntilService < 0
+                    ? const Color(0xFFEF4444)
+                    : const Color(0xFFFACC15),
               ),
             ],
           ),

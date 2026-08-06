@@ -706,15 +706,14 @@ class WeatherSheetContentState extends ConsumerState<WeatherSheetContent> {
 
   @override
   Widget build(BuildContext context) {
-    final tr = widget.tr;
-    final strings = AppStrings(ref.read(appSettingsProvider).locale);
+    final strings = AppStrings(ref.watch(appSettingsProvider).locale);
     final filterText = _normalizeTurkish(_query);
     final isSearching = filterText.isNotEmpty;
 
     // Filter predefined cities based on search & dropdowns
     var filteredCities = predefinedCities.where((c) {
-      final name = _normalizeTurkish(c.displayName(tr));
-      final cat = _normalizeTurkish(c.displayCategory(tr));
+      final name = _normalizeTurkish(c.displayName(strings.languageCode));
+      final cat = _normalizeTurkish(c.displayCategory(strings.languageCode));
       return name.contains(filterText) || cat.contains(filterText);
     }).toList();
 
@@ -725,7 +724,9 @@ class WeatherSheetContentState extends ConsumerState<WeatherSheetContent> {
     } else if (_filterMode == WeatherFilterMode.region &&
         _selectedRegion != null) {
       filteredCities = filteredCities
-          .where((c) => c.displayCategory(tr) == _selectedRegion)
+          .where(
+            (c) => c.displayCategory(strings.languageCode) == _selectedRegion,
+          )
           .toList();
     }
 
@@ -962,7 +963,10 @@ class WeatherSheetContentState extends ConsumerState<WeatherSheetContent> {
                         scrollDirection: Axis.horizontal,
                         child: Row(
                           children: recentPredefined
-                              .map((c) => _buildRecentChip(c, tr))
+                              .map(
+                                (c) =>
+                                    _buildRecentChip(c, strings.languageCode),
+                              )
                               .toList(),
                         ),
                       ),
@@ -1056,7 +1060,7 @@ class WeatherSheetContentState extends ConsumerState<WeatherSheetContent> {
                             return _buildSuggestedRow(
                               city,
                               isSelected,
-                              tr,
+                              strings.languageCode,
                               city == filteredCities.last,
                             );
                           }).toList(),
@@ -1142,12 +1146,12 @@ class WeatherSheetContentState extends ConsumerState<WeatherSheetContent> {
     );
   }
 
-  Widget _buildRecentChip(PredefinedCity city, bool tr) {
+  Widget _buildRecentChip(PredefinedCity city, String languageCode) {
     return GestureDetector(
       onTap: _loading
           ? null
           : () {
-              _controller.text = city.displayName(tr);
+              _controller.text = city.displayName(languageCode);
               _fetchWeatherForCity(city.label, city.latitude, city.longitude);
             },
       child: Container(
@@ -1168,7 +1172,7 @@ class WeatherSheetContentState extends ConsumerState<WeatherSheetContent> {
             ),
             const SizedBox(width: 6),
             Text(
-              '${city.displayName(tr)}, ${city.countryCode == 'GB' ? 'UK' : city.displayCategory(tr)}',
+              '${city.displayName(languageCode)}, ${city.countryCode == 'GB' ? 'UK' : city.displayCategory(languageCode)}',
               style: TextStyle(
                 fontSize: 12,
                 color: context.colors.textSecondary,
@@ -1183,7 +1187,7 @@ class WeatherSheetContentState extends ConsumerState<WeatherSheetContent> {
   Widget _buildSuggestedRow(
     PredefinedCity city,
     bool isSelected,
-    bool tr,
+    String languageCode,
     bool isLast,
   ) {
     return Material(
@@ -1192,7 +1196,7 @@ class WeatherSheetContentState extends ConsumerState<WeatherSheetContent> {
         onTap: _loading
             ? null
             : () {
-                _controller.text = city.displayName(tr);
+                _controller.text = city.displayName(languageCode);
                 _fetchWeatherForCity(city.label, city.latitude, city.longitude);
               },
         child: Container(
@@ -1221,7 +1225,7 @@ class WeatherSheetContentState extends ConsumerState<WeatherSheetContent> {
                 child: Row(
                   children: [
                     Text(
-                      city.displayName(tr),
+                      city.displayName(languageCode),
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 14,
@@ -1231,7 +1235,7 @@ class WeatherSheetContentState extends ConsumerState<WeatherSheetContent> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        '${city.countryCode == 'GB' ? 'United Kingdom' : city.categoryTr} • ${city.displayCategory(tr)}',
+                        '${city.countryCode == 'GB' ? 'United Kingdom' : city.categoryTr} • ${city.displayCategory(languageCode)}',
                         style: TextStyle(
                           color: context.colors.textSecondary,
                           fontSize: 12,
