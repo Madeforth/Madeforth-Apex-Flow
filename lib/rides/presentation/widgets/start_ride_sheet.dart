@@ -86,7 +86,7 @@ class _StartRideSheet extends StatefulWidget {
 
 class _StartRideSheetState extends State<_StartRideSheet> {
   late final TextEditingController _moodController;
-  bool _isMounted = false;
+  final bool _isMounted = false;
 
   @override
   void initState() {
@@ -182,77 +182,6 @@ class _StartRideSheetState extends State<_StartRideSheet> {
               'Hedefini belirle, gerisini sensörlere bırak.',
               'Set your intention, let sensors do the rest.',
               'Legen Sie Ihre Absicht fest, den Rest erledigen die Sensoren.',
-            ),
-          ),
-          const SizedBox(height: ApexSpacing.x2),
-          // Mount Calibration Toggle
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: context.colors.surface.withValues(alpha: 0.3),
-              borderRadius: BorderRadius.circular(4),
-              border: Border.all(
-                color: _isMounted
-                    ? context.colors.cyan.withValues(alpha: 0.5)
-                    : context.colors.border.withValues(alpha: 0.3),
-              ),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.phone_android,
-                  color: _isMounted
-                      ? context.colors.cyan
-                      : context.colors.textSecondary,
-                  size: 20,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        tInline(
-                          strings.languageCode,
-                          'Telefon Motora Sabit (Gidon/QuadLock)',
-                          'Phone is rigidly mounted (Handlebars)',
-                          'Telefon ist fest montiert (Lenker)',
-                        ),
-                        style: TextStyle(
-                          color: _isMounted
-                              ? Colors.white
-                              : context.colors.textSecondary,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        tInline(
-                          strings.languageCode,
-                          '%99 Doğruluklu IMU Telemetrisini Aktifleştirir.',
-                          'Enables 99% Precision IMU Telemetry.',
-                          'Aktiviert 99 % Präzisions-IMU-Telemetrie.',
-                        ),
-                        style: TextStyle(
-                          color: context.colors.textSecondary.withValues(
-                            alpha: 0.8,
-                          ),
-                          fontSize: 11,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Switch(
-                  value: _isMounted,
-                  activeColor: context.colors.cyan,
-                  onChanged: (val) {
-                    setState(() => _isMounted = val);
-                    HapticFeedback.lightImpact();
-                  },
-                ),
-              ],
             ),
           ),
           const SizedBox(height: ApexSpacing.x2),
