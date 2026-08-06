@@ -411,43 +411,7 @@ class _SupporterPaywallScreenState
                       ),
                     ),
                   ),
-                  const SizedBox(height: 8),
-
-                  // Return to App Button
-                  SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: OutlinedButton.icon(
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: context.colors.white,
-                        side: BorderSide(
-                          color: context.colors.border,
-                          width: 1.2,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(_cardRadius),
-                        ),
-                      ),
-                      onPressed: () {
-                        if (Navigator.canPop(context)) Navigator.pop(context);
-                      },
-                      icon: Icon(
-                        Icons.arrow_back,
-                        size: 18,
-                        color: context.colors.white,
-                      ),
-                      label: Text(
-                        tInline(
-                          widget.strings.languageCode,
-                          'Uygulamaya Dön',
-                          'Return to App',
-                          'Zurück zur App',
-                        ),
-                        style: const TextStyle(fontWeight: FontWeight.w900),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 24),
                 ],
               ),
       ),

@@ -380,263 +380,231 @@ class _PremiumPaywallScreenState extends ConsumerState<PremiumPaywallScreen> {
                       ),
                     ),
                   ] else ...[
-                    // Pricing Card
-                    Container(
-                      clipBehavior: Clip.antiAlias,
-                      decoration: BoxDecoration(
-                        color: context.colors.surface,
-                        borderRadius: BorderRadius.circular(_cardRadius),
-                        border: Border.all(
-                          color: context.colors.border,
-                          width: 1,
-                        ),
-                      ),
-                      child: Column(
+                    // Side-by-side equal height plan cards: Monthly vs Yearly
+                    IntrinsicHeight(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          // Side-by-side equal height plan cards: Monthly vs Yearly
-                          IntrinsicHeight(
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                // Monthly Plan Card
-                                Expanded(
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        _selectedPlan = 'monthly';
-                                      });
-                                    },
-                                    child: Container(
-                                      padding: const EdgeInsets.all(12),
-                                      decoration: BoxDecoration(
-                                        color: _selectedPlan == 'monthly'
-                                            ? context.colors.cyan.withValues(
-                                                alpha: 0.12,
-                                              )
-                                            : context.colors.surface,
-                                        borderRadius: BorderRadius.circular(
-                                          _cardRadius,
-                                        ),
-                                        border: Border.all(
-                                          color: _selectedPlan == 'monthly'
-                                              ? context.colors.cyan
-                                              : context.colors.border,
-                                          width: _selectedPlan == 'monthly'
-                                              ? 2
-                                              : 1,
-                                        ),
-                                      ),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            tInline(
-                                              widget.strings.languageCode,
-                                              'AYLIK',
-                                              'MONTHLY',
-                                              'MONATLICH',
-                                            ),
-                                            style: TextStyle(
-                                              color:
-                                                  context.colors.textSecondary,
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.w900,
-                                              letterSpacing: 1.2,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 6),
-                                          Text(
-                                            tInline(
-                                              widget.strings.languageCode,
-                                              '₺14,99',
-                                              '\$4.99',
-                                              '4,99 €',
-                                            ),
-                                            style: TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.w900,
-                                              color: context.colors.white,
-                                            ),
-                                          ),
-                                          Text(
-                                            tInline(
-                                              widget.strings.languageCode,
-                                              '/ ay',
-                                              '/ month',
-                                              '/ Monat',
-                                            ),
-                                            style: TextStyle(
-                                              color:
-                                                  context.colors.textSecondary,
-                                              fontSize: 11,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-
-                                // Yearly Plan Card (POPULAR / BEST VALUE)
-                                Expanded(
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        _selectedPlan = 'yearly';
-                                      });
-                                    },
-                                    child: Container(
-                                      padding: const EdgeInsets.all(12),
-                                      decoration: BoxDecoration(
-                                        color: _selectedPlan == 'yearly'
-                                            ? context.colors.cyan.withValues(
-                                                alpha: 0.12,
-                                              )
-                                            : context.colors.surface,
-                                        borderRadius: BorderRadius.circular(
-                                          _cardRadius,
-                                        ),
-                                        border: Border.all(
-                                          color: _selectedPlan == 'yearly'
-                                              ? context.colors.cyan
-                                              : context.colors.border,
-                                          width: _selectedPlan == 'yearly'
-                                              ? 2
-                                              : 1,
-                                        ),
-                                      ),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 6,
-                                              vertical: 2,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: context.colors.caution,
-                                              borderRadius:
-                                                  BorderRadius.circular(4),
-                                            ),
-                                            child: Text(
-                                              tInline(
-                                                widget.strings.languageCode,
-                                                'ÖNERİLEN',
-                                                'RECOMMENDED',
-                                                'EMPFOHLEN',
-                                              ),
-                                              style: TextStyle(
-                                                color: context.colors.onAccent,
-                                                fontSize: 9,
-                                                fontWeight: FontWeight.w900,
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            tInline(
-                                              widget.strings.languageCode,
-                                              'YILLIK',
-                                              'YEARLY',
-                                              'JÄHRLICH',
-                                            ),
-                                            style: TextStyle(
-                                              color: context.colors.cyan,
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.w900,
-                                              letterSpacing: 1.2,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            tInline(
-                                              widget.strings.languageCode,
-                                              '₺99,99',
-                                              '\$29.99',
-                                              '29,99 €',
-                                            ),
-                                            style: TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.w900,
-                                              color: context.colors.white,
-                                            ),
-                                          ),
-                                          Text(
-                                            tInline(
-                                              widget.strings.languageCode,
-                                              '/ yıl',
-                                              '/ year',
-                                              '/ Jahr',
-                                            ),
-                                            style: TextStyle(
-                                              color:
-                                                  context.colors.textSecondary,
-                                              fontSize: 11,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-
-                          // Google Play Action Button
-                          SizedBox(
-                            width: double.infinity,
-                            height: 48,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: context.colors.cyan,
-                                foregroundColor: context.colors.onAccent,
-                                shape: RoundedRectangleBorder(
+                          // Monthly Plan Card
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _selectedPlan = 'monthly';
+                                });
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: _selectedPlan == 'monthly'
+                                      ? context.colors.cyan.withValues(
+                                          alpha: 0.12,
+                                        )
+                                      : context.colors.surface,
                                   borderRadius: BorderRadius.circular(
                                     _cardRadius,
                                   ),
+                                  border: Border.all(
+                                    color: _selectedPlan == 'monthly'
+                                        ? context.colors.cyan
+                                        : context.colors.border,
+                                    width: _selectedPlan == 'monthly' ? 2 : 1,
+                                  ),
                                 ),
-                                elevation: 0,
-                              ),
-                              onPressed: _isLoading ? null : _executePurchase,
-                              child: _isLoading
-                                  ? const SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                        color: Colors.white,
-                                        strokeWidth: 2,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      tInline(
+                                        widget.strings.languageCode,
+                                        'AYLIK',
+                                        'MONTHLY',
+                                        'MONATLICH',
                                       ),
-                                    )
-                                  : Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        const Icon(
-                                          Icons.shop_2_outlined,
-                                          size: 18,
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Text(
-                                          tInline(
-                                            widget.strings.languageCode,
-                                            'Google Play ile Güvenli Satın Al',
-                                            'Purchase via Google Play',
-                                            'Kauf über Google Play',
-                                          ),
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.w900,
-                                          ),
-                                        ),
-                                      ],
+                                      style: TextStyle(
+                                        color: context.colors.textSecondary,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: 1.2,
+                                      ),
                                     ),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      tInline(
+                                        widget.strings.languageCode,
+                                        '₺14,99',
+                                        '\$4.99',
+                                        '4,99 €',
+                                      ),
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w900,
+                                        color: context.colors.white,
+                                      ),
+                                    ),
+                                    Text(
+                                      tInline(
+                                        widget.strings.languageCode,
+                                        '/ ay',
+                                        '/ month',
+                                        '/ Monat',
+                                      ),
+                                      style: TextStyle(
+                                        color: context.colors.textSecondary,
+                                        fontSize: 11,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+
+                          // Yearly Plan Card (POPULAR / BEST VALUE)
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _selectedPlan = 'yearly';
+                                });
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: _selectedPlan == 'yearly'
+                                      ? context.colors.cyan.withValues(
+                                          alpha: 0.12,
+                                        )
+                                      : context.colors.surface,
+                                  borderRadius: BorderRadius.circular(
+                                    _cardRadius,
+                                  ),
+                                  border: Border.all(
+                                    color: _selectedPlan == 'yearly'
+                                        ? context.colors.cyan
+                                        : context.colors.border,
+                                    width: _selectedPlan == 'yearly' ? 2 : 1,
+                                  ),
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 6,
+                                        vertical: 2,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: context.colors.caution,
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Text(
+                                        tInline(
+                                          widget.strings.languageCode,
+                                          'ÖNERİLEN',
+                                          'RECOMMENDED',
+                                          'EMPFOHLEN',
+                                        ),
+                                        style: TextStyle(
+                                          color: context.colors.onAccent,
+                                          fontSize: 9,
+                                          fontWeight: FontWeight.w900,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      tInline(
+                                        widget.strings.languageCode,
+                                        'YILLIK',
+                                        'YEARLY',
+                                        'JÄHRLICH',
+                                      ),
+                                      style: TextStyle(
+                                        color: context.colors.cyan,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: 1.2,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      tInline(
+                                        widget.strings.languageCode,
+                                        '₺99,99',
+                                        '\$29.99',
+                                        '29,99 €',
+                                      ),
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w900,
+                                        color: context.colors.white,
+                                      ),
+                                    ),
+                                    Text(
+                                      tInline(
+                                        widget.strings.languageCode,
+                                        '/ yıl',
+                                        '/ year',
+                                        '/ Jahr',
+                                      ),
+                                      style: TextStyle(
+                                        color: context.colors.textSecondary,
+                                        fontSize: 11,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
                           ),
                         ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Google Play Action Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: context.colors.cyan,
+                          foregroundColor: context.colors.onAccent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(_cardRadius),
+                          ),
+                          elevation: 0,
+                        ),
+                        onPressed: _isLoading ? null : _executePurchase,
+                        child: _isLoading
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(Icons.shop_2_outlined, size: 18),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    tInline(
+                                      widget.strings.languageCode,
+                                      'Google Play ile Güvenli Satın Al',
+                                      'Purchase via Google Play',
+                                      'Kauf über Google Play',
+                                    ),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w900,
+                                    ),
+                                  ),
+                                ],
+                              ),
                       ),
                     ),
                   ],
@@ -663,42 +631,7 @@ class _PremiumPaywallScreenState extends ConsumerState<PremiumPaywallScreen> {
                     ),
                     const SizedBox(height: 8),
                   ],
-
-                  // Return to App Button
-                  SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: OutlinedButton.icon(
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: context.colors.white,
-                        side: BorderSide(
-                          color: context.colors.border,
-                          width: 1.2,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(_cardRadius),
-                        ),
-                      ),
-                      onPressed: () {
-                        if (Navigator.canPop(context)) Navigator.pop(context);
-                      },
-                      icon: Icon(
-                        Icons.arrow_back,
-                        size: 18,
-                        color: context.colors.white,
-                      ),
-                      label: Text(
-                        tInline(
-                          widget.strings.languageCode,
-                          'Uygulamaya Dön (Ücretsiz Sürüm)',
-                          'Return to App (Free Version)',
-                          'Zurück zur App (Kostenlose Version)',
-                        ),
-                        style: const TextStyle(fontWeight: FontWeight.w900),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 24),
                 ],
               ),
       ),
