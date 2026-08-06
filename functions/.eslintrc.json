@@ -1,0 +1,26 @@
+{
+  "root": true,
+  "env": {
+    "es6": true,
+    "node": true
+  },
+  "extends": ["eslint:recommended", "google"],
+  "parserOptions": {
+    "ecmaVersion": 2020,
+    "sourceType": "script"
+  },
+  "rules": {
+    "quotes": ["error", "double", {"allowTemplateLiterals": true}],
+    "require-jsdoc": "off",
+    "valid-jsdoc": "off",
+    "max-len": "off",
+    "indent": "off",
+    "object-curly-spacing": "off",
+    "quote-props": "off",
+    "comma-dangle": "off",
+    "camelcase": "off",
+    "arrow-parens": "off",
+    "padded-blocks": "off",
+    "operator-linebreak": "off"
+  }
+}

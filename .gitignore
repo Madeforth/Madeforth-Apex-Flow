@@ -49,3 +49,7 @@ key.properties
 *.jks
 *.keystore
 venv/
+
+# Node dependencies — install via package-lock.json instead of committing
+# the platform-specific build (native binaries + .bin shims differ per OS).
+node_modules/
