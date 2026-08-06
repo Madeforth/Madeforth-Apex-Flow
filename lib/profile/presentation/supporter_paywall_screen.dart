@@ -99,6 +99,61 @@ class _SupporterPaywallScreenState
     if (Navigator.canPop(context)) Navigator.pop(context);
   }
 
+  Future<void> _restorePurchases() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final customerInfo = await PurchasesService.instance.restorePurchases();
+    if (!mounted) return;
+    setState(() {
+      _isLoading = false;
+    });
+
+    final activeEntitlements = customerInfo?.entitlements.active ?? {};
+    final highestTier = [3, 2, 1].firstWhere(
+      (tier) => activeEntitlements.containsKey(
+        PurchasesEntitlements.supporterTier(tier),
+      ),
+      orElse: () => 0,
+    );
+
+    if (highestTier == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            tInline(
+              widget.strings.languageCode,
+              'Bu hesaba bağlı, geri yüklenecek bir satın alma bulunamadı.',
+              'No purchases were found to restore for this account.',
+              'Für dieses Konto wurden keine wiederherstellbaren Käufe gefunden.',
+            ),
+          ),
+          backgroundColor: context.colors.caution,
+        ),
+      );
+      return;
+    }
+
+    await ref
+        .read(userProfileProvider.notifier)
+        .updateSupporterTier(highestTier);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          tInline(
+            widget.strings.languageCode,
+            'Supporter paketiniz geri yüklendi. 🏍️',
+            'Your Supporter pack has been restored. 🏍️',
+            'Ihr Supporter-Paket wurde wiederhergestellt. 🏍️',
+          ),
+        ),
+        backgroundColor: context.colors.cyan,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final tr = widget.strings.locale.languageCode == 'tr';
@@ -333,6 +388,26 @@ class _SupporterPaywallScreenState
                   ),
 
                   const SizedBox(height: ApexSpacing.x3),
+
+                  Center(
+                    child: TextButton(
+                      onPressed: _isLoading ? null : _restorePurchases,
+                      child: Text(
+                        tInline(
+                          widget.strings.languageCode,
+                          'Satın Alımları Geri Yükle',
+                          'Restore Purchases',
+                          'Käufe wiederherstellen',
+                        ),
+                        style: TextStyle(
+                          color: context.colors.textSecondary,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
 
                   // Return to App Button
                   SizedBox(

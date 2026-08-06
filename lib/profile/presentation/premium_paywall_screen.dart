@@ -88,6 +88,57 @@ class _PremiumPaywallScreenState extends ConsumerState<PremiumPaywallScreen> {
     if (Navigator.canPop(context)) Navigator.pop(context);
   }
 
+  Future<void> _restorePurchases() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final customerInfo = await PurchasesService.instance.restorePurchases();
+    if (!mounted) return;
+    setState(() {
+      _isLoading = false;
+    });
+
+    final unlocked =
+        customerInfo?.entitlements.active.containsKey(
+          PurchasesEntitlements.premium,
+        ) ??
+        false;
+
+    if (!unlocked) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            tInline(
+              widget.strings.languageCode,
+              'Bu hesaba bağlı, geri yüklenecek bir satın alma bulunamadı.',
+              'No purchases were found to restore for this account.',
+              'Für dieses Konto wurden keine wiederherstellbaren Käufe gefunden.',
+            ),
+          ),
+          backgroundColor: context.colors.caution,
+        ),
+      );
+      return;
+    }
+
+    await ref.read(userProfileProvider.notifier).updatePremiumStatus(true);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          tInline(
+            widget.strings.languageCode,
+            'Premium üyeliğiniz geri yüklendi. 👑',
+            'Your Premium membership has been restored. 👑',
+            'Ihre Premium-Mitgliedschaft wurde wiederhergestellt. 👑',
+          ),
+        ),
+        backgroundColor: context.colors.cyan,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final tr = widget.strings.locale.languageCode == 'tr';
@@ -577,6 +628,28 @@ class _PremiumPaywallScreenState extends ConsumerState<PremiumPaywallScreen> {
                     ),
                   ],
                   const SizedBox(height: ApexSpacing.x2),
+
+                  if (!profile.isPremium) ...[
+                    Center(
+                      child: TextButton(
+                        onPressed: _isLoading ? null : _restorePurchases,
+                        child: Text(
+                          tInline(
+                            widget.strings.languageCode,
+                            'Satın Alımları Geri Yükle',
+                            'Restore Purchases',
+                            'Käufe wiederherstellen',
+                          ),
+                          style: TextStyle(
+                            color: context.colors.textSecondary,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
 
                   // Return to App Button
                   SizedBox(

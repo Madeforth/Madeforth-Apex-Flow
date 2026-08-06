@@ -30,9 +30,9 @@ class PurchasesService {
   bool _configured = false;
 
   // RevenueCat public SDK key (safe to embed client-side — not a secret
-  // key). Sandbox/"test_" key from RevenueCat onboarding, 2026-08-05 —
-  // swap for the production key before a real release build.
-  static const String _androidApiKey = 'test_fvELpOGwmQYczPBZoMCjnadMUaD';
+  // key). Production key, swapped in 2026-08-06 (was the sandbox/"test_"
+  // onboarding key from 2026-08-05).
+  static const String _androidApiKey = 'goog_pGsrqzcNiRuecBuzekHGWCmlrLW';
   static const String? _iosApiKey = null; // Not yet configured in RevenueCat.
 
   Future<void> init() async {
