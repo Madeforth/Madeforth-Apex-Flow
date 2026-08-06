@@ -109,49 +109,48 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    userProfile.name.isEmpty
-                                        ? _t('Rider', 'Rider', 'Fahrer')
-                                        : userProfile.name,
-                                    style: const TextStyle(
-                                      fontSize: 28,
-                                      fontWeight: FontWeight.w900,
-                                      color: Colors.white,
-                                      letterSpacing: -0.5,
+                              Text(
+                                userProfile.name.isEmpty
+                                    ? _t('Rider', 'Rider', 'Fahrer')
+                                    : userProfile.name,
+                                style: const TextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.w900,
+                                  color: Colors.white,
+                                  letterSpacing: -0.5,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              if (userProfile.isPremium) ...[
+                                const SizedBox(height: 4),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: context.colors.caution.withValues(
+                                      alpha: 0.15,
+                                    ),
+                                    borderRadius: BorderRadius.circular(4),
+                                    border: Border.all(
+                                      color: context.colors.caution.withValues(
+                                        alpha: 0.3,
+                                      ),
+                                      width: 1,
                                     ),
                                   ),
-                                  if (userProfile.isPremium) ...[
-                                    const SizedBox(width: 6),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 6,
-                                        vertical: 2,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: context.colors.caution
-                                            .withValues(alpha: 0.15),
-                                        borderRadius: BorderRadius.circular(4),
-                                        border: Border.all(
-                                          color: context.colors.caution
-                                              .withValues(alpha: 0.3),
-                                          width: 1,
-                                        ),
-                                      ),
-                                      child: Text(
-                                        _t('PREMİUM', 'PREMIUM', 'PREMIUM'),
-                                        style: TextStyle(
-                                          color: context.colors.caution,
-                                          fontSize: 9,
-                                          fontWeight: FontWeight.w900,
-                                          letterSpacing: 0.5,
-                                        ),
-                                      ),
+                                  child: Text(
+                                    _t('PREMİUM', 'PREMIUM', 'PREMIUM'),
+                                    style: TextStyle(
+                                      color: context.colors.caution,
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.w900,
+                                      letterSpacing: 0.5,
                                     ),
-                                  ],
-                                ],
-                              ),
+                                  ),
+                                ),
+                              ],
                               const SizedBox(height: 4),
                               Text(
                                 _t(
