@@ -29,12 +29,13 @@ Bu dosya, ApexFlow projesine eklenecek yeni özellikleri ve gelecek faz planlar�
 
 ## 👥 4. [PREMIUM] Grup Sürüşü ve Canlı Konum Paylaşımı (Group Ride & Live Tracking)
 * **Açıklama:** Sürücülerin arkadaşlarıyla grup sürüşleri planlamasını ve sürüş esnasında haritada birbirlerinin konumlarını canlı izlemesini sağlayan premium özellik.
+* **Karar (2026-08-06):** Canlı konum takibi (alt görevler 2-5) **kasıtlı olarak ertelendi** — uygulama ilk sürümünü çıkardıktan bir süre sonra, ayrı büyük bir güncelleme olarak ele alınacak. Gerekçe: maliyet düşük çıktı (RTDB ile tahmini ~1.5MB/grup sürüşü, ücretsiz kotanın onbinde biri) ama ürün kimliği açısından risk — piyasada doymuş bir kategori (Life360/Strava Beacon/Rever), ApexFlow'un asıl farkı (Harmony Engine, telemetri, bakım takibi) değil. Mimari karar netleşti (Supabase değil Firebase Realtime Database; `flutter_map`+OSM, Google Maps değil — `google_maps_flutter` pubspec'te kurulu ama kullanılmıyor, ayrı bir temizlik konusu).
 * **Alt Görevler:**
-  - [ ] **Grup Sürüşü Yönetimi:** Sürüş oluşturma, davet kodu/QR kod ile arkadaşları gruba ekleme ve katılım listesi ekranı.
-  - [ ] **Gerçek Zamanlı Konum İletişimi:** Supabase Realtime / WebSocket üzerinden 5 saniyede bir koordinatların sunucuya senkronize edilmesi.
-  - [ ] **Canlı Harita Arayüzü:** `flutter_map` ve OpenStreetMap kullanarak gruptaki tüm sürücüleri ve rotayı canlı gösteren harita paneli.
-  - [ ] **Konum Yumuşatma (Interpolation):** Haritada arkadaşların konumlarının zıplayarak değil, akıcı şekilde hareket etmesini sağlayan lerp algoritması.
-  - [ ] **Pil ve Veri Tasarrufu Modu:** Motor durduğunda veya hız sıfıra indiğinde konum yayınının otomatik durdurulması.
+  - [x] **Grup Sürüşü Yönetimi:** Sürüş oluşturma, davet kodu/QR kod ile arkadaşları gruba ekleme ve katılım listesi ekranı — `lib/rides/presentation/group_ride_lobby_screen.dart` içinde tam kurulu.
+  - [ ] **Gerçek Zamanlı Konum İletişimi:** (ERTELENDİ) Firebase Realtime Database ile 5 saniyede bir koordinat senkronu.
+  - [ ] **Canlı Harita Arayüzü:** (ERTELENDİ) `flutter_map` ve OpenStreetMap kullanarak gruptaki tüm sürücüleri canlı gösteren harita paneli.
+  - [ ] **Konum Yumuşatma (Interpolation):** (ERTELENDİ) Lerp algoritması.
+  - [ ] **Pil ve Veri Tasarrufu Modu:** (ERTELENDİ) Motor durduğunda/hız sıfıra indiğinde yayının otomatik durdurulması.
 
 
 

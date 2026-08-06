@@ -94,6 +94,51 @@ Kullanıcının onayladığı çok fazlı plana göre (bkz. `activeContext.md`) 
 
 **Commit edilmedi** — kullanıcı onayı bekleniyor. Faz 3 (yeni özellikler) henüz başlamadı.
 
+## 2026-08-06 — Faz 3a (Yakıt Ekonomisi Analitiği) Tamamlandı
+`lib/fuel/` zaten bir giriş formu + `FuelHistoryList` (range-filtreli geçmiş) içeriyordu; `FuelEntry`'de `brand` ve `odometerKm` alanları, `receipt_parser.dart`'ta marka OCR/alias tanıma (Shell/Opet/BP/vb.) ve `fuel_screen.dart`'ta bir sonraki odometre tahmini için "son dolumdan bu yana kat edilen mesafe" hesaplaması **zaten vardı** — sıfırdan değil, üzerine inşa edildi. Ayrıca `garage_screen.dart`'ta zaten `CostAnalyticsPainter` ile 6 aylık yakıt+bakım harcama trendi çizilen bir grafik olduğu keşfedildi — bu yüzden TODO.md'nin "harcama trendi" isteği zaten kısmen karşılanıyormuş; eksik olan asıl **tüketim (L/100km) trendi**, istasyon kıyaslaması, anomali tespiti ve km-başı-maliyetti.
+
+Eklenenler (`lib/fuel/application/fuel_state.dart`):
+- `FuelConsumptionPoint`/`FuelBrandStat`/`FuelAnomaly` modelleri.
+- `consumptionTrend`: art arda odometre etiketli iki dolum arasındaki L/100km (odometre geriye gitmesi/typo'ya karşı korumalı, tüm geçmiş üzerinden hesaplanıp aktif aralığa kırpılıyor — `filteredEntries` ile tutarlı kalması için range hesaplaması `_rangeBounds` adlı ortak bir getter'a çıkarıldı).
+- `brandComparison`: marka bazlı dolum sayısı, ortalama L/fiyatı, ortalama L/100km.
+- `costPerKm`: aktif aralıktaki toplam harcama / toplam mesafe.
+- `latestConsumptionAnomaly`: son dolum, önceki noktaların ortalamasının **%20 üzerindeyse** işaretleniyor (kullanıcı isteği: "normal tüketimin %20 üzerine çıkılması").
+
+Eklenenler (UI, `lib/fuel/presentation/widgets/fuel_insights_panel.dart`, yeni dosya):
+- Anomali banner'ı (lastik basıncı/hava filtresi/zincir önerisi, hata değil bilgi tonunda).
+- Tüketim trendi mini bar chart'ı — proje genelinde harici bir chart kütüphanesi olmadığı için (garage'daki `CostAnalyticsPainter` ile aynı desen) `CustomPainter` ile yazıldı, kendi izole `_ConsumptionTrendPainter` sınıfı olarak (mevcut painter'a bağımlılık eklemeden, aynı görsel dili taklit ederek).
+- İstasyon kıyaslaması listesi.
+- `fuel_screen.dart`'a `FuelHistoryList`'in hemen üstüne eklendi.
+
+Test: 7 yeni birim testi (`test/fuel_economy_analytics_test.dart`) — tüketim hesabı, odometre-geriye-gitme koruması, anomali eşiği, marka gruplama. `flutter analyze`: yeni dosyalarda 0 sorun (pre-existing 325 issue'dan bağımsız). `flutter test`: **98/98 passed**.
+
+**Commit edilmedi.**
+
+## 2026-08-06 — Faz 3b (Belge Cüzdanı Hatırlatıcı Sistemi) Tamamlandı
+`lib/documents/` zaten büyük ölçüde inşa edilmişti — `DocumentEntity.expirationDateIso` Isar şemasında zaten vardı (migration gerekmedi), `TaxRecord` domain modeli (mtv_1/mtv_2/insurance/inspection/road_tax, dueDate, isPaid) tamamen kuruluydu ve vault ekranında add/list/paid-toggle akışı çalışıyordu, `NotificationScheduler.scheduleDocumentExpiryReminder` **tek** bir 30 günlük hatırlatıcı zaten atıyordu. Eksik olan: 15/1 günlük ek hatırlatıcılar, tax kayıtları için hiç hatırlatıcı olmaması, resmi yönlendirme kısayolları, ve şifreleme.
+
+1. **30/15/1 gün hatırlatıcılar**: `NotificationScheduler.scheduleDocumentExpiryReminder` tek çağrıdan 3 çağrıya çıkarıldı (`reminderOffsetsDays = [30, 15, 1]`, geçmişte kalan offsetler sessizce atlanıyor). Yeni `scheduleTaxDueReminder` eklendi ve `document_vault_screen.dart`'ın tax-ekleme akışına bağlandı (önceden hiç bildirim yoktu). `app_strings.dart`'taki `notifDocExpiryBody` artık `daysLeft` parametresi alıyor (30/15/1 için farklı metin), yeni `notifTaxDueTitle`/`notifTaxDueBody` eklendi.
+2. **Resmi kısayollar**: Tax sekmesine TÜVTÜRK (muayene randevu) ve e-Devlet (MTV ödeme) linklerine açılan iki küçük `OutlinedButton` chip eklendi (`_OfficialShortcutChip`, `url_launcher` — zaten bağımlılık olarak vardı, sadece bu dosyada import edilmemişti).
+3. **Şifreli yerel depolama**: Isar v3.1'in (bu projenin kullandığı sürüm) **native veritabanı şifrelemesi olmadığı** tespit edildi (`Isar.open()`'da `encryptionKey` parametresi yok — bu Isar v4'e ait, henüz olgunlaşmamış bir özellik; v4'e geçmek ayrı, büyük bir upgrade olurdu). Kullanıcıyla konuşulup asıl hassas verinin (taranmış ehliyet/ruhsat/sigorta görselleri) dosya seviyesinde şifrelenmesine karar verildi — Isar'daki metadata (başlık/açıklama) şifrelenmedi, gerçek risk zaten görsellerdeydi.
+   - Yeni `lib/core/storage/document_file_crypto.dart`: `flutter_secure_storage` (Keychain/Keystore) ile cihaza özel rastgele AES-256 anahtarı saklanıyor (kullanıcı hesabına değil cihaza bağlı — kullanıcı tercihiyle), her dosya için rastgele IV üretilip dosyanın başına ekleniyor (`encrypt` paketi, AES-CBC).
+   - `document_vault_screen.dart`'ın "Kaydet" akışında, `image_picker`'dan gelen ham dosya artık kaydedilmeden önce `DocumentFileCrypto.encryptIntoVault()` ile şifrelenip app'in belgeler dizinine taşınıyor (eski plaintext temp dosya siliniyor), dönen şifreli path Isar'a yazılıyor.
+   - Görüntüleme tarafında yeni `_VaultImage` widget'ı (`FutureBuilder` + `Image.memory`) hem thumbnail'de hem tam ekran dialogda kullanılıyor; decrypt başarısız olursa (örn. bu özellikten önce kaydedilmiş eski plaintext dosyalar) `Image.file`'a **sessizce fallback** yapıyor — kırık görsel veya crash yok.
+   - **Gerçek kullanıcı olmadığı için** (kullanıcının kendi teyidi) migration/veri kaybı riski değerlendirilmedi — bu karar sadece test/geliştirme ortamı için geçerli, üretimde gerçek kullanıcılar olduğunda bu tür bir şema/depolama değişikliği CLAUDE.md'nin migration kuralına tabi olurdu.
+
+Test: `flutter analyze` yeni dosyalarda 0 sorun, `flutter test`: 98/98 passed, `flutter build ios --no-codesign` başarılı (yeni native bağımlılık `flutter_secure_storage` derlendi doğrulandı). Android build ayrıca **test edilmedi** (not verified).
+
+**Commit edilmedi.**
+
+## 2026-08-06 — Faz 3c (Grup Sürüşü Canlı Takip): Kasıtlı Olarak Ertelendi
+Kod yazmadan önce kullanıcıyla maliyet/ürün-uyumu konuşuldu (kullanıcı özellikle "başlamadan önce dur, beni dinle" dedi):
+- **Maliyet analizi:** Proje zaten Blaze planında (bu oturumda Cloud Functions'ı sorunsuz deploy ettik — Spark planda 2nd gen Functions deploy edilemez, bu kesin kanıt). Realtime Database ile tahmini maliyet: 5 kişilik, 1 saatlik bir grup sürüşü ~1-1.5MB veri trafiği üretir — RTDB'nin ücretsiz 10GB/ay indirme kotasının onbinde biri. **Maliyet gerçek engel değildi.**
+- **Ürün karar:** Kullanıcı, sürekli canlı GPS yayınının piyasada doymuş bir kategori olduğunu (Life360/Strava Beacon/Rever) ve ApexFlow'un asıl farkının (Harmony Engine, telemetri, bakım/yakıt takibi) bu olmadığını fark etti. Karar: **ilk sürümden sonra, ayrı büyük bir güncellemede** ele alınacak.
+- Mimari yönü netleşti (ileride uygulanacaksa): Supabase değil **Firebase Realtime Database** (TODO.md'nin eski notu güncellendi), `flutter_map`+OSM (Google Maps değil — `google_maps_flutter` pubspec'te kurulu ama `lib/`'de sıfır kullanım, ölü bağımlılık, ayrı bir temizlik konusu olarak not edildi).
+- `TODO.md`'nin ilgili maddesi güncellendi: "Grup Sürüşü Yönetimi" (davet/QR/roster) aslında **zaten tam kurulu** (`group_ride_lobby_screen.dart`) — TODO.md'de yanlışlıkla işaretlenmemiş, düzeltildi. Kalan 4 alt görev (gerçek zamanlı senkron, canlı harita, interpolation, pil tasarrufu) "ERTELENDİ" notuyla işaretli bırakıldı.
+
+## Faz 3 (Yeni Özellikler) — Genel Özet
+3a (yakıt ekonomisi) ve 3b (belge hatırlatıcıları) tamamlandı, kod yazıldı ve test edildi (yukarıda ayrı ayrı detaylı). 3c kasıtlı olarak ertelendi (yukarıda). Üçü de **commit edilmedi** — kullanıcı onayı bekleniyor. `flutter test` son durumda 98/98 passed (3a+3b testleri dahil), `flutter analyze` yeni/değişen dosyalarda 0 sorun, `flutter build ios --no-codesign` başarılı.
+
 ## Other Known Pre-Existing Risk Areas (per CLAUDE.md, carry forward until closed by evidence)
 - ~~Pocket telemetry zeroing~~ — **OBSOLETE, confirmed by user 2026-08-06.** The pocket-mode lean-angle estimation system this risk referred to was intentionally removed by the user and will not be reintroduced. No longer tracked as an open risk. Note: `CLAUDE.md`'s Critical Invariants section still has a line referencing this ("gyro updates must not erase valid pocket-mode estimates") — that line is now stale; not edited here since `CLAUDE.md` is the user's own governance file, flagging for the user to update it directly if desired.
 - Platform configuration inconsistencies (Android/iOS) — not verified this session.
