@@ -1,6 +1,15 @@
 # Active Context
 
-## Current Task
+## Current Task (2026-08-06)
+Fixed the Discord bug-report dispatch gap and **deployed it to production** (user explicitly authorized the assistant to run `firebase` commands directly this session). See `progress.md` "2026-08-06 — Deployed Discord Fix; Discovered & Recovered from a Production Functions Incident" for full detail — this is required reading before touching `functions/` again, not optional background.
+
+Summary: implemented Phase 1 Discord dispatch (outbox + retry + duplicate protection, no buttons/bidirectional sync yet). First deploy attempt **deleted 5 live production functions** not present in this repo's stale `functions/index.js` (3 totally unrelated — `activateApexPass`/`claimAchievementMilestone`/`verifyRideContribution`, an Apex Pass reward engine — plus `onBugReportSubmitted`/`discordInteractions`, an undocumented prior Discord attempt from 2026-07-29 that was never committed here). Recovered all 5 from Cloud Storage's soft-delete window and redeployed. Restored the 3 unrelated ones verbatim. Restored `discordInteractions` (Discord's registered Interactions Endpoint URL depends on it) as `functions/src/discord/interactions.js`. **Deliberately did not restore `onBugReportSubmitted`** — it would double-post bug reports alongside the new `dispatchBugReportToDiscord`.
+
+Current production state (verified via `firebase functions:list`): 7 functions, all present, matches local `functions/index.js` exactly. **Not committed to git yet** — working tree has `functions/index.js`, `functions/.env`, `functions/src/discord/*`, `functions/package.json`+lockfile (`tweetnacl` added), and `functions/node_modules/.bin/*` permission fixes (deploy was blocked by broken/non-executable shims — fixed, tracked since `functions/node_modules` is unusually git-tracked in this repo).
+
+Also resolved this session: the token the user pasted into chat/terminal (multiple times, before understanding the correct `firebase functions:secrets:set` UX) turned out to be `DISCORD_PUBLIC_KEY`, not the actual bot token — lower severity than initially treated, but user rotated it anyway. The real `DISCORD_BOT_TOKEN` is now correctly in Secret Manager (`DISCORD_BOT_TOKEN` secret, `apex-flow-7baea` project), confirmed changed via hash comparison (value itself never displayed in chat).
+
+## Prior Task
 **All 6 items on the user's issue list are now fixed and committed** (`ce6131b`, `443ea27`, `aece0d1`, `e107a75`, `5ba660d`, `e2eb1d0` — see `progress.md` for the full per-item detail). Two things remain genuinely open, both requiring the user's own action, not more code:
 1. Deploy `firestore.rules` (items #3/#5) — never run this session; needs `firebase deploy --only firestore:rules` after the user verifies in Firebase Console Rules Playground (no local Java 21+ for the emulator).
 2. Swap the RevenueCat sandbox API key for the production key (item #2) before any real release build, and decide whether to add a "Restore Purchases" UI entry point and/or the optional Pub/Sub real-time notifications (both deferred, not blocking).
