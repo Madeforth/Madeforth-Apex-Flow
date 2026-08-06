@@ -14,6 +14,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:apexflow/features/shell/apex_app_shell.dart';
 import 'package:apexflow/notifications/apex_notification_service.dart';
 import 'package:firebase_core/firebase_core.dart'; // Import Firebase Core
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:apexflow/features/splash/presentation/apex_splash_screen.dart';
 import 'package:apexflow/garage/presentation/smart_park_alert_handler_screen.dart';
 import 'package:apexflow/settings/application/theme_mode_provider.dart';
@@ -112,6 +113,21 @@ void main() async {
     await Firebase.initializeApp(
       options: options,
     ).timeout(const Duration(seconds: 3));
+
+    // Activates App Check so the client can attest itself to Cloud Functions
+    // (Play Integrity on Android, App Attest on iOS with a Debug fallback
+    // for the simulator). None of the callable functions enforce this yet
+    // (server-side enforceAppCheck stays false until Play Integrity is
+    // configured in the Firebase Console) — this only starts the client
+    // half so enforcement can be turned on later without an app update.
+    try {
+      await FirebaseAppCheck.instance.activate(
+        androidProvider: AndroidProvider.playIntegrity,
+        appleProvider: AppleProvider.appAttest,
+      );
+    } catch (e) {
+      debugPrint('App Check activation error: $e');
+    }
   } catch (e) {
     debugPrint('Firebase init error: $e');
   }
