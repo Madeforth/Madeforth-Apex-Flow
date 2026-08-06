@@ -78,26 +78,50 @@ class NotificationScheduler {
     );
   }
 
-  /// Schedules a reminder for document expiration (30 days before expiry)
+  /// Days-before-deadline offsets shared by document expiry and tax/renewal
+  /// due-date reminders.
+  static const List<int> reminderOffsetsDays = [30, 15, 1];
+
+  /// Schedules up to 3 reminders (30/15/1 days before expiry) for a
+  /// document. Offsets already in the past are silently skipped (e.g. a
+  /// document expiring in 10 days only gets the 1-day reminder).
   static Future<void> scheduleDocumentExpiryReminder({
     required String docId,
     required String title,
     required DateTime expirationDate,
     required AppStrings strings,
   }) async {
-    final reminderDate = expirationDate.subtract(const Duration(days: 30));
-    if (reminderDate.isBefore(DateTime.now())) return;
-
     final nTitle = strings.notifDocExpiryTitle;
-    final nBody = strings.notifDocExpiryBody(title);
+    for (final daysLeft in reminderOffsetsDays) {
+      final reminderDate = expirationDate.subtract(Duration(days: daysLeft));
+      if (reminderDate.isBefore(DateTime.now())) continue;
+      await ApexNotificationService.instance.scheduleNotification(
+        id: Object.hash(docId, daysLeft),
+        title: nTitle,
+        body: strings.notifDocExpiryBody(title, daysLeft),
+        scheduledDate: reminderDate,
+      );
+    }
+  }
 
-    final id = docId.hashCode;
-
-    await ApexNotificationService.instance.scheduleNotification(
-      id: id,
-      title: nTitle,
-      body: nBody,
-      scheduledDate: reminderDate,
-    );
+  /// Schedules up to 3 reminders (30/15/1 days before) for a tax/renewal
+  /// due date (MTV taksiti, trafik sigortası, muayene, vb.).
+  static Future<void> scheduleTaxDueReminder({
+    required String recordId,
+    required String typeLabel,
+    required DateTime dueDate,
+    required AppStrings strings,
+  }) async {
+    final nTitle = strings.notifTaxDueTitle;
+    for (final daysLeft in reminderOffsetsDays) {
+      final reminderDate = dueDate.subtract(Duration(days: daysLeft));
+      if (reminderDate.isBefore(DateTime.now())) continue;
+      await ApexNotificationService.instance.scheduleNotification(
+        id: Object.hash(recordId, daysLeft),
+        title: nTitle,
+        body: strings.notifTaxDueBody(typeLabel, daysLeft),
+        scheduledDate: reminderDate,
+      );
+    }
   }
 }

@@ -888,10 +888,33 @@ class AppStrings {
     en: 'Document Expiry Warning 📄',
     de: 'Dokumentenablauf Warnung 📄',
   );
-  String notifDocExpiryBody(String title) => _t(
-    tr: '"$title" belgesinin geçerlilik süresi 30 gün içinde dolacak.',
-    en: 'The document "$title" will expire in 30 days.',
-    de: 'Das Dokument "$title" läuft in 30 Tagen ab.',
+  String notifDocExpiryBody(String title, int daysLeft) => _t(
+    tr: daysLeft <= 1
+        ? '"$title" belgesinin geçerlilik süresi yarın doluyor.'
+        : '"$title" belgesinin geçerlilik süresi $daysLeft gün içinde dolacak.',
+    en: daysLeft <= 1
+        ? 'The document "$title" expires tomorrow.'
+        : 'The document "$title" will expire in $daysLeft days.',
+    de: daysLeft <= 1
+        ? 'Das Dokument "$title" läuft morgen ab.'
+        : 'Das Dokument "$title" läuft in $daysLeft Tagen ab.',
+  );
+
+  String get notifTaxDueTitle => _t(
+    tr: 'Ödeme Hatırlatıcısı 🧾',
+    en: 'Payment Reminder 🧾',
+    de: 'Zahlungserinnerung 🧾',
+  );
+  String notifTaxDueBody(String typeLabel, int daysLeft) => _t(
+    tr: daysLeft <= 1
+        ? '$typeLabel son ödeme tarihi yarın.'
+        : '$typeLabel son ödeme tarihine $daysLeft gün kaldı.',
+    en: daysLeft <= 1
+        ? '$typeLabel is due tomorrow.'
+        : '$typeLabel is due in $daysLeft days.',
+    de: daysLeft <= 1
+        ? '$typeLabel ist morgen fällig.'
+        : '$typeLabel ist in $daysLeft Tagen fällig.',
   );
 
   String get notifChain => _t(tr: 'Zincir', en: 'Chain', de: 'Kette');

@@ -21,6 +21,8 @@ import 'package:apexflow/garage/presentation/accident_region_selector.dart';
 
 import 'package:apexflow/notifications/notification_scheduler.dart';
 import 'package:apexflow/core/design/theme_extensions.dart';
+import 'package:apexflow/core/storage/document_file_crypto.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class DocumentVaultScreen extends ConsumerStatefulWidget {
   const DocumentVaultScreen({
@@ -121,7 +123,9 @@ class _DocumentVaultScreenState extends ConsumerState<DocumentVaultScreen> {
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: context.colors.red.withValues(alpha: 0.1),
+                        backgroundColor: context.colors.red.withValues(
+                          alpha: 0.1,
+                        ),
                         foregroundColor: context.colors.red,
                         elevation: 0,
                       ),
@@ -413,13 +417,20 @@ class _DocumentVaultScreenState extends ConsumerState<DocumentVaultScreen> {
                       onPressed: () async {
                         final title = titleController.text.trim();
                         if (title.isEmpty) return;
+                        var vaultImagePath = pickedImagePath;
+                        if (vaultImagePath != null) {
+                          vaultImagePath =
+                              await DocumentFileCrypto.encryptIntoVault(
+                                File(vaultImagePath),
+                              );
+                        }
                         await ref
                             .read(documentVaultProvider.notifier)
                             .addDocument(
                               bikeStableId: bikeId,
                               title: title,
                               description: descController.text.trim(),
-                              imagePath: pickedImagePath,
+                              imagePath: vaultImagePath,
                               expirationDateIso: selectedExpirationDate
                                   ?.toIso8601String(),
                             );
@@ -618,6 +629,15 @@ class _DocumentVaultScreenState extends ConsumerState<DocumentVaultScreen> {
                                 'USD',
                               ),
                             );
+                        unawaited(
+                          NotificationScheduler.scheduleTaxDueReminder(
+                            recordId: DateTime.now().millisecondsSinceEpoch
+                                .toString(),
+                            typeLabel: widget.strings.taxLabel(selectedType),
+                            dueDate: selectedDate,
+                            strings: widget.strings,
+                          ),
+                        );
                         if (context.mounted) Navigator.of(context).pop();
                       },
                       child: Text(
@@ -746,7 +766,9 @@ class _VaultTabSelector extends StatelessWidget {
             height: 38,
             constraints: const BoxConstraints(maxWidth: 270),
             decoration: BoxDecoration(
-              color: const Color(0xFF1A1F2B).withValues(alpha: 0.8), // Semi-transparent navbar background
+              color: const Color(
+                0xFF1A1F2B,
+              ).withValues(alpha: 0.8), // Semi-transparent navbar background
               border: Border.all(
                 color: Colors.white.withValues(alpha: 0.08),
                 width: 1,
@@ -765,7 +787,9 @@ class _VaultTabSelector extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 4),
                       decoration: BoxDecoration(
                         color: activeTab == 'docs'
-                            ? context.colors.cyan.withValues(alpha: 0.14) // Liquid-like highlight
+                            ? context.colors.cyan.withValues(
+                                alpha: 0.14,
+                              ) // Liquid-like highlight
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(17),
                       ),
@@ -778,7 +802,9 @@ class _VaultTabSelector extends StatelessWidget {
                               Icons.description_outlined,
                               size: 14, // Slimmer icon
                               color: activeTab == 'docs'
-                                  ? context.colors.cyan // Selected tab icon color
+                                  ? context
+                                        .colors
+                                        .cyan // Selected tab icon color
                                   : context.colors.textSecondary,
                             ),
                             const SizedBox(width: 6),
@@ -790,7 +816,9 @@ class _VaultTabSelector extends StatelessWidget {
                                     ? FontWeight.bold
                                     : FontWeight.normal,
                                 color: activeTab == 'docs'
-                                    ? context.colors.cyan // Selected tab text color
+                                    ? context
+                                          .colors
+                                          .cyan // Selected tab text color
                                     : context.colors.textSecondary,
                               ),
                             ),
@@ -809,7 +837,9 @@ class _VaultTabSelector extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 4),
                       decoration: BoxDecoration(
                         color: activeTab == 'tax'
-                            ? context.colors.cyan.withValues(alpha: 0.14) // Liquid-like highlight
+                            ? context.colors.cyan.withValues(
+                                alpha: 0.14,
+                              ) // Liquid-like highlight
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(17),
                       ),
@@ -822,7 +852,9 @@ class _VaultTabSelector extends StatelessWidget {
                               Icons.receipt_long_outlined,
                               size: 14, // Slimmer icon
                               color: activeTab == 'tax'
-                                  ? context.colors.cyan // Selected tab icon color
+                                  ? context
+                                        .colors
+                                        .cyan // Selected tab icon color
                                   : context.colors.textSecondary,
                             ),
                             const SizedBox(width: 6),
@@ -834,7 +866,9 @@ class _VaultTabSelector extends StatelessWidget {
                                     ? FontWeight.bold
                                     : FontWeight.normal,
                                 color: activeTab == 'tax'
-                                    ? context.colors.cyan // Selected tab text color
+                                    ? context
+                                          .colors
+                                          .cyan // Selected tab text color
                                     : context.colors.textSecondary,
                               ),
                             ),
@@ -961,7 +995,7 @@ class _DocCard extends ConsumerWidget {
                   width: double.infinity,
                   color: context.colors.elevated,
                   child: hasImage
-                      ? Image.file(File(doc.imagePath!), fit: BoxFit.cover)
+                      ? _VaultImage(path: doc.imagePath!, fit: BoxFit.cover)
                       : Icon(
                           Icons.description_outlined,
                           color: context.colors.textSecondary,
@@ -1078,7 +1112,7 @@ class _DocCard extends ConsumerWidget {
               ),
               Expanded(
                 child: InteractiveViewer(
-                  child: Image.file(File(path), fit: BoxFit.contain),
+                  child: _VaultImage(path: path, fit: BoxFit.contain),
                 ),
               ),
             ],
@@ -1184,6 +1218,35 @@ class _TaxTabContent extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: ApexSpacing.x1),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              _OfficialShortcutChip(
+                icon: Icons.fact_check_outlined,
+                label: tInline(
+                  strings.languageCode,
+                  'Muayene Randevusu',
+                  'Inspection Appointment',
+                  'Inspektionstermin',
+                ),
+                url: 'https://www.tuvturk.com.tr',
+              ),
+              const SizedBox(width: 8),
+              _OfficialShortcutChip(
+                icon: Icons.account_balance_outlined,
+                label: tInline(
+                  strings.languageCode,
+                  'MTV Öde (e-Devlet)',
+                  'Pay Vehicle Tax (e-Devlet)',
+                  'Kfz-Steuer bezahlen (e-Devlet)',
+                ),
+                url: 'https://www.turkiye.gov.tr',
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: ApexSpacing.x1),
         if (records.isEmpty)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 40),
@@ -1264,6 +1327,70 @@ class _TaxTabContent extends ConsumerWidget {
             },
           ),
       ],
+    );
+  }
+}
+
+/// Displays a document photo/PDF page stored via [DocumentFileCrypto]. Falls
+/// back to rendering [path] as a plain file if decryption fails, which
+/// covers pre-encryption files saved before this feature existed.
+class _VaultImage extends StatelessWidget {
+  const _VaultImage({required this.path, required this.fit});
+
+  final String path;
+  final BoxFit fit;
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<Uint8List?>(
+      future: DocumentFileCrypto.decrypt(path),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const Center(
+            child: SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+          );
+        }
+        final bytes = snapshot.data;
+        if (bytes != null) {
+          return Image.memory(bytes, fit: fit);
+        }
+        return Image.file(File(path), fit: fit);
+      },
+    );
+  }
+}
+
+class _OfficialShortcutChip extends StatelessWidget {
+  const _OfficialShortcutChip({
+    required this.icon,
+    required this.label,
+    required this.url,
+  });
+
+  final IconData icon;
+  final String label;
+  final String url;
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton.icon(
+      style: OutlinedButton.styleFrom(
+        foregroundColor: context.colors.textSecondary,
+        side: BorderSide(color: context.colors.border),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      ),
+      onPressed: () async {
+        await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+      },
+      icon: Icon(icon, size: 14),
+      label: Text(
+        label,
+        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+      ),
     );
   }
 }
