@@ -106,6 +106,7 @@ exports.onParkingNotificationCreated = onDocumentCreated("parking_notifications/
 
 // Madeforth Discord QA & In-App Bug Report Engine Endpoint
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
+const { sanitizeUserText } = require("./src/discord/sanitize");
 
 exports.createBugReportDraft = onCall(
   {
@@ -132,18 +133,35 @@ exports.createBugReportDraft = onCall(
       category: input.category || "other",
       priority: input.priority || "p2",
       status: "submitted",
-      title: String(input.title || "").substring(0, 150),
-      whatHappened: String(input.whatHappened || "").substring(0, 1000),
-      expectedBehavior: String(input.expectedBehavior || "").substring(0, 1000),
-      stepsToReproduce: String(input.stepsToReproduce || "").substring(0, 1000),
+      title: sanitizeUserText(input.title, 150),
+      whatHappened: sanitizeUserText(input.whatHappened, 1000),
+      expectedBehavior: sanitizeUserText(input.expectedBehavior, 1000),
+      stepsToReproduce: sanitizeUserText(input.stepsToReproduce, 1000),
       idempotencyKey: String(input.idempotencyKey || ""),
       diagnostic: input.diagnostic || null,
       attachments: input.attachments || [],
+      discord: {
+        syncStatus: "pending",
+        threadId: null,
+        messageId: null,
+        lastErrorCode: null,
+      },
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     };
 
-    await bugRef.set(bugData);
+    const outboxRef = db.collection("bug_dispatch_outbox").doc(bugRef.id);
+    const batch = db.batch();
+    batch.set(bugRef, bugData);
+    batch.set(outboxRef, {
+      bugRef: bugRef.path,
+      bugId: humanBugId,
+      state: "pending",
+      attemptCount: 0,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+    await batch.commit();
 
     return {
       internalBugId: bugRef.id,
@@ -151,6 +169,148 @@ exports.createBugReportDraft = onCall(
       status: "submitted",
       createdAtIso: new Date().toISOString(),
     };
+  }
+);
+
+exports.dispatchBugReportToDiscord =
+  require("./src/discord/dispatchWorker").dispatchBugReportToDiscord;
+
+exports.discordInteractions =
+  require("./src/discord/interactions").discordInteractions;
+
+// Telemetry DNA & Badge Engine Callable: verifyRideContribution
+exports.verifyRideContribution = onCall(
+  { region: "europe-west1", enforceAppCheck: false },
+  async (request) => {
+    if (!request.auth) throw new HttpsError("unauthenticated", "Authentication required");
+    const uid = request.auth.uid;
+    const input = request.data || {};
+    if (!input.rideId || typeof input.rideId !== "string") {
+      throw new HttpsError("invalid-argument", "rideId is required");
+    }
+
+    const db = admin.firestore();
+    const eventRef = db.doc(`users/${uid}/telemetry_dna_events/${input.rideId}`);
+    const stateRef = db.doc(`users/${uid}/telemetry_dna/state/current`);
+
+    return db.runTransaction(async (tx) => {
+      const eventSnap = await tx.get(eventRef);
+      if (eventSnap.exists) {
+        return { status: "duplicate", rideId: input.rideId };
+      }
+
+      const previousSnap = await tx.get(stateRef);
+      const previousState = previousSnap.exists ? previousSnap.data() : { lifetime: {}, count: 0 };
+      const newCount = (previousState.count || 0) + (input.dnaEligible ? 1 : 0);
+
+      const nextState = {
+        schemaVersion: 1,
+        algorithmVersion: 1,
+        computedAtIso: new Date().toISOString(),
+        eligibleRideCount: newCount,
+        lastAppliedEventId: input.rideId,
+      };
+
+      tx.set(eventRef, {
+        rideId: input.rideId,
+        submittedAt: admin.firestore.FieldValue.serverTimestamp(),
+        dnaEligible: Boolean(input.dnaEligible),
+        reasons: input.reasons || [],
+      });
+
+      tx.set(stateRef, nextState, { merge: true });
+
+      return { status: "accepted", rideId: input.rideId, count: newCount };
+    });
+  }
+);
+
+// Apex Pass Engine Callable: claimAchievementMilestone
+exports.claimAchievementMilestone = onCall(
+  { region: "europe-west1", enforceAppCheck: false },
+  async (request) => {
+    if (!request.auth) throw new HttpsError("unauthenticated", "Authentication required");
+    const uid = request.auth.uid;
+    const milestoneId = String(request.data?.milestoneId || "");
+
+    const REWARD_CATALOG = {
+      ACH_100: { durationSeconds: 72 * 3600, requiredCount: 100 },
+      ACH_200: { durationSeconds: 168 * 3600, requiredCount: 200 },
+    };
+
+    const rewardConfig = REWARD_CATALOG[milestoneId];
+    if (!rewardConfig) {
+      throw new HttpsError("invalid-argument", "Invalid milestone ID");
+    }
+
+    const db = admin.firestore();
+    const rewardRef = db.doc(`users/${uid}/reward_wallet/${milestoneId}`);
+    const stateRef = db.doc(`users/${uid}/achievement_private/state`);
+
+    return db.runTransaction(async (tx) => {
+      const rewardSnap = await tx.get(rewardRef);
+      if (rewardSnap.exists) {
+        throw new HttpsError("already-exists", "Milestone reward already claimed");
+      }
+
+      const stateSnap = await tx.get(stateRef);
+      const coreCompletedCount = stateSnap.exists ? (stateSnap.data()?.coreCompletedCount || 0) : 0;
+      if (coreCompletedCount < rewardConfig.requiredCount) {
+        throw new HttpsError("failed-precondition", "Milestone criteria not met");
+      }
+
+      tx.create(rewardRef, {
+        milestoneId,
+        durationSeconds: rewardConfig.durationSeconds,
+        status: "AVAILABLE",
+        earnedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
+      return { status: "AVAILABLE", milestoneId };
+    });
+  }
+);
+
+// Apex Pass Engine Callable: activateApexPass
+exports.activateApexPass = onCall(
+  { region: "europe-west1", enforceAppCheck: false },
+  async (request) => {
+    if (!request.auth) throw new HttpsError("unauthenticated", "Authentication required");
+    const uid = request.auth.uid;
+    const rewardId = String(request.data?.rewardId || "");
+
+    const db = admin.firestore();
+    const rewardRef = db.doc(`users/${uid}/reward_wallet/${rewardId}`);
+
+    return db.runTransaction(async (tx) => {
+      const rewardSnap = await tx.get(rewardRef);
+      if (!rewardSnap.exists || rewardSnap.data()?.status !== "AVAILABLE") {
+        throw new HttpsError("failed-precondition", "Reward is not available for activation");
+      }
+
+      const now = admin.firestore.Timestamp.now();
+      const durationSec = rewardSnap.data().durationSeconds || 72 * 3600;
+      const expiresAt = admin.firestore.Timestamp.fromMillis(now.toMillis() + durationSec * 1000);
+
+      const entitlementRef = db.collection(`users/${uid}/entitlements`).doc();
+
+      tx.update(rewardRef, {
+        status: "ACTIVATED",
+        activatedAt: now,
+        expiresAt,
+      });
+
+      tx.create(entitlementRef, {
+        source: "ACHIEVEMENT_PASS",
+        status: "ACTIVE",
+        rewardId,
+        startsAt: now,
+        expiresAt,
+        issuedAt: now,
+      });
+
+      return { status: "ACTIVE", expiresAtIso: expiresAt.toDate().toISOString() };
+    });
   }
 );
 
