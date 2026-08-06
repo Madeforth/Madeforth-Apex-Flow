@@ -19,6 +19,8 @@ class SupporterPaywallScreen extends ConsumerStatefulWidget {
 
 class _SupporterPaywallScreenState
     extends ConsumerState<SupporterPaywallScreen> {
+  static const double _cardRadius = 18;
+
   bool _isLoading = false;
 
   Future<void> _executePurchase(
@@ -177,9 +179,11 @@ class _SupporterPaywallScreenState
                 child: CircularProgressIndicator(color: context.colors.cyan),
               )
             : ListView(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: ApexSpacing.x2,
-                  vertical: ApexSpacing.x1,
+                padding: EdgeInsets.fromLTRB(
+                  ApexSpacing.x2,
+                  ApexSpacing.x1,
+                  ApexSpacing.x2,
+                  ApexSpacing.x1 + MediaQuery.of(context).padding.bottom,
                 ),
                 children: [
                   Center(
@@ -190,7 +194,7 @@ class _SupporterPaywallScreenState
                       ),
                       decoration: BoxDecoration(
                         color: context.colors.surface,
-                        borderRadius: BorderRadius.circular(ApexSpacing.radius),
+                        borderRadius: BorderRadius.circular(_cardRadius),
                         border: Border.all(
                           color: context.colors.cyan,
                           width: 1.2,
@@ -264,7 +268,7 @@ class _SupporterPaywallScreenState
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: context.colors.cyan.withValues(alpha: 0.08),
-                        borderRadius: BorderRadius.circular(ApexSpacing.radius),
+                        borderRadius: BorderRadius.circular(_cardRadius),
                         border: Border.all(
                           color: context.colors.cyan.withValues(alpha: 0.25),
                         ),
@@ -421,9 +425,7 @@ class _SupporterPaywallScreenState
                           width: 1.2,
                         ),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                            ApexSpacing.radius,
-                          ),
+                          borderRadius: BorderRadius.circular(_cardRadius),
                         ),
                       ),
                       onPressed: () {
@@ -445,7 +447,7 @@ class _SupporterPaywallScreenState
                       ),
                     ),
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 40),
                 ],
               ),
       ),
@@ -485,7 +487,7 @@ class _SupporterPaywallScreenState
                     end: Alignment.bottomRight,
                   )
                 : null,
-            borderRadius: BorderRadius.circular(ApexSpacing.radius),
+            borderRadius: BorderRadius.circular(_cardRadius),
             border: Border.all(
               color: borderColor,
               width: isRecommended ? 2.0 : 1.0,
@@ -603,7 +605,7 @@ class _SupporterPaywallScreenState
                                       ? context.colors.onAccent
                                       : context.colors.white)),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(ApexSpacing.radius),
+                        borderRadius: BorderRadius.circular(_cardRadius),
                         side: isRecommended && !isUnlocked && !isActive
                             ? BorderSide.none
                             : BorderSide(color: context.colors.border),
