@@ -16,13 +16,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:apexflow/core/design/theme_extensions.dart';
 import 'widgets/fuel_history_list.dart';
+import 'widgets/fuel_insights_panel.dart';
 
 class FuelScreen extends ConsumerStatefulWidget {
-  const FuelScreen({
-    super.key,
-    required this.strings,
-    this.topPadding = 0.0,
-  });
+  const FuelScreen({super.key, required this.strings, this.topPadding = 0.0});
 
   final AppStrings strings;
   final double topPadding;
@@ -568,6 +565,8 @@ class _FuelScreenState extends ConsumerState<FuelScreen> {
               ),
             ),
             const SizedBox(height: 32),
+            FuelInsightsPanel(strings: widget.strings),
+            const SizedBox(height: 24),
             FuelHistoryList(strings: widget.strings),
             const SizedBox(height: 80),
           ],

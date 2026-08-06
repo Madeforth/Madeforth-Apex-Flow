@@ -52,6 +52,53 @@ class FuelEntry {
   }
 }
 
+/// Fuel economy between two consecutive odometer-tagged fill-ups.
+class FuelConsumptionPoint {
+  const FuelConsumptionPoint({
+    required this.date,
+    required this.distanceKm,
+    required this.litresPer100Km,
+    required this.brand,
+  });
+
+  final DateTime date;
+  final double distanceKm;
+  final double litresPer100Km;
+  final String brand;
+}
+
+class FuelBrandStat {
+  const FuelBrandStat({
+    required this.brand,
+    required this.entryCount,
+    required this.totalLitres,
+    required this.totalTry,
+    this.avgLitresPer100Km,
+  });
+
+  final String brand;
+  final int entryCount;
+  final double totalLitres;
+  final double totalTry;
+  final double? avgLitresPer100Km;
+
+  double get avgPricePerLitre => totalLitres <= 0 ? 0 : totalTry / totalLitres;
+}
+
+/// A single fill-up whose fuel economy deviates sharply from the rider's
+/// recent average — surfaced as a maintenance-check nudge, not an error.
+class FuelAnomaly {
+  const FuelAnomaly({
+    required this.point,
+    required this.rollingAverageLitresPer100Km,
+    required this.percentAboveAverage,
+  });
+
+  final FuelConsumptionPoint point;
+  final double rollingAverageLitresPer100Km;
+  final double percentAboveAverage;
+}
+
 class FuelSummary {
   const FuelSummary({
     required this.entryCount,
@@ -98,7 +145,7 @@ class FuelState {
     );
   }
 
-  List<FuelEntry> get filteredEntries {
+  (DateTime start, DateTime end) get _rangeBounds {
     final now = DateTime.now();
     final start = switch (activeRange) {
       FuelRange.day => DateTime(now.year, now.month, now.day),
@@ -117,7 +164,11 @@ class FuelState {
     final end = activeRange == FuelRange.custom && customEndIso != null
         ? DateTime.parse(customEndIso!).add(const Duration(days: 1))
         : now.add(const Duration(days: 1));
+    return (start, end);
+  }
 
+  List<FuelEntry> get filteredEntries {
+    final (start, end) = _rangeBounds;
     return entries.where((entry) {
       final date = entry.date;
       return !date.isBefore(start) && date.isBefore(end);
@@ -147,6 +198,111 @@ class FuelState {
           totalTry: item.value.fold(0, (sum, e) => sum + e.totalTry),
         ),
     };
+  }
+
+  /// Fuel economy between consecutive odometer-tagged fill-ups, computed
+  /// across the entire history (economy needs continuity between fills,
+  /// not just the selected window) then clipped to the active range so it
+  /// stays consistent with [filteredEntries]/[summary].
+  List<FuelConsumptionPoint> get consumptionTrend {
+    final withOdometer = entries.where((e) => e.odometerKm != null).toList()
+      ..sort((a, b) => a.date.compareTo(b.date));
+
+    final points = <FuelConsumptionPoint>[];
+    for (var i = 1; i < withOdometer.length; i++) {
+      final prev = withOdometer[i - 1];
+      final curr = withOdometer[i];
+      final distanceKm = (curr.odometerKm! - prev.odometerKm!).toDouble();
+      // Guards against odometer resets/typos producing nonsensical points.
+      if (distanceKm <= 0 || curr.litres <= 0) continue;
+      points.add(
+        FuelConsumptionPoint(
+          date: curr.date,
+          distanceKm: distanceKm,
+          litresPer100Km: curr.litres / distanceKm * 100,
+          brand: curr.brand,
+        ),
+      );
+    }
+
+    final (start, end) = _rangeBounds;
+    return points
+        .where((p) => !p.date.isBefore(start) && p.date.isBefore(end))
+        .toList();
+  }
+
+  /// Per-brand comparison (average L/100km + average price/litre) within
+  /// the active range. Brands with no odometer-derived consumption points
+  /// still appear with `avgLitresPer100Km: null` rather than being dropped.
+  List<FuelBrandStat> get brandComparison {
+    final consumptionByBrand = <String, List<double>>{};
+    for (final point in consumptionTrend) {
+      final key = point.brand.trim().isEmpty ? '—' : point.brand.trim();
+      consumptionByBrand.putIfAbsent(key, () => []).add(point.litresPer100Km);
+    }
+
+    final grouped = <String, List<FuelEntry>>{};
+    for (final entry in filteredEntries) {
+      final key = entry.brand.trim().isEmpty ? '—' : entry.brand.trim();
+      grouped.putIfAbsent(key, () => []).add(entry);
+    }
+
+    final stats = grouped.entries.map((item) {
+      final consumptions = consumptionByBrand[item.key];
+      return FuelBrandStat(
+        brand: item.key,
+        entryCount: item.value.length,
+        totalLitres: item.value.fold(0, (sum, e) => sum + e.litres),
+        totalTry: item.value.fold(0, (sum, e) => sum + e.totalTry),
+        avgLitresPer100Km: (consumptions == null || consumptions.isEmpty)
+            ? null
+            : consumptions.reduce((a, b) => a + b) / consumptions.length,
+      );
+    }).toList()..sort((a, b) => b.totalTry.compareTo(a.totalTry));
+    return stats;
+  }
+
+  /// Total spend divided by total distance covered by odometer-tagged
+  /// fill-ups in the active range. Null when there isn't enough odometer
+  /// data yet to derive a distance.
+  double? get costPerKm {
+    final points = consumptionTrend;
+    if (points.isEmpty) return null;
+    final totalDistance = points.fold<double>(
+      0,
+      (sum, p) => sum + p.distanceKm,
+    );
+    if (totalDistance <= 0) return null;
+    // Cost is attributed to the fill-up that closed each interval.
+    final withOdometer = entries.where((e) => e.odometerKm != null).toList()
+      ..sort((a, b) => a.date.compareTo(b.date));
+    final pointDates = points.map((p) => p.date).toSet();
+    final totalCost = withOdometer
+        .where((e) => pointDates.contains(e.date))
+        .fold<double>(0, (sum, e) => sum + e.totalTry);
+    return totalDistance <= 0 ? null : totalCost / totalDistance;
+  }
+
+  /// Flags the most recent fill-up if its consumption is >20% above the
+  /// rolling average of the prior points in the active range — a quality
+  /// nudge ("check tire pressure / air filter / chain"), not an error.
+  FuelAnomaly? get latestConsumptionAnomaly {
+    final points = consumptionTrend;
+    if (points.length < 2) return null;
+    final latest = points.last;
+    final priorPoints = points.sublist(0, points.length - 1);
+    final rollingAverage =
+        priorPoints.fold<double>(0, (sum, p) => sum + p.litresPer100Km) /
+        priorPoints.length;
+    if (rollingAverage <= 0) return null;
+    final percentAbove =
+        (latest.litresPer100Km - rollingAverage) / rollingAverage * 100;
+    if (percentAbove <= 20) return null;
+    return FuelAnomaly(
+      point: latest,
+      rollingAverageLitresPer100Km: rollingAverage,
+      percentAboveAverage: percentAbove,
+    );
   }
 }
 
