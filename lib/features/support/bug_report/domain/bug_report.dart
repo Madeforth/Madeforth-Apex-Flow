@@ -1,4 +1,3 @@
-import 'package:apexflow/features/support/bug_report/domain/attachment_reference.dart';
 import 'package:apexflow/features/support/bug_report/domain/bug_report_enums.dart';
 import 'package:apexflow/features/support/bug_report/domain/diagnostic_summary.dart';
 
@@ -15,7 +14,6 @@ class BugReport {
     required this.expectedBehavior,
     required this.stepsToReproduce,
     required this.idempotencyKey,
-    required this.attachments,
     required this.diagnostic,
     required this.createdAtIso,
     required this.updatedAtIso,
@@ -34,7 +32,6 @@ class BugReport {
   final String expectedBehavior;
   final String stepsToReproduce;
   final String idempotencyKey;
-  final List<AttachmentReference> attachments;
   final DiagnosticSummary? diagnostic;
   final String createdAtIso;
   final String updatedAtIso;
@@ -54,7 +51,6 @@ class BugReport {
       'expectedBehavior': expectedBehavior,
       'stepsToReproduce': stepsToReproduce,
       'idempotencyKey': idempotencyKey,
-      'attachments': attachments.map((e) => e.toJson()).toList(),
       'diagnostic': diagnostic?.toJson(),
       'createdAtIso': createdAtIso,
       'updatedAtIso': updatedAtIso,
@@ -86,15 +82,6 @@ class BugReport {
       expectedBehavior: json['expectedBehavior'] as String? ?? '',
       stepsToReproduce: json['stepsToReproduce'] as String? ?? '',
       idempotencyKey: json['idempotencyKey'] as String? ?? '',
-      attachments:
-          (json['attachments'] as List<dynamic>?)
-              ?.map(
-                (e) => AttachmentReference.fromJson(
-                  Map<String, dynamic>.from(e as Map),
-                ),
-              )
-              .toList() ??
-          const [],
       diagnostic: json['diagnostic'] != null
           ? DiagnosticSummary.fromJson(
               Map<String, dynamic>.from(json['diagnostic'] as Map),

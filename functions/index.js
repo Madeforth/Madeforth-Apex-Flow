@@ -145,7 +145,6 @@ exports.createBugReportDraft = onCall(
       stepsToReproduce: sanitizeUserText(input.stepsToReproduce, 1000),
       idempotencyKey: String(input.idempotencyKey || ""),
       diagnostic: input.diagnostic || null,
-      attachments: input.attachments || [],
       discord: {
         syncStatus: "pending",
         threadId: null,
