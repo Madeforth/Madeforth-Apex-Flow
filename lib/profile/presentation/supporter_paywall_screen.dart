@@ -19,8 +19,6 @@ class SupporterPaywallScreen extends ConsumerStatefulWidget {
 
 class _SupporterPaywallScreenState
     extends ConsumerState<SupporterPaywallScreen> {
-  static const double _cardRadius = 18;
-
   bool _isLoading = false;
 
   Future<void> _executePurchase(
@@ -194,7 +192,7 @@ class _SupporterPaywallScreenState
                       ),
                       decoration: BoxDecoration(
                         color: context.colors.surface,
-                        borderRadius: BorderRadius.circular(_cardRadius),
+                        borderRadius: BorderRadius.circular(ApexSpacing.radius),
                         border: Border.all(
                           color: context.colors.cyan,
                           width: 1.2,
@@ -268,7 +266,7 @@ class _SupporterPaywallScreenState
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: context.colors.cyan.withValues(alpha: 0.08),
-                        borderRadius: BorderRadius.circular(_cardRadius),
+                        borderRadius: BorderRadius.circular(ApexSpacing.radius),
                         border: Border.all(
                           color: context.colors.cyan.withValues(alpha: 0.25),
                         ),
@@ -451,7 +449,7 @@ class _SupporterPaywallScreenState
                     end: Alignment.bottomRight,
                   )
                 : null,
-            borderRadius: BorderRadius.circular(_cardRadius),
+            borderRadius: BorderRadius.circular(ApexSpacing.radius),
             border: Border.all(
               color: borderColor,
               width: isRecommended ? 2.0 : 1.0,
@@ -569,7 +567,7 @@ class _SupporterPaywallScreenState
                                       ? context.colors.onAccent
                                       : context.colors.white)),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(_cardRadius),
+                        borderRadius: BorderRadius.circular(ApexSpacing.radius),
                         side: isRecommended && !isUnlocked && !isActive
                             ? BorderSide.none
                             : BorderSide(color: context.colors.border),

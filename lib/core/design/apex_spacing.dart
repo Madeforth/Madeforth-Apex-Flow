@@ -4,5 +4,5 @@ abstract final class ApexSpacing {
   static const double x3 = 24;
   static const double x4 = 32;
   static const double x5 = 40;
-  static const double radius = 6;
+  static const double radius = 16;
 }

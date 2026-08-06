@@ -22,8 +22,6 @@ class PremiumPaywallScreen extends ConsumerStatefulWidget {
 }
 
 class _PremiumPaywallScreenState extends ConsumerState<PremiumPaywallScreen> {
-  static const double _cardRadius = 18;
-
   bool _isLoading = false;
   String _selectedPlan = 'yearly'; // 'monthly', 'yearly', 'lifetime'
 
@@ -189,7 +187,7 @@ class _PremiumPaywallScreenState extends ConsumerState<PremiumPaywallScreen> {
                       ),
                       decoration: BoxDecoration(
                         color: context.colors.surface,
-                        borderRadius: BorderRadius.circular(_cardRadius),
+                        borderRadius: BorderRadius.circular(ApexSpacing.radius),
                         border: Border.all(
                           color: context.colors.caution,
                           width: 1.2,
@@ -263,7 +261,7 @@ class _PremiumPaywallScreenState extends ConsumerState<PremiumPaywallScreen> {
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: context.colors.surface,
-                      borderRadius: BorderRadius.circular(_cardRadius),
+                      borderRadius: BorderRadius.circular(ApexSpacing.radius),
                       border: Border.all(
                         color: context.colors.border,
                         width: 1,
@@ -367,7 +365,7 @@ class _PremiumPaywallScreenState extends ConsumerState<PremiumPaywallScreen> {
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: context.colors.cyan.withValues(alpha: 0.08),
-                        borderRadius: BorderRadius.circular(_cardRadius),
+                        borderRadius: BorderRadius.circular(ApexSpacing.radius),
                         border: Border.all(
                           color: context.colors.cyan.withValues(alpha: 0.25),
                         ),
@@ -411,7 +409,7 @@ class _PremiumPaywallScreenState extends ConsumerState<PremiumPaywallScreen> {
                                         )
                                       : context.colors.surface,
                                   borderRadius: BorderRadius.circular(
-                                    _cardRadius,
+                                    ApexSpacing.radius,
                                   ),
                                   border: Border.all(
                                     color: _selectedPlan == 'monthly'
@@ -487,7 +485,7 @@ class _PremiumPaywallScreenState extends ConsumerState<PremiumPaywallScreen> {
                                         )
                                       : context.colors.surface,
                                   borderRadius: BorderRadius.circular(
-                                    _cardRadius,
+                                    ApexSpacing.radius,
                                   ),
                                   border: Border.all(
                                     color: _selectedPlan == 'yearly'
@@ -582,7 +580,9 @@ class _PremiumPaywallScreenState extends ConsumerState<PremiumPaywallScreen> {
                           backgroundColor: context.colors.cyan,
                           foregroundColor: context.colors.onAccent,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(_cardRadius),
+                            borderRadius: BorderRadius.circular(
+                              ApexSpacing.radius,
+                            ),
                           ),
                           elevation: 0,
                         ),
