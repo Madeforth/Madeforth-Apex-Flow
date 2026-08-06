@@ -117,7 +117,7 @@ const { sanitizeUserText } = require("./src/discord/sanitize");
 exports.createBugReportDraft = onCall(
   {
     region: "europe-west1",
-    enforceAppCheck: false,
+    enforceAppCheck: true,
   },
   async (request) => {
     if (!request.auth) {
@@ -185,7 +185,7 @@ exports.discordInteractions =
 
 // Telemetry DNA & Badge Engine Callable: verifyRideContribution
 exports.verifyRideContribution = onCall(
-  { region: "europe-west1", enforceAppCheck: false },
+  { region: "europe-west1", enforceAppCheck: true },
   async (request) => {
     if (!request.auth) throw new HttpsError("unauthenticated", "Authentication required");
     const uid = request.auth.uid;
@@ -232,7 +232,7 @@ exports.verifyRideContribution = onCall(
 
 // Apex Pass Engine Callable: claimAchievementMilestone
 exports.claimAchievementMilestone = onCall(
-  { region: "europe-west1", enforceAppCheck: false },
+  { region: "europe-west1", enforceAppCheck: true },
   async (request) => {
     if (!request.auth) throw new HttpsError("unauthenticated", "Authentication required");
     const uid = request.auth.uid;
@@ -278,7 +278,7 @@ exports.claimAchievementMilestone = onCall(
 
 // Apex Pass Engine Callable: activateApexPass
 exports.activateApexPass = onCall(
-  { region: "europe-west1", enforceAppCheck: false },
+  { region: "europe-west1", enforceAppCheck: true },
   async (request) => {
     if (!request.auth) throw new HttpsError("unauthenticated", "Authentication required");
     const uid = request.auth.uid;
