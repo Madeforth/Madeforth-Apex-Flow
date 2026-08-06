@@ -7,9 +7,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:apexflow/core/design/theme_extensions.dart';
 
 class PremiumPaywallScreen extends ConsumerStatefulWidget {
-  const PremiumPaywallScreen({super.key, required this.strings});
+  const PremiumPaywallScreen({super.key, required this.strings, this.onClose});
 
   final AppStrings strings;
+
+  /// Called when the close button is pressed and there's no route to pop —
+  /// i.e. when this screen is embedded directly as a tab's gated content
+  /// rather than pushed via Navigator.
+  final VoidCallback? onClose;
 
   @override
   ConsumerState<PremiumPaywallScreen> createState() =>
@@ -154,7 +159,11 @@ class _PremiumPaywallScreenState extends ConsumerState<PremiumPaywallScreen> {
         leading: IconButton(
           icon: Icon(Icons.close, color: context.colors.white),
           onPressed: () {
-            if (Navigator.canPop(context)) Navigator.pop(context);
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context);
+            } else {
+              widget.onClose?.call();
+            }
           },
         ),
       ),

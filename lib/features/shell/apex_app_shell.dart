@@ -52,7 +52,10 @@ class _ApexAppShellState extends ConsumerState<ApexAppShell> {
         onOpenPartStatus: () => setState(() => _index = 10),
         onOpenNotifications: () => setState(() => _index = 8),
       ),
-      DocumentVaultScreen(strings: strings),
+      DocumentVaultScreen(
+        strings: strings,
+        onClose: () => setState(() => _index = 0),
+      ),
       RidesScreen(strings: strings),
       GroupRideLobbyScreen(strings: strings),
       FuelScreen(strings: strings),

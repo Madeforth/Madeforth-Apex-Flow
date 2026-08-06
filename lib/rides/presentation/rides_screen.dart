@@ -200,7 +200,11 @@ class _RidesScreenState extends ConsumerState<RidesScreen> {
                   ),
                   isPremium
                       ? GroupRideLobbyScreen(strings: strings, isEmbedded: true)
-                      : PremiumPaywallScreen(strings: strings),
+                      : PremiumPaywallScreen(
+                          strings: strings,
+                          onClose: () =>
+                              DefaultTabController.of(context).animateTo(0),
+                        ),
                 ],
               ),
               Positioned(

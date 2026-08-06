@@ -29,10 +29,16 @@ class DocumentVaultScreen extends ConsumerStatefulWidget {
     super.key,
     required this.strings,
     this.topPadding = 0.0,
+    this.onClose,
   });
 
   final AppStrings strings;
   final double topPadding;
+
+  /// Forwarded to the paywall shown when the user isn't premium — lets it
+  /// switch to a different tab since this screen isn't reached via
+  /// Navigator.push (there's nothing to pop back to).
+  final VoidCallback? onClose;
 
   @override
   ConsumerState<DocumentVaultScreen> createState() =>
@@ -46,7 +52,10 @@ class _DocumentVaultScreenState extends ConsumerState<DocumentVaultScreen> {
   Widget build(BuildContext context) {
     final isPremium = ref.watch(userProfileProvider).isPremium;
     if (!isPremium) {
-      return PremiumPaywallScreen(strings: widget.strings);
+      return PremiumPaywallScreen(
+        strings: widget.strings,
+        onClose: widget.onClose,
+      );
     }
 
     final state = ref.watch(documentVaultProvider);
