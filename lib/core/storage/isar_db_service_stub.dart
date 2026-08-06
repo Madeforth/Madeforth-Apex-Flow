@@ -315,6 +315,18 @@ class IsarDbService implements DbService {
   }
 
   @override
+  Future<void> deleteAllForUser(String userId) async {
+    if (userId.isEmpty) return;
+    await ApexKvStore.remove(_bikesKey(userId));
+    await ApexKvStore.remove(_serviceRecordsKey(userId));
+    await ApexKvStore.remove('db.ride_sessions.$userId');
+    await ApexKvStore.remove(_dailyChecksKey(userId));
+    await ApexKvStore.remove(_documentsKey(userId));
+    await ApexKvStore.remove(_taxRecordsKey(userId));
+    await ApexKvStore.remove(_friendsKey(userId));
+  }
+
+  @override
   Future<void> clearAll() async {
     await ApexKvStore.remove('db.bikes');
     await ApexKvStore.remove('db.service_records');

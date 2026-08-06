@@ -181,6 +181,14 @@ class UserProfileController extends Notifier<UserProfile> {
   static const _unlockedSupporterTiersKey = 'profile.unlocked_supporter_tiers';
   static const _riderXpKey = 'profile.rider_xp';
 
+  // Tracks which UID's data currently occupies the profile.*/insights.*
+  // KV keys below — none of them are UID-scoped (unlike garage/rides/
+  // documents, which key their storage per-user). If a session ends
+  // abnormally (crash, force-quit, expired token) without logout() running,
+  // this lets the next login detect a different account and purge the
+  // previous user's leftovers before reading anything.
+  static const _lastHydratedUidKey = 'profile.last_hydrated_uid';
+
   @override
   UserProfile build() {
     ref.listen(garageStateProvider, (previous, next) {
@@ -208,6 +216,7 @@ class UserProfileController extends Notifier<UserProfile> {
   Future<void> _hydrate() async {
     await ApexKvStore.init();
     await FirebaseService.instance.init(); // Initialize Firebase service
+    await _purgeStaleProfileDataOnAccountSwitch();
     final name = await ApexKvStore.getString(_nameKey) ?? '';
     final phone = await ApexKvStore.getString(_phoneKey) ?? '';
     final blood = await ApexKvStore.getString(_bloodTypeKey) ?? '';
@@ -235,11 +244,8 @@ class UserProfileController extends Notifier<UserProfile> {
       rawTag = 'rider';
     }
 
-    // Check if it is the authorized developer tag
-    final isDevTag = riderTag == '@apex_dev#1881';
-
-    // If not authorized developer tag and contains apex_dev, reset it to rider
-    if (!isDevTag && rawTag.toLowerCase().contains('apex_dev')) {
+    // Reset any leftover 'apex_dev' tag from before this was removed
+    if (rawTag.toLowerCase().contains('apex_dev')) {
       rawTag = 'rider';
     }
 
@@ -250,18 +256,16 @@ class UserProfileController extends Notifier<UserProfile> {
     final randomNum = (1000 + (DateTime.now().millisecondsSinceEpoch % 9000))
         .toString();
     if (riderTag.isEmpty || !riderTag.contains('#')) {
-      riderTag = isDevTag ? '@apex_dev#1881' : '@$rawTag#$randomNum';
+      riderTag = '@$rawTag#$randomNum';
       await ApexKvStore.setString(_riderTagKey, riderTag);
     } else {
       // Re-assemble formatted tag to apply max-length / spaces constraints
       final existingSuffix = riderTag.split('#')[1];
-      riderTag = isDevTag ? '@apex_dev#1881' : '@$rawTag#$existingSuffix';
+      riderTag = '@$rawTag#$existingSuffix';
       await ApexKvStore.setString(_riderTagKey, riderTag);
     }
 
-    final isPremium = isDevTag
-        ? true
-        : (await ApexKvStore.getBool(_isPremiumKey) ?? false);
+    final isPremium = await ApexKvStore.getBool(_isPremiumKey) ?? false;
     final isTagCustomized =
         (await ApexKvStore.getBool(_isTagCustomizedKey)) ??
         (riderTag.isNotEmpty && !riderTag.startsWith('@rider#'));
@@ -361,6 +365,53 @@ class UserProfileController extends Notifier<UserProfile> {
     if (Firebase.apps.isNotEmpty) {
       unawaited(_syncProfileToFirestore());
     }
+  }
+
+  /// If the signed-in Firebase UID differs from whoever last hydrated these
+  /// (non-UID-scoped) profile.*/insights.* keys, wipes them before reading
+  /// anything — otherwise a session that ended without logout() running
+  /// (crash, force-quit, expired token) would leak the previous user's
+  /// name/phone/blood type/insights to whoever signs in next on this device.
+  Future<void> _purgeStaleProfileDataOnAccountSwitch() async {
+    if (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST')) return;
+    final currentUid = FirebaseAuth.instance.currentUser?.uid ?? '';
+    final lastUid = await ApexKvStore.getString(_lastHydratedUidKey) ?? '';
+    if (lastUid == currentUid) return;
+
+    for (final key in [
+      _nameKey,
+      _phoneKey,
+      _bloodTypeKey,
+      _emergencyNameKey,
+      _emergencyPhoneKey,
+      _riderTagKey,
+      _ridingStyleKey,
+      _avatarIndexKey,
+      _ghostModeKey,
+      _sharePhoneKey,
+      _shareEmergencyKey,
+      _isPremiumKey,
+      _isTagCustomizedKey,
+      _cardThemeIndexKey,
+      _selectedFrameIndexKey,
+      _purchasedThemesKey,
+      _cityKey,
+      _instagramKey,
+      _tiktokKey,
+      _youtubeKey,
+      _licensePlateKey,
+      _selectedBadgesKey,
+      _unlockedBadgesKey,
+      _isFoundingMemberKey,
+      _supporterTierKey,
+      _unlockedSupporterTiersKey,
+      _riderXpKey,
+      'insights.state.v1', // InsightsController._storageKey — also global
+    ]) {
+      await ApexKvStore.remove(key);
+    }
+
+    await ApexKvStore.setString(_lastHydratedUidKey, currentUid);
   }
 
   Future<void> addXp(int xpAmount) async {
@@ -799,15 +850,8 @@ class UserProfileController extends Notifier<UserProfile> {
 
     if (riderTag != null && riderTag.trim().isNotEmpty) {
       var rawInput = riderTag.trim();
-      final cleanLowerInput = rawInput.toLowerCase();
-      final isSecretDevPin =
-          cleanLowerInput == '@apex_dev#1881' ||
-          cleanLowerInput == 'apex_dev#1881';
 
-      if (isSecretDevPin) {
-        updatedTag = '@apex_dev#1881';
-        newlyCustomized = true;
-      } else if (!state.isTagCustomized || rawInput != state.riderTag) {
+      if (!state.isTagCustomized || rawInput != state.riderTag) {
         // Format the tag according to rules
         var rawTag = rawInput.replaceAll(RegExp(r'\s+'), '');
 
@@ -826,7 +870,7 @@ class UserProfileController extends Notifier<UserProfile> {
 
         final cleanLower = rawTag.toLowerCase();
 
-        // Strictly ban any attempt to type plain 'apex_dev' tag without #1881 PIN
+        // Ban 'apex_dev' as a tag name to avoid impersonating an official account
         if (cleanLower.contains('apex_dev')) {
           rawTag = 'rider';
         }
@@ -857,7 +901,6 @@ class UserProfileController extends Notifier<UserProfile> {
       }
     }
 
-    final isDevTag = updatedTag == '@apex_dev#1881';
     final isCustomized = state.isTagCustomized || newlyCustomized;
 
     state = UserProfile(
@@ -872,7 +915,7 @@ class UserProfileController extends Notifier<UserProfile> {
       ghostMode: ghostMode ?? state.ghostMode,
       sharePhone: sharePhone ?? state.sharePhone,
       shareEmergency: shareEmergency ?? state.shareEmergency,
-      isPremium: isDevTag ? true : (isPremium ?? state.isPremium),
+      isPremium: isPremium ?? state.isPremium,
       isTagCustomized: isCustomized,
       cardThemeIndex: state.cardThemeIndex,
       selectedFrameIndex: selectedFrameIndex ?? state.selectedFrameIndex,
@@ -1024,6 +1067,7 @@ class UserProfileController extends Notifier<UserProfile> {
     if (uid != null) {
       try {
         await FirebaseService.instance.deleteUserAccount(uid, riderTag);
+        await ref.read(dbServiceProvider).deleteAllForUser(uid);
       } catch (_) {
         return false;
       }

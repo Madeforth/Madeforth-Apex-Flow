@@ -49,5 +49,10 @@ abstract class DbService {
   /// Never deletes data — see migration_service.dart.
   Future<void> backfillOwnerId(String ownerId);
 
+  /// Deletes every locally stored record owned by [userId] (bikes, service
+  /// records, rides, daily checks, documents, tax records, friends) — used
+  /// by account deletion so device-local data doesn't outlive the account.
+  Future<void> deleteAllForUser(String userId);
+
   Future<void> clearAll();
 }

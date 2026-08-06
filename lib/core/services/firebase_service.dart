@@ -44,9 +44,8 @@ class FirebaseService {
     return instId;
   }
 
-  /// Checks if a Rider Tag is already registered in Firestore.
-  /// If it is the protected developer tag '@apex_dev#1881', it strictly ensures
-  /// that only the authorized client installation ID can claim or edit it.
+  /// Checks if a Rider Tag is already registered in Firestore. A tag is
+  /// available if unclaimed, or already owned by this installation.
   Future<bool> isTagAvailable(String tag, String installationId) async {
     if (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST'))
       return true;
@@ -651,104 +650,141 @@ class FirebaseService {
 
     final activeUid = currentUser.uid;
 
+    // Each step below deliberately does NOT swallow errors: a real Firestore
+    // failure here must abort before the Auth account is deleted (step 12),
+    // otherwise the account becomes undeletable-but-orphaned — no session
+    // left to authorize retrying the cleanup, per firestore.rules' UID checks.
+
     // 1. Delete Rider Tag document (only if associated with this user)
     if (riderTag.isNotEmpty) {
       final cleanTag = riderTag.toLowerCase().replaceAll('@', '');
-      try {
-        final tagDoc = await FirebaseFirestore.instance
-            .collection('rider_tags')
-            .doc(cleanTag)
-            .get();
-        if (tagDoc.exists && tagDoc.data()?['ownerId'] == activeUid) {
-          await tagDoc.reference.delete();
-        }
-      } catch (_) {}
+      final tagDoc = await FirebaseFirestore.instance
+          .collection('rider_tags')
+          .doc(cleanTag)
+          .get();
+      if (tagDoc.exists && tagDoc.data()?['ownerId'] == activeUid) {
+        await tagDoc.reference.delete();
+      }
     }
 
-    // 2. Delete User Profile document strictly matching activeUid
-    try {
-      await FirebaseFirestore.instance.collection('users').doc(activeUid).delete();
-    } catch (_) {}
+    // 2. Delete the public rider-card projection
+    await FirebaseFirestore.instance
+        .collection('public_rider_cards')
+        .doc(activeUid)
+        .delete();
 
-    // 3. Delete user's garage bikes strictly filtered by activeUid
-    try {
-      final bikesQuery = await FirebaseFirestore.instance
-          .collection('bikes')
-          .where('userId', isEqualTo: activeUid)
+    // 3. Delete the Store/webhook-owned entitlement record
+    await FirebaseFirestore.instance
+        .collection('entitlements')
+        .doc(activeUid)
+        .delete();
+
+    // 4. Delete User Profile document strictly matching activeUid
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(activeUid)
+        .delete();
+
+    // 5. Delete users/{uid} subcollections — deleting the parent doc above
+    // does NOT cascade-delete these in Firestore.
+    for (final subcollection in [
+      'telemetry_dna_events',
+      'reward_wallet',
+      'entitlements',
+    ]) {
+      final docs = await FirebaseFirestore.instance
+          .collection('users/$activeUid/$subcollection')
           .get();
-      for (final doc in bikesQuery.docs) {
+      for (final doc in docs.docs) {
         await doc.reference.delete();
       }
-    } catch (_) {}
+    }
+    for (final docPath in [
+      'users/$activeUid/telemetry_dna/state/current',
+      'users/$activeUid/achievement_private/state',
+    ]) {
+      await FirebaseFirestore.instance.doc(docPath).delete();
+    }
 
-    // 4. Delete user's ride sessions strictly filtered by activeUid
-    try {
-      final ridesQuery = await FirebaseFirestore.instance
-          .collection('rides')
-          .where('userId', isEqualTo: activeUid)
-          .get();
-      for (final doc in ridesQuery.docs) {
-        await doc.reference.delete();
-      }
-    } catch (_) {}
+    // 6. Delete user's garage bikes strictly filtered by activeUid
+    final bikesQuery = await FirebaseFirestore.instance
+        .collection('bikes')
+        .where('userId', isEqualTo: activeUid)
+        .get();
+    for (final doc in bikesQuery.docs) {
+      await doc.reference.delete();
+    }
 
-    // 5. Delete friendships involving activeUid
-    try {
-      final friendQueryA = await FirebaseFirestore.instance
-          .collection('friendships')
-          .where('userA', isEqualTo: activeUid)
-          .get();
-      for (final doc in friendQueryA.docs) {
-        await doc.reference.delete();
-      }
-      final friendQueryB = await FirebaseFirestore.instance
-          .collection('friendships')
-          .where('userB', isEqualTo: activeUid)
-          .get();
-      for (final doc in friendQueryB.docs) {
-        await doc.reference.delete();
-      }
-    } catch (_) {}
+    // 7. Delete user's ride sessions strictly filtered by activeUid
+    final ridesQuery = await FirebaseFirestore.instance
+        .collection('rides')
+        .where('userId', isEqualTo: activeUid)
+        .get();
+    for (final doc in ridesQuery.docs) {
+      await doc.reference.delete();
+    }
 
-    // 6. Delete registered FCM device tokens
-    try {
-      final deviceDocs = await FirebaseFirestore.instance
-          .collection('notification_tokens')
-          .doc(activeUid)
-          .collection('devices')
-          .get();
-      for (final doc in deviceDocs.docs) {
-        await doc.reference.delete();
-      }
-    } catch (_) {}
+    // 8. Delete friendships involving activeUid
+    final friendQueryA = await FirebaseFirestore.instance
+        .collection('friendships')
+        .where('userA', isEqualTo: activeUid)
+        .get();
+    for (final doc in friendQueryA.docs) {
+      await doc.reference.delete();
+    }
+    final friendQueryB = await FirebaseFirestore.instance
+        .collection('friendships')
+        .where('userB', isEqualTo: activeUid)
+        .get();
+    for (final doc in friendQueryB.docs) {
+      await doc.reference.delete();
+    }
 
-    // 7. Delete group ride lobbies this user hosted (hostId is the rider tag,
-    // not the UID — lobbies key participants by rider tag, see firestore.rules).
+    // 9. Delete registered FCM device tokens
+    final deviceDocs = await FirebaseFirestore.instance
+        .collection('notification_tokens')
+        .doc(activeUid)
+        .collection('devices')
+        .get();
+    for (final doc in deviceDocs.docs) {
+      await doc.reference.delete();
+    }
+
+    // 10. Delete this user's submitted bug reports
+    final bugReportsQuery = await FirebaseFirestore.instance
+        .collection('bug_reports')
+        .where('reporterUid', isEqualTo: activeUid)
+        .get();
+    for (final doc in bugReportsQuery.docs) {
+      await doc.reference.delete();
+    }
+
     if (riderTag.isNotEmpty) {
       final cleanTag = riderTag.toLowerCase().replaceAll('@', '');
-      try {
-        final hostedLobbies = await FirebaseFirestore.instance
-            .collection('lobbies')
-            .where('hostId', isEqualTo: cleanTag)
-            .get();
-        for (final doc in hostedLobbies.docs) {
-          await doc.reference.delete();
-        }
-      } catch (_) {}
 
-      // 8. Delete parking QR notes addressed to this user's rider tag
-      try {
-        final parkingNotes = await FirebaseFirestore.instance
-            .collection('parking_notifications')
-            .where('vehicleId', isEqualTo: cleanTag)
-            .get();
-        for (final doc in parkingNotes.docs) {
-          await doc.reference.delete();
-        }
-      } catch (_) {}
+      // 11. Delete group ride lobbies this user hosted (hostId is the rider
+      // tag, not the UID — lobbies key participants by rider tag, see
+      // firestore.rules).
+      final hostedLobbies = await FirebaseFirestore.instance
+          .collection('lobbies')
+          .where('hostId', isEqualTo: cleanTag)
+          .get();
+      for (final doc in hostedLobbies.docs) {
+        await doc.reference.delete();
+      }
+
+      // 12. Delete parking QR notes addressed to this user's rider tag
+      final parkingNotes = await FirebaseFirestore.instance
+          .collection('parking_notifications')
+          .where('vehicleId', isEqualTo: cleanTag)
+          .get();
+      for (final doc in parkingNotes.docs) {
+        await doc.reference.delete();
+      }
     }
 
-    // 9. Delete Firebase Auth user account
+    // 13. Delete Firebase Auth user account — only reached if every step
+    // above succeeded.
     await currentUser.delete();
   }
 

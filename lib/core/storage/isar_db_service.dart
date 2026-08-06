@@ -455,6 +455,48 @@ class IsarDbService implements DbService {
   }
 
   @override
+  Future<void> deleteAllForUser(String userId) async {
+    if (userId.isEmpty) return;
+    await _db.writeTxn(() async {
+      await _db
+          .collection<MotorcycleEntity>()
+          .filter()
+          .userIdEqualTo(userId)
+          .deleteAll();
+      await _db
+          .collection<ServiceRecordEntity>()
+          .filter()
+          .userIdEqualTo(userId)
+          .deleteAll();
+      await _db
+          .collection<RideSessionEntity>()
+          .filter()
+          .userIdEqualTo(userId)
+          .deleteAll();
+      await _db
+          .collection<DailyCheckEntity>()
+          .filter()
+          .userIdEqualTo(userId)
+          .deleteAll();
+      await _db
+          .collection<DocumentEntity>()
+          .filter()
+          .userIdEqualTo(userId)
+          .deleteAll();
+      await _db
+          .collection<TaxRecordEntity>()
+          .filter()
+          .userIdEqualTo(userId)
+          .deleteAll();
+      await _db
+          .collection<FriendEntity>()
+          .filter()
+          .userIdEqualTo(userId)
+          .deleteAll();
+    });
+  }
+
+  @override
   Future<void> clearAll() async {
     await _db.writeTxn(() async {
       await _isar?.clear();

@@ -138,6 +138,14 @@ class InMemoryDbService implements DbService {
   }
 
   @override
+  Future<void> deleteAllForUser(String userId) async {
+    // Records aren't tagged by userId in this in-memory store (it backs
+    // tests and web builds only, neither of which persists real per-user
+    // local data) — clearing everything is the correct equivalent here.
+    await clearAll();
+  }
+
+  @override
   Future<void> clearAll() async {
     _motorcycles.clear();
     _serviceRecords.clear();
