@@ -98,6 +98,17 @@ void main() async {
         iosClientId:
             "29839209813-vn573s42fhmbm69ejf6lal4e6fi32ahk.apps.googleusercontent.com",
       );
+    } else if (!kIsWeb && Platform.isAndroid) {
+      // Matches the com.apexflow.app entry in android/app/google-services.json
+      // (App Check/Play Integrity attest against this specific app+package,
+      // not the web app id the old fallback below used to hand out here).
+      options = const FirebaseOptions(
+        apiKey: "AIzaSyAD-gWs08JYU5xFD0LntTtBWJUkXuMgkW4",
+        appId: "1:29839209813:android:0ce2f3034b72c05c796bdc",
+        messagingSenderId: "29839209813",
+        projectId: "apex-flow-7baea",
+        storageBucket: "apex-flow-7baea.firebasestorage.app",
+      );
     } else {
       options = const FirebaseOptions(
         apiKey: "AIzaSyDxClr18Z0pme38vsrs8KWpyIwKfurZ5eE",

@@ -7,7 +7,7 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:29839209813:android:b4245e4dd12b0bce796bdc",
+        "mobilesdk_app_id": "1:29839209813:android:0ce2f3034b72c05c796bdc",
         "android_client_info": {
           "package_name": "com.apexflow.app"
         }
@@ -29,6 +29,57 @@
             {
               "client_id": "29839209813-ulc1uos0dt50n4u0oa4mq0ssdp662fl4.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "29839209813-lha2bm8pqmo53fs09jj0gtct8c5jrbru.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.apexflow"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:29839209813:android:b4245e4dd12b0bce796bdc",
+        "android_client_info": {
+          "package_name": "com.example.apexflow"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "29839209813-ut8ad4vnuutc71uepdk0o700lk7f5bq9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.apexflow",
+            "certificate_hash": "cbdf683dd0fd1f50dbf7377a14b8d3bb56492618"
+          }
+        },
+        {
+          "client_id": "29839209813-ulc1uos0dt50n4u0oa4mq0ssdp662fl4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAD-gWs08JYU5xFD0LntTtBWJUkXuMgkW4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "29839209813-ulc1uos0dt50n4u0oa4mq0ssdp662fl4.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "29839209813-lha2bm8pqmo53fs09jj0gtct8c5jrbru.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.apexflow"
+              }
             }
           ]
         }
