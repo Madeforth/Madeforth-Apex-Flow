@@ -9,7 +9,6 @@ import 'package:apexflow/features/dashboard/dashboard_state.dart';
 import 'package:apexflow/garage/application/garage_state.dart';
 import 'package:apexflow/rides/application/ride_state.dart';
 import 'package:apexflow/rides/application/ride_location_service.dart';
-import 'package:apexflow/rides/application/ride_detection_state.dart';
 import 'package:apexflow/rituals/application/rituals_state.dart';
 import 'package:apexflow/rituals/presentation/daily_machine_check_screen.dart';
 import 'package:apexflow/rituals/presentation/ride_readiness_screen.dart';

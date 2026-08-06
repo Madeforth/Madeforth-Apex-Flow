@@ -2,7 +2,6 @@
 import 'package:apexflow/core/i18n/app_settings_state.dart';
 import 'package:apexflow/core/i18n/app_strings.dart';
 import 'package:apexflow/shared/widgets/apex_panel.dart';
-import 'package:apexflow/rides/application/ride_detection_state.dart';
 import 'package:apexflow/notifications/apex_notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -26,7 +25,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final settings = ref.watch(appSettingsProvider);
-    final detection = ref.watch(rideDetectionProvider);
 
     return Scaffold(
       body: SafeArea(
@@ -263,50 +261,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             const SizedBox(height: ApexSpacing.x2),
 
             const SizedBox(height: ApexSpacing.x2),
-
-            // 4. Automatic Ride Detection Settings
-            ApexPanel(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.strings.settingsAutoRideTitle,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    widget.strings.settingsAutoRideDesc,
-                    style: TextStyle(
-                      color: context.colors.textSecondary,
-                      fontSize: 12,
-                      height: 1.35,
-                    ),
-                  ),
-                  const SizedBox(height: ApexSpacing.x1),
-                  SwitchListTile(
-                    title: Text(
-                      widget.strings.settingsAutoRideToggle,
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        color: context.colors.white,
-                      ),
-                    ),
-                    value: detection.autoRideDetectionEnabled,
-                    onChanged: (value) {
-                      ref
-                          .read(rideDetectionProvider.notifier)
-                          .setAutoRideDetectionEnabled(value);
-                    },
-                    activeThumbColor: context.colors.cyan,
-                    contentPadding: EdgeInsets.zero,
-                  ),
-                ],
-              ),
-            ),
 
             // 5. Support & Madeforth QA Bug Report
             ApexPanel(

@@ -628,42 +628,6 @@ class AppStrings {
   }
 
   // Zero-Friction UX
-  String get settingsAutoRideTitle => _t(
-    tr: 'Otomatik Sürüş Algılama',
-    en: 'Automatic Ride Detection',
-    de: 'Automatische Fahrterkennung',
-  );
-  String get settingsAutoRideDesc => _t(
-    tr: 'Uygulama açıkken cihaz hareketini kullanarak sürüşe başladığınızı algılar ve sorar (pil dostu, arka planda çalışmaz).',
-    en: 'While the app is open, detects likely ride motion and asks you to confirm (battery-safe, does not run in the background).',
-    de: 'Erkennt bei geöffneter App wahrscheinliche Fahrtbewegung und fragt zur Bestätigung (akkuschonend, läuft nicht im Hintergrund).',
-  );
-  String get settingsAutoRideToggle => _t(
-    tr: 'Otomatik Algılamayı Etkinleştir',
-    en: 'Enable Auto Detection',
-    de: 'Automatische Erkennung aktivieren',
-  );
-  String get settingsAutoRideSimBt => _t(
-    tr: 'Bluetooth Bağlantısını Simüle Et',
-    en: 'Simulate Bluetooth Connection',
-    de: 'Bluetooth-Verbindung simulieren',
-  );
-  String get settingsAutoRideSimMotion => _t(
-    tr: 'Cihaz Hareketini Simüle Et',
-    en: 'Simulate Device Motion',
-    de: 'Gerätebewegung simulieren',
-  );
-  String get dashboardAutoRideTitle =>
-      _t(tr: 'Sürüş Algılandı', en: 'Ride Detected', de: 'Fahrt erkannt');
-  String get dashboardAutoRideMsg => _t(
-    tr: 'Bu sürüş seansını kaydetmeye başlamak ister misiniz?',
-    en: 'Would you like to start logging this ride session?',
-    de: 'Möchtest du diese Fahrt aufzeichnen?',
-  );
-  String get dashboardAutoRideStart =>
-      _t(tr: 'Başlat', en: 'Begin', de: 'Starten');
-  String get dashboardAutoRideDismiss =>
-      _t(tr: 'Kapat', en: 'Dismiss', de: 'Schließen');
   String get dailyCheckQuickAllClear => _t(
     tr: 'Tek Tıkla Kaydet: Hepsi Temiz',
     en: 'One-Tap Log: All Clear',
