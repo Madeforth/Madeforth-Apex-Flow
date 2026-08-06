@@ -2,6 +2,13 @@
 
 Status recorded 2026-08-04, from repo inspection (not from README claims alone unless marked as such).
 
+## 2026-08-06 — Bug Report → Discord pipeline: diagnosed, NOT fixed (known broken)
+User asked to check why in-app bug reports never show up in Discord. Root cause traced end-to-end, no code changed (user chose diagnosis-only for now):
+1. **Client never leaves the device.** `lib/features/support/bug_report/application/bug_report_controller.dart` (`submitReport`) only calls `LocalBugOutbox.saveReport(report)`, which writes to `ApexKvStore` (local SharedPreferences-backed storage). There is no Firestore write and no Cloud Functions call anywhere in `lib/` — confirmed via repo-wide grep for `createBugReportDraft`/`httpsCallable`/`bug_reports`, zero hits outside the local-outbox files. `my_bug_reports_screen.dart` / `my_bug_reports_controller.dart` only read back that same local queue, so the UI shows "submitted" reports that never actually transmitted anywhere.
+2. **Even the one Cloud Function that exists doesn't reach Discord.** `functions/index.js`'s `createBugReportDraft` (an `onCall` function, currently unused by the client per #1) only writes a doc to Firestore's `bug_reports` collection and returns — no Discord dispatch. The project's own spec (`docs/APEXFLOW_MADEFORTH_DISCORD_QA_BUG_REPORT_ENGINE_MASTER_SPEC.md`, ~line 1237) defines a separate `createDiscordBugThread()` function that POSTs to `discord.com/api/v10/channels/{forumId}/threads` using a bot token — that function does not exist in `functions/index.js` at all.
+3. **App Check also not enforced**: `createBugReportDraft` is declared with `enforceAppCheck: false`, contrary to CLAUDE.md's stated requirement that this feature use App Check.
+**Not fixed yet** — real fix needs (a) wiring `bug_report_controller.dart` to actually call the Cloud Function/Firestore, (b) writing the missing `createDiscordBugThread` function server-side, and (c) the user provisioning a Discord bot token + forum channel ID into Firebase Secret Manager (secrets this agent cannot generate). User deferred all of this pending a decision on scope.
+
 ## 2026-08-05 — Third-Pass Audit: Parking/QR System + i18n + Layout (24/24 done, on branch `agent/fix-safety-persistence-maps`)
 User asked for a deep audit specifically of the parking-warning/QR-contact system (`qr_contact_web/` + Firestore), QR generation/scanning, and app-wide i18n/layout inconsistencies. 3 parallel Explore agents scanned each area; critical findings verified directly in code. Plan at `C:\Users\onyed\.claude\plans\stateful-swimming-fern.md` (replaced the prior 20-item plan file). All 24 items fixed and committed across 8 commits (`0770a74`, `992f090`, `71d1e3e`, `6d3f6c3`, `2dd4c0e`, `3cb3d46`, `1d680a6`).
 
