@@ -20,8 +20,7 @@ void main() {
 
       final state = container.read(rideDetectionProvider);
       expect(state.autoRideDetectionEnabled, isFalse);
-      expect(state.mockBluetoothConnected, isFalse);
-      expect(state.mockMotionDetected, isFalse);
+      expect(state.motionDetected, isFalse);
       expect(state.dismissed, isFalse);
     },
   );
@@ -37,7 +36,7 @@ void main() {
       final controller = container.read(rideDetectionProvider.notifier);
       await controller.setAutoRideDetectionEnabled(true);
 
-      var state = container.read(rideDetectionProvider);
+      final state = container.read(rideDetectionProvider);
       expect(state.autoRideDetectionEnabled, isTrue);
 
       // Verify key was set in SharedPrefs
@@ -46,30 +45,35 @@ void main() {
     },
   );
 
-  test(
-    'simulation triggers and prompt dismissal update state correctly',
-    () async {
-      SharedPreferences.setMockInitialValues({});
+  test('dismissPrompt sets dismissed without touching other fields', () async {
+    SharedPreferences.setMockInitialValues({});
 
-      final container = ProviderContainer();
-      addTearDown(container.dispose);
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
 
-      final controller = container.read(rideDetectionProvider.notifier);
-      controller.setMockBluetoothConnected(true);
+    final controller = container.read(rideDetectionProvider.notifier);
+    await controller.setAutoRideDetectionEnabled(true);
 
-      var state = container.read(rideDetectionProvider);
-      expect(state.mockBluetoothConnected, isTrue);
-      expect(state.dismissed, isFalse);
+    controller.dismissPrompt();
+    final state = container.read(rideDetectionProvider);
+    expect(state.dismissed, isTrue);
+    expect(state.autoRideDetectionEnabled, isTrue);
+  });
 
-      controller.dismissPrompt();
-      state = container.read(rideDetectionProvider);
-      expect(state.dismissed, isTrue);
+  test('disabling detection clears motionDetected and dismissed', () async {
+    SharedPreferences.setMockInitialValues({});
 
-      // Activating motion should reset dismissed status
-      controller.setMockMotionDetected(true);
-      state = container.read(rideDetectionProvider);
-      expect(state.mockMotionDetected, isTrue);
-      expect(state.dismissed, isFalse);
-    },
-  );
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+
+    final controller = container.read(rideDetectionProvider.notifier);
+    await controller.setAutoRideDetectionEnabled(true);
+    controller.dismissPrompt();
+    await controller.setAutoRideDetectionEnabled(false);
+
+    final state = container.read(rideDetectionProvider);
+    expect(state.autoRideDetectionEnabled, isFalse);
+    expect(state.motionDetected, isFalse);
+    expect(state.dismissed, isFalse);
+  });
 }

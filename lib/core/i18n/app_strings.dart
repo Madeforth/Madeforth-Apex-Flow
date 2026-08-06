@@ -634,9 +634,9 @@ class AppStrings {
     de: 'Automatische Fahrterkennung',
   );
   String get settingsAutoRideDesc => _t(
-    tr: 'Kask intercom Bluetooth bağlantısı veya cihaz hareketini kullanarak sürüşü otomatik olarak algılar (pil dostu).',
-    en: 'Detects active rides automatically using Bluetooth connection or device motion (battery-safe).',
-    de: 'Erkennt Fahrten automatisch über Helm-Intercom-Bluetooth oder Gerätebewegung (akkuschonend).',
+    tr: 'Uygulama açıkken cihaz hareketini kullanarak sürüşe başladığınızı algılar ve sorar (pil dostu, arka planda çalışmaz).',
+    en: 'While the app is open, detects likely ride motion and asks you to confirm (battery-safe, does not run in the background).',
+    de: 'Erkennt bei geöffneter App wahrscheinliche Fahrtbewegung und fragt zur Bestätigung (akkuschonend, läuft nicht im Hintergrund).',
   );
   String get settingsAutoRideToggle => _t(
     tr: 'Otomatik Algılamayı Etkinleştir',

@@ -19,6 +19,7 @@ import 'package:apexflow/features/splash/presentation/apex_splash_screen.dart';
 import 'package:apexflow/garage/presentation/smart_park_alert_handler_screen.dart';
 import 'package:apexflow/settings/application/theme_mode_provider.dart';
 import 'package:apexflow/notifications/presentation/global_notification_overlay.dart';
+import 'package:apexflow/rides/presentation/widgets/ride_detection_prompt_banner.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 class GlobalThemeToggle extends ConsumerWidget {
@@ -176,7 +177,11 @@ class ApexFlowApp extends ConsumerWidget {
       darkTheme: ApexTheme.dark,
       builder: (context, child) {
         return Stack(
-          children: [if (child != null) child, GlobalNotificationOverlay()],
+          children: [
+            if (child != null) child,
+            GlobalNotificationOverlay(),
+            const RideDetectionPromptBanner(),
+          ],
         );
       },
       locale: locale,
