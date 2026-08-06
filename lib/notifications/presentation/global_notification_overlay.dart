@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:apexflow/core/design/apex_colors.dart';
+import 'package:apexflow/core/design/apex_spacing.dart';
 import 'package:apexflow/core/i18n/app_settings_state.dart';
 import 'package:apexflow/notifications/application/parking_notification_state.dart';
 
@@ -247,7 +248,9 @@ class _ReplyButton extends StatelessWidget {
               ? Colors.redAccent
               : Theme.of(context).colorScheme.primary,
           side: BorderSide(color: isUrgent ? Colors.redAccent : Colors.white24),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(ApexSpacing.radius),
+          ),
           elevation: 0,
         ),
         onPressed: onPressed,

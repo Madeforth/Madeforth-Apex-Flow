@@ -368,15 +368,15 @@ class _DailyMachineCheckScreenState
                 filled: true,
                 fillColor: context.colors.surface,
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(ApexSpacing.radius),
                   borderSide: BorderSide(color: context.colors.border),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(ApexSpacing.radius),
                   borderSide: BorderSide(color: context.colors.border),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(ApexSpacing.radius),
                   borderSide: BorderSide(color: context.colors.cyan),
                 ),
               ),
@@ -389,7 +389,7 @@ class _DailyMachineCheckScreenState
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: context.colors.surface,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(ApexSpacing.radius),
                   border: Border.all(color: context.colors.border),
                 ),
                 child: Row(
@@ -458,7 +458,7 @@ class _DailyMachineCheckScreenState
                       ? context.colors.onAccent
                       : context.colors.textSecondary,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(ApexSpacing.radius),
                   ),
                   elevation: 0,
                 ),
@@ -651,7 +651,7 @@ class _CheckItem extends StatelessWidget {
               height: 48,
               decoration: BoxDecoration(
                 color: context.colors.surface,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(ApexSpacing.radius),
               ),
               child: Icon(icon, color: context.colors.textSecondary),
             ),

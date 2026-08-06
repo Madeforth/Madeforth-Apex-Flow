@@ -807,7 +807,9 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                             padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(
+                                ApexSpacing.radius,
+                              ),
                               border: Border.all(
                                 color: Colors.grey.shade200,
                                 width: 1,
@@ -1493,7 +1495,7 @@ class _CardThemeSelectorPanel extends ConsumerWidget {
                             : const Color(0xFF2D2D2F),
                         width: isSelected ? 1.5 : 0.5,
                       ),
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(ApexSpacing.radius),
                       color: const Color(0xFF0A0A0A),
                     ),
                     child: Column(
@@ -1508,7 +1510,9 @@ class _CardThemeSelectorPanel extends ConsumerWidget {
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(
+                              ApexSpacing.radius,
+                            ),
                           ),
                           child: Center(
                             child: isSelected
@@ -3387,7 +3391,7 @@ class _FriendsListState extends ConsumerState<_FriendsList> {
           height: 44,
           decoration: BoxDecoration(
             color: SlatePalette.surfaceDeep,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(ApexSpacing.radius),
             border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
           ),
           child: TextField(
@@ -3438,7 +3442,7 @@ class _FriendsListState extends ConsumerState<_FriendsList> {
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: SlatePalette.surface,
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(ApexSpacing.radius),
               border: Border.all(color: Colors.white.withValues(alpha: 0.03)),
             ),
             child: Row(
@@ -3515,7 +3519,7 @@ class _FriendsListState extends ConsumerState<_FriendsList> {
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: SlatePalette.surface,
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(ApexSpacing.radius),
               border: Border.all(color: Colors.white.withValues(alpha: 0.03)),
             ),
             child: Row(
@@ -3582,7 +3586,7 @@ class _FriendsListState extends ConsumerState<_FriendsList> {
             ),
             InkWell(
               onTap: widget.onAddFriend,
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(ApexSpacing.radius),
               child: Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10,
@@ -3591,7 +3595,7 @@ class _FriendsListState extends ConsumerState<_FriendsList> {
                 decoration: BoxDecoration(
                   color: context.colors.cyan.withValues(alpha: 0.15),
                   border: Border.all(color: context.colors.cyan),
-                  borderRadius: BorderRadius.circular(6),
+                  borderRadius: BorderRadius.circular(ApexSpacing.radius),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -3736,7 +3740,7 @@ class _PendingRequestsScreen extends ConsumerWidget {
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: SlatePalette.surface,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(ApexSpacing.radius),
                     border: Border.all(
                       color: Colors.white.withValues(alpha: 0.05),
                     ),
@@ -4027,13 +4031,13 @@ class _NearbyRidersScreenState extends ConsumerState<_NearbyRidersScreen>
                   margin: const EdgeInsets.only(bottom: 12),
                   decoration: BoxDecoration(
                     color: SlatePalette.surfaceDeep,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(ApexSpacing.radius),
                     border: Border.all(
                       color: Colors.white.withValues(alpha: 0.05),
                     ),
                   ),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(ApexSpacing.radius),
                     child: Stack(
                       children: [
                         Positioned(
@@ -4129,7 +4133,9 @@ class _NearbyRidersScreenState extends ConsumerState<_NearbyRidersScreen>
                                           );
                                         }
                                       },
-                                borderRadius: BorderRadius.circular(6),
+                                borderRadius: BorderRadius.circular(
+                                  ApexSpacing.radius,
+                                ),
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 10,
@@ -4146,7 +4152,9 @@ class _NearbyRidersScreenState extends ConsumerState<_NearbyRidersScreen>
                                           ? Colors.white24
                                           : context.colors.cyan,
                                     ),
-                                    borderRadius: BorderRadius.circular(6),
+                                    borderRadius: BorderRadius.circular(
+                                      ApexSpacing.radius,
+                                    ),
                                   ),
                                   child: Text(
                                     isAlreadyFriend
@@ -4280,7 +4288,7 @@ class _LeaderboardListState extends State<_LeaderboardList> {
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   border: Border.all(color: context.colors.border),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(ApexSpacing.radius),
                 ),
                 child: Icon(
                   Icons.person_add_outlined,
@@ -4299,7 +4307,7 @@ class _LeaderboardListState extends State<_LeaderboardList> {
           decoration: BoxDecoration(
             color: context.colors.surface,
             border: Border.all(color: context.colors.border),
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(ApexSpacing.radius),
           ),
           child: Row(
             children: [
@@ -4511,13 +4519,13 @@ class _LeaderboardListState extends State<_LeaderboardList> {
 
     return InkWell(
       onTap: () => _handleUserTap(item),
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(ApexSpacing.radius),
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: context.colors.surface,
           border: Border.all(color: borderColor, width: isRank1 ? 1.5 : 1.0),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(ApexSpacing.radius),
         ),
         child: Column(
           children: [
@@ -5963,7 +5971,7 @@ class RiderHarmonyRadarChart extends ConsumerWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: context.colors.elevated,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(ApexSpacing.radius),
         border: Border.all(color: context.colors.border, width: 1.2),
       ),
       child: Column(
@@ -6606,7 +6614,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         color: isSelected
                             ? context.colors.cyan
                             : SlatePalette.surfaceDeep,
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(ApexSpacing.radius),
                         border: Border.all(
                           color: isSelected
                               ? context.colors.cyan
@@ -6649,7 +6657,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
           color: SlatePalette.surface,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(ApexSpacing.radius),
           border: Border.all(color: SlatePalette.border, width: 1),
         ),
         child: Row(
@@ -6658,7 +6666,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: iconColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(ApexSpacing.radius),
               ),
               child: Icon(icon, color: iconColor, size: 20),
             ),
@@ -6784,7 +6792,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       backgroundColor: context.colors.cyan,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(ApexSpacing.radius),
                       ),
                     ),
                   ),
@@ -7424,7 +7432,7 @@ class _ProfileAppearanceScreenState
                   ),
                   decoration: BoxDecoration(
                     color: SlatePalette.surface,
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(ApexSpacing.radius),
                     border: Border.all(
                       color: context.colors.cyan.withValues(alpha: 0.15),
                       width: 1,
@@ -7722,7 +7730,7 @@ class _ProfileAppearanceScreenState
                 ),
                 decoration: BoxDecoration(
                   color: SlatePalette.surface,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(ApexSpacing.radius),
                   border: Border.all(
                     color: context.colors.cyan.withValues(alpha: 0.15),
                     width: 1,
@@ -7813,7 +7821,9 @@ class _ProfileAppearanceScreenState
                                 : SlatePalette.border,
                             width: isSelected ? 2 : 1,
                           ),
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(
+                            ApexSpacing.radius,
+                          ),
                           color: SlatePalette.surface,
                         ),
                         child: Column(
@@ -7828,7 +7838,9 @@ class _ProfileAppearanceScreenState
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
                                   ),
-                                  borderRadius: BorderRadius.circular(6),
+                                  borderRadius: BorderRadius.circular(
+                                    ApexSpacing.radius,
+                                  ),
                                 ),
                                 child: Stack(
                                   children: [
@@ -8016,7 +8028,7 @@ class _ProfileAppearanceScreenState
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: SlatePalette.surface,
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(ApexSpacing.radius),
                     border: Border.all(
                       color: Colors.amber.withValues(alpha: 0.2),
                       width: 1,
@@ -8094,7 +8106,9 @@ class _ProfileAppearanceScreenState
                           color: isSelected
                               ? context.colors.cyan.withValues(alpha: 0.1)
                               : SlatePalette.surface,
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(
+                            ApexSpacing.radius,
+                          ),
                           border: Border.all(
                             color: isSelected
                                 ? context.colors.cyan
@@ -8331,7 +8345,7 @@ class _ProfileAppearanceScreenState
                 ),
                 decoration: BoxDecoration(
                   color: SlatePalette.surface,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(ApexSpacing.radius),
                   border: Border.all(
                     color: context.colors.cyan.withValues(alpha: 0.15),
                     width: 1,
@@ -8410,7 +8424,9 @@ class _ProfileAppearanceScreenState
                           color: isSelected
                               ? context.colors.cyan.withValues(alpha: 0.1)
                               : SlatePalette.surface,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(
+                            ApexSpacing.radius,
+                          ),
                           border: Border.all(
                             color: isSelected
                                 ? context.colors.cyan
@@ -8643,7 +8659,7 @@ class _ProfileAppearanceScreenState
                   ),
                   decoration: BoxDecoration(
                     color: SlatePalette.surface,
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(ApexSpacing.radius),
                     border: Border.all(
                       color: context.colors.cyan.withValues(alpha: 0.15),
                       width: 1,
@@ -8755,7 +8771,9 @@ class _ProfileAppearanceScreenState
                           color: isSelected
                               ? context.colors.cyan.withValues(alpha: 0.1)
                               : SlatePalette.surface,
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(
+                            ApexSpacing.radius,
+                          ),
                           border: Border.all(
                             color: isSelected
                                 ? context.colors.cyan
@@ -8853,7 +8871,7 @@ class _ProfileAppearanceScreenState
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: SlatePalette.surface,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(ApexSpacing.radius),
         border: Border.all(color: SlatePalette.border, width: 1),
       ),
       child: ListTile(
@@ -9104,7 +9122,7 @@ class _AchievementOverviewCard extends StatelessWidget {
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     color: context.colors.cyan.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(ApexSpacing.radius),
                   ),
                   child: Icon(
                     Icons.military_tech_outlined,
@@ -9582,7 +9600,9 @@ class _AchievementSheetWidgetState
                               : (isUnlocked
                                     ? context.colors.surface
                                     : SlatePalette.surfaceDeep),
-                          borderRadius: BorderRadius.circular(14),
+                          borderRadius: BorderRadius.circular(
+                            ApexSpacing.radius,
+                          ),
                           border: Border.all(
                             color: isClaimed
                                 ? const Color(
@@ -9626,7 +9646,9 @@ class _AchievementSheetWidgetState
                                                   alpha: 0.15,
                                                 )
                                               : SlatePalette.surface),
-                                    borderRadius: BorderRadius.circular(10),
+                                    borderRadius: BorderRadius.circular(
+                                      ApexSpacing.radius,
+                                    ),
                                   ),
                                   child: Icon(
                                     isUnlocked
@@ -9755,7 +9777,9 @@ class _AchievementSheetWidgetState
                                     ),
                                     decoration: BoxDecoration(
                                       color: const Color(0xFFD97706),
-                                      borderRadius: BorderRadius.circular(6),
+                                      borderRadius: BorderRadius.circular(
+                                        ApexSpacing.radius,
+                                      ),
                                     ),
                                     child: Text(
                                       tr
@@ -9827,7 +9851,7 @@ class _PremiumVaultButton extends StatelessWidget {
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: const Color(0xFF6366F1).withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(ApexSpacing.radius),
               ),
               child: const Icon(
                 Icons.account_balance_wallet_outlined,
@@ -10016,7 +10040,9 @@ class _PremiumVaultSheetWidgetState
                             color: const Color(
                               0xFF6366F1,
                             ).withValues(alpha: 0.25),
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(
+                              ApexSpacing.radius,
+                            ),
                           ),
                           child: const Icon(
                             Icons.card_membership,
@@ -10069,7 +10095,9 @@ class _PremiumVaultSheetWidgetState
                               vertical: 8,
                             ),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(
+                                ApexSpacing.radius,
+                              ),
                             ),
                           ),
                           onPressed: () async {
@@ -10123,7 +10151,7 @@ class _PremiumVaultSheetWidgetState
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         color: SlatePalette.border,
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(ApexSpacing.radius),
                       ),
                       child: const Icon(
                         Icons.style,
@@ -10197,7 +10225,9 @@ class _PremiumVaultSheetWidgetState
                           vertical: 14,
                         ),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(
+                            ApexSpacing.radius,
+                          ),
                           borderSide: const BorderSide(
                             color: SlatePalette.border,
                           ),
@@ -10215,7 +10245,7 @@ class _PremiumVaultSheetWidgetState
                         vertical: 14,
                       ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(ApexSpacing.radius),
                       ),
                     ),
                     onPressed: () async {

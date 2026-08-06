@@ -479,7 +479,7 @@ class _FuelScreenState extends ConsumerState<FuelScreen> {
               decoration: BoxDecoration(
                 color: context.colors.surface,
                 border: Border.all(color: context.colors.border),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(ApexSpacing.radius),
               ),
               child: Row(
                 children: [
@@ -546,7 +546,7 @@ class _FuelScreenState extends ConsumerState<FuelScreen> {
                   foregroundColor: Colors.black,
                   disabledForegroundColor: Colors.black54,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(ApexSpacing.radius),
                   ),
                 ),
                 icon: const Icon(Icons.local_gas_station, size: 20),
@@ -603,21 +603,21 @@ class _FuelScreenState extends ConsumerState<FuelScreen> {
           color: context.colors.textSecondary,
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(ApexSpacing.radius),
           borderSide: BorderSide(
             color: context.colors.border.withValues(alpha: 0.8),
             width: 1.2,
           ),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(ApexSpacing.radius),
           borderSide: BorderSide(
             color: context.colors.border.withValues(alpha: 0.8),
             width: 1.2,
           ),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(ApexSpacing.radius),
           borderSide: BorderSide(color: context.colors.cyan, width: 1.2),
         ),
       ),

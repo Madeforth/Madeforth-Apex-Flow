@@ -13,6 +13,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:apexflow/core/storage/apex_kv_store.dart';
 import 'package:apexflow/core/design/theme_extensions.dart';
+import 'package:apexflow/core/design/apex_spacing.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
@@ -490,7 +491,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
     return Container(
       decoration: BoxDecoration(
         color: context.colors.background.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(ApexSpacing.radius),
         border: Border.all(color: context.colors.border.withValues(alpha: 0.3)),
       ),
       padding: const EdgeInsets.all(3),
@@ -535,7 +536,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
           padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
             color: isSelected ? context.colors.surface : Colors.transparent,
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(ApexSpacing.radius),
             border: isSelected
                 ? Border.all(
                     color: context.colors.border.withValues(alpha: 0.4),
@@ -1015,7 +1016,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                   constraints: const BoxConstraints(maxWidth: 400),
                   decoration: BoxDecoration(
                     color: context.colors.surface.withValues(alpha: 0.7),
-                    borderRadius: BorderRadius.circular(6),
+                    borderRadius: BorderRadius.circular(ApexSpacing.radius),
                     border: Border.all(
                       color: context.colors.border.withValues(alpha: 0.4),
                     ),
@@ -1096,7 +1097,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                               ),
                             ),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(6),
+                              borderRadius: BorderRadius.circular(
+                                ApexSpacing.radius,
+                              ),
                             ),
                           ),
                           onPressed: () {
@@ -1169,19 +1172,19 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
           vertical: 14,
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(ApexSpacing.radius),
           borderSide: BorderSide(
             color: context.colors.border.withValues(alpha: 0.4),
           ),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(ApexSpacing.radius),
           borderSide: BorderSide(
             color: context.colors.border.withValues(alpha: 0.4),
           ),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(ApexSpacing.radius),
           borderSide: BorderSide(color: context.colors.cyan, width: 1.5),
         ),
       ),
@@ -1201,7 +1204,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
           backgroundColor: context.colors.cyan,
           foregroundColor: context.colors.onAccent,
           elevation: 0,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(ApexSpacing.radius),
+          ),
         ),
         onPressed: onPressed,
         child:
@@ -1234,7 +1239,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: context.colors.red.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(ApexSpacing.radius),
         border: Border.all(color: context.colors.red.withValues(alpha: 0.3)),
       ),
       child: Text(
@@ -1280,7 +1285,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                         color: context.colors.border.withValues(alpha: 0.4),
                       ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(6),
+                        borderRadius: BorderRadius.circular(ApexSpacing.radius),
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       minimumSize: const Size(double.infinity, 0),
@@ -1341,7 +1346,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                         color: context.colors.border.withValues(alpha: 0.4),
                       ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(6),
+                        borderRadius: BorderRadius.circular(ApexSpacing.radius),
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       minimumSize: const Size(double.infinity, 0),

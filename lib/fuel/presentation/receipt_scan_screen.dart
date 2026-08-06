@@ -419,7 +419,7 @@ class _ReceiptScanScreenState extends State<ReceiptScanScreen> {
                   backgroundColor: context.colors.elevated,
                   side: BorderSide(color: context.colors.border),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(6),
+                    borderRadius: BorderRadius.circular(ApexSpacing.radius),
                   ),
                 ),
               ),
@@ -459,7 +459,7 @@ class _CameraSurface extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(6),
+      borderRadius: BorderRadius.circular(ApexSpacing.radius),
       child: LayoutBuilder(
         builder: (context, constraints) {
           final size = Size(constraints.maxWidth, constraints.maxHeight);
@@ -488,7 +488,7 @@ class _CameraSurface extends StatelessWidget {
                       color: Colors.white.withValues(alpha: 0.72),
                       width: 2,
                     ),
-                    borderRadius: BorderRadius.circular(6),
+                    borderRadius: BorderRadius.circular(ApexSpacing.radius),
                   ),
                 ),
               ),
@@ -512,7 +512,7 @@ class _CameraSurface extends StatelessWidget {
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     color: Colors.black.withValues(alpha: 0.34),
-                    borderRadius: BorderRadius.circular(6),
+                    borderRadius: BorderRadius.circular(ApexSpacing.radius),
                   ),
                   child: IconButton(
                     tooltip: isFlashOn ? 'Flash off' : 'Flash on',
@@ -546,7 +546,7 @@ class _PhotoPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(6),
+      borderRadius: BorderRadius.circular(ApexSpacing.radius),
       child: Stack(
         fit: StackFit.expand,
         children: [
@@ -596,7 +596,7 @@ class _CameraMessage extends StatelessWidget {
       decoration: BoxDecoration(
         color: context.colors.surface,
         border: Border.all(color: context.colors.border),
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(ApexSpacing.radius),
       ),
       child: Center(
         child: Padding(
@@ -677,7 +677,7 @@ class _ReceiptResultPanel extends StatelessWidget {
       decoration: BoxDecoration(
         color: context.colors.surface,
         border: Border.all(color: context.colors.border),
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(ApexSpacing.radius),
       ),
       child: Padding(
         padding: const EdgeInsets.all(ApexSpacing.x2),
@@ -842,7 +842,7 @@ class _ConfidencePill extends StatelessWidget {
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         border: Border.all(color: color.withValues(alpha: 0.28)),
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(ApexSpacing.radius),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
@@ -925,7 +925,7 @@ class _ActionButtons extends StatelessWidget {
                 disabledBackgroundColor: context.colors.elevated,
                 disabledForegroundColor: context.colors.muted,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6),
+                  borderRadius: BorderRadius.circular(ApexSpacing.radius),
                 ),
               ),
             ),
@@ -943,7 +943,7 @@ class _ActionButtons extends StatelessWidget {
                 foregroundColor: context.colors.cyan,
                 side: BorderSide(color: context.colors.border),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6),
+                  borderRadius: BorderRadius.circular(ApexSpacing.radius),
                 ),
               ),
             ),
@@ -976,7 +976,7 @@ class ApexReceiptOverlay extends StatelessWidget {
             child: DecoratedBox(
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: BorderRadius.circular(ApexSpacing.radius),
               ),
             ),
           ),

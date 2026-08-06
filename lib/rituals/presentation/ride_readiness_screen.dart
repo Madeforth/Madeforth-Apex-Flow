@@ -897,11 +897,11 @@ class WeatherSheetContentState extends ConsumerState<WeatherSheetContent> {
                   vertical: 14,
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(ApexSpacing.radius),
                   borderSide: BorderSide(color: context.colors.border),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(ApexSpacing.radius),
                   borderSide: BorderSide(color: context.colors.cyan),
                 ),
               ),
@@ -914,7 +914,7 @@ class WeatherSheetContentState extends ConsumerState<WeatherSheetContent> {
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: context.colors.caution.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(ApexSpacing.radius),
                   border: Border.all(color: context.colors.caution),
                 ),
                 child: Row(
@@ -1112,7 +1112,7 @@ class WeatherSheetContentState extends ConsumerState<WeatherSheetContent> {
           padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
             color: isSelected ? context.colors.cyan : Colors.transparent,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(ApexSpacing.radius),
             border: Border.all(
               color: isSelected ? context.colors.cyan : context.colors.border,
             ),
@@ -1315,7 +1315,9 @@ class WeatherSheetContentState extends ConsumerState<WeatherSheetContent> {
                           ),
                           decoration: BoxDecoration(
                             color: const Color(0xFF1E293B),
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(
+                              ApexSpacing.radius,
+                            ),
                             border: Border.all(color: const Color(0xFF334155)),
                           ),
                           child: Text(

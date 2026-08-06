@@ -4,6 +4,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/material.dart';
 import 'package:signature/signature.dart';
 import 'package:printing/printing.dart';
+import 'package:apexflow/core/design/apex_spacing.dart';
 import 'package:apexflow/core/i18n/app_strings.dart';
 import 'package:apexflow/garage/domain/accident_report_model.dart';
 import 'package:apexflow/garage/application/accident_pdf_generator.dart';
@@ -756,7 +757,7 @@ class _TrAccidentWizardScreenState extends State<TrAccidentWizardScreen> {
             decoration: BoxDecoration(
               border: Border.all(color: Colors.grey.shade400),
               color: Colors.white,
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: BorderRadius.circular(ApexSpacing.radius),
             ),
             child: Stack(
               children: [

@@ -1,4 +1,5 @@
 import 'package:apexflow/core/design/apex_colors.dart';
+import 'package:apexflow/core/design/apex_spacing.dart';
 import 'package:apexflow/core/design/apex_typography.dart';
 import 'package:flutter/material.dart';
 
@@ -39,11 +40,11 @@ abstract final class ApexTheme {
           vertical: 14,
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(ApexSpacing.radius),
           borderSide: BorderSide(color: ext.border),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(ApexSpacing.radius),
           borderSide: BorderSide(color: ext.orange, width: 2),
         ),
       ),
@@ -104,23 +105,23 @@ abstract final class ApexTheme {
           fontWeight: FontWeight.w400,
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(ApexSpacing.radius),
           borderSide: BorderSide(color: ext.border, width: 0.5),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(ApexSpacing.radius),
           borderSide: BorderSide(color: ext.border, width: 0.5),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(ApexSpacing.radius),
           borderSide: BorderSide(color: ext.cyan, width: 0.8),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(ApexSpacing.radius),
           borderSide: BorderSide(color: ext.red, width: 0.8),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(ApexSpacing.radius),
           borderSide: BorderSide(color: ext.red, width: 0.8),
         ),
         labelStyle: TextStyle(
@@ -165,7 +166,7 @@ abstract final class ApexTheme {
         surfaceTintColor: Colors.transparent,
         shadowColor: Colors.transparent,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(ApexSpacing.radius),
           side: BorderSide(color: ext.border, width: 0.5),
         ),
       ),
@@ -186,7 +187,7 @@ abstract final class ApexTheme {
           fontWeight: FontWeight.w400,
         ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(ApexSpacing.radius),
           side: BorderSide(color: ext.border, width: 0.5),
         ),
       ),
@@ -198,7 +199,9 @@ abstract final class ApexTheme {
         modalElevation: 0,
         modalBackgroundColor: ext.elevated,
         shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(ApexSpacing.radius),
+          ),
         ),
       ),
       // Snackbar — dark, subtle
@@ -210,7 +213,7 @@ abstract final class ApexTheme {
           fontWeight: FontWeight.w400,
         ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(ApexSpacing.radius),
           side: BorderSide(color: ext.border, width: 0.5),
         ),
         behavior: SnackBarBehavior.floating,
@@ -222,7 +225,7 @@ abstract final class ApexTheme {
         elevation: 0,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(ApexSpacing.radius),
           side: BorderSide(color: ext.border, width: 0.5),
         ),
         textStyle: const TextStyle(

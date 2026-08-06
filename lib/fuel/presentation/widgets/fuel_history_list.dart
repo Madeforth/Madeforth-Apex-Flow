@@ -164,7 +164,7 @@ class _FuelHistoryItem extends StatelessWidget {
           height: 40,
           decoration: BoxDecoration(
             color: context.colors.surface,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(ApexSpacing.radius),
             border: Border.all(color: context.colors.border),
           ),
           child: Center(

@@ -148,7 +148,7 @@ class InsightsScreen extends ConsumerWidget {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: SlatePalette.surface,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(ApexSpacing.radius),
                 border: Border.all(color: SlatePalette.border),
               ),
               child: Row(
@@ -392,7 +392,7 @@ class InsightsScreen extends ConsumerWidget {
               Container(
                 decoration: BoxDecoration(
                   color: SlatePalette.surface,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(ApexSpacing.radius),
                   border: Border.all(color: SlatePalette.border),
                 ),
                 child: Column(
@@ -639,7 +639,7 @@ class InsightsScreen extends ConsumerWidget {
     return Container(
       decoration: BoxDecoration(
         color: SlatePalette.surface,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(ApexSpacing.radius),
         border: Border.all(color: SlatePalette.border),
       ),
       child: TextField(
@@ -1066,7 +1066,7 @@ class _StatCard extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: SlatePalette.surface,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(ApexSpacing.radius),
           border: Border.all(color: SlatePalette.border),
         ),
         child: Column(
@@ -1498,7 +1498,7 @@ class _CostLedgerCard extends ConsumerWidget {
     return Container(
       decoration: BoxDecoration(
         color: SlatePalette.oledBackground,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(ApexSpacing.radius),
         border: Border.all(color: SlatePalette.oledBorder, width: 0.5),
       ),
       child: Column(
@@ -2061,7 +2061,9 @@ Future<void> _showAddCostSheet(
                         foregroundColor: Colors.black,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(6),
+                          borderRadius: BorderRadius.circular(
+                            ApexSpacing.radius,
+                          ),
                         ),
                       ),
                       onPressed: () async {
@@ -2402,7 +2404,7 @@ void _showRecentRideImpactDetails(
                   foregroundColor: Colors.white,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(6),
+                    borderRadius: BorderRadius.circular(ApexSpacing.radius),
                     side: BorderSide(color: context.colors.border, width: 0.5),
                   ),
                 ),

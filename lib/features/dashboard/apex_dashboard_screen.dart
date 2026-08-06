@@ -377,7 +377,7 @@ class _BikeSelectorDropdownState extends State<_BikeSelectorDropdown> {
       elevation: 8,
       shadowColor: Colors.black.withValues(alpha: 0.5),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(6), // Design Rules: 4-6 radius
+        borderRadius: BorderRadius.circular(ApexSpacing.radius),
         side: BorderSide(color: Colors.white.withValues(alpha: 0.1), width: 1),
       ),
       offset: const Offset(0, 48),
@@ -454,7 +454,7 @@ class _BikeSelectorDropdownState extends State<_BikeSelectorDropdown> {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.03),
-          borderRadius: BorderRadius.circular(6), // Design Rules: 4-6 radius
+          borderRadius: BorderRadius.circular(ApexSpacing.radius),
           border: Border.all(
             color: _isOpen
                 ? Colors.white.withValues(
@@ -909,7 +909,7 @@ class _WarningBanner extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: const Color(0xFF111827), // Dark card background
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(ApexSpacing.radius),
         border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
       child: Column(
@@ -1024,7 +1024,7 @@ class _MachineHealthRow extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
           decoration: BoxDecoration(
             color: const Color(0xFF111827),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(ApexSpacing.radius),
             border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
           ),
           child: Row(
@@ -1192,7 +1192,7 @@ class _AttentionRequiredList extends StatelessWidget {
         Container(
           decoration: BoxDecoration(
             color: const Color(0xFF111827),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(ApexSpacing.radius),
             border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
           ),
           child: Column(

@@ -132,7 +132,7 @@ class _StartRideSheetState extends State<_StartRideSheet> {
             padding: const EdgeInsets.all(ApexSpacing.x2),
             decoration: BoxDecoration(
               color: context.colors.surface.withValues(alpha: 0.5),
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: BorderRadius.circular(ApexSpacing.radius),
               border: Border.all(
                 color: context.colors.border.withValues(alpha: 0.5),
               ),

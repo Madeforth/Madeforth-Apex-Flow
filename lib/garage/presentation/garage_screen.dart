@@ -1,4 +1,4 @@
-﻿import 'dart:ui';
+import 'dart:ui';
 import 'package:apexflow/core/design/apex_colors.dart';
 import 'package:apexflow/core/design/apex_spacing.dart';
 import 'package:apexflow/core/i18n/app_strings.dart';
@@ -665,7 +665,9 @@ void _showEditIntervalDialog(
     builder: (context) {
       return Dialog(
         backgroundColor: const Color(0xFF0F172A),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(ApexSpacing.radius),
+        ),
         child: StatefulBuilder(
           builder: (context, setState) {
             final currentVal =
@@ -711,7 +713,7 @@ void _showEditIntervalDialog(
                             controller.text = preset.toString();
                           });
                         },
-                        borderRadius: BorderRadius.circular(6),
+                        borderRadius: BorderRadius.circular(ApexSpacing.radius),
                         child: Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 12,
@@ -723,7 +725,9 @@ void _showEditIntervalDialog(
                                     0xFF06B6D4,
                                   ).withValues(alpha: 0.15)
                                 : const Color(0xFF1E293B),
-                            borderRadius: BorderRadius.circular(6),
+                            borderRadius: BorderRadius.circular(
+                              ApexSpacing.radius,
+                            ),
                             border: Border.all(
                               color: isSelected
                                   ? context.colors.cyan
@@ -765,13 +769,13 @@ void _showEditIntervalDialog(
                         vertical: 12,
                       ),
                       enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(6),
+                        borderRadius: BorderRadius.circular(ApexSpacing.radius),
                         borderSide: BorderSide(
                           color: Colors.white.withValues(alpha: 0.05),
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(6),
+                        borderRadius: BorderRadius.circular(ApexSpacing.radius),
                         borderSide: BorderSide(color: context.colors.cyan),
                       ),
                     ),
@@ -804,7 +808,9 @@ void _showEditIntervalDialog(
                           backgroundColor: context.colors.cyan,
                           foregroundColor: Colors.black,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6),
+                            borderRadius: BorderRadius.circular(
+                              ApexSpacing.radius,
+                            ),
                           ),
                           padding: const EdgeInsets.symmetric(
                             horizontal: 18,
@@ -867,7 +873,7 @@ class _GarageSummaryCard extends ConsumerWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: const Color(0xFF0F172A).withValues(alpha: 0.6),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(ApexSpacing.radius),
         border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
       child: Column(
@@ -1177,12 +1183,12 @@ class _QuickActionButton extends StatelessWidget {
         HapticFeedback.selectionClick();
         onTap();
       },
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(ApexSpacing.radius),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
           color: const Color(0xFF0F172A).withValues(alpha: 0.6),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(ApexSpacing.radius),
           border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
         ),
         child: Column(
@@ -1536,7 +1542,7 @@ class _MotorcycleListPanel extends ConsumerWidget {
         return AlertDialog(
           backgroundColor: const Color(0xFF0F172A),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(ApexSpacing.radius),
             side: BorderSide(color: Colors.red.withValues(alpha: 0.3)),
           ),
           title: Row(
@@ -2411,7 +2417,7 @@ class _StatusSlider extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: ApexSpacing.x1),
       decoration: BoxDecoration(
         color: context.colors.elevated,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(ApexSpacing.radius),
         border: Border.all(color: context.colors.border.withValues(alpha: 0.6)),
       ),
       child: Column(
@@ -2588,12 +2594,12 @@ class _ComponentGridCell extends StatelessWidget {
 
     return InkWell(
       onTap: () => _showComponentDetails(context, copy, healthColor),
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(ApexSpacing.radius),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
           color: const Color(0xFF0F172A).withValues(alpha: 0.6),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(ApexSpacing.radius),
           border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
         ),
         child: Row(
@@ -2938,7 +2944,7 @@ class _ComponentGridCell extends StatelessWidget {
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: context.colors.elevated,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(ApexSpacing.radius),
                   border: Border.all(color: context.colors.border),
                 ),
                 child: Text(
@@ -2959,7 +2965,7 @@ class _ComponentGridCell extends StatelessWidget {
                     backgroundColor: context.colors.border,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(ApexSpacing.radius),
                     ),
                   ),
                   onPressed: () => Navigator.pop(context),
@@ -3077,12 +3083,12 @@ class _SystemMenuItem extends StatelessWidget {
         HapticFeedback.selectionClick();
         onTap();
       },
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(ApexSpacing.radius),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
           color: const Color(0xFF0F172A).withValues(alpha: 0.6),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(ApexSpacing.radius),
           border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
         ),
         child: Row(
@@ -3327,7 +3333,7 @@ class _ServiceTimeline extends ConsumerWidget {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: const Color(0xFF0F172A).withValues(alpha: 0.6),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(ApexSpacing.radius),
               border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
             ),
             child: Text(
@@ -3360,7 +3366,7 @@ class _ServiceTimeline extends ConsumerWidget {
                   padding: const EdgeInsets.only(right: 16),
                   decoration: BoxDecoration(
                     color: context.colors.red,
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(ApexSpacing.radius),
                   ),
                   child: const Icon(Icons.delete_outline, color: Colors.white),
                 ),
@@ -3447,7 +3453,7 @@ class _ServiceCard extends ConsumerWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: const Color(0xFF0F172A).withValues(alpha: 0.6),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(ApexSpacing.radius),
         border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
       child: Row(
@@ -3831,7 +3837,7 @@ class _CostAnalyticsPanelInner extends ConsumerWidget {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: const Color(0xFF0F172A).withValues(alpha: 0.6),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(ApexSpacing.radius),
             border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
           ),
           child: Column(
@@ -3898,7 +3904,9 @@ class _CostAnalyticsPanelInner extends ConsumerWidget {
                               color: const Color(
                                 0xFF0F172A,
                               ).withValues(alpha: 0.3),
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(
+                                ApexSpacing.radius,
+                              ),
                             ),
                             child: Text(
                               tr
@@ -4022,7 +4030,7 @@ class _StatMiniPanel extends StatelessWidget {
           color: const Color(
             0xFFE2E8F0,
           ), // Slate 200 (slightly darker than off-white)
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(ApexSpacing.radius),
           border: Border.all(
             color: const Color(0xFF0F172A),
             width: 1.5,
@@ -4432,7 +4440,9 @@ class _ParkedBikeAlertScreenState
                                   padding: const EdgeInsets.all(12),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
-                                    borderRadius: BorderRadius.circular(8),
+                                    borderRadius: BorderRadius.circular(
+                                      ApexSpacing.radius,
+                                    ),
                                     border: Border.all(
                                       color: Colors.grey.shade200,
                                       width: 1,

@@ -826,7 +826,7 @@ Widget _buildCard(
       Container(
         decoration: BoxDecoration(
           color: const Color(0xFF111827),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(ApexSpacing.radius),
           border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
         ),
         child: Column(
@@ -1267,7 +1267,7 @@ class _RideMemoryPanel extends StatelessWidget {
         Container(
           decoration: BoxDecoration(
             color: const Color(0xFF111827),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(ApexSpacing.radius),
             border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
           ),
           child: Column(
@@ -1588,7 +1588,7 @@ void _showHardBrakingDetails(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: const Color(0xFFFACC15).withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(ApexSpacing.radius),
                 border: Border.all(
                   color: const Color(0xFFFACC15).withValues(alpha: 0.2),
                 ),
@@ -1914,7 +1914,7 @@ void _showRideSummary(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: context.colors.cyan,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(ApexSpacing.radius),
                   ),
                 ),
                 child: Text(
@@ -1950,7 +1950,7 @@ Widget _buildSummaryBox(
     padding: const EdgeInsets.all(16),
     decoration: BoxDecoration(
       color: context.colors.surface,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(ApexSpacing.radius),
       border: Border.all(color: context.colors.border),
     ),
     child: Column(

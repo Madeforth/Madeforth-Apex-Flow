@@ -1,4 +1,4 @@
-﻿import 'dart:ui' as ui;
+import 'dart:ui' as ui;
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
@@ -900,7 +900,9 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
                                   foregroundColor: Colors.white,
                                   elevation: 0,
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
+                                    borderRadius: BorderRadius.circular(
+                                      ApexSpacing.radius,
+                                    ),
                                   ),
                                   padding: const EdgeInsets.symmetric(
                                     vertical: 14,
@@ -943,7 +945,9 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
                       return Container(
                         decoration: BoxDecoration(
                           color: const Color(0xFF1E293B),
-                          borderRadius: BorderRadius.circular(6),
+                          borderRadius: BorderRadius.circular(
+                            ApexSpacing.radius,
+                          ),
                           border: Border.all(
                             color: const Color(0xFF334155),
                             width: 0.5,
@@ -1123,7 +1127,7 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
                         },
                       );
                     },
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(ApexSpacing.radius),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
@@ -1131,7 +1135,7 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
                       ),
                       decoration: BoxDecoration(
                         color: const Color(0xFF111827),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(ApexSpacing.radius),
                         border: Border.all(
                           color: Colors.white.withValues(alpha: 0.05),
                         ),
@@ -1263,7 +1267,7 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: const Color(0xFF111827),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(ApexSpacing.radius),
                       border: Border.all(
                         color: Colors.white.withValues(alpha: 0.05),
                       ),
