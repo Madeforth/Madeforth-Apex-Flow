@@ -69,13 +69,13 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
       parent: _cardAnimController,
       curve: const Interval(0.0, 1.0, curve: Curves.easeOutCubic),
     );
-    _cardSlideAnim = Tween<Offset>(
-      begin: const Offset(0, 0.06),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _cardAnimController,
-      curve: const Interval(0.0, 1.0, curve: Curves.easeOutCubic),
-    ));
+    _cardSlideAnim =
+        Tween<Offset>(begin: const Offset(0, 0.06), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _cardAnimController,
+            curve: const Interval(0.0, 1.0, curve: Curves.easeOutCubic),
+          ),
+        );
 
     Future.delayed(const Duration(milliseconds: 400), () {
       if (mounted) _cardAnimController.forward();
@@ -395,10 +395,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                 gradient: RadialGradient(
                   center: Alignment(0, -0.3),
                   radius: 0.8,
-                  colors: [
-                    Color(0x0FFFFFFF),
-                    Colors.transparent,
-                  ],
+                  colors: [Color(0x0FFFFFFF), Colors.transparent],
                   stops: [0.0, 0.6],
                 ),
               ),
@@ -406,57 +403,24 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
           ),
         ),
 
-        // ── Header ──
-        Positioned(
-          left: 0,
-          right: 0,
-          top: 0,
-          child: SafeArea(
-            bottom: false,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(
-                    color: context.colors.border.withValues(alpha: 0.3),
-                  ),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Image.asset(
-                    'assets/images/app_icon.png',
-                    width: 24,
-                    height: 24,
-                  ),
-                  const SizedBox(width: 10),
-                  Text(
-                    'APEX FLOW',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 1.4,
-                      color: context.colors.textSecondary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-
-        // ── Centered card ──
+        // ── Full-screen card ──
         Positioned.fill(
           child: SafeArea(
-            child: Center(
-              child: FadeTransition(
-                opacity: _cardFadeAnim,
-                child: SlideTransition(
-                  position: _cardSlideAnim,
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: _buildCard(),
-                  ),
+            child: FadeTransition(
+              opacity: _cardFadeAnim,
+              child: SlideTransition(
+                position: _cardSlideAnim,
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: constraints.maxHeight,
+                        ),
+                        child: _buildCard(),
+                      ),
+                    );
+                  },
                 ),
               ),
             ),
@@ -469,13 +433,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
   Widget _buildCard() {
     return Container(
       width: double.infinity,
-      constraints: const BoxConstraints(maxWidth: 400),
       decoration: BoxDecoration(
         color: context.colors.surface.withValues(alpha: 0.7),
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(
-          color: context.colors.border.withValues(alpha: 0.4),
-        ),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -493,27 +452,14 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                   Text(
                     tInline(
                       widget.strings.languageCode,
-                      'Hoş Geldiniz',
-                      'Welcome',
-                      'Willkommen',
-                    ),
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w800,
-                      color: context.colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    tInline(
-                      widget.strings.languageCode,
                       'Giriş yapın veya hesap oluşturun',
                       'Log in or create an account',
                       'Anmelden oder Konto erstellen',
                     ),
                     style: TextStyle(
-                      fontSize: 13,
-                      color: context.colors.textSecondary,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: context.colors.white,
                     ),
                   ),
                 ],
@@ -545,20 +491,28 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
       decoration: BoxDecoration(
         color: context.colors.background.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(
-          color: context.colors.border.withValues(alpha: 0.3),
-        ),
+        border: Border.all(color: context.colors.border.withValues(alpha: 0.3)),
       ),
       padding: const EdgeInsets.all(3),
       child: Row(
         children: [
           _tabButton(
             'login',
-            tInline(widget.strings.languageCode, 'Giriş Yap', 'Log In', 'Anmelden'),
+            tInline(
+              widget.strings.languageCode,
+              'Giriş Yap',
+              'Log In',
+              'Anmelden',
+            ),
           ),
           _tabButton(
             'signup',
-            tInline(widget.strings.languageCode, 'Kayıt Ol', 'Sign Up', 'Registrieren'),
+            tInline(
+              widget.strings.languageCode,
+              'Kayıt Ol',
+              'Sign Up',
+              'Registrieren',
+            ),
           ),
         ],
       ),
@@ -580,13 +534,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
           alignment: Alignment.center,
           padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(
-            color: isSelected
-                ? context.colors.surface
-                : Colors.transparent,
+            color: isSelected ? context.colors.surface : Colors.transparent,
             borderRadius: BorderRadius.circular(4),
             border: isSelected
                 ? Border.all(
-                    color: context.colors.border.withValues(alpha: 0.4))
+                    color: context.colors.border.withValues(alpha: 0.4),
+                  )
                 : null,
           ),
           child: Text(
@@ -614,9 +567,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Email field
-          _fieldLabel(tInline(
-            widget.strings.languageCode, 'E-posta', 'Email', 'E-Mail',
-          )),
+          _fieldLabel(
+            tInline(widget.strings.languageCode, 'E-posta', 'Email', 'E-Mail'),
+          ),
           const SizedBox(height: 6),
           _buildTextField(
             controller: _loginTag,
@@ -628,9 +581,14 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
           const SizedBox(height: 16),
 
           // Password field
-          _fieldLabel(tInline(
-            widget.strings.languageCode, 'Şifre', 'Password', 'Passwort',
-          )),
+          _fieldLabel(
+            tInline(
+              widget.strings.languageCode,
+              'Şifre',
+              'Password',
+              'Passwort',
+            ),
+          ),
           const SizedBox(height: 6),
           _buildTextField(
             controller: _loginPassword,
@@ -667,9 +625,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                       child: Checkbox(
                         value: _rememberMe,
                         activeColor: context.colors.cyan,
-                        side: BorderSide(
-                          color: context.colors.border,
-                        ),
+                        side: BorderSide(color: context.colors.border),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(3),
                         ),
@@ -680,8 +636,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      tInline(widget.strings.languageCode,
-                          'Beni hatırla', 'Remember me', 'Erinnere dich'),
+                      tInline(
+                        widget.strings.languageCode,
+                        'Beni hatırla',
+                        'Remember me',
+                        'Erinnere dich',
+                      ),
                       style: TextStyle(
                         color: context.colors.textSecondary,
                         fontSize: 13,
@@ -700,12 +660,13 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                   });
                 },
                 child: Text(
-                  tInline(widget.strings.languageCode,
-                      'Şifremi unuttum?', 'Forgot password?', 'Passwort vergessen?'),
-                  style: TextStyle(
-                    color: context.colors.white,
-                    fontSize: 13,
+                  tInline(
+                    widget.strings.languageCode,
+                    'Şifremi unuttum?',
+                    'Forgot password?',
+                    'Passwort vergessen?',
                   ),
+                  style: TextStyle(color: context.colors.white, fontSize: 13),
                 ),
               ),
             ],
@@ -714,15 +675,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
           const SizedBox(height: 20),
 
           // Error message
-          if (_error != null) ...[
-            _buildErrorBox(),
-            const SizedBox(height: 16),
-          ],
+          if (_error != null) ...[_buildErrorBox(), const SizedBox(height: 16)],
 
           // Login button
           _buildPrimaryButton(
-            label: tInline(widget.strings.languageCode,
-                'Giriş Yap', 'Continue', 'Weiter'),
+            label: tInline(
+              widget.strings.languageCode,
+              'Giriş Yap',
+              'Continue',
+              'Weiter',
+            ),
             onPressed: _isSubmitting ? null : _login,
             isLoading: _isSubmitting,
           ),
@@ -745,8 +707,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  tInline(widget.strings.languageCode,
-                      'Hesabınız yok mu? ', "Don't have an account? ", 'Kein Konto? '),
+                  tInline(
+                    widget.strings.languageCode,
+                    'Hesabınız yok mu? ',
+                    "Don't have an account? ",
+                    'Kein Konto? ',
+                  ),
                   style: TextStyle(
                     color: context.colors.textSecondary,
                     fontSize: 13,
@@ -758,8 +724,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                     _error = null;
                   }),
                   child: Text(
-                    tInline(widget.strings.languageCode,
-                        'Hesap oluştur', 'Create one', 'Erstellen'),
+                    tInline(
+                      widget.strings.languageCode,
+                      'Hesap oluştur',
+                      'Create one',
+                      'Erstellen',
+                    ),
                     style: TextStyle(
                       color: context.colors.white,
                       fontSize: 13,
@@ -787,9 +757,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Email field
-          _fieldLabel(tInline(
-            widget.strings.languageCode, 'E-posta', 'Email', 'E-Mail',
-          )),
+          _fieldLabel(
+            tInline(widget.strings.languageCode, 'E-posta', 'Email', 'E-Mail'),
+          ),
           const SizedBox(height: 6),
           _buildTextField(
             controller: _signupEmail,
@@ -801,14 +771,23 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
           const SizedBox(height: 16),
 
           // Password field
-          _fieldLabel(tInline(
-            widget.strings.languageCode, 'Şifre', 'Password', 'Passwort',
-          )),
+          _fieldLabel(
+            tInline(
+              widget.strings.languageCode,
+              'Şifre',
+              'Password',
+              'Passwort',
+            ),
+          ),
           const SizedBox(height: 6),
           _buildTextField(
             controller: _signupPassword,
-            hint: tInline(widget.strings.languageCode,
-                'En az 6 karakter', 'At least 6 characters', 'Mindestens 6 Zeichen'),
+            hint: tInline(
+              widget.strings.languageCode,
+              'En az 6 karakter',
+              'At least 6 characters',
+              'Mindestens 6 Zeichen',
+            ),
             obscure: _obscureSignupPassword,
             prefixIcon: Icons.lock_outline,
             suffixIcon: IconButton(
@@ -821,7 +800,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
               ),
               onPressed: () {
                 setState(
-                    () => _obscureSignupPassword = !_obscureSignupPassword);
+                  () => _obscureSignupPassword = !_obscureSignupPassword,
+                );
               },
             ),
           ),
@@ -829,15 +809,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
           const SizedBox(height: 20),
 
           // Error message
-          if (_error != null) ...[
-            _buildErrorBox(),
-            const SizedBox(height: 16),
-          ],
+          if (_error != null) ...[_buildErrorBox(), const SizedBox(height: 16)],
 
           // Signup button
           _buildPrimaryButton(
-            label: tInline(widget.strings.languageCode,
-                'Kayıt Ol', 'Sign Up', 'Registrieren'),
+            label: tInline(
+              widget.strings.languageCode,
+              'Kayıt Ol',
+              'Sign Up',
+              'Registrieren',
+            ),
             onPressed: _isSubmitting ? null : _submit,
             isLoading: _isSubmitting,
           ),
@@ -860,8 +841,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  tInline(widget.strings.languageCode,
-                      'Zaten hesabınız var mı? ', 'Already have an account? ', 'Bereits ein Konto? '),
+                  tInline(
+                    widget.strings.languageCode,
+                    'Zaten hesabınız var mı? ',
+                    'Already have an account? ',
+                    'Bereits ein Konto? ',
+                  ),
                   style: TextStyle(
                     color: context.colors.textSecondary,
                     fontSize: 13,
@@ -873,8 +858,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                     _error = null;
                   }),
                   child: Text(
-                    tInline(widget.strings.languageCode,
-                        'Giriş yap', 'Log in', 'Anmelden'),
+                    tInline(
+                      widget.strings.languageCode,
+                      'Giriş yap',
+                      'Log in',
+                      'Anmelden',
+                    ),
                     style: TextStyle(
                       color: context.colors.white,
                       fontSize: 13,
@@ -902,8 +891,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            tInline(widget.strings.languageCode,
-                'Şifremi Unuttum?', 'Forgot password?', 'Passwort vergessen?'),
+            tInline(
+              widget.strings.languageCode,
+              'Şifremi Unuttum?',
+              'Forgot password?',
+              'Passwort vergessen?',
+            ),
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.w800,
@@ -918,18 +911,15 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
               'Enter your email and we\'ll send you a reset link',
               'Geben Sie Ihre E-Mail ein und wir senden Ihnen einen Reset-Link',
             ),
-            style: TextStyle(
-              fontSize: 13,
-              color: context.colors.textSecondary,
-            ),
+            style: TextStyle(fontSize: 13, color: context.colors.textSecondary),
           ),
 
           const SizedBox(height: 24),
 
           // Email field
-          _fieldLabel(tInline(
-            widget.strings.languageCode, 'E-posta', 'Email', 'E-Mail',
-          )),
+          _fieldLabel(
+            tInline(widget.strings.languageCode, 'E-posta', 'Email', 'E-Mail'),
+          ),
           const SizedBox(height: 6),
           _buildTextField(
             controller: _forgotPasswordEmail,
@@ -941,15 +931,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
           const SizedBox(height: 20),
 
           // Error
-          if (_error != null) ...[
-            _buildErrorBox(),
-            const SizedBox(height: 16),
-          ],
+          if (_error != null) ...[_buildErrorBox(), const SizedBox(height: 16)],
 
           // Send reset link button
           _buildPrimaryButton(
-            label: tInline(widget.strings.languageCode,
-                'Sıfırlama linki gönder  \u2192', 'Send reset link  \u2192', 'Reset-Link senden  \u2192'),
+            label: tInline(
+              widget.strings.languageCode,
+              'Sıfırlama linki gönder  \u2192',
+              'Send reset link  \u2192',
+              'Reset-Link senden  \u2192',
+            ),
             onPressed: _isSubmitting ? null : _sendPasswordReset,
             isLoading: _isSubmitting,
           ),
@@ -968,8 +959,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
               _error = null;
             }),
             child: Text(
-              tInline(widget.strings.languageCode,
-                  'Giriş ekranına dön', 'Back to log in', 'Zurück zur Anmeldung'),
+              tInline(
+                widget.strings.languageCode,
+                'Giriş ekranına dön',
+                'Back to log in',
+                'Zurück zur Anmeldung',
+              ),
               style: TextStyle(
                 color: context.colors.white,
                 fontSize: 14,
@@ -984,8 +979,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
               _error = null;
             }),
             child: Text(
-              tInline(widget.strings.languageCode,
-                  'Yeni hesap oluştur', 'Create a new account', 'Neues Konto erstellen'),
+              tInline(
+                widget.strings.languageCode,
+                'Yeni hesap oluştur',
+                'Create a new account',
+                'Neues Konto erstellen',
+              ),
               style: TextStyle(
                 color: context.colors.white,
                 fontSize: 14,
@@ -1079,8 +1078,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                           'Check Verification Status',
                           'Überprüfen Sie den Verifizierungsstatus',
                         ),
-                        onPressed:
-                            _isSubmitting ? null : _checkEmailVerification,
+                        onPressed: _isSubmitting
+                            ? null
+                            : _checkEmailVerification,
                         isLoading: _isSubmitting,
                       ),
                       const SizedBox(height: 12),
@@ -1091,7 +1091,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                           style: OutlinedButton.styleFrom(
                             foregroundColor: context.colors.white,
                             side: BorderSide(
-                              color: context.colors.border.withValues(alpha: 0.5),
+                              color: context.colors.border.withValues(
+                                alpha: 0.5,
+                              ),
                             ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(6),
@@ -1155,24 +1157,28 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
       style: TextStyle(color: context.colors.white, fontSize: 14),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: TextStyle(
-          color: context.colors.muted,
-          fontSize: 14,
-        ),
+        hintStyle: TextStyle(color: context.colors.muted, fontSize: 14),
         prefixIcon: prefixIcon != null
             ? Icon(prefixIcon, size: 18, color: context.colors.textSecondary)
             : null,
         suffixIcon: suffixIcon,
         filled: true,
         fillColor: context.colors.background,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 14,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(6),
-          borderSide: BorderSide(color: context.colors.border.withValues(alpha: 0.4)),
+          borderSide: BorderSide(
+            color: context.colors.border.withValues(alpha: 0.4),
+          ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(6),
-          borderSide: BorderSide(color: context.colors.border.withValues(alpha: 0.4)),
+          borderSide: BorderSide(
+            color: context.colors.border.withValues(alpha: 0.4),
+          ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(6),
@@ -1195,12 +1201,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
           backgroundColor: context.colors.cyan,
           foregroundColor: context.colors.onAccent,
           elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(6),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
         ),
         onPressed: onPressed,
-        child: isLoading &&
+        child:
+            isLoading &&
                 (kIsWeb
                     ? true
                     : !Platform.environment.containsKey('FLUTTER_TEST'))
@@ -1230,9 +1235,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
       decoration: BoxDecoration(
         color: context.colors.red.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(
-          color: context.colors.red.withValues(alpha: 0.3),
-        ),
+        border: Border.all(color: context.colors.red.withValues(alpha: 0.3)),
       ),
       child: Text(
         _error!,
@@ -1245,15 +1248,17 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
     );
   }
 
-
-
   Widget _buildSocialButtons() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          tInline(widget.strings.languageCode,
-              'Topluluğumuza katılın', 'Join our community', 'Treten Sie unserer Community bei'),
+          tInline(
+            widget.strings.languageCode,
+            'Topluluğumuza katılın',
+            'Join our community',
+            'Treten Sie unserer Community bei',
+          ),
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
@@ -1282,13 +1287,19 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                     ),
                     onPressed: () async {
                       final uri = Uri.parse('https://discord.gg/madeforth');
-                      await launchUrl(uri, mode: LaunchMode.externalApplication);
+                      await launchUrl(
+                        uri,
+                        mode: LaunchMode.externalApplication,
+                      );
                     },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.forum_outlined, size: 16,
-                            color: context.colors.white),
+                        Icon(
+                          Icons.forum_outlined,
+                          size: 16,
+                          color: context.colors.white,
+                        ),
                         const SizedBox(width: 8),
                         Text(
                           'Discord',
@@ -1303,8 +1314,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    tInline(widget.strings.languageCode,
-                        'Topluluk sunucusu', 'Community server', 'Community-Server'),
+                    tInline(
+                      widget.strings.languageCode,
+                      'Topluluk sunucusu',
+                      'Community server',
+                      'Community-Server',
+                    ),
                     style: TextStyle(
                       fontSize: 10,
                       color: context.colors.textSecondary,
@@ -1332,15 +1347,22 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                       minimumSize: const Size(double.infinity, 0),
                     ),
                     onPressed: () async {
-                      final uri =
-                          Uri.parse('https://www.instagram.com/apexflow.app/');
-                      await launchUrl(uri, mode: LaunchMode.externalApplication);
+                      final uri = Uri.parse(
+                        'https://www.instagram.com/apexflow.app/',
+                      );
+                      await launchUrl(
+                        uri,
+                        mode: LaunchMode.externalApplication,
+                      );
                     },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.camera_alt_outlined, size: 16,
-                            color: context.colors.white),
+                        Icon(
+                          Icons.camera_alt_outlined,
+                          size: 16,
+                          color: context.colors.white,
+                        ),
                         const SizedBox(width: 8),
                         Text(
                           'Instagram',
@@ -1355,8 +1377,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    tInline(widget.strings.languageCode,
-                        'Resmi sayfamız', 'Official page', 'Offizielle Seite'),
+                    tInline(
+                      widget.strings.languageCode,
+                      'Resmi sayfamız',
+                      'Official page',
+                      'Offizielle Seite',
+                    ),
                     style: TextStyle(
                       fontSize: 10,
                       color: context.colors.textSecondary,
@@ -1370,7 +1396,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
       ],
     );
   }
-
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1406,12 +1431,14 @@ class _ParticleBackgroundState extends State<_ParticleBackground>
     _initialized = true;
     final count = (size.width * size.height / 12000).floor().clamp(20, 120);
     for (int i = 0; i < count; i++) {
-      _particles.add(_Particle(
-        x: _rng.nextDouble() * size.width,
-        y: _rng.nextDouble() * size.height,
-        speed: _rng.nextDouble() * 0.3 + 0.05,
-        opacity: _rng.nextDouble() * 0.3 + 0.1,
-      ));
+      _particles.add(
+        _Particle(
+          x: _rng.nextDouble() * size.width,
+          y: _rng.nextDouble() * size.height,
+          speed: _rng.nextDouble() * 0.3 + 0.05,
+          opacity: _rng.nextDouble() * 0.3 + 0.1,
+        ),
+      );
     }
   }
 

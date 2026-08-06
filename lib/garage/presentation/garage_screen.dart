@@ -4011,7 +4011,7 @@ class _StatMiniPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isZero =
-        value == '0 TL' || value == '0' || value.startsWith('0 ');
+        value == '0 ₺' || value == '0' || value.startsWith('0 ');
     final displayValueColor = isZero ? const Color(0xFF64748B) : color;
 
     return Expanded(
@@ -4156,7 +4156,7 @@ class CostAnalyticsPainter extends CustomPainter {
       final double y = paddingTop + (chartHeight / 3) * i;
 
       textPainter.text = TextSpan(
-        text: '${val.toStringAsFixed(0)} TL',
+        text: '${val.toStringAsFixed(0)} ₺',
         style: TextStyle(
           color: Colors.white.withValues(alpha: 0.5),
           fontSize: 8,

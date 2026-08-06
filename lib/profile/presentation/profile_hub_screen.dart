@@ -1588,7 +1588,7 @@ class _CardThemeSelectorPanel extends ConsumerWidget {
           content: Text(
             tInline(
               AppStrings.currentLanguageCode,
-              '${theme.nameTr} temasını 35 TL (\$0.99) karşılığında satın almak istiyor musunuz?',
+              '${theme.nameTr} temasını 35₺ (\$0.99) karşılığında satın almak istiyor musunuz?',
               'Do you want to unlock the ${theme.nameEn} theme for \$0.99?',
               'Möchten Sie das Design "${theme.nameEn}" für \$0.99 freischalten?',
             ),
@@ -7173,7 +7173,7 @@ class _ProfileAppearanceScreenState
           content: Text(
             tInline(
               AppStrings.currentLanguageCode,
-              '${theme.nameTr} temasını 35 TL (\$0.99) karşılığında satın almak istiyor musunuz?',
+              '${theme.nameTr} temasını 35₺ (\$0.99) karşılığında satın almak istiyor musunuz?',
               'Do you want to unlock the ${theme.nameEn} theme for \$0.99?',
               'Möchten Sie das Design "${theme.nameEn}" für \$0.99 freischalten?',
             ),
