@@ -1,4 +1,4 @@
-﻿import 'dart:ui';
+import 'dart:ui';
 import 'package:apexflow/rides/presentation/widgets/start_ride_sheet.dart';
 import 'package:apexflow/rituals/application/rituals_state.dart';
 import 'package:apexflow/rituals/presentation/ride_readiness_screen.dart';
@@ -103,12 +103,10 @@ class _RidesScreenState extends ConsumerState<RidesScreen> {
                                     'Rides',
                                     'Fahrten',
                                   ),
-                                  style: const TextStyle(
-                                    fontSize: 32,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                    letterSpacing: -0.5,
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headlineLarge
+                                      ?.copyWith(color: Colors.white),
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
@@ -118,10 +116,10 @@ class _RidesScreenState extends ConsumerState<RidesScreen> {
                                     'Save, analyze and improve your rides.',
                                     'Speichern, analysieren und verbessern Sie Ihre Fahrten.',
                                   ),
-                                  style: const TextStyle(
-                                    fontSize: 13,
-                                    color: SlatePalette.oledMutedText,
-                                  ),
+                                  style: Theme.of(context).textTheme.bodyMedium
+                                      ?.copyWith(
+                                        color: SlatePalette.oledMutedText,
+                                      ),
                                 ),
                               ],
                             ),
@@ -155,11 +153,13 @@ class _RidesScreenState extends ConsumerState<RidesScreen> {
                                       'Coffee Invite',
                                       'Kaffee Einladung',
                                     ),
-                                    style: const TextStyle(
-                                      color: SlatePalette.oledMutedText,
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(
+                                          color: SlatePalette.oledMutedText,
+                                          fontWeight: FontWeight.w500,
+                                        ),
                                   ),
                                 ],
                               ),
@@ -287,16 +287,12 @@ class _RidesScreenState extends ConsumerState<RidesScreen> {
                           labelColor:
                               context.colors.cyan, // Selected text/icon color
                           unselectedLabelColor: context.colors.textSecondary,
-                          labelStyle: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 11,
-                            letterSpacing: 0.2,
-                          ),
-                          unselectedLabelStyle: const TextStyle(
-                            fontWeight: FontWeight.w400,
-                            fontSize: 11,
-                            letterSpacing: 0.2,
-                          ),
+                          labelStyle: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(fontWeight: FontWeight.w600),
+                          unselectedLabelStyle: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.copyWith(fontWeight: FontWeight.w400),
                         ),
                       ),
                     ),
@@ -347,8 +343,7 @@ class _RidesScreenState extends ConsumerState<RidesScreen> {
                   'Create Coffee Invitation',
                   'Erstellen Sie eine Kaffeeeinladung',
                 ),
-                style: const TextStyle(
-                  fontSize: 16,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
@@ -532,7 +527,12 @@ class _GpsStatusBanner extends StatelessWidget {
             color: isTracking ? context.colors.cyan : context.colors.caution,
           ),
           const SizedBox(width: 8),
-          Expanded(child: Text(message, style: const TextStyle(fontSize: 12))),
+          Expanded(
+            child: Text(
+              message,
+              style: Theme.of(context).textTheme.labelMedium,
+            ),
+          ),
         ],
       ),
     );
@@ -590,9 +590,8 @@ class _StartRidePanelState extends ConsumerState<_StartRidePanel> {
                       'Ready to ride',
                       'Fahrt bereit',
                     ),
-              style: const TextStyle(
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Colors.greenAccent,
-                fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -613,9 +612,8 @@ class _StartRidePanelState extends ConsumerState<_StartRidePanel> {
                   'Are you ready to hit the road?',
                   'Bereit loszufahren?',
                 ),
-          style: const TextStyle(
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
             color: Colors.white,
-            fontSize: 24,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -634,7 +632,10 @@ class _StartRidePanelState extends ConsumerState<_StartRidePanel> {
                   const SizedBox(width: 6),
                   Text(
                     '${_conditionLabel(weather.condition, lang)} • ${weather.tempC}°C',
-                    style: const TextStyle(color: Colors.white70, fontSize: 13),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Colors.white70,
+                      fontSize: 13,
+                    ),
                   ),
                 ],
               ),
@@ -655,7 +656,10 @@ class _StartRidePanelState extends ConsumerState<_StartRidePanel> {
                 'GPS ready',
                 'GPS bereit',
               ),
-              style: const TextStyle(color: Colors.white70, fontSize: 13),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Colors.white70,
+                fontSize: 13,
+              ),
             ),
           ],
         ),
@@ -688,7 +692,9 @@ class _StartRidePanelState extends ConsumerState<_StartRidePanel> {
               'GPS automatically activates when recording starts.',
               'GPS wird automatisch aktiviert, wenn die Aufzeichnung beginnt.',
             ),
-            style: const TextStyle(color: SlatePalette.oledMutedText, fontSize: 12),
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+              color: SlatePalette.oledMutedText,
+            ),
           ),
         ),
       ],
@@ -751,9 +757,8 @@ class _NoRidePanelEmptyState extends StatelessWidget {
               'No Rides Recorded Yet',
               'Noch keine Fahrten aufgezeichnet',
             ),
-            style: const TextStyle(
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
               color: Colors.white,
-              fontSize: 15,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -766,7 +771,9 @@ class _NoRidePanelEmptyState extends StatelessWidget {
               'Starte deine erste Fahrt, um hier Daten zu verfolgen.',
             ),
             textAlign: TextAlign.center,
-            style: const TextStyle(color: SlatePalette.oledMutedText, fontSize: 12),
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+              color: SlatePalette.oledMutedText,
+            ),
           ),
         ],
       ),
@@ -803,9 +810,8 @@ Widget _buildCard(
                   'Last Ride',
                   'Letzte Fahrt',
                 ),
-                style: const TextStyle(
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   color: Colors.white,
-                  fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -817,7 +823,9 @@ Widget _buildCard(
                   'Today • 08:42',
                   'Heute • 08:42',
                 ),
-                style: const TextStyle(color: SlatePalette.oledMutedText, fontSize: 13),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: SlatePalette.oledMutedText,
+                ),
               ),
             ],
           ),
@@ -846,19 +854,16 @@ Widget _buildCard(
                             children: [
                               TextSpan(
                                 text: distance,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 32,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                style: Theme.of(context).textTheme.headlineLarge
+                                    ?.copyWith(color: Colors.white),
                               ),
-                              const TextSpan(
+                              TextSpan(
                                 text: ' km',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                style: Theme.of(context).textTheme.titleLarge
+                                    ?.copyWith(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                               ),
                             ],
                           ),
@@ -871,10 +876,8 @@ Widget _buildCard(
                             'Distance',
                             'Distanz',
                           ),
-                          style: const TextStyle(
-                            color: SlatePalette.oledMutedText,
-                            fontSize: 13,
-                          ),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(color: SlatePalette.oledMutedText),
                         ),
                         const SizedBox(height: 16),
                         // Mini route graph
@@ -957,19 +960,17 @@ Widget _buildCard(
                         const SizedBox(width: 4),
                         Text(
                           '${tInline(AppStrings.currentLanguageCode, 'Maks. Hız:', 'Max Speed:', 'Max Geschw.:')} ',
-                          style: const TextStyle(
-                            color: SlatePalette.oledMutedText,
-                            fontSize: 12,
-                          ),
+                          style: Theme.of(context).textTheme.labelMedium
+                              ?.copyWith(color: SlatePalette.oledMutedText),
                         ),
                         Expanded(
                           child: Text(
                             maxSpeed,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: Theme.of(context).textTheme.labelMedium
+                                ?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -995,18 +996,16 @@ Widget _buildCard(
                         const SizedBox(width: 4),
                         Text(
                           '${tInline(AppStrings.currentLanguageCode, 'Maks. Yatış:', 'Max Lean:', 'Max. Neigung:')} ',
-                          style: const TextStyle(
-                            color: SlatePalette.oledMutedText,
-                            fontSize: 12,
-                          ),
+                          style: Theme.of(context).textTheme.labelMedium
+                              ?.copyWith(color: SlatePalette.oledMutedText),
                         ),
                         Text(
                           maxLean,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context).textTheme.labelMedium
+                              ?.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       ],
                     ),
@@ -1023,7 +1022,10 @@ Widget _buildCard(
                 ),
                 decoration: BoxDecoration(
                   border: const Border(
-                    top: BorderSide(color: SlatePalette.warningYellow, width: 1),
+                    top: BorderSide(
+                      color: SlatePalette.warningYellow,
+                      width: 1,
+                    ),
                   ),
                   color: SlatePalette.warningYellow.withValues(alpha: 0.05),
                   borderRadius: const BorderRadius.only(
@@ -1047,10 +1049,8 @@ Widget _buildCard(
                           'Sudden braking or harsh acceleration detected.',
                           'Plötzliches Bremsen erkannt.',
                         ),
-                        style: const TextStyle(
-                          color: SlatePalette.warningYellow,
-                          fontSize: 12,
-                        ),
+                        style: Theme.of(context).textTheme.labelMedium
+                            ?.copyWith(color: SlatePalette.warningYellow),
                       ),
                     ),
                     InkWell(
@@ -1070,11 +1070,11 @@ Widget _buildCard(
                               'View Details',
                               'Details ansehen',
                             ),
-                            style: const TextStyle(
-                              color: SlatePalette.warningYellow,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: Theme.of(context).textTheme.labelMedium
+                                ?.copyWith(
+                                  color: SlatePalette.warningYellow,
+                                  fontWeight: FontWeight.bold,
+                                ),
                           ),
                           const Icon(
                             Icons.chevron_right,
@@ -1120,15 +1120,16 @@ class _StatRowMini extends StatelessWidget {
             children: [
               Text(
                 value,
-                style: const TextStyle(
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Colors.white,
-                  fontSize: 14,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               Text(
                 label,
-                style: const TextStyle(color: SlatePalette.oledMutedText, fontSize: 12),
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  color: SlatePalette.oledMutedText,
+                ),
               ),
             ],
           ),
@@ -1244,9 +1245,8 @@ class _RideMemoryPanel extends StatelessWidget {
                 'Ride Memory',
                 'Fahrtspeicher',
               ),
-              style: const TextStyle(
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 color: Colors.white,
-                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -1259,7 +1259,9 @@ class _RideMemoryPanel extends StatelessWidget {
               ),
               child: Text(
                 '${sessions.length > 4 ? 4 : sessions.length}',
-                style: const TextStyle(color: SlatePalette.oledMutedText, fontSize: 12),
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  color: SlatePalette.oledMutedText,
+                ),
               ),
             ),
           ],
@@ -1292,11 +1294,11 @@ class _RideMemoryPanel extends StatelessWidget {
                             'Ride History Empty',
                             'Fahrtverlauf leer',
                           ),
-                          style: const TextStyle(
-                            color: SlatePalette.oledMutedText,
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                color: SlatePalette.oledMutedText,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       ],
                     ),
@@ -1351,9 +1353,8 @@ class _RideMemoryPanel extends StatelessWidget {
                           'View all rides',
                           'Alle Fahrten anzeigen',
                         ),
-                        style: TextStyle(
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: context.colors.cyan,
-                          fontSize: 13,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -1443,10 +1444,10 @@ class _RideMemoryRow extends StatelessWidget {
                       width: 80,
                       child: Text(
                         title,
-                        style: const TextStyle(
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Colors.white,
-                          fontSize: 14,
                           fontWeight: FontWeight.w600,
+                          fontSize: 13,
                         ),
                       ),
                     ),
@@ -1454,7 +1455,7 @@ class _RideMemoryRow extends StatelessWidget {
                       width: 50,
                       child: Text(
                         subtitle1,
-                        style: const TextStyle(
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: SlatePalette.oledMutedText,
                           fontSize: 13,
                         ),
@@ -1463,7 +1464,7 @@ class _RideMemoryRow extends StatelessWidget {
                     Expanded(
                       child: Text(
                         subtitle2,
-                        style: const TextStyle(
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: SlatePalette.oledMutedText,
                           fontSize: 13,
                         ),
@@ -1471,7 +1472,7 @@ class _RideMemoryRow extends StatelessWidget {
                     ),
                     Text(
                       date,
-                      style: const TextStyle(
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: SlatePalette.oledMutedText,
                         fontSize: 13,
                       ),
@@ -1520,7 +1521,7 @@ class _ShareVibeButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(icon, style: const TextStyle(fontSize: 12)),
+            Text(icon, style: Theme.of(context).textTheme.labelMedium),
             const SizedBox(width: 4),
             Text(
               label,
@@ -1572,9 +1573,8 @@ void _showHardBrakingDetails(
                       : ((AppStrings.currentLanguageCode == 'de')
                             ? 'Details zum harten Bremsen'
                             : 'Harsh Braking Details'),
-                  style: const TextStyle(
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: Colors.white,
-                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -1613,11 +1613,11 @@ void _showHardBrakingDetails(
                               : ((AppStrings.currentLanguageCode == 'de')
                                     ? 'Starke Beschleunigung'
                                     : 'Harsh Acceleration'),
-                          style: const TextStyle(
-                            color: SlatePalette.warningYellow,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context).textTheme.bodyLarge
+                              ?.copyWith(
+                                color: SlatePalette.warningYellow,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                         const SizedBox(height: 4),
                         Text(
@@ -1626,11 +1626,8 @@ void _showHardBrakingDetails(
                               : ((AppStrings.currentLanguageCode == 'de')
                                     ? 'In dieser Fahrt wurden $totalEvents mal starkes Bremsen oder starke Beschleunigung erkannt. Versuchen Sie weichere Übergänge, um Reifen und Bremsbeläge zu schonen.'
                                     : 'Harsh braking or acceleration detected $totalEvents times in this ride. Try smoother transitions to protect your tires and brake pads.'),
-                          style: const TextStyle(
-                            color: Colors.white70,
-                            fontSize: 13,
-                            height: 1.4,
-                          ),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(color: Colors.white70),
                         ),
                       ],
                     ),
@@ -1743,9 +1740,8 @@ void _showRideSummary(
                     'RIDE SUMMARY',
                     'FAHRTZUSAMMENFASSUNG',
                   ),
-                  style: const TextStyle(
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     color: Colors.white,
-                    fontSize: 20,
                     fontWeight: FontWeight.w900,
                   ),
                 ),
@@ -1767,11 +1763,11 @@ void _showRideSummary(
                       const SizedBox(width: 4),
                       Text(
                         rideCharacter,
-                        style: TextStyle(
-                          color: characterColor,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: Theme.of(context).textTheme.labelMedium
+                            ?.copyWith(
+                              color: characterColor,
+                              fontWeight: FontWeight.bold,
+                            ),
                       ),
                     ],
                   ),
@@ -1850,14 +1846,14 @@ void _showRideSummary(
                 'DYNAMICS',
                 'DYNAMIK',
               ),
-              style: TextStyle(
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(
                 color: context.colors.textSecondary,
-                fontSize: 12,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 12),
             _buildSummaryRow(
+              context,
               tInline(
                 AppStrings.currentLanguageCode,
                 'Tahmini Maks. Yatış Açısı',
@@ -1881,6 +1877,7 @@ void _showRideSummary(
               ),
             ),
             _buildSummaryRow(
+              context,
               tInline(
                 AppStrings.currentLanguageCode,
                 'Uyum Puanı (Harmony)',
@@ -1890,6 +1887,7 @@ void _showRideSummary(
               '$harmony/100',
             ),
             _buildSummaryRow(
+              context,
               tInline(
                 AppStrings.currentLanguageCode,
                 'Ani Frenleme Sayısı',
@@ -1899,6 +1897,7 @@ void _showRideSummary(
               hardBrake,
             ),
             _buildSummaryRow(
+              context,
               tInline(
                 AppStrings.currentLanguageCode,
                 'Ani Hızlanma Sayısı',
@@ -1926,10 +1925,9 @@ void _showRideSummary(
                     'CLOSE',
                     'SCHLIESSEN',
                   ),
-                  style: const TextStyle(
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
-                    fontSize: 14,
                   ),
                 ),
               ),
@@ -1962,34 +1960,39 @@ Widget _buildSummaryBox(
         const SizedBox(height: 8),
         Text(
           value,
-          style: const TextStyle(
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
             color: Colors.white,
-            fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),
         const SizedBox(height: 4),
         Text(
           label,
-          style: TextStyle(color: context.colors.textSecondary, fontSize: 12),
+          style: Theme.of(context).textTheme.labelMedium?.copyWith(
+            color: context.colors.textSecondary,
+          ),
         ),
       ],
     ),
   );
 }
 
-Widget _buildSummaryRow(String label, String value) {
+Widget _buildSummaryRow(BuildContext context, String label, String value) {
   return Padding(
     padding: const EdgeInsets.symmetric(vertical: 8.0),
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: const TextStyle(color: Colors.grey, fontSize: 14)),
+        Text(
+          label,
+          style: Theme.of(
+            context,
+          ).textTheme.bodyLarge?.copyWith(color: Colors.grey),
+        ),
         Text(
           value,
-          style: const TextStyle(
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
             color: Colors.white,
-            fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -2021,9 +2024,8 @@ class AllRidesScreen extends ConsumerWidget {
           isTurkish
               ? 'Tüm Sürüşler'
               : 'All Rides', // AllRidesScreen uses isTurkish bool, no de support added here
-          style: const TextStyle(
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
             color: Colors.white,
-            fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -2033,7 +2035,9 @@ class AllRidesScreen extends ConsumerWidget {
           ? Center(
               child: Text(
                 isTurkish ? 'Henüz sürüş verisi yok.' : 'No ride data yet.',
-                style: const TextStyle(color: Colors.white54, fontSize: 16),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyLarge?.copyWith(color: Colors.white54),
               ),
             )
           : ListView.builder(
@@ -2083,39 +2087,46 @@ class AllRidesScreen extends ConsumerWidget {
                               children: [
                                 Text(
                                   session.mood,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                  style: Theme.of(context).textTheme.bodyLarge
+                                      ?.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                 ),
                                 const SizedBox(height: 4),
                                 Row(
                                   children: [
                                     Text(
                                       '${session.distanceKm.toStringAsFixed(1)} km',
-                                      style: const TextStyle(
-                                        color: SlatePalette.oledMutedText,
-                                        fontSize: 14,
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium
+                                          ?.copyWith(
+                                            color: SlatePalette.oledMutedText,
+                                          ),
                                     ),
-                                    const Padding(
-                                      padding: EdgeInsets.symmetric(
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
                                         horizontal: 8.0,
                                       ),
                                       child: Text(
                                         '•',
-                                        style: TextStyle(
-                                          color: SlatePalette.oledMutedText,
-                                        ),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyMedium
+                                            ?.copyWith(
+                                              color: SlatePalette.oledMutedText,
+                                            ),
                                       ),
                                     ),
                                     Text(
                                       '${session.durationMinutes} min',
-                                      style: const TextStyle(
-                                        color: SlatePalette.oledMutedText,
-                                        fontSize: 14,
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium
+                                          ?.copyWith(
+                                            color: SlatePalette.oledMutedText,
+                                          ),
                                     ),
                                   ],
                                 ),

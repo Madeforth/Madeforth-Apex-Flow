@@ -58,17 +58,16 @@ class InsightsScreen extends ConsumerWidget {
                     children: [
                       Text(
                         strings.insightsTitle,
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
+                        style: Theme.of(context).textTheme.headlineMedium
+                            ?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         strings.insightsSubtitle,
-                        style: TextStyle(
-                          fontSize: 13,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: context.colors.textSecondary,
                         ),
                       ),
@@ -102,11 +101,11 @@ class InsightsScreen extends ConsumerWidget {
                           children: [
                             Text(
                               garageState.activeBike?.name ?? 'RKS SRK 250 RR',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                              ),
+                              style: Theme.of(context).textTheme.labelMedium
+                                  ?.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                             ),
                             const SizedBox(width: 8),
                             const Icon(
@@ -176,11 +175,11 @@ class InsightsScreen extends ConsumerWidget {
                             'Insights up to date',
                             'Erkenntnisse auf dem neuesten Stand',
                           ),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                         const SizedBox(height: 2),
                         Text(
@@ -190,10 +189,8 @@ class InsightsScreen extends ConsumerWidget {
                             'Based on your local garage and ride records.',
                             'Basierend auf Ihren lokalen Werkstatt- und Fahrtaufzeichnungen.',
                           ),
-                          style: TextStyle(
-                            color: context.colors.textSecondary,
-                            fontSize: 12,
-                          ),
+                          style: Theme.of(context).textTheme.labelMedium
+                              ?.copyWith(color: context.colors.textSecondary),
                         ),
                       ],
                     ),
@@ -215,9 +212,8 @@ class InsightsScreen extends ConsumerWidget {
                         'Offline',
                         'Offline',
                       ),
-                      style: TextStyle(
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: context.colors.textSecondary,
-                        fontSize: 11,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -369,11 +365,11 @@ class InsightsScreen extends ConsumerWidget {
                         const SizedBox(width: 4),
                         Text(
                           strings.addPart,
-                          style: TextStyle(
-                            color: context.colors.cyan,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 12,
-                          ),
+                          style: Theme.of(context).textTheme.labelMedium
+                              ?.copyWith(
+                                color: context.colors.cyan,
+                                fontWeight: FontWeight.w600,
+                              ),
                         ),
                       ],
                     ),
@@ -391,7 +387,7 @@ class InsightsScreen extends ConsumerWidget {
                     'Your parts wishlist is empty. Add parts you plan to buy, optionally with a link.',
                     'Ihre Ersatzteil-Wunschliste ist leer. Fügen Sie Teile hinzu, die Sie kaufen möchten, optional mit einem Link.',
                   ),
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: context.colors.textSecondary,
                     height: 1.35,
                   ),
@@ -490,9 +486,8 @@ class InsightsScreen extends ConsumerWidget {
                       'Add Part',
                       'Teil hinzufügen',
                     ),
-                    style: const TextStyle(
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       color: Colors.white,
-                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -517,6 +512,7 @@ class InsightsScreen extends ConsumerWidget {
               const SizedBox(height: 24),
               // Input fields
               _buildPremiumTextField(
+                context: context,
                 controller: name,
                 label: tInline(
                   AppStrings.currentLanguageCode,
@@ -528,6 +524,7 @@ class InsightsScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 16),
               _buildPremiumTextField(
+                context: context,
                 controller: note,
                 label: tInline(
                   AppStrings.currentLanguageCode,
@@ -539,6 +536,7 @@ class InsightsScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 16),
               _buildPremiumTextField(
+                context: context,
                 controller: url,
                 label: tInline(
                   AppStrings.currentLanguageCode,
@@ -550,6 +548,7 @@ class InsightsScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 16),
               _buildPremiumTextField(
+                context: context,
                 controller: price,
                 label: tInline(
                   AppStrings.currentLanguageCode,
@@ -625,9 +624,8 @@ class InsightsScreen extends ConsumerWidget {
                       'Save part',
                       'Teil speichern',
                     ),
-                    style: const TextStyle(
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: SlatePalette.surfaceDeep,
-                      fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -641,6 +639,7 @@ class InsightsScreen extends ConsumerWidget {
   }
 
   Widget _buildPremiumTextField({
+    required BuildContext context,
     required TextEditingController controller,
     required String label,
     required IconData icon,
@@ -655,13 +654,14 @@ class InsightsScreen extends ConsumerWidget {
       child: TextField(
         controller: controller,
         keyboardType: keyboardType,
-        style: const TextStyle(color: Colors.white, fontSize: 14),
+        style: Theme.of(
+          context,
+        ).textTheme.bodyMedium?.copyWith(color: Colors.white),
         decoration: InputDecoration(
           hintText: label,
-          hintStyle: const TextStyle(
-            color: SlatePalette.mutedText,
-            fontSize: 14,
-          ),
+          hintStyle: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: SlatePalette.mutedText),
           prefixIcon: Icon(icon, color: SlatePalette.mutedText, size: 18),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(
@@ -687,8 +687,7 @@ class _SectionTitle extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 12),
       child: Text(
         title,
-        style: const TextStyle(
-          fontSize: 16,
+        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
           fontWeight: FontWeight.bold,
           color: Colors.white,
         ),
@@ -760,12 +759,12 @@ class _MaintenanceOverviewCard extends StatelessWidget {
                         children: [
                           Text(
                             '$harmonyScore',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                              height: 1.0,
-                            ),
+                            style: Theme.of(context).textTheme.headlineLarge
+                                ?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  height: 1.0,
+                                ),
                           ),
                           const SizedBox(height: 4),
                           Text(
@@ -814,9 +813,8 @@ class _MaintenanceOverviewCard extends StatelessWidget {
                         'Attention',
                         'Achtung',
                       ),
-                      style: const TextStyle(
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: SlatePalette.caution,
-                        fontSize: 11,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -839,9 +837,8 @@ class _MaintenanceOverviewCard extends StatelessWidget {
                     'Service interval is approaching',
                     'Serviceintervall nähert sich',
                   ),
-                  style: const TextStyle(
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
                     color: Colors.white,
-                    fontSize: 15,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -859,9 +856,8 @@ class _MaintenanceOverviewCard extends StatelessWidget {
                         ? '$remainingText km überfällig im aktuellen\n$intervalText km Intervall.'
                         : '$remainingText km verbleibend im aktuellen\n$intervalText km Intervall.',
                   ),
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: context.colors.textSecondary,
-                    fontSize: 13,
                     height: 1.4,
                   ),
                 ),
@@ -881,9 +877,8 @@ class _MaintenanceOverviewCard extends StatelessWidget {
                   children: [
                     Text(
                       '${numberFormat.format(currentKm - lastServiceKm)} / $intervalText km',
-                      style: TextStyle(
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
                         color: context.colors.textSecondary,
-                        fontSize: 12,
                       ),
                     ),
                     GestureDetector(
@@ -905,7 +900,10 @@ class _MaintenanceOverviewCard extends StatelessWidget {
                                       'Service Interval',
                                       'Wartungsintervall',
                                     ),
-                                    style: const TextStyle(color: Colors.white),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleLarge
+                                        ?.copyWith(color: Colors.white),
                                   ),
                                   content: Column(
                                     mainAxisSize: MainAxisSize.min,
@@ -917,19 +915,24 @@ class _MaintenanceOverviewCard extends StatelessWidget {
                                           'Set service interval (km)',
                                           'Wartungsintervall festlegen (km)',
                                         ),
-                                        style: TextStyle(
-                                          color: context.colors.textSecondary,
-                                          fontSize: 13,
-                                        ),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyMedium
+                                            ?.copyWith(
+                                              color:
+                                                  context.colors.textSecondary,
+                                            ),
                                       ),
                                       const SizedBox(height: 24),
                                       Text(
                                         '$newInterval km',
-                                        style: TextStyle(
-                                          color: context.colors.cyan,
-                                          fontSize: 24,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headlineMedium
+                                            ?.copyWith(
+                                              color: context.colors.cyan,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                       ),
                                       Slider(
                                         value: newInterval.toDouble(),
@@ -955,9 +958,13 @@ class _MaintenanceOverviewCard extends StatelessWidget {
                                           'Cancel',
                                           'Abbrechen',
                                         ),
-                                        style: TextStyle(
-                                          color: context.colors.textSecondary,
-                                        ),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyMedium
+                                            ?.copyWith(
+                                              color:
+                                                  context.colors.textSecondary,
+                                            ),
                                       ),
                                     ),
                                     Consumer(
@@ -1009,9 +1016,10 @@ class _MaintenanceOverviewCard extends StatelessWidget {
                                               'Save',
                                               'Speichern',
                                             ),
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                            ),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyMedium
+                                                ?.copyWith(color: Colors.white),
                                           ),
                                         );
                                       },
@@ -1038,11 +1046,11 @@ class _MaintenanceOverviewCard extends StatelessWidget {
                               'Edit',
                               'Bearbeiten',
                             ),
-                            style: TextStyle(
-                              color: context.colors.cyan,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                            ),
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(
+                                  color: context.colors.cyan,
+                                  fontWeight: FontWeight.w600,
+                                ),
                           ),
                         ],
                       ),
@@ -1091,9 +1099,8 @@ class _StatCard extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               title,
-              style: TextStyle(
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(
                 color: context.colors.textSecondary,
-                fontSize: 12,
               ),
               // Three of these sit side by side, so a single line clips
               // longer localized titles ("Sıradaki servis",
@@ -1108,9 +1115,8 @@ class _StatCard extends StatelessWidget {
               child: Text(
                 value,
                 maxLines: 1,
-                style: const TextStyle(
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: Colors.white,
-                  fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -1207,9 +1213,8 @@ class _RecentRideImpactCard extends StatelessWidget {
                   children: [
                     Text(
                       _translateLine(pattern.label, tr),
-                      style: const TextStyle(
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         color: Colors.white,
-                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -1221,17 +1226,15 @@ class _RecentRideImpactCard extends StatelessWidget {
                         'Last ride · $distanceStr',
                         'Letzte Fahrt · $distanceStr',
                       ),
-                      style: TextStyle(
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
                         color: context.colors.textSecondary,
-                        fontSize: 12,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       _translateLine(pattern.recommendation, tr),
-                      style: TextStyle(
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: context.colors.textSecondary,
-                        fontSize: 13,
                       ),
                     ),
                   ],
@@ -1256,9 +1259,8 @@ class _RecentRideImpactCard extends StatelessWidget {
                       'Review',
                       'Überprüfen',
                     ),
-                    style: const TextStyle(
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
                       color: SlatePalette.danger,
-                      fontSize: 12,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -1323,9 +1325,8 @@ class _RecentRideImpactCard extends StatelessWidget {
                     'Wear estimates improve as more rides are recorded.',
                     'Die Verschleißschätzungen verbessern sich, je mehr Fahrten aufgezeichnet werden.',
                   ),
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
                     color: context.colors.textSecondary,
-                    fontSize: 12,
                     fontStyle: FontStyle.italic,
                   ),
                 ),
@@ -1419,9 +1420,8 @@ class _UpcomingMaintenanceCard extends StatelessWidget {
                           'Service interval',
                           'Serviceintervall',
                         ),
-                        style: const TextStyle(
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
                           color: Colors.white,
-                          fontSize: 15,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -1439,9 +1439,8 @@ class _UpcomingMaintenanceCard extends StatelessWidget {
                               ? '${remaining.abs()} km überfällig'
                               : 'Noch $remaining km',
                         ),
-                        style: TextStyle(
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: context.colors.textSecondary,
-                          fontSize: 13,
                         ),
                       ),
                     ],
@@ -1477,19 +1476,17 @@ class _UpcomingMaintenanceCard extends StatelessWidget {
                       children: [
                         Text(
                           _translateLine(item.task, tr),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context).textTheme.labelLarge
+                              ?.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           _translateLine(item.note, tr),
-                          style: TextStyle(
-                            color: context.colors.textSecondary,
-                            fontSize: 13,
-                          ),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(color: context.colors.textSecondary),
                         ),
                       ],
                     ),
@@ -1554,9 +1551,8 @@ class _CostLedgerCard extends ConsumerWidget {
                     children: [
                       Text(
                         settings.formatCurrency(state.totalCostTry),
-                        style: const TextStyle(
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           color: Colors.white,
-                          fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -1568,10 +1564,8 @@ class _CostLedgerCard extends ConsumerWidget {
                           'Recorded this month',
                           'Diesen Monat aufgezeichnet',
                         ),
-                        style: TextStyle(
-                          color: context.colors.textSecondary,
-                          fontSize: 12,
-                        ),
+                        style: Theme.of(context).textTheme.labelMedium
+                            ?.copyWith(color: context.colors.textSecondary),
                       ),
                     ],
                   ),
@@ -1598,9 +1592,8 @@ class _CostLedgerCard extends ConsumerWidget {
                         'View ledger',
                         'Ansehen',
                       ),
-                      style: TextStyle(
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
                         color: context.colors.cyan,
-                        fontSize: 12,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 0.2,
                       ),
@@ -1659,20 +1652,20 @@ class _CostLedgerCard extends ConsumerWidget {
                         Expanded(
                           child: Text(
                             '${_translateLine(entry.category, tr)} · ${_formatCostEntryDate(entry.dateIso)}',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
                           ),
                         ),
                         Text(
                           settings.formatCurrency(entry.amountTry),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       ],
                     ),
@@ -1681,18 +1674,14 @@ class _CostLedgerCard extends ConsumerWidget {
                       children: [
                         Text(
                           _translateLine(entry.category, tr),
-                          style: TextStyle(
-                            color: context.colors.textSecondary,
-                            fontSize: 12,
-                          ),
+                          style: Theme.of(context).textTheme.labelMedium
+                              ?.copyWith(color: context.colors.textSecondary),
                         ),
                         const Spacer(),
                         Text(
                           '${(percent * 100).toStringAsFixed(0)}%',
-                          style: TextStyle(
-                            color: context.colors.textSecondary,
-                            fontSize: 12,
-                          ),
+                          style: Theme.of(context).textTheme.labelMedium
+                              ?.copyWith(color: context.colors.textSecondary),
                         ),
                       ],
                     ),
@@ -1720,7 +1709,9 @@ class _CostLedgerCard extends ConsumerWidget {
                   'No cost entries yet.',
                   'Noch keine Kosteneinträge.',
                 ),
-                style: TextStyle(color: context.colors.textSecondary),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: context.colors.textSecondary,
+                ),
               ),
             ),
         ],
@@ -1793,9 +1784,8 @@ void _showLedgerSheet(
                           'Cost Ledger',
                           'Kostenbuch',
                         ),
-                        style: TextStyle(
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
                           color: context.colors.white,
-                          fontSize: 15,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 0.3,
                         ),
@@ -1803,9 +1793,8 @@ void _showLedgerSheet(
                       const Spacer(),
                       Text(
                         settings.formatCurrency(state.totalCostTry),
-                        style: TextStyle(
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
                           color: context.colors.cyan,
-                          fontSize: 15,
                           fontWeight: FontWeight.w900,
                         ),
                       ),
@@ -1828,10 +1817,8 @@ void _showLedgerSheet(
                               'No entries yet.',
                               'Noch keine Einträge.',
                             ),
-                            style: TextStyle(
-                              color: context.colors.textSecondary,
-                              fontSize: 13,
-                            ),
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(color: context.colors.textSecondary),
                           ),
                         )
                       : ListView.separated(
@@ -1865,19 +1852,19 @@ void _showLedgerSheet(
                               ),
                               title: Text(
                                 _translateLine(e.category, tr),
-                                style: TextStyle(
-                                  color: context.colors.white,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(
+                                      color: context.colors.white,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                               ),
                               trailing: Text(
                                 settings.formatCurrency(e.amountTry),
-                                style: TextStyle(
-                                  color: context.colors.white,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w900,
-                                ),
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(
+                                      color: context.colors.white,
+                                      fontWeight: FontWeight.w900,
+                                    ),
                               ),
                             );
                           },
@@ -2025,15 +2012,15 @@ Future<void> _showAddCostSheet(
                                       'Other',
                                       'Sonstiges',
                                     ),
-                              style: TextStyle(
-                                color: sel
-                                    ? context.colors.cyan
-                                    : context.colors.textSecondary,
-                                fontSize: 12,
-                                fontWeight: sel
-                                    ? FontWeight.w600
-                                    : FontWeight.w400,
-                              ),
+                              style: Theme.of(context).textTheme.labelMedium
+                                  ?.copyWith(
+                                    color: sel
+                                        ? context.colors.cyan
+                                        : context.colors.textSecondary,
+                                    fontWeight: sel
+                                        ? FontWeight.w600
+                                        : FontWeight.w400,
+                                  ),
                             ),
                           ),
                         );
@@ -2043,7 +2030,9 @@ Future<void> _showAddCostSheet(
                   const SizedBox(height: 12),
                   TextField(
                     controller: descCtrl,
-                    style: TextStyle(color: context.colors.white, fontSize: 13),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: context.colors.white,
+                    ),
                     decoration: InputDecoration(
                       hintText: tInline(
                         AppStrings.currentLanguageCode,
@@ -2061,17 +2050,20 @@ Future<void> _showAddCostSheet(
                     keyboardType: const TextInputType.numberWithOptions(
                       decimal: true,
                     ),
-                    style: TextStyle(color: context.colors.white, fontSize: 13),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: context.colors.white,
+                    ),
                     decoration: InputDecoration(
                       hintText:
                           '${tInline(AppStrings.currentLanguageCode, 'Tutar', 'Amount', 'Betrag')} ($currencySymbol)',
                       filled: true,
                       fillColor: SlatePalette.oledBackground,
                       prefixText: '$currencySymbol ',
-                      prefixStyle: TextStyle(
-                        color: context.colors.cyan,
-                        fontWeight: FontWeight.w700,
-                      ),
+                      prefixStyle: Theme.of(context).textTheme.bodyMedium
+                          ?.copyWith(
+                            color: context.colors.cyan,
+                            fontWeight: FontWeight.w700,
+                          ),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -2136,8 +2128,7 @@ Future<void> _showAddCostSheet(
                           'SAVE',
                           'SPEICHERN',
                         ),
-                        style: const TextStyle(
-                          fontSize: 13,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w700,
                           letterSpacing: 1.2,
                         ),
@@ -2258,7 +2249,7 @@ class _WishlistRow extends StatelessWidget {
               children: [
                 Text(
                   part.name,
-                  style: const TextStyle(
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
@@ -2266,9 +2257,8 @@ class _WishlistRow extends StatelessWidget {
                 if (part.note.isNotEmpty)
                   Text(
                     part.note,
-                    style: TextStyle(
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: context.colors.textSecondary,
-                      fontSize: 13,
                     ),
                   ),
               ],
@@ -2277,7 +2267,7 @@ class _WishlistRow extends StatelessWidget {
           if (part.priceTry != null && part.priceTry! > 0) ...[
             Text(
               settings.formatCurrency(part.priceTry!),
-              style: const TextStyle(
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
               ),
@@ -2363,18 +2353,16 @@ void _showRecentRideImpactDetails(
             const SizedBox(height: 16),
             Text(
               _translateLine(pattern.label, tr),
-              style: const TextStyle(
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 color: Colors.white,
-                fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               _translateLine(pattern.recommendation, tr),
-              style: const TextStyle(
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: SlatePalette.oledMutedText,
-                fontSize: 13,
               ),
             ),
             const SizedBox(height: 20),
@@ -2440,8 +2428,7 @@ void _showRecentRideImpactDetails(
                     'CLOSE',
                     'SCHLIESSEN',
                   ),
-                  style: const TextStyle(
-                    fontSize: 12,
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.5,
                   ),
@@ -2466,13 +2453,14 @@ Widget _buildDetailRow(
     children: [
       Text(
         label,
-        style: const TextStyle(color: SlatePalette.oledMutedText, fontSize: 13),
+        style: Theme.of(
+          context,
+        ).textTheme.bodyMedium?.copyWith(color: SlatePalette.oledMutedText),
       ),
       Text(
         value,
-        style: TextStyle(
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
           color: valColor ?? Colors.white,
-          fontSize: 13,
           fontWeight: FontWeight.bold,
         ),
       ),
