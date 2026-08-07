@@ -342,14 +342,12 @@ class GarageScreen extends ConsumerWidget {
                           labelColor:
                               context.colors.cyan, // Selected text/icon color
                           unselectedLabelColor: context.colors.textSecondary,
-                          labelStyle: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 11,
-                          ),
-                          unselectedLabelStyle: const TextStyle(
-                            fontWeight: FontWeight.w400,
-                            fontSize: 11,
-                          ),
+                          labelStyle: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(fontWeight: FontWeight.w600),
+                          unselectedLabelStyle: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.copyWith(fontWeight: FontWeight.w400),
                         ),
                       ),
                     ),
@@ -405,10 +403,9 @@ class GarageScreen extends ConsumerWidget {
                   'Add Motorcycle',
                   'Motorrad hinzufügen',
                 ),
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w900,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w900),
               ),
               const SizedBox(height: 12),
               _ApexTextField(
@@ -595,12 +592,7 @@ class _GarageHeader extends ConsumerWidget {
             children: [
               Text(
                 tr ? 'Garaj' : 'Garage',
-                style: const TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  letterSpacing: -0.5,
-                ),
+                style: Theme.of(context).textTheme.headlineLarge,
               ),
               const SizedBox(height: 4),
               Text(
@@ -610,7 +602,9 @@ class _GarageHeader extends ConsumerWidget {
                   'Machines, service history, and component condition.',
                   'Maschinen, Servicehistorie und Zustand der Komponenten.',
                 ),
-                style: const TextStyle(color: SlatePalette.oledMutedText, fontSize: 13),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: SlatePalette.oledMutedText,
+                ),
               ),
             ],
           ),
@@ -683,9 +677,8 @@ void _showEditIntervalDialog(
                 children: [
                   Text(
                     tr ? 'Bakım Aralığı Belirle' : 'Set Service Interval',
-                    style: const TextStyle(
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: Colors.white,
-                      fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -694,9 +687,8 @@ void _showEditIntervalDialog(
                     tr
                         ? 'Motosikletin kaç kilometrede bir bakıma girmesi gerektiğini belirtin.'
                         : 'Enter how many kilometers between maintenance cycles.',
-                    style: const TextStyle(
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
                       color: SlatePalette.oledMutedText,
-                      fontSize: 12,
                     ),
                   ),
                   const SizedBox(height: 18),
@@ -737,13 +729,13 @@ void _showEditIntervalDialog(
                           ),
                           child: Text(
                             '$preset km',
-                            style: TextStyle(
-                              color: isSelected
-                                  ? context.colors.cyan
-                                  : Colors.white70,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: Theme.of(context).textTheme.labelMedium
+                                ?.copyWith(
+                                  color: isSelected
+                                      ? context.colors.cyan
+                                      : Colors.white70,
+                                  fontWeight: FontWeight.bold,
+                                ),
                           ),
                         ),
                       );
@@ -756,15 +748,15 @@ void _showEditIntervalDialog(
                     controller: controller,
                     keyboardType: TextInputType.number,
                     onChanged: (_) => setState(() {}),
-                    style: const TextStyle(color: Colors.white, fontSize: 14),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.copyWith(color: Colors.white),
                     decoration: InputDecoration(
                       filled: true,
                       fillColor: SlatePalette.surface,
                       labelText: tr ? 'Özel Değer (km)' : 'Custom Value (km)',
-                      labelStyle: const TextStyle(
-                        color: SlatePalette.oledMutedText,
-                        fontSize: 12,
-                      ),
+                      labelStyle: Theme.of(context).textTheme.labelMedium
+                          ?.copyWith(color: SlatePalette.oledMutedText),
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 12,
                         vertical: 12,
@@ -821,10 +813,8 @@ void _showEditIntervalDialog(
                         ),
                         child: Text(
                           tr ? 'Kaydet' : 'Save',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13,
-                          ),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                       ),
                     ],
@@ -887,8 +877,7 @@ class _GarageSummaryCard extends ConsumerWidget {
               'GARAGE SUMMARY',
               'GARAGENÜBERSICHT',
             ),
-            style: TextStyle(
-              fontSize: 11,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
               fontWeight: FontWeight.bold,
               color: context.colors.cyan,
               letterSpacing: 1.0,
@@ -902,14 +891,15 @@ class _GarageSummaryCard extends ConsumerWidget {
               'Active motorcycle',
               'Aktives Motorrad',
             ),
-            style: TextStyle(color: context.colors.textSecondary, fontSize: 11),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: context.colors.textSecondary,
+            ),
           ),
           const SizedBox(height: 2),
           Text(
             bike.name,
-            style: const TextStyle(
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
               color: Colors.white,
-              fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -925,8 +915,7 @@ class _GarageSummaryCard extends ConsumerWidget {
                     'Maintenance tracking',
                     'Wartungsverfolgung',
                   ),
-                  style: const TextStyle(
-                    fontSize: 18,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
@@ -978,7 +967,9 @@ class _GarageSummaryCard extends ConsumerWidget {
               'Manage your machine\'s current status in one place.',
               'Verwalten Sie den aktuellen Status Ihrer Maschine an einem Ort.',
             ),
-            style: const TextStyle(color: SlatePalette.oledMutedText, fontSize: 12),
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+              color: SlatePalette.oledMutedText,
+            ),
           ),
           const SizedBox(height: 16),
           Row(
@@ -989,18 +980,17 @@ class _GarageSummaryCard extends ConsumerWidget {
                   children: [
                     Text(
                       ref.watch(appSettingsProvider).formatNumber(odometerVal),
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+                      style: Theme.of(context).textTheme.headlineMedium
+                          ?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       tr ? 'Toplam kilometre' : 'Total odometer',
-                      style: const TextStyle(
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
                         color: SlatePalette.oledMutedText,
-                        fontSize: 12,
                       ),
                     ),
                   ],
@@ -1014,20 +1004,16 @@ class _GarageSummaryCard extends ConsumerWidget {
                       ref
                           .watch(appSettingsProvider)
                           .formatNumber(remaining.abs()),
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: color,
-                      ),
+                      style: Theme.of(context).textTheme.headlineMedium
+                          ?.copyWith(fontWeight: FontWeight.bold, color: color),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       remaining < 0
                           ? (tr ? 'Bakım gecikti' : 'Service overdue')
                           : (tr ? 'Sonraki bakıma' : 'Next service'),
-                      style: const TextStyle(
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
                         color: SlatePalette.oledMutedText,
-                        fontSize: 12,
                       ),
                     ),
                   ],
@@ -1051,7 +1037,9 @@ class _GarageSummaryCard extends ConsumerWidget {
             children: [
               Text(
                 '$displayInterval $distanceUnitLabel ',
-                style: const TextStyle(color: SlatePalette.oledMutedText, fontSize: 12),
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  color: SlatePalette.oledMutedText,
+                ),
               ),
               Text(
                 tInline(
@@ -1060,7 +1048,9 @@ class _GarageSummaryCard extends ConsumerWidget {
                   'Service interval',
                   'Wartungsintervall',
                 ),
-                style: const TextStyle(color: SlatePalette.oledMutedText, fontSize: 12),
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  color: SlatePalette.oledMutedText,
+                ),
               ),
             ],
           ),
@@ -1078,9 +1068,8 @@ class _GarageSummaryCard extends ConsumerWidget {
                     'Last update • Today $updateTimeStr',
                     'Letztes Update • Heute $updateTimeStr',
                   ),
-                  style: const TextStyle(
-                    color: Color(0xFF6B7280),
-                    fontSize: 11,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: const Color(0xFF6B7280),
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -1104,8 +1093,7 @@ class _GarageSummaryCard extends ConsumerWidget {
                     'Edit Interval',
                     'Intervall bearbeiten',
                   ),
-                  style: const TextStyle(
-                    fontSize: 12,
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -1202,9 +1190,8 @@ class _QuickActionButton extends StatelessWidget {
               fit: BoxFit.scaleDown,
               child: Text(
                 label,
-                style: const TextStyle(
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
                   color: Colors.white,
-                  fontSize: 12,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -1244,9 +1231,8 @@ class _MachineMetric extends StatelessWidget {
             children: [
               Text(
                 label,
-                style: TextStyle(
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: context.colors.textSecondary,
-                  fontSize: 11,
                 ),
               ),
               const SizedBox(height: ApexSpacing.x1),
@@ -1264,9 +1250,8 @@ class _MachineMetric extends StatelessWidget {
                   const SizedBox(width: 4),
                   Text(
                     unit,
-                    style: TextStyle(
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: context.colors.muted,
-                      fontSize: 11,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
@@ -1320,7 +1305,7 @@ class _MotorcycleListPanel extends ConsumerWidget {
                 'No motorcycles yet. Add your first machine to begin.',
                 'Noch keine Motorräder. Fügen Sie zunächst Ihre erste Maschine hinzu.',
               ),
-              style: TextStyle(
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: context.colors.textSecondary,
                 height: 1.35,
               ),
@@ -1351,7 +1336,9 @@ class _MotorcycleListPanel extends ConsumerWidget {
                 'Archive',
                 'Archiv',
               ),
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w900),
+              style: Theme.of(
+                context,
+              ).textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w900),
             ),
             const SizedBox(height: 8),
             for (final bike in archived) ...[
@@ -1415,10 +1402,9 @@ class _MotorcycleListPanel extends ConsumerWidget {
                   'Edit profile',
                   'Profil bearbeiten',
                 ),
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w900,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w900),
               ),
               const SizedBox(height: 12),
               _ApexTextField(
@@ -1564,9 +1550,8 @@ class _MotorcycleListPanel extends ConsumerWidget {
                     'Delete Motorcycle?',
                     'Motorrad löschen?',
                   ),
-                  style: const TextStyle(
+                  style: Theme.of(ctx).textTheme.bodyLarge?.copyWith(
                     color: Colors.white,
-                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -1580,18 +1565,18 @@ class _MotorcycleListPanel extends ConsumerWidget {
               'Are you sure you want to delete "${bike.name}" and all associated service records? This action cannot be undone.',
               'Sind Sie sicher, dass Sie "${bike.name}" und alle zugehörigen Serviceeinträge löschen möchten? Dies kann nicht rückgängig gemacht werden.',
             ),
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 13,
-              height: 1.4,
-            ),
+            style: Theme.of(
+              ctx,
+            ).textTheme.bodyMedium?.copyWith(color: Colors.white70),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(false),
               child: Text(
                 tInline(lang, 'İptal', 'Cancel', 'Abbrechen'),
-                style: const TextStyle(color: Colors.grey),
+                style: Theme.of(
+                  ctx,
+                ).textTheme.bodyMedium?.copyWith(color: Colors.grey),
               ),
             ),
             ElevatedButton(
@@ -1602,7 +1587,9 @@ class _MotorcycleListPanel extends ConsumerWidget {
               onPressed: () => Navigator.of(ctx).pop(true),
               child: Text(
                 tInline(lang, 'Sil', 'Delete', 'Löschen'),
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                style: Theme.of(
+                  ctx,
+                ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
               ),
             ),
           ],
@@ -1677,16 +1664,17 @@ class _MotorcycleRow extends StatelessWidget {
                     bike.name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontWeight: FontWeight.w800),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     bike.model,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
                       color: context.colors.textSecondary,
-                      fontSize: 12,
                     ),
                   ),
                 ],
@@ -1823,7 +1811,9 @@ class _GarageActionStrip extends StatelessWidget {
             'More garage tools',
             'Weitere Garagenwerkzeuge',
           ),
-          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w800),
         ),
         const SizedBox(height: ApexSpacing.x1),
         ApexPanel(
@@ -1930,7 +1920,9 @@ class _GarageMainAction extends StatelessWidget {
               textAlign: TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600),
             ),
           ],
         ),
@@ -1965,10 +1957,7 @@ class _GarageToolListTile extends StatelessWidget {
                 label,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                ),
+                style: Theme.of(context).textTheme.labelMedium,
               ),
             ),
             Icon(Icons.chevron_right, color: context.colors.muted, size: 16),
@@ -2058,10 +2047,8 @@ class _ServiceEntrySheetState extends State<_ServiceEntrySheet> {
             const SizedBox(height: ApexSpacing.x1),
             Text(
               strings.garageServiceEntryHelper,
-              style: TextStyle(
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(
                 color: context.colors.textSecondary,
-                fontSize: 12,
-                height: 1.35,
               ),
             ),
             if (quickLabels.isNotEmpty) ...[
@@ -2120,12 +2107,13 @@ class _ServiceEntrySheetState extends State<_ServiceEntrySheet> {
                             'Mechanic',
                             'Mechaniker',
                           ),
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: _selectedType == 'mechanic'
-                                ? context.colors.cyan
-                                : context.colors.textSecondary,
-                          ),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: _selectedType == 'mechanic'
+                                    ? context.colors.cyan
+                                    : context.colors.textSecondary,
+                              ),
                         ),
                       ),
                     ),
@@ -2157,12 +2145,13 @@ class _ServiceEntrySheetState extends State<_ServiceEntrySheet> {
                             'DIY',
                             'DIY',
                           ),
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: _selectedType == 'diy'
-                                ? context.colors.healthy
-                                : context.colors.textSecondary,
-                          ),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: _selectedType == 'diy'
+                                    ? context.colors.healthy
+                                    : context.colors.textSecondary,
+                              ),
                         ),
                       ),
                     ),
@@ -2218,7 +2207,9 @@ class _ServiceEntrySheetState extends State<_ServiceEntrySheet> {
               const SizedBox(height: ApexSpacing.x1),
               Text(
                 _error!,
-                style: TextStyle(color: context.colors.red, fontSize: 12),
+                style: Theme.of(
+                  context,
+                ).textTheme.labelMedium?.copyWith(color: context.colors.red),
               ),
             ],
             const SizedBox(height: ApexSpacing.x2),
@@ -2243,8 +2234,7 @@ class _ServiceEntrySheetState extends State<_ServiceEntrySheet> {
                     borderRadius: BorderRadius.circular(ApexSpacing.radius),
                     side: BorderSide(color: context.colors.cyan),
                   ),
-                  textStyle: const TextStyle(
-                    fontSize: 12,
+                  textStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
                     fontWeight: FontWeight.w800,
                   ),
                 ),
@@ -2346,13 +2336,14 @@ class _ApexTextField extends StatelessWidget {
       keyboardType: keyboardType,
       maxLines: maxLines,
       cursorColor: context.colors.cyan,
-      style: TextStyle(color: context.colors.white, fontSize: 13),
+      style: Theme.of(
+        context,
+      ).textTheme.bodyMedium?.copyWith(color: context.colors.white),
       decoration: InputDecoration(
         labelText: label,
         helperText: helperText,
-        labelStyle: TextStyle(
+        labelStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
           color: context.colors.textSecondary,
-          fontSize: 11,
           fontWeight: FontWeight.w700,
         ),
         filled: true,
@@ -2382,7 +2373,9 @@ class _QuickFillChip extends StatelessWidget {
       onPressed: onTap,
       avatar: Icon(Icons.bolt_outlined, size: 14, color: context.colors.cyan),
       label: Text(label),
-      labelStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700),
+      labelStyle: Theme.of(
+        context,
+      ).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w700),
       side: BorderSide(color: context.colors.border),
       backgroundColor: context.colors.elevated,
     );
@@ -2440,17 +2433,15 @@ class _StatusSlider extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(
-                        fontSize: 15,
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
                         fontWeight: FontWeight.w800,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       hint,
-                      style: TextStyle(
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
                         color: context.colors.textSecondary,
-                        fontSize: 12,
                       ),
                     ),
                   ],
@@ -2469,10 +2460,9 @@ class _StatusSlider extends StatelessWidget {
                 ),
                 child: Text(
                   '${value.toInt()}%',
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: color,
                     fontWeight: FontWeight.w900,
-                    fontSize: 14,
                   ),
                 ),
               ),
@@ -2532,8 +2522,7 @@ class _MachineHealthGrid extends StatelessWidget {
                 'Machine Health',
                 'Maschinengesundheit',
               ),
-              style: const TextStyle(
-                fontSize: 16,
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
@@ -2550,9 +2539,8 @@ class _MachineHealthGrid extends StatelessWidget {
                   'See All >',
                   'Alle sehen >',
                 ),
-                style: TextStyle(
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: context.colors.cyan,
-                  fontSize: 13,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -2634,8 +2622,7 @@ class _ComponentGridCell extends StatelessWidget {
                 children: [
                   Text(
                     strings.garageComponentLabel(status.label),
-                    style: const TextStyle(
-                      fontSize: 12,
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
@@ -2914,19 +2901,17 @@ class _ComponentGridCell extends StatelessWidget {
                       children: [
                         Text(
                           strings.garageComponentLabel(status.label),
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w900,
-                          ),
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w900),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           copy.headline,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: healthColor,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                color: healthColor,
+                                fontWeight: FontWeight.w600,
+                              ),
                         ),
                       ],
                     ),
@@ -2940,8 +2925,7 @@ class _ComponentGridCell extends StatelessWidget {
                     : (strings.locale.languageCode == 'de'
                           ? 'Komponenten-Zustand'
                           : 'Component Status'),
-                style: TextStyle(
-                  fontSize: 12,
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
                   color: context.colors.textSecondary,
                   fontWeight: FontWeight.bold,
                 ),
@@ -2957,11 +2941,9 @@ class _ComponentGridCell extends StatelessWidget {
                 ),
                 child: Text(
                   copy.signal,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 13,
-                    height: 1.4,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(color: Colors.white),
                 ),
               ),
               const SizedBox(height: 24),
@@ -3106,9 +3088,8 @@ class _SystemMenuItem extends StatelessWidget {
             Expanded(
               child: Text(
                 label,
-                style: const TextStyle(
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: Colors.white,
-                  fontSize: 11,
                   fontWeight: FontWeight.w600,
                 ),
                 maxLines: 2,
@@ -3310,8 +3291,7 @@ class _ServiceTimeline extends ConsumerWidget {
           children: [
             Text(
               tr ? 'Servis Hafızası' : 'Service memory',
-              style: const TextStyle(
-                fontSize: 16,
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
@@ -3325,9 +3305,8 @@ class _ServiceTimeline extends ConsumerWidget {
               ),
               child: Text(
                 '${records.length}',
-                style: const TextStyle(
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: Colors.white70,
-                  fontSize: 11,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -3351,10 +3330,8 @@ class _ServiceTimeline extends ConsumerWidget {
                 'No service history yet. Add your first entry from quick actions.',
                 'Noch kein Servicespeicher. Fügen Sie Ihren ersten Eintrag über Schnellaktionen hinzu.',
               ),
-              style: TextStyle(
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: context.colors.textSecondary,
-                fontSize: 13,
-                height: 1.35,
               ),
             ),
           )
@@ -3403,9 +3380,8 @@ class _ServiceTimeline extends ConsumerWidget {
                 children: [
                   Text(
                     tr ? 'Tüm kayıtları görüntüle' : 'View all records',
-                    style: TextStyle(
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: context.colors.cyan,
-                      fontSize: 13,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -3483,16 +3459,17 @@ class _ServiceCard extends ConsumerWidget {
               children: [
                 Text(
                   record.label,
-                  style: const TextStyle(
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Colors.white,
-                    fontSize: 13,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   '${record.odometerKm} km • ${record.note.isEmpty ? (tr ? 'Ek mekanik not bulunmuyor.' : 'No additional mechanical notes.') : record.note}',
-                  style: const TextStyle(color: Colors.white54, fontSize: 11),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: Colors.white54),
                 ),
               ],
             ),
@@ -3537,9 +3514,8 @@ class _ServiceCard extends ConsumerWidget {
               children: [
                 Text(
                   formattedStatus,
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: context.colors.cyan,
-                    fontSize: 11,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -3567,14 +3543,15 @@ class _PanelTitle extends StatelessWidget {
         Expanded(
           child: Text(
             label,
-            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w900),
           ),
         ),
         Text(
           value,
-          style: TextStyle(
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
             color: context.colors.cyan,
-            fontSize: 11,
             fontWeight: FontWeight.w800,
           ),
         ),
@@ -3598,9 +3575,8 @@ class _StatusTag extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: TextStyle(
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
           color: context.colors.cyan,
-          fontSize: 11,
           fontWeight: FontWeight.w700,
         ),
       ),
@@ -3756,8 +3732,7 @@ class _CostAnalyticsPanelInner extends ConsumerWidget {
           children: [
             Text(
               tr ? 'Giderler' : (de ? 'Ausgaben' : 'Expenses'),
-              style: const TextStyle(
-                fontSize: 16,
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
@@ -3786,9 +3761,8 @@ class _CostAnalyticsPanelInner extends ConsumerWidget {
                   children: [
                     Text(
                       filterText,
-                      style: TextStyle(
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: context.colors.cyan,
-                        fontSize: 13,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -3806,7 +3780,9 @@ class _CostAnalyticsPanelInner extends ConsumerWidget {
                   value: '1m',
                   child: Text(
                     tr ? 'Son 1 Ay' : (de ? 'Letzter 1 Monat' : 'Last 1 Month'),
-                    style: const TextStyle(color: Colors.white, fontSize: 13),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.copyWith(color: Colors.white),
                   ),
                 ),
                 PopupMenuItem(
@@ -3815,7 +3791,9 @@ class _CostAnalyticsPanelInner extends ConsumerWidget {
                     tr
                         ? 'Son 3 Ay'
                         : (de ? 'Letzte 3 Monate' : 'Last 3 Months'),
-                    style: const TextStyle(color: Colors.white, fontSize: 13),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.copyWith(color: Colors.white),
                   ),
                 ),
                 PopupMenuItem(
@@ -3824,7 +3802,9 @@ class _CostAnalyticsPanelInner extends ConsumerWidget {
                     tr
                         ? 'Son 6 Ay'
                         : (de ? 'Letzte 6 Monate' : 'Last 6 Months'),
-                    style: const TextStyle(color: Colors.white, fontSize: 13),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.copyWith(color: Colors.white),
                   ),
                 ),
                 PopupMenuItem(
@@ -3833,7 +3813,9 @@ class _CostAnalyticsPanelInner extends ConsumerWidget {
                     tr
                         ? 'Son 12 Ay'
                         : (de ? 'Letzte 12 Monate' : 'Last 12 Months'),
-                    style: const TextStyle(color: Colors.white, fontSize: 13),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.copyWith(color: Colors.white),
                   ),
                 ),
               ],
@@ -3858,36 +3840,32 @@ class _CostAnalyticsPanelInner extends ConsumerWidget {
                     children: [
                       Text(
                         '${totalFuel.toStringAsFixed(0)} TL',
-                        style: const TextStyle(
-                          color: Color(0xFFEA580C),
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              color: const Color(0xFFEA580C),
+                              fontWeight: FontWeight.bold,
+                            ),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         tr ? 'Yakıt' : 'Fuel',
-                        style: const TextStyle(
-                          color: Colors.white54,
-                          fontSize: 12,
-                        ),
+                        style: Theme.of(context).textTheme.labelMedium
+                            ?.copyWith(color: Colors.white54),
                       ),
                       const SizedBox(height: 16),
                       Text(
                         '${totalService.toStringAsFixed(0)} TL',
-                        style: TextStyle(
-                          color: context.colors.cyan,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              color: context.colors.cyan,
+                              fontWeight: FontWeight.bold,
+                            ),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         tr ? 'Bakım' : 'Service',
-                        style: const TextStyle(
-                          color: Colors.white54,
-                          fontSize: 12,
-                        ),
+                        style: Theme.of(context).textTheme.labelMedium
+                            ?.copyWith(color: Colors.white54),
                       ),
                     ],
                   ),
@@ -3922,10 +3900,8 @@ class _CostAnalyticsPanelInner extends ConsumerWidget {
                                   : (AppStrings.currentLanguageCode == 'de'
                                         ? 'Warten auf Daten'
                                         : 'Chart waiting for data'),
-                              style: const TextStyle(
-                                color: Colors.white30,
-                                fontSize: 11,
-                              ),
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(color: Colors.white30),
                             ),
                           ),
                   ),
@@ -4066,8 +4042,7 @@ class _StatMiniPanel extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               value,
-              style: TextStyle(
-                fontSize: 16,
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 color:
                     displayValueColor, // Muted gray for 0 TL, otherwise color
                 fontWeight: FontWeight.w900,
@@ -4366,11 +4341,11 @@ class _ParkedBikeAlertScreenState
                                 'SMART PARK STICKER',
                                 'SMART PARK-AUFKLEBER',
                               ),
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: context.colors.cyan,
-                              ),
+                              style: Theme.of(context).textTheme.labelMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: context.colors.cyan,
+                                  ),
                             ),
                           ],
                         ),
@@ -4382,11 +4357,8 @@ class _ParkedBikeAlertScreenState
                             'Stick the QR code below on your bike (e.g. helmet or mudguard). Other riders can scan it to send you anonymous emergency alerts.',
                             'Kleben Sie den untenstehenden QR-Code auf Ihr Fahrrad (z. B. Helm oder Schutzblech). Andere Fahrer können es scannen, um Ihnen anonyme Notfallwarnungen zu senden.',
                           ),
-                          style: TextStyle(
-                            color: context.colors.textSecondary,
-                            fontSize: 12,
-                            height: 1.4,
-                          ),
+                          style: Theme.of(context).textTheme.labelMedium
+                              ?.copyWith(color: context.colors.textSecondary),
                         ),
                         const SizedBox(height: 20),
                         Center(
@@ -4568,11 +4540,11 @@ class _ParkedBikeAlertScreenState
                           'Premium Feature',
                           'Premium-Funktion',
                         ),
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
                       ),
                       const SizedBox(height: 8),
                       Text(
@@ -4583,7 +4555,9 @@ class _ParkedBikeAlertScreenState
                           'Führen Sie ein Upgrade auf Premium durch, um die Funktion „Smart Park QR Sticker & Anonymous Alert“ zu nutzen.',
                         ),
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: context.colors.textSecondary),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: context.colors.textSecondary,
+                        ),
                       ),
                       const SizedBox(height: 24),
                       SizedBox(
@@ -4657,9 +4631,8 @@ class _ParkedBikeAlertScreenState
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.bold,
-                      fontSize: 13,
                     ),
                   ),
                   Text(
@@ -4687,10 +4660,9 @@ class _ParkedBikeAlertScreenState
             Expanded(
               child: Text(
                 message,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.labelMedium?.copyWith(fontWeight: FontWeight.bold),
               ),
             ),
           ],
