@@ -1,6 +1,7 @@
 ﻿import 'dart:math' as math;
 import 'package:apexflow/rides/presentation/widgets/start_ride_sheet.dart';
 import 'package:apexflow/core/design/apex_colors.dart';
+import 'package:apexflow/shared/design/slate_palette.dart';
 import 'package:apexflow/core/design/apex_breakpoints.dart';
 import 'package:apexflow/core/design/apex_spacing.dart';
 import 'package:apexflow/core/i18n/app_strings.dart';
@@ -349,6 +350,11 @@ class _TopBar extends StatelessWidget {
               ),
             ),
             onPressed: onOpenNotifications,
+            tooltip: AppStrings.currentLanguageCode == 'tr'
+                ? 'Bildirimler'
+                : (AppStrings.currentLanguageCode == 'de'
+                      ? 'Benachrichtigungen'
+                      : 'Notifications'),
           ),
       ],
     );
@@ -371,9 +377,7 @@ class _BikeSelectorDropdownState extends State<_BikeSelectorDropdown> {
   Widget build(BuildContext context) {
     return PopupMenuButton<String>(
       initialValue: widget.garage.activeBike.id,
-      color: const Color(
-        0xFF0F172A,
-      ), // Minimal dark slate, matches bg-background
+      color: SlatePalette.surfaceDeep, // Minimal dark slate, matches bg-background
       elevation: 8,
       shadowColor: Colors.black.withValues(alpha: 0.5),
       shape: RoundedRectangleBorder(
@@ -540,7 +544,7 @@ class _MainStatusSection extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFFFACC15), // Yellow
+                      color: SlatePalette.warningYellow, // Yellow
                     ),
                   ),
                   const Text(
@@ -598,8 +602,8 @@ class _MainStatusSection extends StatelessWidget {
                 size: const Size(110, 110),
                 painter: _ScoreGaugePainter(
                   score: score,
-                  color: const Color(0xFFFACC15),
-                  backgroundColor: const Color(0xFF1E293B),
+                  color: SlatePalette.warningYellow,
+                  backgroundColor: SlatePalette.surface,
                 ),
               ),
               SizedBox(
@@ -764,7 +768,7 @@ class _StartRideActionState extends State<_StartRideAction>
   @override
   Widget build(BuildContext context) {
     final buttonColor = widget.isRideActive
-        ? const Color(0xFFEF4444)
+        ? SlatePalette.danger
         : context.colors.cyan;
 
     final buttonText = widget.isRideActive
@@ -873,7 +877,7 @@ class _StartRideActionState extends State<_StartRideAction>
             children: [
               const Icon(
                 Icons.verified_user_outlined,
-                color: Color(0xFF10B981),
+                color: SlatePalette.emerald,
                 size: 14,
               ), // Green
               const SizedBox(width: 6),
@@ -908,7 +912,7 @@ class _WarningBanner extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF111827), // Dark card background
+        color: SlatePalette.background, // Dark card background
         borderRadius: BorderRadius.circular(ApexSpacing.radius),
         border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
@@ -919,7 +923,7 @@ class _WarningBanner extends StatelessWidget {
             children: [
               const Icon(
                 Icons.warning_amber_rounded,
-                color: Color(0xFFFACC15),
+                color: SlatePalette.warningYellow,
                 size: 24,
               ),
               const SizedBox(width: 12),
@@ -930,7 +934,7 @@ class _WarningBanner extends StatelessWidget {
                   de: 'Service überfällig',
                 ),
                 style: const TextStyle(
-                  color: Color(0xFFFACC15),
+                  color: SlatePalette.warningYellow,
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
@@ -976,7 +980,7 @@ class _WarningBanner extends StatelessWidget {
                       de: 'Service planen',
                     ),
                     style: const TextStyle(
-                      color: Color(0xFFFACC15),
+                      color: SlatePalette.warningYellow,
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                     ),
@@ -984,7 +988,7 @@ class _WarningBanner extends StatelessWidget {
                   const SizedBox(width: 4),
                   const Icon(
                     Icons.chevron_right,
-                    color: Color(0xFFFACC15),
+                    color: SlatePalette.warningYellow,
                     size: 18,
                   ),
                 ],
@@ -1023,7 +1027,7 @@ class _MachineHealthRow extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
           decoration: BoxDecoration(
-            color: const Color(0xFF111827),
+            color: SlatePalette.background,
             borderRadius: BorderRadius.circular(ApexSpacing.radius),
             border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
           ),
@@ -1034,7 +1038,7 @@ class _MachineHealthRow extends StatelessWidget {
                 icon: Icons.sync,
                 label: strings.t(tr: 'Uyum', en: 'Sync', de: 'Harmonie'),
                 value: '${state.harmony.score}%',
-                valueColor: const Color(0xFFFACC15),
+                valueColor: SlatePalette.warningYellow,
               ),
               _Divider(),
               _HealthColumn(
@@ -1043,7 +1047,7 @@ class _MachineHealthRow extends StatelessWidget {
                 value: state.bike.oilHealthPercent == -1
                     ? '—'
                     : '${state.bike.oilHealthPercent}%',
-                valueColor: const Color(0xFF10B981),
+                valueColor: SlatePalette.emerald,
               ),
               _Divider(),
               _HealthColumn(
@@ -1052,7 +1056,7 @@ class _MachineHealthRow extends StatelessWidget {
                 value: state.bike.batteryHealthPercent == -1
                     ? '—'
                     : '${state.bike.batteryHealthPercent}%',
-                valueColor: const Color(0xFF10B981),
+                valueColor: SlatePalette.emerald,
               ),
               _Divider(),
               _HealthColumn(
@@ -1069,8 +1073,8 @@ class _MachineHealthRow extends StatelessWidget {
                       )
                     : 'km',
                 valueColor: state.bike.kmUntilService < 0
-                    ? const Color(0xFFEF4444)
-                    : const Color(0xFFFACC15),
+                    ? SlatePalette.danger
+                    : SlatePalette.warningYellow,
               ),
             ],
           ),
@@ -1191,7 +1195,7 @@ class _AttentionRequiredList extends StatelessWidget {
         const SizedBox(height: 12),
         Container(
           decoration: BoxDecoration(
-            color: const Color(0xFF111827),
+            color: SlatePalette.background,
             borderRadius: BorderRadius.circular(ApexSpacing.radius),
             border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
           ),
@@ -1245,8 +1249,8 @@ class _AttentionRow extends StatelessWidget {
     // In design, 50% is Yellow (Orta)
     final isCritical = percent < 20;
     final color = isCritical
-        ? const Color(0xFFEF4444)
-        : const Color(0xFFFACC15);
+        ? SlatePalette.danger
+        : SlatePalette.warningYellow;
     final statusText = isCritical
         ? strings.t(tr: 'Kritik', en: 'Critical', de: 'Kritisch')
         : strings.t(tr: 'Orta', en: 'Moderate', de: 'Mittel');
@@ -1257,7 +1261,7 @@ class _AttentionRow extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            Icon(icon, color: const Color(0xFFFACC15), size: 24),
+            Icon(icon, color: SlatePalette.warningYellow, size: 24),
             const SizedBox(width: 16),
             SizedBox(
               width: 80,

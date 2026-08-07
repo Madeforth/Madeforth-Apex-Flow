@@ -407,6 +407,7 @@ class InsightsScreen extends ConsumerWidget {
                           tr: tr,
                           currencySymbol: currencySymbol,
                           onDelete: () {
+                            HapticFeedback.mediumImpact();
                             ref
                                 .read(insightsStateProvider.notifier)
                                 .removeWishlistPart(part);
@@ -2268,6 +2269,7 @@ class _WishlistRow extends StatelessWidget {
               color: SlatePalette.danger,
               size: 18,
             ),
+            tooltip: tr ? 'Sil' : 'Delete',
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(),
           ),

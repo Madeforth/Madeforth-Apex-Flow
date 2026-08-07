@@ -321,6 +321,12 @@ class _DocumentVaultScreenState extends ConsumerState<DocumentVaultScreen> {
                                 () => selectedExpirationDate = null,
                               );
                             },
+                            tooltip: tInline(
+                              AppStrings.currentLanguageCode,
+                              'Temizle',
+                              'Clear',
+                              'Löschen',
+                            ),
                           ),
                         Icon(
                           Icons.calendar_today_outlined,
@@ -1092,6 +1098,12 @@ class _DocCard extends ConsumerWidget {
                         .read(documentVaultProvider.notifier)
                         .deleteDocument(doc.id);
                   },
+                  tooltip: tInline(
+                    AppStrings.currentLanguageCode,
+                    'Sil',
+                    'Delete',
+                    'Löschen',
+                  ),
                 ),
               ],
             ),
@@ -1122,6 +1134,12 @@ class _DocCard extends ConsumerWidget {
                 leading: IconButton(
                   icon: const Icon(Icons.close, color: Colors.white),
                   onPressed: () => Navigator.of(ctx).pop(),
+                  tooltip: tInline(
+                    AppStrings.currentLanguageCode,
+                    'Kapat',
+                    'Close',
+                    'Schließen',
+                  ),
                 ),
               ),
               Expanded(
@@ -1520,6 +1538,12 @@ class _TaxCard extends ConsumerWidget {
               Icons.delete_outline,
               size: 18,
               color: context.colors.muted,
+            ),
+            tooltip: tInline(
+              AppStrings.currentLanguageCode,
+              'Sil',
+              'Delete',
+              'Löschen',
             ),
             onPressed: () async {
               HapticFeedback.mediumImpact();

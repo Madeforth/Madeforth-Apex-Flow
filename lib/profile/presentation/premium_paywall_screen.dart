@@ -156,6 +156,7 @@ class _PremiumPaywallScreenState extends ConsumerState<PremiumPaywallScreen> {
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.close, color: context.colors.white),
+          tooltip: tr ? 'Kapat' : 'Close',
           onPressed: () {
             if (Navigator.canPop(context)) {
               Navigator.pop(context);

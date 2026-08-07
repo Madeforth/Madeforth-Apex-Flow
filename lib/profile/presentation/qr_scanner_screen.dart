@@ -255,6 +255,7 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
+          tooltip: tr ? 'Geri' : 'Back',
         ),
         title: Text(
           tInline(

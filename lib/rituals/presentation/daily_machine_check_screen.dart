@@ -88,6 +88,7 @@ class _DailyMachineCheckScreenState
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
+          tooltip: 'Back',
         ),
         actions: [
           if (garage.activeBike.model.isNotEmpty)

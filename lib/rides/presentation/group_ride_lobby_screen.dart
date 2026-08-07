@@ -2,6 +2,7 @@ import 'dart:ui' as ui;
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
+import 'package:apexflow/shared/design/slate_palette.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -450,6 +451,7 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
                       IconButton(
                         icon: const Icon(Icons.close, size: 18),
                         onPressed: () => Navigator.pop(context),
+                        tooltip: isTr ? 'Kapat' : 'Close',
                       ),
                     ],
                   ),
@@ -630,6 +632,7 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
                             size: 20,
                           ),
                           onPressed: () => Navigator.pop(context),
+                          tooltip: tr ? 'Geri' : (de ? 'Zurück' : 'Back'),
                         ),
                         Text(
                           tr
@@ -650,7 +653,7 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
                     Container(
                       height: 48,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF0F172A),
+                        color: SlatePalette.surfaceDeep,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: Colors.white.withValues(alpha: 0.1),
@@ -680,7 +683,7 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
                             child: Container(
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
-                                color: const Color(0xFF1E293B),
+                                color: SlatePalette.surface,
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               margin: const EdgeInsets.all(4),
@@ -768,7 +771,7 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF111827),
+                      color: SlatePalette.background,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
                         color: Colors.white.withValues(alpha: 0.05),
@@ -944,12 +947,12 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
                       if (friends.isEmpty) return const SizedBox.shrink();
                       return Container(
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1E293B),
+                          color: SlatePalette.surface,
                           borderRadius: BorderRadius.circular(
                             ApexSpacing.radius,
                           ),
                           border: Border.all(
-                            color: const Color(0xFF334155),
+                            color: SlatePalette.border,
                             width: 0.5,
                           ),
                         ),
@@ -977,7 +980,7 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
                               dense: true,
                               leading: CircleAvatar(
                                 radius: 16,
-                                backgroundColor: const Color(0xFF334155),
+                                backgroundColor: SlatePalette.border,
                                 child: Text(
                                   friend.name.isNotEmpty
                                       ? friend.name[0].toUpperCase()
@@ -1009,6 +1012,7 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
                                   color: context.colors.cyan,
                                   size: 18,
                                 ),
+                                tooltip: tr ? 'Davet gönder' : (de ? 'Einladung senden' : 'Send invite'),
                                 onPressed: () {
                                   HapticFeedback.lightImpact();
                                   final link =
@@ -1047,7 +1051,7 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
                         builder: (context) {
                           String enteredCode = '';
                           return AlertDialog(
-                            backgroundColor: const Color(0xFF1E293B),
+                            backgroundColor: SlatePalette.surface,
                             title: Text(
                               tr
                                   ? 'Lobiye Katıl'
@@ -1134,7 +1138,7 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
                         vertical: 16,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF111827),
+                        color: SlatePalette.background,
                         borderRadius: BorderRadius.circular(ApexSpacing.radius),
                         border: Border.all(
                           color: Colors.white.withValues(alpha: 0.05),
@@ -1190,7 +1194,7 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1E293B),
+                          color: SlatePalette.surface,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
@@ -1266,7 +1270,7 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF111827),
+                      color: SlatePalette.background,
                       borderRadius: BorderRadius.circular(ApexSpacing.radius),
                       border: Border.all(
                         color: Colors.white.withValues(alpha: 0.05),
@@ -1277,7 +1281,7 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
                         Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF1E293B),
+                            color: SlatePalette.surface,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: const Icon(
@@ -1436,7 +1440,7 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
       inactiveLabel: tr
           ? 'Grup Sürüşünü Başlat'
           : (de ? 'Gruppenfahrt starten' : 'Start Group Ride'),
-      activeColor: const Color(0xFFEF4444),
+      activeColor: SlatePalette.danger,
       inactiveColor: context.colors.cyan,
       inactiveIcon: Icons.arrow_forward_rounded,
       height: 52,
@@ -1839,7 +1843,7 @@ class _IconBtn extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: const Color(0xFF1E293B),
+          color: SlatePalette.surface,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(icon, color: Colors.white, size: 20),

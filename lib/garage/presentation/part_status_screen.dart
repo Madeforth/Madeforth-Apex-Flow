@@ -66,6 +66,7 @@ class _PartStatusScreenState extends ConsumerState<PartStatusScreen> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: context.colors.textSecondary),
           onPressed: widget.onBack,
+          tooltip: AppStrings.currentLanguageCode == 'tr' ? 'Geri' : 'Back',
         ),
         title: Text(
           strings.garagePartStatusTitle,

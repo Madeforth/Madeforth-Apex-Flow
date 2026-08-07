@@ -243,6 +243,7 @@ class _ProfileSetupWizardScreenState
                     IconButton(
                       icon: Icon(Icons.arrow_back, color: colors.white),
                       onPressed: _prevStep,
+                      tooltip: 'Back',
                     )
                   else
                     const SizedBox(width: 48),

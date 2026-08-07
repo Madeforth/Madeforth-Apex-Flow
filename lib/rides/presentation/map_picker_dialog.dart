@@ -158,6 +158,12 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
         leading: IconButton(
           icon: const Icon(Icons.close),
           onPressed: () => Navigator.pop(context),
+          tooltip: tInline(
+            AppStrings.currentLanguageCode,
+            'Kapat',
+            'Close',
+            'Schließen',
+          ),
         ),
       ),
       body: Stack(
@@ -265,6 +271,12 @@ class _MapPickerDialogState extends State<MapPickerDialog> {
                                 _searchController.clear();
                                 _onSearchChanged('');
                               },
+                              tooltip: tInline(
+                                AppStrings.currentLanguageCode,
+                                'Temizle',
+                                'Clear',
+                                'Löschen',
+                              ),
                             )
                           : null,
                       border: InputBorder.none,

@@ -111,6 +111,12 @@ class _SmartParkAlertHandlerScreenState
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
+          tooltip: tInline(
+            widget.strings.languageCode,
+            'Geri',
+            'Back',
+            'Zurück',
+          ),
         ),
       ),
       body: SafeArea(

@@ -169,6 +169,7 @@ class _SupporterPaywallScreenState
           onPressed: () {
             if (Navigator.canPop(context)) Navigator.pop(context);
           },
+          tooltip: tr ? 'Kapat' : 'Close',
         ),
       ),
       body: SafeArea(

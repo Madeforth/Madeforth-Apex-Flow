@@ -32,4 +32,13 @@ abstract final class SlatePalette {
   static const Color oledBackground = Color(0xFF0A0A0A);
   static const Color oledBorder = Color(0xFF2D2D2F);
   static const Color oledMutedText = Color(0xFF9CA3AF);
+
+  // Repeated across Dashboard/Rides/Garage/Insights/Splash but not part of
+  // ApexColorsExtension's own dark palette (close-but-different shades kept
+  // separate rather than merged, same reasoning as the block above).
+  static const Color background = Color(0xFF111827);
+  static const Color cyanAccent = Color(0xFF06B6D4);
+  static const Color emerald = Color(0xFF10B981);
+  static const Color amber = Color(0xFFF59E0B);
+  static const Color warningYellow = Color(0xFFFACC15);
 }

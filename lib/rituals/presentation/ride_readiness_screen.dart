@@ -1,4 +1,5 @@
 import 'package:apexflow/core/design/apex_spacing.dart';
+import 'package:apexflow/shared/design/slate_palette.dart';
 import 'package:apexflow/core/i18n/app_strings.dart';
 import 'package:apexflow/core/i18n/app_settings_state.dart';
 import 'package:apexflow/core/storage/apex_kv_store.dart';
@@ -888,7 +889,7 @@ class WeatherSheetContentState extends ConsumerState<WeatherSheetContent> {
                 ),
                 prefixIcon: const Icon(
                   Icons.search,
-                  color: Color(0xFF94A3B8),
+                  color: SlatePalette.mutedText,
                   size: 20,
                 ),
 
@@ -954,7 +955,7 @@ class WeatherSheetContentState extends ConsumerState<WeatherSheetContent> {
                         style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w900,
-                          color: Color(0xFF94A3B8),
+                          color: SlatePalette.mutedText,
                           letterSpacing: 1.2,
                         ),
                       ),
@@ -990,7 +991,7 @@ class WeatherSheetContentState extends ConsumerState<WeatherSheetContent> {
                           style: const TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w900,
-                            color: Color(0xFF94A3B8),
+                            color: SlatePalette.mutedText,
                             letterSpacing: 1.2,
                           ),
                         ),
@@ -1280,7 +1281,7 @@ class WeatherSheetContentState extends ConsumerState<WeatherSheetContent> {
       builder: (context) {
         return Container(
           decoration: const BoxDecoration(
-            color: Color(0xFF0F172A),
+            color: SlatePalette.surfaceDeep,
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
           padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
@@ -1314,11 +1315,11 @@ class WeatherSheetContentState extends ConsumerState<WeatherSheetContent> {
                             vertical: 14,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF1E293B),
+                            color: SlatePalette.surface,
                             borderRadius: BorderRadius.circular(
                               ApexSpacing.radius,
                             ),
-                            border: Border.all(color: const Color(0xFF334155)),
+                            border: Border.all(color: SlatePalette.border),
                           ),
                           child: Text(
                             item,

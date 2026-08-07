@@ -1,6 +1,7 @@
 ﻿import 'package:apexflow/core/design/apex_spacing.dart';
 import 'package:apexflow/core/i18n/app_settings_state.dart';
 import 'package:apexflow/core/i18n/app_strings.dart';
+import 'package:apexflow/shared/design/slate_palette.dart';
 import 'package:apexflow/shared/widgets/apex_panel.dart';
 import 'package:apexflow/notifications/apex_notification_service.dart';
 import 'package:flutter/material.dart';
@@ -490,7 +491,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       barrierDismissible: false,
       builder: (dialogContext) {
         return AlertDialog(
-          backgroundColor: const Color(0xFF1E293B),
+          backgroundColor: SlatePalette.surface,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(ApexSpacing.radius),
           ),
@@ -531,7 +532,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   'Diese Aktion kann nicht rückgängig gemacht werden! Ihr derzeit angemeldetes Konto ($activeEmail), Ihre Cloud-Daten und Ihr Verlauf werden dauerhaft gelöscht.',
                 ),
                 style: const TextStyle(
-                  color: Color(0xFF94A3B8),
+                  color: SlatePalette.mutedText,
                   fontSize: 13,
                   height: 1.4,
                 ),

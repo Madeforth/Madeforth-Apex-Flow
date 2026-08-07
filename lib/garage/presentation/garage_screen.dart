@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:apexflow/core/design/apex_colors.dart';
+import 'package:apexflow/shared/design/slate_palette.dart';
 import 'package:apexflow/core/design/apex_spacing.dart';
 import 'package:apexflow/core/i18n/app_strings.dart';
 import 'package:apexflow/core/i18n/app_settings_state.dart';
@@ -609,7 +610,7 @@ class _GarageHeader extends ConsumerWidget {
                   'Machines, service history, and component condition.',
                   'Maschinen, Servicehistorie und Zustand der Komponenten.',
                 ),
-                style: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 13),
+                style: const TextStyle(color: SlatePalette.oledMutedText, fontSize: 13),
               ),
             ],
           ),
@@ -664,7 +665,7 @@ void _showEditIntervalDialog(
     context: context,
     builder: (context) {
       return Dialog(
-        backgroundColor: const Color(0xFF0F172A),
+        backgroundColor: SlatePalette.surfaceDeep,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(ApexSpacing.radius),
         ),
@@ -694,7 +695,7 @@ void _showEditIntervalDialog(
                         ? 'Motosikletin kaç kilometrede bir bakıma girmesi gerektiğini belirtin.'
                         : 'Enter how many kilometers between maintenance cycles.',
                     style: const TextStyle(
-                      color: Color(0xFF9CA3AF),
+                      color: SlatePalette.oledMutedText,
                       fontSize: 12,
                     ),
                   ),
@@ -724,7 +725,7 @@ void _showEditIntervalDialog(
                                 ? const Color(
                                     0xFF06B6D4,
                                   ).withValues(alpha: 0.15)
-                                : const Color(0xFF1E293B),
+                                : SlatePalette.surface,
                             borderRadius: BorderRadius.circular(
                               ApexSpacing.radius,
                             ),
@@ -758,10 +759,10 @@ void _showEditIntervalDialog(
                     style: const TextStyle(color: Colors.white, fontSize: 14),
                     decoration: InputDecoration(
                       filled: true,
-                      fillColor: const Color(0xFF1E293B),
+                      fillColor: SlatePalette.surface,
                       labelText: tr ? 'Özel Değer (km)' : 'Custom Value (km)',
                       labelStyle: const TextStyle(
-                        color: Color(0xFF9CA3AF),
+                        color: SlatePalette.oledMutedText,
                         fontSize: 12,
                       ),
                       contentPadding: const EdgeInsets.symmetric(
@@ -789,7 +790,7 @@ void _showEditIntervalDialog(
                       TextButton(
                         onPressed: () => Navigator.pop(context),
                         style: TextButton.styleFrom(
-                          foregroundColor: const Color(0xFF9CA3AF),
+                          foregroundColor: SlatePalette.oledMutedText,
                         ),
                         child: Text(tr ? 'İptal' : 'Cancel'),
                       ),
@@ -872,7 +873,7 @@ class _GarageSummaryCard extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF0F172A).withValues(alpha: 0.6),
+        color: SlatePalette.surfaceDeep.withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(ApexSpacing.radius),
         border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
@@ -936,10 +937,10 @@ class _GarageSummaryCard extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF10B981).withValues(alpha: 0.1),
+                  color: SlatePalette.emerald.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: const Color(0xFF10B981).withValues(alpha: 0.2),
+                    color: SlatePalette.emerald.withValues(alpha: 0.2),
                   ),
                 ),
                 child: Row(
@@ -947,7 +948,7 @@ class _GarageSummaryCard extends ConsumerWidget {
                   children: [
                     const Icon(
                       Icons.check_circle,
-                      color: Color(0xFF10B981),
+                      color: SlatePalette.emerald,
                       size: 12,
                     ),
                     const SizedBox(width: 4),
@@ -959,7 +960,7 @@ class _GarageSummaryCard extends ConsumerWidget {
                         'Protokolle aktuell',
                       ),
                       style: const TextStyle(
-                        color: Color(0xFF10B981),
+                        color: SlatePalette.emerald,
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
                       ),
@@ -977,7 +978,7 @@ class _GarageSummaryCard extends ConsumerWidget {
               'Manage your machine\'s current status in one place.',
               'Verwalten Sie den aktuellen Status Ihrer Maschine an einem Ort.',
             ),
-            style: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 12),
+            style: const TextStyle(color: SlatePalette.oledMutedText, fontSize: 12),
           ),
           const SizedBox(height: 16),
           Row(
@@ -998,7 +999,7 @@ class _GarageSummaryCard extends ConsumerWidget {
                     Text(
                       tr ? 'Toplam kilometre' : 'Total odometer',
                       style: const TextStyle(
-                        color: Color(0xFF9CA3AF),
+                        color: SlatePalette.oledMutedText,
                         fontSize: 12,
                       ),
                     ),
@@ -1023,7 +1024,7 @@ class _GarageSummaryCard extends ConsumerWidget {
                           ? (tr ? 'Bakım gecikti' : 'Service overdue')
                           : (tr ? 'Sonraki bakıma' : 'Next service'),
                       style: const TextStyle(
-                        color: Color(0xFF9CA3AF),
+                        color: SlatePalette.oledMutedText,
                         fontSize: 12,
                       ),
                     ),
@@ -1048,7 +1049,7 @@ class _GarageSummaryCard extends ConsumerWidget {
             children: [
               Text(
                 '$displayInterval $distanceUnitLabel ',
-                style: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 12),
+                style: const TextStyle(color: SlatePalette.oledMutedText, fontSize: 12),
               ),
               Text(
                 tInline(
@@ -1057,7 +1058,7 @@ class _GarageSummaryCard extends ConsumerWidget {
                   'Service interval',
                   'Wartungsintervall',
                 ),
-                style: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 12),
+                style: const TextStyle(color: SlatePalette.oledMutedText, fontSize: 12),
               ),
             ],
           ),
@@ -1187,7 +1188,7 @@ class _QuickActionButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: const Color(0xFF0F172A).withValues(alpha: 0.6),
+          color: SlatePalette.surfaceDeep.withValues(alpha: 0.6),
           borderRadius: BorderRadius.circular(ApexSpacing.radius),
           border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
         ),
@@ -1331,8 +1332,10 @@ class _MotorcycleListPanel extends ConsumerWidget {
                   .read(garageStateProvider.notifier)
                   .setActiveMotorcycle(bike),
               onEdit: () => _showEditBikeSheet(context, ref, bike, tr),
-              onArchive: () =>
-                  ref.read(garageStateProvider.notifier).toggleArchive(bike),
+              onArchive: () {
+                HapticFeedback.selectionClick();
+                ref.read(garageStateProvider.notifier).toggleArchive(bike);
+              },
               onDelete: () => _confirmDeleteBike(context, ref, bike),
             ),
             if (bike != activeList.last) const SizedBox(height: 8),
@@ -1361,8 +1364,10 @@ class _MotorcycleListPanel extends ConsumerWidget {
                       .setActiveMotorcycle(bike.copyWith(archived: false));
                 },
                 onEdit: () => _showEditBikeSheet(context, ref, bike, tr),
-                onArchive: () =>
-                    ref.read(garageStateProvider.notifier).toggleArchive(bike),
+                onArchive: () {
+                  HapticFeedback.selectionClick();
+                  ref.read(garageStateProvider.notifier).toggleArchive(bike);
+                },
                 onDelete: () => _confirmDeleteBike(context, ref, bike),
               ),
               if (bike != archived.last) const SizedBox(height: 8),
@@ -1540,7 +1545,7 @@ class _MotorcycleListPanel extends ConsumerWidget {
       context: context,
       builder: (ctx) {
         return AlertDialog(
-          backgroundColor: const Color(0xFF0F172A),
+          backgroundColor: SlatePalette.surfaceDeep,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(ApexSpacing.radius),
             side: BorderSide(color: Colors.red.withValues(alpha: 0.3)),
@@ -1604,6 +1609,7 @@ class _MotorcycleListPanel extends ConsumerWidget {
     );
 
     if (confirmed == true) {
+      HapticFeedback.mediumImpact();
       ref.read(garageStateProvider.notifier).deleteMotorcycle(bike.id);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -2598,7 +2604,7 @@ class _ComponentGridCell extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
-          color: const Color(0xFF0F172A).withValues(alpha: 0.6),
+          color: SlatePalette.surfaceDeep.withValues(alpha: 0.6),
           borderRadius: BorderRadius.circular(ApexSpacing.radius),
           border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
         ),
@@ -3087,7 +3093,7 @@ class _SystemMenuItem extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
-          color: const Color(0xFF0F172A).withValues(alpha: 0.6),
+          color: SlatePalette.surfaceDeep.withValues(alpha: 0.6),
           borderRadius: BorderRadius.circular(ApexSpacing.radius),
           border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
         ),
@@ -3312,7 +3318,7 @@ class _ServiceTimeline extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: const Color(0xFF1E293B),
+                color: SlatePalette.surface,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
@@ -3332,7 +3338,7 @@ class _ServiceTimeline extends ConsumerWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFF0F172A).withValues(alpha: 0.6),
+              color: SlatePalette.surfaceDeep.withValues(alpha: 0.6),
               borderRadius: BorderRadius.circular(ApexSpacing.radius),
               border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
             ),
@@ -3452,7 +3458,7 @@ class _ServiceCard extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFF0F172A).withValues(alpha: 0.6),
+        color: SlatePalette.surfaceDeep.withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(ApexSpacing.radius),
         border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
@@ -3760,14 +3766,14 @@ class _CostAnalyticsPanelInner extends ConsumerWidget {
                 HapticFeedback.selectionClick();
                 onFilterChanged(value);
               },
-              color: const Color(0xFF1E293B),
+              color: SlatePalette.surface,
               child: Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10,
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1E293B),
+                  color: SlatePalette.surface,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
                     color: context.colors.cyan.withValues(alpha: 0.15),
@@ -3836,7 +3842,7 @@ class _CostAnalyticsPanelInner extends ConsumerWidget {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: const Color(0xFF0F172A).withValues(alpha: 0.6),
+            color: SlatePalette.surfaceDeep.withValues(alpha: 0.6),
             borderRadius: BorderRadius.circular(ApexSpacing.radius),
             border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
           ),
@@ -3901,9 +3907,9 @@ class _CostAnalyticsPanelInner extends ConsumerWidget {
                             height: 120,
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
-                              color: const Color(
-                                0xFF0F172A,
-                              ).withValues(alpha: 0.3),
+                              color: SlatePalette.surfaceDeep.withValues(
+                                alpha: 0.3,
+                              ),
                               borderRadius: BorderRadius.circular(
                                 ApexSpacing.radius,
                               ),
@@ -4032,7 +4038,7 @@ class _StatMiniPanel extends StatelessWidget {
           ), // Slate 200 (slightly darker than off-white)
           borderRadius: BorderRadius.circular(ApexSpacing.radius),
           border: Border.all(
-            color: const Color(0xFF0F172A),
+            color: SlatePalette.surfaceDeep,
             width: 1.5,
           ), // Solid slate border
           boxShadow: [
@@ -4050,7 +4056,7 @@ class _StatMiniPanel extends StatelessWidget {
               label,
               style: const TextStyle(
                 fontSize: 8.5,
-                color: Color(0xFF1E293B), // Deep slate gray close to black
+                color: SlatePalette.surface, // Deep slate gray close to black
                 fontWeight: FontWeight.w900,
                 letterSpacing: 0.5,
               ),
@@ -4390,7 +4396,7 @@ class _ParkedBikeAlertScreenState
                               ), // Slate 200 (slightly darker than off-white)
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
-                                color: const Color(0xFF0F172A),
+                                color: SlatePalette.surfaceDeep,
                                 width: 2,
                               ), // Slate 900
                               boxShadow: [
@@ -4414,7 +4420,7 @@ class _ParkedBikeAlertScreenState
                                   style: TextStyle(
                                     fontSize: 8.5,
                                     fontWeight: FontWeight.bold,
-                                    color: Color(0xFF0F172A),
+                                    color: SlatePalette.surfaceDeep,
                                     letterSpacing: 0.8,
                                   ),
                                 ),
@@ -4472,7 +4478,7 @@ class _ParkedBikeAlertScreenState
                                     vertical: 3,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFF0F172A),
+                                    color: SlatePalette.surfaceDeep,
                                     borderRadius: BorderRadius.circular(4),
                                   ),
                                   child: Text(

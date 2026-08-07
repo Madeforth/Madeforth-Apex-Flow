@@ -4,6 +4,7 @@ import 'package:apexflow/rituals/application/rituals_state.dart';
 import 'package:apexflow/rituals/presentation/ride_readiness_screen.dart';
 
 import 'package:apexflow/core/design/apex_spacing.dart';
+import 'package:apexflow/shared/design/slate_palette.dart';
 import 'package:apexflow/core/i18n/app_strings.dart';
 import 'package:apexflow/rides/application/ride_location_service.dart';
 import 'package:apexflow/rides/application/ride_state.dart';
@@ -119,7 +120,7 @@ class _RidesScreenState extends ConsumerState<RidesScreen> {
                                   ),
                                   style: const TextStyle(
                                     fontSize: 13,
-                                    color: Color(0xFF9CA3AF),
+                                    color: SlatePalette.oledMutedText,
                                   ),
                                 ),
                               ],
@@ -143,7 +144,7 @@ class _RidesScreenState extends ConsumerState<RidesScreen> {
                                 children: [
                                   const Icon(
                                     Icons.coffee_outlined,
-                                    color: Color(0xFF9CA3AF),
+                                    color: SlatePalette.oledMutedText,
                                     size: 16,
                                   ),
                                   const SizedBox(width: 6),
@@ -155,7 +156,7 @@ class _RidesScreenState extends ConsumerState<RidesScreen> {
                                       'Kaffee Einladung',
                                     ),
                                     style: const TextStyle(
-                                      color: Color(0xFF9CA3AF),
+                                      color: SlatePalette.oledMutedText,
                                       fontSize: 13,
                                       fontWeight: FontWeight.w500,
                                     ),
@@ -673,7 +674,7 @@ class _StartRidePanelState extends ConsumerState<_StartRidePanel> {
             'Start Ride',
             'Fahrt starten',
           ),
-          activeColor: const Color(0xFFEF4444),
+          activeColor: SlatePalette.danger,
           inactiveColor: context.colors.cyan,
           inactiveIcon: Icons.arrow_forward_rounded,
           onTap: isActive ? widget.onEnd : widget.onStart,
@@ -687,7 +688,7 @@ class _StartRidePanelState extends ConsumerState<_StartRidePanel> {
               'GPS automatically activates when recording starts.',
               'GPS wird automatisch aktiviert, wenn die Aufzeichnung beginnt.',
             ),
-            style: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 12),
+            style: const TextStyle(color: SlatePalette.oledMutedText, fontSize: 12),
           ),
         ),
       ],
@@ -735,7 +736,7 @@ class _NoRidePanelEmptyState extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF111827),
+        color: SlatePalette.background,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
       ),
@@ -765,7 +766,7 @@ class _NoRidePanelEmptyState extends StatelessWidget {
               'Starte deine erste Fahrt, um hier Daten zu verfolgen.',
             ),
             textAlign: TextAlign.center,
-            style: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 12),
+            style: const TextStyle(color: SlatePalette.oledMutedText, fontSize: 12),
           ),
         ],
       ),
@@ -816,7 +817,7 @@ Widget _buildCard(
                   'Today • 08:42',
                   'Heute • 08:42',
                 ),
-                style: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 13),
+                style: const TextStyle(color: SlatePalette.oledMutedText, fontSize: 13),
               ),
             ],
           ),
@@ -825,7 +826,7 @@ Widget _buildCard(
       const SizedBox(height: 12),
       Container(
         decoration: BoxDecoration(
-          color: const Color(0xFF111827),
+          color: SlatePalette.background,
           borderRadius: BorderRadius.circular(ApexSpacing.radius),
           border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
         ),
@@ -871,7 +872,7 @@ Widget _buildCard(
                             'Distanz',
                           ),
                           style: const TextStyle(
-                            color: Color(0xFF9CA3AF),
+                            color: SlatePalette.oledMutedText,
                             fontSize: 13,
                           ),
                         ),
@@ -950,14 +951,14 @@ Widget _buildCard(
                       children: [
                         const Icon(
                           Icons.speed,
-                          color: Color(0xFF9CA3AF),
+                          color: SlatePalette.oledMutedText,
                           size: 16,
                         ),
                         const SizedBox(width: 4),
                         Text(
                           '${tInline(AppStrings.currentLanguageCode, 'Maks. Hız:', 'Max Speed:', 'Max Geschw.:')} ',
                           style: const TextStyle(
-                            color: Color(0xFF9CA3AF),
+                            color: SlatePalette.oledMutedText,
                             fontSize: 12,
                           ),
                         ),
@@ -988,14 +989,14 @@ Widget _buildCard(
                       children: [
                         const Icon(
                           Icons.screen_rotation,
-                          color: Color(0xFF9CA3AF),
+                          color: SlatePalette.oledMutedText,
                           size: 16,
                         ),
                         const SizedBox(width: 4),
                         Text(
                           '${tInline(AppStrings.currentLanguageCode, 'Maks. Yatış:', 'Max Lean:', 'Max. Neigung:')} ',
                           style: const TextStyle(
-                            color: Color(0xFF9CA3AF),
+                            color: SlatePalette.oledMutedText,
                             fontSize: 12,
                           ),
                         ),
@@ -1022,9 +1023,9 @@ Widget _buildCard(
                 ),
                 decoration: BoxDecoration(
                   border: const Border(
-                    top: BorderSide(color: Color(0xFFFACC15), width: 1),
+                    top: BorderSide(color: SlatePalette.warningYellow, width: 1),
                   ),
-                  color: const Color(0xFFFACC15).withValues(alpha: 0.05),
+                  color: SlatePalette.warningYellow.withValues(alpha: 0.05),
                   borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(12),
                     bottomRight: Radius.circular(12),
@@ -1034,7 +1035,7 @@ Widget _buildCard(
                   children: [
                     const Icon(
                       Icons.warning_amber_rounded,
-                      color: Color(0xFFFACC15),
+                      color: SlatePalette.warningYellow,
                       size: 18,
                     ),
                     const SizedBox(width: 8),
@@ -1047,7 +1048,7 @@ Widget _buildCard(
                           'Plötzliches Bremsen erkannt.',
                         ),
                         style: const TextStyle(
-                          color: Color(0xFFFACC15),
+                          color: SlatePalette.warningYellow,
                           fontSize: 12,
                         ),
                       ),
@@ -1070,14 +1071,14 @@ Widget _buildCard(
                               'Details ansehen',
                             ),
                             style: const TextStyle(
-                              color: Color(0xFFFACC15),
+                              color: SlatePalette.warningYellow,
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           const Icon(
                             Icons.chevron_right,
-                            color: Color(0xFFFACC15),
+                            color: SlatePalette.warningYellow,
                             size: 16,
                           ),
                         ],
@@ -1127,7 +1128,7 @@ class _StatRowMini extends StatelessWidget {
               ),
               Text(
                 label,
-                style: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 12),
+                style: const TextStyle(color: SlatePalette.oledMutedText, fontSize: 12),
               ),
             ],
           ),
@@ -1143,7 +1144,7 @@ class _MiniRouteGraphPainter extends CustomPainter {
     final paint = Paint()
       // CustomPainter has no BuildContext, so this can't reference the
       // theme token directly — kept in sync with ApexColors.dark.cyan.
-      ..color = const Color(0xFF06B6D4)
+      ..color = SlatePalette.cyanAccent
       ..strokeWidth = 3
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
@@ -1258,7 +1259,7 @@ class _RideMemoryPanel extends StatelessWidget {
               ),
               child: Text(
                 '${sessions.length > 4 ? 4 : sessions.length}',
-                style: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 12),
+                style: const TextStyle(color: SlatePalette.oledMutedText, fontSize: 12),
               ),
             ),
           ],
@@ -1266,7 +1267,7 @@ class _RideMemoryPanel extends StatelessWidget {
         const SizedBox(height: 12),
         Container(
           decoration: BoxDecoration(
-            color: const Color(0xFF111827),
+            color: SlatePalette.background,
             borderRadius: BorderRadius.circular(ApexSpacing.radius),
             border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
           ),
@@ -1292,7 +1293,7 @@ class _RideMemoryPanel extends StatelessWidget {
                             'Fahrtverlauf leer',
                           ),
                           style: const TextStyle(
-                            color: Color(0xFF9CA3AF),
+                            color: SlatePalette.oledMutedText,
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
                           ),
@@ -1454,7 +1455,7 @@ class _RideMemoryRow extends StatelessWidget {
                       child: Text(
                         subtitle1,
                         style: const TextStyle(
-                          color: Color(0xFF9CA3AF),
+                          color: SlatePalette.oledMutedText,
                           fontSize: 13,
                         ),
                       ),
@@ -1463,7 +1464,7 @@ class _RideMemoryRow extends StatelessWidget {
                       child: Text(
                         subtitle2,
                         style: const TextStyle(
-                          color: Color(0xFF9CA3AF),
+                          color: SlatePalette.oledMutedText,
                           fontSize: 13,
                         ),
                       ),
@@ -1471,14 +1472,14 @@ class _RideMemoryRow extends StatelessWidget {
                     Text(
                       date,
                       style: const TextStyle(
-                        color: Color(0xFF9CA3AF),
+                        color: SlatePalette.oledMutedText,
                         fontSize: 13,
                       ),
                     ),
                     const SizedBox(width: 12),
                     const Icon(
                       Icons.chevron_right,
-                      color: Color(0xFF9CA3AF),
+                      color: SlatePalette.oledMutedText,
                       size: 16,
                     ),
                   ],
@@ -1552,7 +1553,7 @@ void _showHardBrakingDetails(
       return Container(
         height: MediaQuery.of(context).size.height * 0.5,
         decoration: const BoxDecoration(
-          color: Color(0xFF1E293B),
+          color: SlatePalette.surface,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(24),
             topRight: Radius.circular(24),
@@ -1580,6 +1581,7 @@ void _showHardBrakingDetails(
                 IconButton(
                   onPressed: () => Navigator.pop(context),
                   icon: const Icon(Icons.close, color: Colors.white54),
+                  tooltip: tr ? 'Kapat' : (de ? 'Schließen' : 'Close'),
                 ),
               ],
             ),
@@ -1587,17 +1589,17 @@ void _showHardBrakingDetails(
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFFFACC15).withValues(alpha: 0.1),
+                color: SlatePalette.warningYellow.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(ApexSpacing.radius),
                 border: Border.all(
-                  color: const Color(0xFFFACC15).withValues(alpha: 0.2),
+                  color: SlatePalette.warningYellow.withValues(alpha: 0.2),
                 ),
               ),
               child: Row(
                 children: [
                   const Icon(
                     Icons.warning_amber_rounded,
-                    color: Color(0xFFFACC15),
+                    color: SlatePalette.warningYellow,
                     size: 32,
                   ),
                   const SizedBox(width: 16),
@@ -1612,7 +1614,7 @@ void _showHardBrakingDetails(
                                     ? 'Starke Beschleunigung'
                                     : 'Harsh Acceleration'),
                           style: const TextStyle(
-                            color: Color(0xFFFACC15),
+                            color: SlatePalette.warningYellow,
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
@@ -2006,13 +2008,14 @@ class AllRidesScreen extends ConsumerWidget {
     final sessions = rideState.sessions;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: SlatePalette.surfaceDeep,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
+          tooltip: isTurkish ? 'Geri' : 'Back',
         ),
         title: Text(
           isTurkish
@@ -2053,7 +2056,7 @@ class AllRidesScreen extends ConsumerWidget {
                         horizontal: 16,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1E293B),
+                        color: SlatePalette.surface,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
                           color: Colors.white.withValues(alpha: 0.05),
@@ -2092,7 +2095,7 @@ class AllRidesScreen extends ConsumerWidget {
                                     Text(
                                       '${session.distanceKm.toStringAsFixed(1)} km',
                                       style: const TextStyle(
-                                        color: Color(0xFF9CA3AF),
+                                        color: SlatePalette.oledMutedText,
                                         fontSize: 14,
                                       ),
                                     ),
@@ -2103,14 +2106,14 @@ class AllRidesScreen extends ConsumerWidget {
                                       child: Text(
                                         '•',
                                         style: TextStyle(
-                                          color: Color(0xFF9CA3AF),
+                                          color: SlatePalette.oledMutedText,
                                         ),
                                       ),
                                     ),
                                     Text(
                                       '${session.durationMinutes} min',
                                       style: const TextStyle(
-                                        color: Color(0xFF9CA3AF),
+                                        color: SlatePalette.oledMutedText,
                                         fontSize: 14,
                                       ),
                                     ),
@@ -2121,7 +2124,7 @@ class AllRidesScreen extends ConsumerWidget {
                           ),
                           const Icon(
                             Icons.chevron_right,
-                            color: Color(0xFF9CA3AF),
+                            color: SlatePalette.oledMutedText,
                           ),
                         ],
                       ),

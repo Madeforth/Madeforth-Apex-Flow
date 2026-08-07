@@ -604,6 +604,19 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                 color: context.colors.textSecondary,
                 size: 18,
               ),
+              tooltip: _obscureLoginPassword
+                  ? tInline(
+                      widget.strings.languageCode,
+                      'Şifreyi göster',
+                      'Show password',
+                      'Passwort anzeigen',
+                    )
+                  : tInline(
+                      widget.strings.languageCode,
+                      'Şifreyi gizle',
+                      'Hide password',
+                      'Passwort verbergen',
+                    ),
               onPressed: () {
                 setState(() => _obscureLoginPassword = !_obscureLoginPassword);
               },
@@ -799,6 +812,19 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                 color: context.colors.textSecondary,
                 size: 18,
               ),
+              tooltip: _obscureSignupPassword
+                  ? tInline(
+                      widget.strings.languageCode,
+                      'Şifreyi göster',
+                      'Show password',
+                      'Passwort anzeigen',
+                    )
+                  : tInline(
+                      widget.strings.languageCode,
+                      'Şifreyi gizle',
+                      'Hide password',
+                      'Passwort verbergen',
+                    ),
               onPressed: () {
                 setState(
                   () => _obscureSignupPassword = !_obscureSignupPassword,

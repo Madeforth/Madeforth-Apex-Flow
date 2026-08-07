@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui';
 import 'package:apexflow/core/design/apex_colors.dart';
+import 'package:apexflow/shared/design/slate_palette.dart';
 import 'package:apexflow/core/i18n/app_settings_state.dart';
 import 'package:apexflow/core/i18n/app_strings.dart';
 import 'package:apexflow/features/shell/apex_app_shell.dart';
@@ -346,7 +347,7 @@ class _ApexSplashScreenState extends ConsumerState<ApexSplashScreen>
                             return Text(
                               'Apex Flow',
                               style: TextStyle(
-                                color: const Color(0xFF06B6D4), // Cyan 500
+                                color: SlatePalette.cyanAccent, // Cyan 500
                                 fontSize: 28,
                                 fontWeight: FontWeight.w900,
                                 letterSpacing: _textLetterSpacing.value,
@@ -404,7 +405,7 @@ class _ApexSplashScreenState extends ConsumerState<ApexSplashScreen>
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
                           valueColor: AlwaysStoppedAnimation<Color>(
-                            const Color(0xFF06B6D4).withValues(alpha: 0.55),
+                            SlatePalette.cyanAccent.withValues(alpha: 0.55),
                           ),
                         ),
                       ),
@@ -440,7 +441,7 @@ class ApexTelemetryPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     // 3 overlapping elegant flow lines
     final cyanPaint = Paint()
-      ..color = const Color(0xFF06B6D4).withValues(alpha: 0.10)
+      ..color = SlatePalette.cyanAccent.withValues(alpha: 0.10)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.0;
 
@@ -450,7 +451,7 @@ class ApexTelemetryPainter extends CustomPainter {
       ..strokeWidth = 1.5;
 
     final dotPaint = Paint()
-      ..color = const Color(0xFF06B6D4).withValues(alpha: 0.65)
+      ..color = SlatePalette.cyanAccent.withValues(alpha: 0.65)
       ..style = PaintingStyle.fill;
 
     // Draw main cyan wave
@@ -493,7 +494,7 @@ class ApexTelemetryPainter extends CustomPainter {
             tangent.position,
             5.5,
             Paint()
-              ..color = const Color(0xFF06B6D4).withValues(alpha: 0.18)
+              ..color = SlatePalette.cyanAccent.withValues(alpha: 0.18)
               ..style = PaintingStyle.stroke
               ..strokeWidth = 1.0,
           );

@@ -188,6 +188,11 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                                   ),
                                 ),
                                 onPressed: widget.onOpenNotifications,
+                                tooltip: _t(
+                                  'Bildirimler',
+                                  'Notifications',
+                                  'Benachrichtigungen',
+                                ),
                               ),
                             ],
                             IconButton(
@@ -197,6 +202,11 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                               ),
                               onPressed: () =>
                                   _showAddFriendSheet(context, tr, de),
+                              tooltip: _t(
+                                'Arkadaş ekle',
+                                'Add friend',
+                                'Freund hinzufügen',
+                              ),
                             ),
                             IconButton(
                               icon: Icon(
@@ -204,12 +214,14 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                                 color: context.colors.cyan,
                               ),
                               onPressed: widget.onOpenSettings,
+                              tooltip: _t('Ayarlar', 'Settings', 'Einstellungen'),
                             ),
                             IconButton(
                               icon: Icon(
                                 Icons.logout,
                                 color: context.colors.red,
                               ),
+                              tooltip: _t('Çıkış yap', 'Log out', 'Abmelden'),
                               onPressed: () async {
                                 final confirm = await showDialog<bool>(
                                   context: context,
@@ -265,6 +277,7 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                                   ),
                                 );
                                 if (confirm == true) {
+                                  HapticFeedback.mediumImpact();
                                   await ref
                                       .read(userProfileProvider.notifier)
                                       .logout();
@@ -742,6 +755,12 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                   IconButton(
                     icon: const Icon(Icons.close, size: 18),
                     onPressed: () => Navigator.pop(context),
+                    tooltip: tInline(
+                      AppStrings.currentLanguageCode,
+                      'Kapat',
+                      'Close',
+                      'Schließen',
+                    ),
                   ),
                 ],
               ),
@@ -1140,6 +1159,12 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                   IconButton(
                     icon: const Icon(Icons.close, size: 18),
                     onPressed: () => Navigator.pop(context),
+                    tooltip: tInline(
+                      AppStrings.currentLanguageCode,
+                      'Kapat',
+                      'Close',
+                      'Schließen',
+                    ),
                   ),
                 ],
               ),
@@ -2092,7 +2117,7 @@ class RiderIdCard extends StatelessWidget {
                                     decoration: BoxDecoration(
                                       gradient: const LinearGradient(
                                         colors: [
-                                          Color(0xFFF59E0B),
+                                          SlatePalette.amber,
                                           Color(0xFFD97706),
                                         ],
                                       ),
@@ -2138,7 +2163,7 @@ class RiderIdCard extends StatelessWidget {
                                 minHeight: 6,
                                 backgroundColor: Colors.white12,
                                 valueColor: const AlwaysStoppedAnimation<Color>(
-                                  Color(0xFFF59E0B),
+                                  SlatePalette.amber,
                                 ),
                               ),
                             ),
@@ -3474,7 +3499,7 @@ class _FriendsListState extends ConsumerState<_FriendsList> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF59E0B),
+                      color: SlatePalette.amber,
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
@@ -3717,6 +3742,11 @@ class _PendingRequestsScreen extends ConsumerWidget {
         leading: IconButton(
           icon: const Icon(Icons.close, color: Colors.white),
           onPressed: () => Navigator.pop(context),
+          tooltip: tr
+              ? 'Kapat'
+              : ((AppStrings.currentLanguageCode == 'de')
+                    ? 'Schließen'
+                    : 'Close'),
         ),
       ),
       body: pendingRequests.isEmpty
@@ -3803,7 +3833,13 @@ class _PendingRequestsScreen extends ConsumerWidget {
                               Icons.check,
                               color: Colors.greenAccent,
                             ),
+                            tooltip: tr
+                                ? 'Kabul et'
+                                : ((AppStrings.currentLanguageCode == 'de')
+                                      ? 'Akzeptieren'
+                                      : 'Accept'),
                             onPressed: () async {
+                              HapticFeedback.lightImpact();
                               final tag = req.relatedId ?? '';
                               if (tag.isNotEmpty) {
                                 await ref
@@ -3835,7 +3871,13 @@ class _PendingRequestsScreen extends ConsumerWidget {
                               Icons.close,
                               color: Colors.redAccent,
                             ),
+                            tooltip: tr
+                                ? 'Reddet'
+                                : ((AppStrings.currentLanguageCode == 'de')
+                                      ? 'Ablehnen'
+                                      : 'Decline'),
                             onPressed: () {
+                              HapticFeedback.lightImpact();
                               ref
                                   .read(notificationsProvider.notifier)
                                   .remove(req.id);
@@ -3919,6 +3961,7 @@ class _NearbyRidersScreenState extends ConsumerState<_NearbyRidersScreen>
         leading: IconButton(
           icon: const Icon(Icons.close, color: Colors.white),
           onPressed: () => Navigator.pop(context),
+          tooltip: _t('Kapat', 'Close', 'Schließen'),
         ),
       ),
       body: _scanning
@@ -6744,6 +6787,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
+          tooltip: _t('Geri', 'Back', 'Zurück'),
         ),
         title: Text(
           _t('Profili Düzenle', 'Edit profile', 'Profil bearbeiten'),
@@ -7399,6 +7443,7 @@ class _ProfileAppearanceScreenState
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
+          tooltip: _t('Geri', 'Back', 'Zurück'),
         ),
         title: Text(
           _t(
@@ -7666,6 +7711,7 @@ class _ProfileAppearanceScreenState
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () =>
               setState(() => _currentPanel = StudioPanel.mainStudio),
+          tooltip: _t('Geri', 'Back', 'Zurück'),
         ),
         title: Text(
           _t('Kart Arka Planı', 'Card Background', 'Kartenhintergrund'),
@@ -7990,6 +8036,7 @@ class _ProfileAppearanceScreenState
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () =>
               setState(() => _currentPanel = StudioPanel.mainStudio),
+          tooltip: _t('Geri', 'Back', 'Zurück'),
         ),
         title: Text(
           _t('Sürüş Tipi', 'Riding Style', 'Fahrstil'),
@@ -8254,6 +8301,7 @@ class _ProfileAppearanceScreenState
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () =>
               setState(() => _currentPanel = StudioPanel.mainStudio),
+          tooltip: _t('Geri', 'Back', 'Zurück'),
         ),
         title: Text(
           _t('Rozet Kütüphanesi', 'Badge Library', 'Abzeichen-Bibliothek'),
@@ -8619,6 +8667,7 @@ class _ProfileAppearanceScreenState
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () =>
               setState(() => _currentPanel = StudioPanel.mainStudio),
+          tooltip: _t('Geri', 'Back', 'Zurück'),
         ),
         title: Text(
           _t('Avatar ve Çerçeve', 'Avatar and Frame', 'Avatar und Rahmen'),
@@ -9407,6 +9456,7 @@ class _AchievementSheetWidgetState
                         color: context.colors.textSecondary,
                       ),
                       onPressed: () => Navigator.pop(context),
+                      tooltip: tr ? 'Kapat' : 'Close',
                     ),
                   ],
                 ),
@@ -9999,6 +10049,7 @@ class _PremiumVaultSheetWidgetState
                       color: context.colors.textSecondary,
                     ),
                     onPressed: () => Navigator.pop(context),
+                    tooltip: tr ? 'Kapat' : (de ? 'Schließen' : 'Close'),
                   ),
                 ],
               ),
@@ -10077,7 +10128,7 @@ class _PremiumVaultSheetWidgetState
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: userProfile.isPremium
-                                      ? const Color(0xFF10B981)
+                                      ? SlatePalette.emerald
                                       : const Color(0xFFC7D2FE),
                                 ),
                               ),
@@ -10087,7 +10138,7 @@ class _PremiumVaultSheetWidgetState
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: userProfile.isPremium
-                                ? const Color(0xFF10B981)
+                                ? SlatePalette.emerald
                                 : const Color(0xFF6366F1),
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(
@@ -10109,7 +10160,7 @@ class _PremiumVaultSheetWidgetState
                               if (mounted) {
                                 messenger.showSnackBar(
                                   SnackBar(
-                                    backgroundColor: const Color(0xFF10B981),
+                                    backgroundColor: SlatePalette.emerald,
                                     content: Text(
                                       tr
                                           ? '🎉 Premium Hesabınıza Başarıyla Aktifleştirildi!'
@@ -10155,7 +10206,7 @@ class _PremiumVaultSheetWidgetState
                       ),
                       child: const Icon(
                         Icons.style,
-                        color: Color(0xFFF59E0B),
+                        color: SlatePalette.amber,
                         size: 28,
                       ),
                     ),
@@ -10274,7 +10325,7 @@ class _PremiumVaultSheetWidgetState
                         if (mounted) {
                           messenger.showSnackBar(
                             SnackBar(
-                              backgroundColor: const Color(0xFF10B981),
+                              backgroundColor: SlatePalette.emerald,
                               content: Text(
                                 tr
                                     ? '🎉 Promo Kod Başarıyla Uygulandı ve Bildirim Kutunuza Eklendi: $code'
