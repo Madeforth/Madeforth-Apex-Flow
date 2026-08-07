@@ -84,7 +84,7 @@ class _RidesScreenState extends ConsumerState<RidesScreen> {
                       top: 72, // 16 top + 38 height + 18 spacing
                       left: 16,
                       right: 16,
-                      bottom: 12,
+                      bottom: ApexSpacing.navBarClearance,
                     ),
                     children: [
                       // Top Navigation Bar

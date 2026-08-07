@@ -57,7 +57,7 @@ class GarageScreen extends ConsumerWidget {
                       top: 72, // 16 top + 38 height + 18 spacing
                       left: ApexSpacing.x2,
                       right: ApexSpacing.x2,
-                      bottom: ApexSpacing.x2,
+                      bottom: ApexSpacing.navBarClearance,
                     ),
                     children: [
                       _GarageHeader(
@@ -988,7 +988,7 @@ class _GarageSummaryCard extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "${odometerVal.toStringAsFixed(0)}",
+                      ref.watch(appSettingsProvider).formatNumber(odometerVal),
                       style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -1011,7 +1011,9 @@ class _GarageSummaryCard extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "${remaining.abs().toStringAsFixed(0)}",
+                      ref
+                          .watch(appSettingsProvider)
+                          .formatNumber(remaining.abs()),
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,

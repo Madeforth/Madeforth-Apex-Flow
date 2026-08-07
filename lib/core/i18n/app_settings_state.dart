@@ -45,7 +45,24 @@ class AppSettingsState {
   String formatDistance(double km) {
     final val = toDisplayDistance(km);
     final unitLabel = distanceUnit == 'mi' ? 'mi' : 'km';
-    return '${val.toStringAsFixed(0)} $unitLabel';
+    return '${formatNumber(val)} $unitLabel';
+  }
+
+  /// Groups thousands using the *selected app locale*, not Dart's default
+  /// (en_US). Calling NumberFormat without a locale renders "6,000" even in
+  /// Turkish, where "6.000" is correct.
+  String formatNumber(num value) =>
+      NumberFormat.decimalPattern(locale.languageCode).format(value);
+
+  /// Symbol-then-amount, with a space only when the symbol is alphabetic
+  /// ("TL 250" reads as one token otherwise: "TL250").
+  String formatCurrency(num value) {
+    final separator =
+        currencySymbol.isNotEmpty &&
+            RegExp(r'[A-Za-z]').hasMatch(currencySymbol)
+        ? ' '
+        : '';
+    return '$currencySymbol$separator${formatNumber(value)}';
   }
 
   double toDisplayVolume(double liters) {

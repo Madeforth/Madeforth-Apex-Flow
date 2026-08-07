@@ -101,7 +101,12 @@ class ApexDashboardScreen extends ConsumerWidget {
       backgroundColor: const Color(0xFF0B121A),
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.fromLTRB(
+            20,
+            20,
+            20,
+            ApexSpacing.navBarClearance,
+          ),
           children: [
             _TopBar(
               ref: ref,

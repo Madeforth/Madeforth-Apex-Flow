@@ -38,6 +38,17 @@ class _ProfileSetupWizardScreenState
   String _riderCountryCode = '+90';
   String _emergencyCountryCode = '+90';
 
+  /// Joins the picked dial code with the typed number, dropping the national
+  /// trunk prefix ("0" in TR and most of Europe) — keeping both produces
+  /// "+90 0544...", which is not a dialable number.
+  static String _withCountryCode(String dialCode, String rawPhone) {
+    final phone = rawPhone.trim();
+    if (phone.isEmpty) return '';
+    final national = phone.replaceFirst(RegExp(r'^0+'), '').trim();
+    if (national.isEmpty) return '';
+    return '$dialCode $national';
+  }
+
   // Step 2: Motorcycle Controllers
   late final TextEditingController _bikeName;
   late final TextEditingController _bikeModel;
@@ -193,14 +204,16 @@ class _ProfileSetupWizardScreenState
           .updateProfile(
             name: riderNameVal,
             riderTag: riderNameVal,
-            phoneNumber: _riderPhone.text.trim().isNotEmpty
-                ? '$_riderCountryCode ${_riderPhone.text.trim()}'
-                : '',
+            phoneNumber: _withCountryCode(
+              _riderCountryCode,
+              _riderPhone.text,
+            ),
             bloodType: _riderBlood.text.trim(),
             emergencyContactName: _emergencyName.text.trim(),
-            emergencyContactPhone: _emergencyPhone.text.trim().isNotEmpty
-                ? '$_emergencyCountryCode ${_emergencyPhone.text.trim()}'
-                : '',
+            emergencyContactPhone: _withCountryCode(
+              _emergencyCountryCode,
+              _emergencyPhone.text,
+            ),
             sharePhone: _sharePhone,
             shareEmergency: _shareEmergency,
           );

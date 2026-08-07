@@ -97,7 +97,7 @@ class _DocumentVaultScreenState extends ConsumerState<DocumentVaultScreen> {
                 top: widget.topPadding + 64, // 16 top + 38 height + 10 spacing
                 left: ApexSpacing.x2,
                 right: ApexSpacing.x2,
-                bottom: 80,
+                bottom: ApexSpacing.navBarClearance,
               ),
               children: [
                 // Header

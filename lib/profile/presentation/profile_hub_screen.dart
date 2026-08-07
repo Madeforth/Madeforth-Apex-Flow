@@ -97,7 +97,7 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                     top: 72, // 16 top + 38 height + 18 spacing
                     left: ApexSpacing.x2,
                     right: ApexSpacing.x2,
-                    bottom: 80,
+                    bottom: ApexSpacing.navBarClearance,
                   ),
                   children: [
                     // Scrollable Top Bar
@@ -639,40 +639,62 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                           ), // Liquid highlight
                           borderRadius: BorderRadius.circular(17),
                         ),
+                        // Each tab gets ~90px of the fixed 270px bar; Tab's
+                        // default horizontal padding leaves too little for
+                        // longer localized labels ("Arkadaşlar",
+                        // "Bestenliste"), which overflowed. Trim the padding
+                        // and scale down as a fallback, matching how the
+                        // Garage and Rides tab bars already handle this.
+                        labelPadding: const EdgeInsets.symmetric(horizontal: 2),
                         tabs: [
                           Tab(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(Icons.person_outline, size: 13),
-                                const SizedBox(width: 4),
-                                Text(_t('Profil', 'Profile', 'Profil')),
-                              ],
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(Icons.person_outline, size: 13),
+                                  const SizedBox(width: 4),
+                                  Text(_t('Profil', 'Profile', 'Profil')),
+                                ],
+                              ),
                             ),
                           ),
                           Tab(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(Icons.people_outline, size: 13),
-                                const SizedBox(width: 4),
-                                Text(_t('Arkadaşlar', 'Friends', 'Freunde')),
-                              ],
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(Icons.people_outline, size: 13),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    _t('Arkadaşlar', 'Friends', 'Freunde'),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                           Tab(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(
-                                  Icons.leaderboard_outlined,
-                                  size: 13,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  _t('Liderlik', 'Leaderboard', 'Bestenliste'),
-                                ),
-                              ],
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(
+                                    Icons.leaderboard_outlined,
+                                    size: 13,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    _t(
+                                      'Liderlik',
+                                      'Leaderboard',
+                                      'Bestenliste',
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],

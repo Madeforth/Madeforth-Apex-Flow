@@ -30,7 +30,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     return Scaffold(
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.all(ApexSpacing.x2),
+          padding: const EdgeInsets.fromLTRB(
+            ApexSpacing.x2,
+            ApexSpacing.x2,
+            ApexSpacing.x2,
+            ApexSpacing.navBarClearance,
+          ),
           children: [
             Text(
               widget.strings.settingsTitle,

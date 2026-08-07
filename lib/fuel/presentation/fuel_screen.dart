@@ -121,6 +121,7 @@ class _FuelScreenState extends ConsumerState<FuelScreen> {
             top: widget.topPadding + 16,
             left: 16,
             right: 16,
+            bottom: ApexSpacing.navBarClearance,
           ),
           children: [
             // Top Navigation & Header

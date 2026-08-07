@@ -356,7 +356,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.ensureVisible(find.text('Machine Memory'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Machine Memory'));
+    await tester.tap(find.byIcon(Icons.timeline_outlined));
     await tester.pumpAndSettle();
 
     expect(find.textContaining('Unified timeline'), findsOneWidget);
@@ -384,10 +384,14 @@ void main() {
 
     await tester.drag(find.byType(ListView).first, const Offset(0, -600));
     await tester.pumpAndSettle();
-
     await tester.ensureVisible(find.text('Machine Memory'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Machine Memory'));
+    // Tap the icon rather than the (2-line, wrapped) text label — the
+    // floating bottom nav bar sits above scroll content at a fixed screen
+    // band, and a raw text widget's computed center can land in that band
+    // even once ensureVisible reports it "visible" per the list's own
+    // viewport math.
+    await tester.tap(find.byIcon(Icons.timeline_outlined));
     await tester.pumpAndSettle();
     expect(find.text('Unified timeline'), findsOneWidget);
     expect(tester.takeException(), isNull);

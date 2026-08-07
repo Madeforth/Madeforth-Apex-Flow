@@ -31,7 +31,8 @@ class InsightsScreen extends ConsumerWidget {
     final garageState = ref.watch(garageStateProvider);
     final dashboard = ref.watch(dashboardStateProvider);
     final rideState = ref.watch(rideStateProvider);
-    final currencySymbol = ref.watch(appSettingsProvider).currencySymbol;
+    final settings = ref.watch(appSettingsProvider);
+    final currencySymbol = settings.currencySymbol;
     final tr = strings.locale.languageCode == 'tr';
 
     return Scaffold(
@@ -39,7 +40,12 @@ class InsightsScreen extends ConsumerWidget {
           SlatePalette.surfaceDeep, // Very dark background matching the image
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+          padding: const EdgeInsets.fromLTRB(
+            16,
+            24,
+            16,
+            ApexSpacing.navBarClearance,
+          ),
           children: [
             // Header Row
             Row(
@@ -237,53 +243,56 @@ class InsightsScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
 
-            // 3 Stat Cards Row
-            Row(
-              children: [
-                Expanded(
-                  child: _StatCard(
-                    icon: Icons.build_outlined,
-                    iconColor: context.colors.cyan,
-                    title: tInline(
-                      AppStrings.currentLanguageCode,
-                      'Sıradaki servis',
-                      'Next service',
-                      'Nächster Service',
+            // 3 Stat Cards Row — IntrinsicHeight keeps all three the same
+            // height once a title wraps to two lines.
+            IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: _StatCard(
+                      icon: Icons.build_outlined,
+                      iconColor: context.colors.cyan,
+                      title: tInline(
+                        AppStrings.currentLanguageCode,
+                        'Sıradaki servis',
+                        'Next service',
+                        'Nächster Service',
+                      ),
+                      value:
+                          '${settings.formatNumber((garageState.activeBike?.lastServiceKm ?? 0) + (garageState.activeBike?.serviceIntervalKm ?? 2500))} km',
                     ),
-                    value:
-                        '${(garageState.activeBike?.lastServiceKm ?? 0) + (garageState.activeBike?.serviceIntervalKm ?? 2500)} km',
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _StatCard(
-                    icon: Icons.account_balance_wallet_outlined,
-                    iconColor: context.colors.cyan,
-                    title: tInline(
-                      AppStrings.currentLanguageCode,
-                      'Toplam kayıtlı',
-                      'Total recorded',
-                      'Insgesamt erfasst',
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _StatCard(
+                      icon: Icons.account_balance_wallet_outlined,
+                      iconColor: context.colors.cyan,
+                      title: tInline(
+                        AppStrings.currentLanguageCode,
+                        'Toplam kayıtlı',
+                        'Total recorded',
+                        'Insgesamt erfasst',
+                      ),
+                      value: settings.formatCurrency(state.totalCostTry),
                     ),
-                    value:
-                        '$currencySymbol${state.totalCostTry.toStringAsFixed(0)}',
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _StatCard(
-                    icon: Icons.add_road_outlined,
-                    iconColor: context.colors.cyan,
-                    title: tInline(
-                      AppStrings.currentLanguageCode,
-                      'Sürüş kaydı',
-                      'Ride records',
-                      'Fahrtaufzeichnungen',
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _StatCard(
+                      icon: Icons.add_road_outlined,
+                      iconColor: context.colors.cyan,
+                      title: tInline(
+                        AppStrings.currentLanguageCode,
+                        'Sürüş kaydı',
+                        'Ride records',
+                        'Fahrtaufzeichnungen',
+                      ),
+                      value: '${rideState.sessions.length}',
                     ),
-                    value: '${rideState.sessions.length}',
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             const SizedBox(height: 24),
 
@@ -405,7 +414,7 @@ class InsightsScreen extends ConsumerWidget {
                         _WishlistRow(
                           part: part,
                           tr: tr,
-                          currencySymbol: currencySymbol,
+                          settings: settings,
                           onDelete: () {
                             HapticFeedback.mediumImpact();
                             ref
@@ -708,6 +717,11 @@ class _MaintenanceOverviewCard extends StatelessWidget {
     final remaining = nextService - currentKm;
     final progress = (currentKm - lastServiceKm) / interval;
     final clampedProgress = progress.clamp(0.0, 1.0);
+    final numberFormat = NumberFormat.decimalPattern(
+      AppStrings.currentLanguageCode,
+    );
+    final intervalText = numberFormat.format(interval);
+    final remainingText = numberFormat.format(remaining.abs());
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -836,14 +850,14 @@ class _MaintenanceOverviewCard extends StatelessWidget {
                   tInline(
                     AppStrings.currentLanguageCode,
                     remaining < 0
-                        ? 'Mevcut ${NumberFormat.decimalPattern().format(interval)} km aralığında ${remaining.abs()} km aşıldı.'
-                        : 'Mevcut ${NumberFormat.decimalPattern().format(interval)} km aralığında $remaining km kaldı.',
+                        ? 'Mevcut $intervalText km aralığında $remainingText km aşıldı.'
+                        : 'Mevcut $intervalText km aralığında $remainingText km kaldı.',
                     remaining < 0
-                        ? '${remaining.abs()} km overdue in the current\n${NumberFormat.decimalPattern().format(interval)} km interval.'
-                        : '$remaining km remaining in the current\n${NumberFormat.decimalPattern().format(interval)} km interval.',
+                        ? '$remainingText km overdue in the current\n$intervalText km interval.'
+                        : '$remainingText km remaining in the current\n$intervalText km interval.',
                     remaining < 0
-                        ? '${remaining.abs()} km überfällig im aktuellen\n${NumberFormat.decimalPattern().format(interval)} km Intervall.'
-                        : '$remaining km verbleibend im aktuellen\n${NumberFormat.decimalPattern().format(interval)} km Intervall.',
+                        ? '$remainingText km überfällig im aktuellen\n$intervalText km Intervall.'
+                        : '$remainingText km verbleibend im aktuellen\n$intervalText km Intervall.',
                   ),
                   style: TextStyle(
                     color: context.colors.textSecondary,
@@ -866,7 +880,7 @@ class _MaintenanceOverviewCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      '${NumberFormat.decimalPattern().format(currentKm - lastServiceKm)} / ${NumberFormat.decimalPattern().format(interval)} km',
+                      '${numberFormat.format(currentKm - lastServiceKm)} / $intervalText km',
                       style: TextStyle(
                         color: context.colors.textSecondary,
                         fontSize: 12,
@@ -1081,16 +1095,24 @@ class _StatCard extends StatelessWidget {
                 color: context.colors.textSecondary,
                 fontSize: 12,
               ),
-              maxLines: 1,
+              // Three of these sit side by side, so a single line clips
+              // longer localized titles ("Sıradaki servis",
+              // "Fahrtaufzeichnungen") mid-word.
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 4),
-            Text(
-              value,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                value,
+                maxLines: 1,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ],
@@ -1495,7 +1517,8 @@ class _CostLedgerCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currencySymbol = ref.watch(appSettingsProvider).currencySymbol;
+    final settings = ref.watch(appSettingsProvider);
+    final currencySymbol = settings.currencySymbol;
     return Container(
       decoration: BoxDecoration(
         color: SlatePalette.oledBackground,
@@ -1530,7 +1553,7 @@ class _CostLedgerCard extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '$currencySymbol${state.totalCostTry.toStringAsFixed(0)}',
+                        settings.formatCurrency(state.totalCostTry),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 20,
@@ -1554,8 +1577,7 @@ class _CostLedgerCard extends ConsumerWidget {
                   ),
                 ),
                 GestureDetector(
-                  onTap: () =>
-                      _showLedgerSheet(context, state, tr, currencySymbol),
+                  onTap: () => _showLedgerSheet(context, state, tr, settings),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12,
@@ -1645,7 +1667,7 @@ class _CostLedgerCard extends ConsumerWidget {
                           ),
                         ),
                         Text(
-                          '$currencySymbol${entry.amountTry.toStringAsFixed(0)}',
+                          settings.formatCurrency(entry.amountTry),
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 14,
@@ -1717,7 +1739,7 @@ void _showLedgerSheet(
   BuildContext context,
   InsightsState state,
   bool tr,
-  String currencySymbol,
+  AppSettingsState settings,
 ) {
   showModalBottomSheet(
     context: context,
@@ -1780,7 +1802,7 @@ void _showLedgerSheet(
                       ),
                       const Spacer(),
                       Text(
-                        '$currencySymbol${state.totalCostTry.toStringAsFixed(0)}',
+                        settings.formatCurrency(state.totalCostTry),
                         style: TextStyle(
                           color: context.colors.cyan,
                           fontSize: 15,
@@ -1850,7 +1872,7 @@ void _showLedgerSheet(
                                 ),
                               ),
                               trailing: Text(
-                                '$currencySymbol${e.amountTry.toStringAsFixed(0)}',
+                                settings.formatCurrency(e.amountTry),
                                 style: TextStyle(
                                   color: context.colors.white,
                                   fontSize: 14,
@@ -2210,13 +2232,13 @@ class _WishlistRow extends StatelessWidget {
     required this.part,
     required this.tr,
     required this.onDelete,
-    required this.currencySymbol,
+    required this.settings,
   });
 
   final WishlistPart part;
   final bool tr;
   final VoidCallback onDelete;
-  final String currencySymbol;
+  final AppSettingsState settings;
 
   @override
   Widget build(BuildContext context) {
@@ -2254,7 +2276,7 @@ class _WishlistRow extends StatelessWidget {
           ),
           if (part.priceTry != null && part.priceTry! > 0) ...[
             Text(
-              '$currencySymbol${part.priceTry!.toStringAsFixed(0)}',
+              settings.formatCurrency(part.priceTry!),
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
