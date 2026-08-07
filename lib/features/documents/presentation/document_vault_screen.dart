@@ -73,7 +73,9 @@ class _DocumentVaultScreenState extends ConsumerState<DocumentVaultScreen> {
                 'Please add a motorcycle in the Garage tab first.',
                 'Bitte fügen Sie zuerst ein Motorrad im Reiter „Garage“ hinzu.',
               ),
-              style: TextStyle(color: context.colors.textSecondary),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: context.colors.textSecondary,
+              ),
             ),
           ),
         ),
@@ -107,10 +109,11 @@ class _DocumentVaultScreenState extends ConsumerState<DocumentVaultScreen> {
                     Expanded(
                       child: Text(
                         widget.strings.vaultTitle,
-                        style: const TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.w900,
-                        ),
+                        style: Theme.of(context).textTheme.headlineLarge
+                            ?.copyWith(
+                              fontSize: 28,
+                              fontWeight: FontWeight.w900,
+                            ),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -148,7 +151,9 @@ class _DocumentVaultScreenState extends ConsumerState<DocumentVaultScreen> {
                 const SizedBox(height: 4),
                 Text(
                   widget.strings.vaultSubtitle,
-                  style: TextStyle(color: context.colors.textSecondary),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: context.colors.textSecondary,
+                  ),
                 ),
                 const SizedBox(height: 24),
 
@@ -245,8 +250,7 @@ class _DocumentVaultScreenState extends ConsumerState<DocumentVaultScreen> {
                       'Add New Document',
                       'Neues Dokument hinzufügen',
                     ),
-                    style: const TextStyle(
-                      fontSize: 16,
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       fontWeight: FontWeight.w900,
                     ),
                   ),
@@ -519,8 +523,7 @@ class _DocumentVaultScreenState extends ConsumerState<DocumentVaultScreen> {
                       'Add New Due Date',
                       'Neues Fälligkeitsdatum hinzufügen',
                     ),
-                    style: const TextStyle(
-                      fontSize: 16,
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       fontWeight: FontWeight.w900,
                     ),
                   ),
@@ -828,17 +831,17 @@ class _VaultTabSelector extends StatelessWidget {
                             const SizedBox(width: 6),
                             Text(
                               strings.vaultDocTab,
-                              style: TextStyle(
-                                fontSize: 11, // Slimmer text
-                                fontWeight: activeTab == 'docs'
-                                    ? FontWeight.bold
-                                    : FontWeight.normal,
-                                color: activeTab == 'docs'
-                                    ? context
-                                          .colors
-                                          .cyan // Selected tab text color
-                                    : context.colors.textSecondary,
-                              ),
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(
+                                    fontWeight: activeTab == 'docs'
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                    color: activeTab == 'docs'
+                                        ? context
+                                              .colors
+                                              .cyan // Selected tab text color
+                                        : context.colors.textSecondary,
+                                  ),
                             ),
                           ],
                         ),
@@ -878,17 +881,17 @@ class _VaultTabSelector extends StatelessWidget {
                             const SizedBox(width: 6),
                             Text(
                               strings.vaultTaxTab,
-                              style: TextStyle(
-                                fontSize: 11, // Slimmer text
-                                fontWeight: activeTab == 'tax'
-                                    ? FontWeight.bold
-                                    : FontWeight.normal,
-                                color: activeTab == 'tax'
-                                    ? context
-                                          .colors
-                                          .cyan // Selected tab text color
-                                    : context.colors.textSecondary,
-                              ),
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(
+                                    fontWeight: activeTab == 'tax'
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                    color: activeTab == 'tax'
+                                        ? context
+                                              .colors
+                                              .cyan // Selected tab text color
+                                        : context.colors.textSecondary,
+                                  ),
                             ),
                           ],
                         ),
@@ -929,7 +932,9 @@ class _DocsTabContent extends ConsumerWidget {
           children: [
             Text(
               strings.vaultDocTab,
-              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w900),
+              style: Theme.of(
+                context,
+              ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w900),
             ),
             SizedBox(
               height: 32,
@@ -943,10 +948,9 @@ class _DocsTabContent extends ConsumerWidget {
                 icon: const Icon(Icons.add, size: 14),
                 label: Text(
                   strings.vaultAddDoc,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -959,7 +963,9 @@ class _DocsTabContent extends ConsumerWidget {
             child: Center(
               child: Text(
                 strings.vaultNoDocs,
-                style: TextStyle(color: context.colors.textSecondary),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: context.colors.textSecondary,
+                ),
               ),
             ),
           )
@@ -1032,10 +1038,8 @@ class _DocCard extends ConsumerWidget {
                         doc.title,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: Theme.of(context).textTheme.labelMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       if (doc.description.isNotEmpty) ...[
                         const SizedBox(height: 2),
@@ -1069,13 +1073,13 @@ class _DocCard extends ConsumerWidget {
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                  color: _isNearExpiry(doc.expirationDate)
-                                      ? context.colors.red
-                                      : context.colors.textSecondary,
-                                ),
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: _isNearExpiry(doc.expirationDate)
+                                          ? context.colors.red
+                                          : context.colors.textSecondary,
+                                    ),
                               ),
                             ),
                           ],
@@ -1128,7 +1132,12 @@ class _DocCard extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               AppBar(
-                title: Text(title, style: const TextStyle(color: Colors.white)),
+                title: Text(
+                  title,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(color: Colors.white),
+                ),
                 backgroundColor: Colors.transparent,
                 elevation: 0,
                 leading: IconButton(
@@ -1201,7 +1210,9 @@ class _TaxTabContent extends ConsumerWidget {
           children: [
             Text(
               strings.vaultTaxTab,
-              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w900),
+              style: Theme.of(
+                context,
+              ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w900),
             ),
             if (records.isNotEmpty)
               Wrap(
@@ -1224,8 +1235,7 @@ class _TaxTabContent extends ConsumerWidget {
                           'Template',
                           'Vorlage',
                         ),
-                        style: const TextStyle(
-                          fontSize: 11,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -1243,8 +1253,7 @@ class _TaxTabContent extends ConsumerWidget {
                       icon: const Icon(Icons.add, size: 14),
                       label: Text(
                         strings.taxAddButton,
-                        style: const TextStyle(
-                          fontSize: 11,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -1304,7 +1313,9 @@ class _TaxTabContent extends ConsumerWidget {
                       'No due dates saved yet.',
                       'Noch keine Fälligkeitstermine gespeichert.',
                     ),
-                    style: TextStyle(color: context.colors.textSecondary),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: context.colors.textSecondary,
+                    ),
                   ),
                   const SizedBox(height: 20),
                   Wrap(
@@ -1322,10 +1333,8 @@ class _TaxTabContent extends ConsumerWidget {
                         icon: const Icon(Icons.auto_awesome, size: 16),
                         label: Text(
                           strings.taxTemplateButton,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context).textTheme.labelMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                       ),
                       TextButton.icon(
@@ -1338,10 +1347,8 @@ class _TaxTabContent extends ConsumerWidget {
                         icon: const Icon(Icons.add, size: 16),
                         label: Text(
                           strings.taxAddButton,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context).textTheme.labelMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                       ),
                     ],
@@ -1426,7 +1433,9 @@ class _OfficialShortcutChip extends StatelessWidget {
       icon: Icon(icon, size: 14),
       label: Text(
         label,
-        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+        style: Theme.of(
+          context,
+        ).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600),
       ),
     );
   }
@@ -1490,7 +1499,7 @@ class _TaxCard extends ConsumerWidget {
               children: [
                 Text(
                   strings.taxLabel(record.type),
-                  style: const TextStyle(
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
                   ),
@@ -1498,8 +1507,7 @@ class _TaxCard extends ConsumerWidget {
                 const SizedBox(height: 4),
                 Text(
                   '$formattedDate • $daysText',
-                  style: TextStyle(
-                    fontSize: 11,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: record.isPaid
                         ? context.colors.textSecondary
                         : alertColor,
@@ -1512,8 +1520,7 @@ class _TaxCard extends ConsumerWidget {
                   const SizedBox(height: 2),
                   Text(
                     '${record.amount.toStringAsFixed(0)} ${record.currency}',
-                    style: TextStyle(
-                      fontSize: 11,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: context.colors.textSecondary,
                     ),
                   ),

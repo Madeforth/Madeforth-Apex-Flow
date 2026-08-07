@@ -1,4 +1,4 @@
-﻿import 'package:apexflow/core/design/apex_spacing.dart';
+import 'package:apexflow/core/design/apex_spacing.dart';
 import 'package:apexflow/core/i18n/app_settings_state.dart';
 import 'package:apexflow/core/i18n/app_strings.dart';
 import 'package:apexflow/shared/design/slate_palette.dart';
@@ -39,7 +39,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           children: [
             Text(
               widget.strings.settingsTitle,
-              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
+              style: Theme.of(
+                context,
+              ).textTheme.headlineLarge?.copyWith(fontWeight: FontWeight.w900),
             ),
             const SizedBox(height: 4),
             Text(
@@ -49,7 +51,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 'App preferences and rider profile.',
                 'App-Einstellungen und Fahrerprofil.',
               ),
-              style: TextStyle(color: context.colors.textSecondary),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: context.colors.textSecondary,
+              ),
             ),
             const SizedBox(height: ApexSpacing.x2),
 
@@ -60,18 +64,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 children: [
                   Text(
                     widget.strings.settingsNotificationTitle,
-                    style: const TextStyle(
-                      fontSize: 14,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w900,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     widget.strings.settingsNotificationDesc,
-                    style: TextStyle(
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
                       color: context.colors.textSecondary,
-                      fontSize: 12,
-                      height: 1.35,
                     ),
                   ),
                   const SizedBox(height: ApexSpacing.x1),
@@ -122,8 +123,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 children: [
                   Text(
                     widget.strings.language,
-                    style: const TextStyle(
-                      fontSize: 14,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w900,
                     ),
                   ),
@@ -148,9 +148,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         : (settings.locale.languageCode == 'de'
                               ? 'App-Sprache wird sofort aktualisiert.'
                               : 'App language changes take effect instantly.'),
-                    style: TextStyle(
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
                       color: context.colors.textSecondary,
-                      fontSize: 12,
                     ),
                   ),
                 ],
@@ -170,8 +169,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       'Unit System',
                       'Einheitensystem',
                     ),
-                    style: const TextStyle(
-                      fontSize: 14,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w900,
                     ),
                   ),
@@ -183,8 +181,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       'Distance Unit',
                       'Entfernungseinheit',
                     ),
-                    style: TextStyle(
-                      fontSize: 12,
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: context.colors.textSecondary,
                     ),
@@ -226,8 +223,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       'Volume Unit',
                       'Volumeneinheit',
                     ),
-                    style: TextStyle(
-                      fontSize: 12,
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: context.colors.textSecondary,
                     ),
@@ -280,8 +276,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       'Support & Madeforth QA',
                       'Support & Madeforth-QA',
                     ),
-                    style: const TextStyle(
-                      fontSize: 14,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w900,
                     ),
                   ),
@@ -293,10 +288,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       'Report issues directly to Madeforth QA and track status.',
                       'Melden Sie Probleme direkt an Madeforth QA und verfolgen Sie den Status.',
                     ),
-                    style: TextStyle(
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
                       color: context.colors.textSecondary,
-                      fontSize: 12,
-                      height: 1.35,
                     ),
                   ),
                   const SizedBox(height: ApexSpacing.x1),
@@ -372,8 +365,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       'Account Management & Privacy',
                       'Konto-Verwaltung & Datenschutz',
                     ),
-                    style: const TextStyle(
-                      fontSize: 14,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w900,
                     ),
                   ),
@@ -385,9 +377,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       'Permanently delete your account and all associated cloud data.',
                       'Löschen Sie Ihr Konto und alle Cloud-Daten dauerhaft.',
                     ),
-                    style: TextStyle(
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
                       color: context.colors.textSecondary,
-                      fontSize: 12,
                     ),
                   ),
                   const SizedBox(height: ApexSpacing.x2),
@@ -411,7 +402,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           'Delete My Account & All Data',
                           'Mein Konto & alle Daten löschen',
                         ),
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
@@ -435,7 +428,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     'Join Our Discord Community',
                     'Tritt unserer Discord-Community bei',
                   ),
-                  style: const TextStyle(fontWeight: FontWeight.w700),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700),
                 ),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: context.colors.cyan,
@@ -516,8 +511,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     'Are You Sure You Want to Delete Your Account?',
                     'Möchten Sie Ihr Konto wirklich löschen?',
                   ),
-                  style: const TextStyle(
-                    fontSize: 16,
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
@@ -536,11 +530,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   'This action cannot be undone! Your currently logged in account ($activeEmail), Firebase cloud data, garage motorcycles, and ride history will be permanently deleted.',
                   'Diese Aktion kann nicht rückgängig gemacht werden! Ihr derzeit angemeldetes Konto ($activeEmail), Ihre Cloud-Daten und Ihr Verlauf werden dauerhaft gelöscht.',
                 ),
-                style: const TextStyle(
-                  color: SlatePalette.mutedText,
-                  fontSize: 13,
-                  height: 1.4,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: SlatePalette.mutedText),
               );
             },
           ),
@@ -554,7 +546,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   'Cancel',
                   'Abbrechen',
                 ),
-                style: const TextStyle(color: Colors.white70),
+                style: Theme.of(
+                  context,
+                ).textTheme.labelLarge?.copyWith(color: Colors.white70),
               ),
             ),
             ElevatedButton(
@@ -609,7 +603,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   'Delete Permanently',
                   'Dauerhaft löschen',
                 ),
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                style: Theme.of(
+                  context,
+                ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
               ),
             ),
           ],
@@ -670,8 +666,7 @@ class ApexSegmentedToggle extends StatelessWidget {
                     fit: BoxFit.scaleDown,
                     child: Text(
                       entry.value,
-                      style: TextStyle(
-                        fontSize: 12,
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
                         fontWeight: isSelected
                             ? FontWeight.bold
                             : FontWeight.normal,
