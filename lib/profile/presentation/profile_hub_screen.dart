@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:apexflow/core/services/firebase_service.dart';
 import 'package:flutter/services.dart';
 import 'dart:math' as math;
 import 'dart:io';
@@ -348,6 +352,7 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                       totalKm: totalKm,
                       harmonyScore: garageState.activeBike.name != '—' ? 95 : 0,
                       avatarIndex: userProfile.avatarIndex,
+                      avatarPhotoUrl: userProfile.avatarPhotoUrl,
                       tr: tr,
                       de: AppStrings.currentLanguageCode == 'de',
                       onTap: () =>
@@ -613,6 +618,7 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                   tr: tr,
                   userSupporterTier: userProfile.supporterTier,
                   userAvatarIndex: userProfile.avatarIndex,
+                  userAvatarPhotoUrl: userProfile.avatarPhotoUrl,
                   onOpenFriendProfile: (f) =>
                       _showFriendShowcaseGarage(context, f, tr, de),
                   onAddFriend: () => _showAddFriendSheet(context, tr, de),
@@ -1222,6 +1228,7 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                 totalKm: friend.weeklyKm * 4.2,
                 harmonyScore: friend.harmonyScore,
                 avatarIndex: friend.avatarIndex,
+                avatarPhotoUrl: friend.avatarPhotoUrl,
                 tr: tr,
                 de: AppStrings.currentLanguageCode == 'de',
 
@@ -1722,6 +1729,7 @@ class RiderIdCard extends StatelessWidget {
     required this.totalKm,
     required this.harmonyScore,
     required this.avatarIndex,
+    this.avatarPhotoUrl,
     required this.tr,
     this.de = false,
     this.onTap,
@@ -1754,6 +1762,7 @@ class RiderIdCard extends StatelessWidget {
   final double totalKm;
   final int harmonyScore;
   final int avatarIndex;
+  final String? avatarPhotoUrl;
   final bool tr;
   final bool de;
   final VoidCallback? onTap;
@@ -1902,6 +1911,7 @@ class RiderIdCard extends StatelessWidget {
                       children: [
                         RiderAvatarWidget(
                           avatarIndex: avatarIndex,
+                          avatarPhotoUrl: avatarPhotoUrl,
                           radius: 28,
                           color: Colors.white,
                           selectedFrameIndex: selectedFrameIndex,
@@ -3714,6 +3724,7 @@ class _FriendsListState extends ConsumerState<_FriendsList> {
                 totalKm: friend.weeklyKm * 10,
                 harmonyScore: friend.harmonyScore,
                 avatarIndex: friend.avatarIndex,
+                avatarPhotoUrl: friend.avatarPhotoUrl,
                 tr: tr,
                 de: AppStrings.currentLanguageCode == 'de',
                 themeIndex: friend.cardThemeIndex,
@@ -4132,6 +4143,7 @@ class _NearbyRidersScreenState extends ConsumerState<_NearbyRidersScreen>
                             children: [
                               RiderAvatarWidget(
                                 avatarIndex: rider.avatarIndex,
+                                avatarPhotoUrl: rider.avatarPhotoUrl,
                                 radius: 22,
                                 color: theme.colors.first,
                               ),
@@ -4265,6 +4277,7 @@ class _LeaderboardList extends StatefulWidget {
     required this.tr,
     required this.userSupporterTier,
     required this.userAvatarIndex,
+    this.userAvatarPhotoUrl,
     required this.onOpenFriendProfile,
     required this.onAddFriend,
     this.topPadding = 0.0,
@@ -4276,6 +4289,7 @@ class _LeaderboardList extends StatefulWidget {
   final bool tr;
   final int userSupporterTier;
   final int userAvatarIndex;
+  final String? userAvatarPhotoUrl;
   final void Function(FriendProfile) onOpenFriendProfile;
   final VoidCallback onAddFriend;
   final double topPadding;
@@ -4300,6 +4314,7 @@ class _LeaderboardListState extends State<_LeaderboardList> {
         isUser: true,
         supporterTier: widget.userSupporterTier,
         avatarIndex: widget.userAvatarIndex,
+        avatarPhotoUrl: widget.userAvatarPhotoUrl,
         friendObj: null,
       ),
       for (final f in widget.friends)
@@ -4310,6 +4325,7 @@ class _LeaderboardListState extends State<_LeaderboardList> {
           isUser: false,
           supporterTier: f.supporterTier,
           avatarIndex: f.avatarIndex,
+          avatarPhotoUrl: f.avatarPhotoUrl,
           friendObj: f,
         ),
     ];
@@ -4609,6 +4625,7 @@ class _LeaderboardListState extends State<_LeaderboardList> {
             const SizedBox(height: 8),
             RiderAvatarWidget(
               avatarIndex: item.avatarIndex,
+              avatarPhotoUrl: item.avatarPhotoUrl,
               radius: 24,
               selectedFrameIndex: isRank1 ? 3 : 0,
             ),
@@ -4687,7 +4704,11 @@ class _LeaderboardListState extends State<_LeaderboardList> {
               ),
             ),
             const SizedBox(width: 12),
-            RiderAvatarWidget(avatarIndex: item.avatarIndex, radius: 16),
+            RiderAvatarWidget(
+              avatarIndex: item.avatarIndex,
+              avatarPhotoUrl: item.avatarPhotoUrl,
+              radius: 16,
+            ),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -4767,6 +4788,7 @@ class _LeaderboardItem {
     required this.isUser,
     required this.supporterTier,
     required this.avatarIndex,
+    this.avatarPhotoUrl,
     required this.friendObj,
   });
 
@@ -4776,6 +4798,7 @@ class _LeaderboardItem {
   final bool isUser;
   final int supporterTier;
   final int avatarIndex;
+  final String? avatarPhotoUrl;
   final FriendProfile? friendObj;
 }
 
@@ -5764,6 +5787,7 @@ class PremiumAvatarPainter extends CustomPainter {
 
 class RiderAvatarWidget extends StatelessWidget {
   final int avatarIndex;
+  final String? avatarPhotoUrl;
   final double radius;
   final Color? color;
   final int selectedFrameIndex;
@@ -5771,6 +5795,7 @@ class RiderAvatarWidget extends StatelessWidget {
   const RiderAvatarWidget({
     super.key,
     required this.avatarIndex,
+    this.avatarPhotoUrl,
     this.radius = 28,
     this.color,
     this.selectedFrameIndex = 0,
@@ -5828,12 +5853,29 @@ class RiderAvatarWidget extends StatelessWidget {
         border: customBorder,
       ),
       child: ClipOval(
-        child: CustomPaint(
-          painter: PremiumAvatarPainter(
-            index: cleanIndex,
-            color: color ?? theme.accentColor,
-          ),
-        ),
+        child: (avatarPhotoUrl != null && avatarPhotoUrl!.isNotEmpty)
+            ? CachedNetworkImage(
+                imageUrl: avatarPhotoUrl!,
+                fit: BoxFit.cover,
+                placeholder: (context, url) => CustomPaint(
+                  painter: PremiumAvatarPainter(
+                    index: cleanIndex,
+                    color: color ?? theme.accentColor,
+                  ),
+                ),
+                errorWidget: (context, url, error) => CustomPaint(
+                  painter: PremiumAvatarPainter(
+                    index: cleanIndex,
+                    color: color ?? theme.accentColor,
+                  ),
+                ),
+              )
+            : CustomPaint(
+                painter: PremiumAvatarPainter(
+                  index: cleanIndex,
+                  color: color ?? theme.accentColor,
+                ),
+              ),
       ),
     );
 
@@ -6472,6 +6514,7 @@ class _RiderMatchmakerScreenState extends State<_RiderMatchmakerScreen>
                     totalKm: match.weeklyKm * 10,
                     harmonyScore: match.harmonyScore,
                     avatarIndex: match.avatarIndex,
+                    avatarPhotoUrl: match.avatarPhotoUrl,
                     tr: widget.tr,
                     themeIndex: match.cardThemeIndex,
                     supporterTier: match.supporterTier,
@@ -7160,10 +7203,14 @@ class ProfileAppearanceScreen extends ConsumerStatefulWidget {
 class _ProfileAppearanceScreenState
     extends ConsumerState<ProfileAppearanceScreen> {
   late int localAvatarIndex;
+  String? localAvatarPhotoUrl;
   late int localSelectedFrameIndex;
   late List<String> localSelectedBadges;
   late int localThemeIndex;
   late String localRidingStyle;
+
+  bool _isUploadingPhoto = false;
+  String? _photoUploadError;
 
   StudioPanel _currentPanel = StudioPanel.mainStudio;
   String _backgroundFilter = 'Tümü';
@@ -7174,6 +7221,7 @@ class _ProfileAppearanceScreenState
     super.initState();
     final profile = ref.read(userProfileProvider);
     localAvatarIndex = profile.avatarIndex;
+    localAvatarPhotoUrl = profile.avatarPhotoUrl;
     localSelectedFrameIndex = profile.selectedFrameIndex;
     localSelectedBadges = List.from(profile.selectedBadges);
     localThemeIndex = profile.cardThemeIndex;
@@ -7181,6 +7229,93 @@ class _ProfileAppearanceScreenState
 
     _backgroundFilter = widget.tr ? 'Tümü' : (widget.de ? 'Alle' : 'All');
     _badgeFilter = widget.tr ? 'Tümü' : (widget.de ? 'Alle' : 'All');
+  }
+
+  Future<void> _pickAndUploadPhoto(ImageSource source) async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return;
+
+    final picker = ImagePicker();
+    XFile? picked;
+    try {
+      picked = await picker.pickImage(
+        source: source,
+        maxWidth: 512,
+        maxHeight: 512,
+        imageQuality: 82,
+      );
+    } catch (_) {
+      picked = null;
+    }
+    if (picked == null || !mounted) return;
+
+    setState(() {
+      _isUploadingPhoto = true;
+      _photoUploadError = null;
+    });
+
+    try {
+      final bytes = await picked.readAsBytes();
+      final url = await FirebaseService.instance.uploadAvatarPhoto(bytes, uid);
+      if (!mounted) return;
+      setState(() {
+        localAvatarPhotoUrl = url;
+        _isUploadingPhoto = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _isUploadingPhoto = false;
+        _photoUploadError = widget.tr
+            ? 'Fotoğraf yüklenemedi. Lütfen tekrar deneyin.'
+            : (widget.de
+                  ? 'Foto konnte nicht hochgeladen werden. Bitte erneut versuchen.'
+                  : 'Photo upload failed. Please try again.');
+      });
+    }
+  }
+
+  void _showPhotoSourceSheet() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: context.colors.elevated,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: Icon(Icons.photo_camera, color: context.colors.cyan),
+                title: Text(
+                  widget.tr
+                      ? 'Kameradan çek'
+                      : (widget.de ? 'Kamera' : 'Take photo'),
+                ),
+                onTap: () {
+                  Navigator.pop(sheetContext);
+                  _pickAndUploadPhoto(ImageSource.camera);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.photo_library, color: context.colors.cyan),
+                title: Text(
+                  widget.tr
+                      ? 'Galeriden seç'
+                      : (widget.de ? 'Galerie' : 'Choose from gallery'),
+                ),
+                onTap: () {
+                  Navigator.pop(sheetContext);
+                  _pickAndUploadPhoto(ImageSource.gallery);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   void _save() {
@@ -7195,6 +7330,7 @@ class _ProfileAppearanceScreenState
           emergencyContactPhone: profile.emergencyContactPhone,
           ridingStyle: localRidingStyle,
           avatarIndex: localAvatarIndex,
+          avatarPhotoUrl: localAvatarPhotoUrl,
           selectedFrameIndex: localSelectedFrameIndex,
           selectedBadges: localSelectedBadges,
         );
@@ -8737,6 +8873,89 @@ class _ProfileAppearanceScreenState
                     ],
                   ),
                 ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        RiderAvatarWidget(
+                          avatarIndex: localAvatarIndex,
+                          avatarPhotoUrl: localAvatarPhotoUrl,
+                          radius: 32,
+                        ),
+                        if (_isUploadingPhoto)
+                          Container(
+                            width: 64,
+                            height: 64,
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.black45,
+                            ),
+                            child: const Center(
+                              child: SizedBox(
+                                width: 22,
+                                height: 22,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          OutlinedButton.icon(
+                            onPressed: _isUploadingPhoto
+                                ? null
+                                : _showPhotoSourceSheet,
+                            icon: const Icon(Icons.upload, size: 16),
+                            label: Text(
+                              _t(
+                                'Fotoğraf Yükle',
+                                'Upload Photo',
+                                'Foto hochladen',
+                              ),
+                            ),
+                          ),
+                          if (localAvatarPhotoUrl != null &&
+                              localAvatarPhotoUrl!.isNotEmpty)
+                            TextButton(
+                              onPressed: _isUploadingPhoto
+                                  ? null
+                                  : () => setState(
+                                      () => localAvatarPhotoUrl = null,
+                                    ),
+                              child: Text(
+                                _t(
+                                  'Fotoğrafı Kaldır',
+                                  'Remove Photo',
+                                  'Foto entfernen',
+                                ),
+                                style: TextStyle(color: context.colors.red),
+                              ),
+                            ),
+                          if (_photoUploadError != null)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4),
+                              child: Text(
+                                _photoUploadError!,
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(color: context.colors.red),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
                 GridView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),

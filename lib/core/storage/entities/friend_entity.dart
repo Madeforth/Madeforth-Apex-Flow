@@ -17,6 +17,11 @@ class FriendEntity {
   late String riderTag;
   late String ridingStyle;
   late int avatarIndex;
+
+  // Nullable by design: additive Isar field, so records written before
+  // profile photos existed simply read back as null (no migration needed).
+  String? avatarPhotoUrl;
+
   late String activeBikeName;
   late String activeBikeModel;
   late double weeklyKm;
@@ -35,6 +40,7 @@ class FriendEntity {
       riderTag: riderTag,
       ridingStyle: ridingStyle,
       avatarIndex: avatarIndex,
+      avatarPhotoUrl: avatarPhotoUrl,
       activeBikeName: activeBikeName,
       activeBikeModel: activeBikeModel,
       weeklyKm: weeklyKm,
@@ -56,6 +62,7 @@ class FriendEntity {
       ..riderTag = domain.riderTag
       ..ridingStyle = domain.ridingStyle
       ..avatarIndex = domain.avatarIndex
+      ..avatarPhotoUrl = domain.avatarPhotoUrl
       ..activeBikeName = domain.activeBikeName
       ..activeBikeModel = domain.activeBikeModel
       ..weeklyKm = domain.weeklyKm

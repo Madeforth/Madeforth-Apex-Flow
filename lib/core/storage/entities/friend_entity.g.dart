@@ -32,68 +32,73 @@ const FriendEntitySchema = CollectionSchema(
       name: r'avatarIndex',
       type: IsarType.long,
     ),
-    r'bloodType': PropertySchema(
+    r'avatarPhotoUrl': PropertySchema(
       id: 3,
+      name: r'avatarPhotoUrl',
+      type: IsarType.string,
+    ),
+    r'bloodType': PropertySchema(
+      id: 4,
       name: r'bloodType',
       type: IsarType.string,
     ),
     r'cardThemeIndex': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'cardThemeIndex',
       type: IsarType.long,
     ),
     r'emergencyPhone': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'emergencyPhone',
       type: IsarType.string,
     ),
     r'ghostMode': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'ghostMode',
       type: IsarType.bool,
     ),
     r'harmonyScore': PropertySchema(
-      id: 7,
+      id: 8,
       name: r'harmonyScore',
       type: IsarType.long,
     ),
     r'modifications': PropertySchema(
-      id: 8,
+      id: 9,
       name: r'modifications',
       type: IsarType.stringList,
     ),
     r'name': PropertySchema(
-      id: 9,
+      id: 10,
       name: r'name',
       type: IsarType.string,
     ),
     r'phone': PropertySchema(
-      id: 10,
+      id: 11,
       name: r'phone',
       type: IsarType.string,
     ),
     r'riderTag': PropertySchema(
-      id: 11,
+      id: 12,
       name: r'riderTag',
       type: IsarType.string,
     ),
     r'ridingStyle': PropertySchema(
-      id: 12,
+      id: 13,
       name: r'ridingStyle',
       type: IsarType.string,
     ),
     r'stableId': PropertySchema(
-      id: 13,
+      id: 14,
       name: r'stableId',
       type: IsarType.string,
     ),
     r'userId': PropertySchema(
-      id: 14,
+      id: 15,
       name: r'userId',
       type: IsarType.string,
     ),
     r'weeklyKm': PropertySchema(
-      id: 15,
+      id: 16,
       name: r'weeklyKm',
       type: IsarType.double,
     )
@@ -148,6 +153,12 @@ int _friendEntityEstimateSize(
   bytesCount += 3 + object.activeBikeModel.length * 3;
   bytesCount += 3 + object.activeBikeName.length * 3;
   {
+    final value = object.avatarPhotoUrl;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
     final value = object.bloodType;
     if (value != null) {
       bytesCount += 3 + value.length * 3;
@@ -189,19 +200,20 @@ void _friendEntitySerialize(
   writer.writeString(offsets[0], object.activeBikeModel);
   writer.writeString(offsets[1], object.activeBikeName);
   writer.writeLong(offsets[2], object.avatarIndex);
-  writer.writeString(offsets[3], object.bloodType);
-  writer.writeLong(offsets[4], object.cardThemeIndex);
-  writer.writeString(offsets[5], object.emergencyPhone);
-  writer.writeBool(offsets[6], object.ghostMode);
-  writer.writeLong(offsets[7], object.harmonyScore);
-  writer.writeStringList(offsets[8], object.modifications);
-  writer.writeString(offsets[9], object.name);
-  writer.writeString(offsets[10], object.phone);
-  writer.writeString(offsets[11], object.riderTag);
-  writer.writeString(offsets[12], object.ridingStyle);
-  writer.writeString(offsets[13], object.stableId);
-  writer.writeString(offsets[14], object.userId);
-  writer.writeDouble(offsets[15], object.weeklyKm);
+  writer.writeString(offsets[3], object.avatarPhotoUrl);
+  writer.writeString(offsets[4], object.bloodType);
+  writer.writeLong(offsets[5], object.cardThemeIndex);
+  writer.writeString(offsets[6], object.emergencyPhone);
+  writer.writeBool(offsets[7], object.ghostMode);
+  writer.writeLong(offsets[8], object.harmonyScore);
+  writer.writeStringList(offsets[9], object.modifications);
+  writer.writeString(offsets[10], object.name);
+  writer.writeString(offsets[11], object.phone);
+  writer.writeString(offsets[12], object.riderTag);
+  writer.writeString(offsets[13], object.ridingStyle);
+  writer.writeString(offsets[14], object.stableId);
+  writer.writeString(offsets[15], object.userId);
+  writer.writeDouble(offsets[16], object.weeklyKm);
 }
 
 FriendEntity _friendEntityDeserialize(
@@ -214,20 +226,21 @@ FriendEntity _friendEntityDeserialize(
   object.activeBikeModel = reader.readString(offsets[0]);
   object.activeBikeName = reader.readString(offsets[1]);
   object.avatarIndex = reader.readLong(offsets[2]);
-  object.bloodType = reader.readStringOrNull(offsets[3]);
-  object.cardThemeIndex = reader.readLongOrNull(offsets[4]);
-  object.emergencyPhone = reader.readStringOrNull(offsets[5]);
-  object.ghostMode = reader.readBool(offsets[6]);
-  object.harmonyScore = reader.readLong(offsets[7]);
+  object.avatarPhotoUrl = reader.readStringOrNull(offsets[3]);
+  object.bloodType = reader.readStringOrNull(offsets[4]);
+  object.cardThemeIndex = reader.readLongOrNull(offsets[5]);
+  object.emergencyPhone = reader.readStringOrNull(offsets[6]);
+  object.ghostMode = reader.readBool(offsets[7]);
+  object.harmonyScore = reader.readLong(offsets[8]);
   object.id = id;
-  object.modifications = reader.readStringList(offsets[8]) ?? [];
-  object.name = reader.readString(offsets[9]);
-  object.phone = reader.readStringOrNull(offsets[10]);
-  object.riderTag = reader.readString(offsets[11]);
-  object.ridingStyle = reader.readString(offsets[12]);
-  object.stableId = reader.readString(offsets[13]);
-  object.userId = reader.readString(offsets[14]);
-  object.weeklyKm = reader.readDouble(offsets[15]);
+  object.modifications = reader.readStringList(offsets[9]) ?? [];
+  object.name = reader.readString(offsets[10]);
+  object.phone = reader.readStringOrNull(offsets[11]);
+  object.riderTag = reader.readString(offsets[12]);
+  object.ridingStyle = reader.readString(offsets[13]);
+  object.stableId = reader.readString(offsets[14]);
+  object.userId = reader.readString(offsets[15]);
+  object.weeklyKm = reader.readDouble(offsets[16]);
   return object;
 }
 
@@ -247,21 +260,21 @@ P _friendEntityDeserializeProp<P>(
     case 3:
       return (reader.readStringOrNull(offset)) as P;
     case 4:
-      return (reader.readLongOrNull(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 5:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readLongOrNull(offset)) as P;
     case 6:
-      return (reader.readBool(offset)) as P;
-    case 7:
-      return (reader.readLong(offset)) as P;
-    case 8:
-      return (reader.readStringList(offset) ?? []) as P;
-    case 9:
-      return (reader.readString(offset)) as P;
-    case 10:
       return (reader.readStringOrNull(offset)) as P;
-    case 11:
+    case 7:
+      return (reader.readBool(offset)) as P;
+    case 8:
+      return (reader.readLong(offset)) as P;
+    case 9:
+      return (reader.readStringList(offset) ?? []) as P;
+    case 10:
       return (reader.readString(offset)) as P;
+    case 11:
+      return (reader.readStringOrNull(offset)) as P;
     case 12:
       return (reader.readString(offset)) as P;
     case 13:
@@ -269,6 +282,8 @@ P _friendEntityDeserializeProp<P>(
     case 14:
       return (reader.readString(offset)) as P;
     case 15:
+      return (reader.readString(offset)) as P;
+    case 16:
       return (reader.readDouble(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -838,6 +853,160 @@ extension FriendEntityQueryFilter
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<FriendEntity, FriendEntity, QAfterFilterCondition>
+      avatarPhotoUrlIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'avatarPhotoUrl',
+      ));
+    });
+  }
+
+  QueryBuilder<FriendEntity, FriendEntity, QAfterFilterCondition>
+      avatarPhotoUrlIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'avatarPhotoUrl',
+      ));
+    });
+  }
+
+  QueryBuilder<FriendEntity, FriendEntity, QAfterFilterCondition>
+      avatarPhotoUrlEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'avatarPhotoUrl',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FriendEntity, FriendEntity, QAfterFilterCondition>
+      avatarPhotoUrlGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'avatarPhotoUrl',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FriendEntity, FriendEntity, QAfterFilterCondition>
+      avatarPhotoUrlLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'avatarPhotoUrl',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FriendEntity, FriendEntity, QAfterFilterCondition>
+      avatarPhotoUrlBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'avatarPhotoUrl',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FriendEntity, FriendEntity, QAfterFilterCondition>
+      avatarPhotoUrlStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'avatarPhotoUrl',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FriendEntity, FriendEntity, QAfterFilterCondition>
+      avatarPhotoUrlEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'avatarPhotoUrl',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FriendEntity, FriendEntity, QAfterFilterCondition>
+      avatarPhotoUrlContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'avatarPhotoUrl',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FriendEntity, FriendEntity, QAfterFilterCondition>
+      avatarPhotoUrlMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'avatarPhotoUrl',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<FriendEntity, FriendEntity, QAfterFilterCondition>
+      avatarPhotoUrlIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'avatarPhotoUrl',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<FriendEntity, FriendEntity, QAfterFilterCondition>
+      avatarPhotoUrlIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'avatarPhotoUrl',
+        value: '',
       ));
     });
   }
@@ -2513,6 +2682,20 @@ extension FriendEntityQuerySortBy
     });
   }
 
+  QueryBuilder<FriendEntity, FriendEntity, QAfterSortBy>
+      sortByAvatarPhotoUrl() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'avatarPhotoUrl', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FriendEntity, FriendEntity, QAfterSortBy>
+      sortByAvatarPhotoUrlDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'avatarPhotoUrl', Sort.desc);
+    });
+  }
+
   QueryBuilder<FriendEntity, FriendEntity, QAfterSortBy> sortByBloodType() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'bloodType', Sort.asc);
@@ -2707,6 +2890,20 @@ extension FriendEntityQuerySortThenBy
     });
   }
 
+  QueryBuilder<FriendEntity, FriendEntity, QAfterSortBy>
+      thenByAvatarPhotoUrl() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'avatarPhotoUrl', Sort.asc);
+    });
+  }
+
+  QueryBuilder<FriendEntity, FriendEntity, QAfterSortBy>
+      thenByAvatarPhotoUrlDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'avatarPhotoUrl', Sort.desc);
+    });
+  }
+
   QueryBuilder<FriendEntity, FriendEntity, QAfterSortBy> thenByBloodType() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'bloodType', Sort.asc);
@@ -2894,6 +3091,14 @@ extension FriendEntityQueryWhereDistinct
     });
   }
 
+  QueryBuilder<FriendEntity, FriendEntity, QDistinct> distinctByAvatarPhotoUrl(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'avatarPhotoUrl',
+          caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<FriendEntity, FriendEntity, QDistinct> distinctByBloodType(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -3009,6 +3214,13 @@ extension FriendEntityQueryProperty
   QueryBuilder<FriendEntity, int, QQueryOperations> avatarIndexProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'avatarIndex');
+    });
+  }
+
+  QueryBuilder<FriendEntity, String?, QQueryOperations>
+      avatarPhotoUrlProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'avatarPhotoUrl');
     });
   }
 

@@ -5,6 +5,7 @@ class FriendProfile {
     required this.riderTag,
     required this.ridingStyle,
     required this.avatarIndex,
+    this.avatarPhotoUrl,
     required this.activeBikeName,
     required this.activeBikeModel,
     required this.weeklyKm,
@@ -29,6 +30,7 @@ class FriendProfile {
   final String riderTag;
   final String ridingStyle;
   final int avatarIndex;
+  final String? avatarPhotoUrl;
   final String activeBikeName;
   final String activeBikeModel;
   final double weeklyKm;
@@ -53,6 +55,7 @@ class FriendProfile {
     String? riderTag,
     String? ridingStyle,
     int? avatarIndex,
+    String? avatarPhotoUrl,
     String? activeBikeName,
     String? activeBikeModel,
     double? weeklyKm,
@@ -77,6 +80,7 @@ class FriendProfile {
       riderTag: riderTag ?? this.riderTag,
       ridingStyle: ridingStyle ?? this.ridingStyle,
       avatarIndex: avatarIndex ?? this.avatarIndex,
+      avatarPhotoUrl: avatarPhotoUrl ?? this.avatarPhotoUrl,
       activeBikeName: activeBikeName ?? this.activeBikeName,
       activeBikeModel: activeBikeModel ?? this.activeBikeModel,
       weeklyKm: weeklyKm ?? this.weeklyKm,
@@ -104,6 +108,7 @@ class FriendProfile {
       'riderTag': riderTag,
       'ridingStyle': ridingStyle,
       'avatarIndex': avatarIndex,
+      'avatarPhotoUrl': avatarPhotoUrl,
       'activeBikeName': activeBikeName,
       'activeBikeModel': activeBikeModel,
       'weeklyKm': weeklyKm,
@@ -131,6 +136,7 @@ class FriendProfile {
       riderTag: json['riderTag'] as String? ?? '',
       ridingStyle: json['ridingStyle'] as String? ?? 'Focused',
       avatarIndex: json['avatarIndex'] as int? ?? 0,
+      avatarPhotoUrl: json['avatarPhotoUrl'] as String?,
       activeBikeName: json['activeBikeName'] as String? ?? '',
       activeBikeModel: json['activeBikeModel'] as String? ?? '',
       weeklyKm: (json['weeklyKm'] as num?)?.toDouble() ?? 0.0,

@@ -99,6 +99,7 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
       'hostId': userProfile.riderTag,
       'hostName': userProfile.name.isEmpty ? 'Sürücü' : userProfile.name,
       'hostAvatarIndex': userProfile.avatarIndex,
+      'hostAvatarPhotoUrl': userProfile.avatarPhotoUrl,
       'hostSupporterTier': userProfile.supporterTier,
       'status': 'waiting',
       'riders': [],
@@ -149,6 +150,7 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
                 riderTag: r['riderTag'] ?? '',
                 ridingStyle: r['ridingStyle'] ?? 'Focused',
                 avatarIndex: r['avatarIndex'] ?? 0,
+                avatarPhotoUrl: r['avatarPhotoUrl'] as String?,
                 activeBikeName: r['activeBikeName'] ?? '',
                 activeBikeModel: r['activeBikeModel'] ?? '',
                 weeklyKm: (r['weeklyKm'] as num?)?.toDouble() ?? 0.0,
@@ -360,6 +362,7 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
       'riderTag': userProfile.riderTag,
       'ridingStyle': userProfile.ridingStyle,
       'avatarIndex': userProfile.avatarIndex,
+      'avatarPhotoUrl': userProfile.avatarPhotoUrl,
       'activeBikeName': garageState.activeBike.name != '—'
           ? garageState.activeBike.name
           : 'Motorcycle',
@@ -473,6 +476,7 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
                     totalKm: profile.weeklyKm * 4.2,
                     harmonyScore: profile.harmonyScore,
                     avatarIndex: profile.avatarIndex,
+                    avatarPhotoUrl: profile.avatarPhotoUrl,
                     tr: isTr,
                     de: isDe,
                     supporterTier: profile.supporterTier,
@@ -574,6 +578,7 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
       bloodType: userProfile.bloodType,
       city: userProfile.city,
       avatarIndex: userProfile.avatarIndex,
+      avatarPhotoUrl: userProfile.avatarPhotoUrl,
       activeBikeName:
           garageState.activeBike?.name ??
           (tr
@@ -1012,7 +1017,9 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
                                   color: context.colors.cyan,
                                   size: 18,
                                 ),
-                                tooltip: tr ? 'Davet gönder' : (de ? 'Einladung senden' : 'Send invite'),
+                                tooltip: tr
+                                    ? 'Davet gönder'
+                                    : (de ? 'Einladung senden' : 'Send invite'),
                                 onPressed: () {
                                   HapticFeedback.lightImpact();
                                   final link =
@@ -1755,6 +1762,7 @@ class _LobbyRiderCardState extends State<_LobbyRiderCard>
               totalKm: widget.profile.weeklyKm * 4.2,
               harmonyScore: widget.profile.harmonyScore,
               avatarIndex: widget.profile.avatarIndex,
+              avatarPhotoUrl: widget.profile.avatarPhotoUrl,
               tr: true, // simplified
               de: false,
               compact: true,
@@ -1928,6 +1936,7 @@ class _NewLobbyRiderCard extends StatelessWidget {
         totalKm: profile.weeklyKm,
         harmonyScore: profile.harmonyScore,
         avatarIndex: profile.avatarIndex,
+        avatarPhotoUrl: profile.avatarPhotoUrl,
         tr: tr,
         themeIndex: profile.cardThemeIndex,
         city: profile.city,

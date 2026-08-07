@@ -32,6 +32,7 @@ class UserProfile {
     this.riderTag = '',
     this.ridingStyle = 'Focused',
     this.avatarIndex = 0,
+    this.avatarPhotoUrl,
     this.ghostMode = false,
     this.sharePhone = false,
     this.shareEmergency = false,
@@ -65,6 +66,7 @@ class UserProfile {
   final String riderTag;
   final String ridingStyle;
   final int avatarIndex;
+  final String? avatarPhotoUrl;
   final bool ghostMode;
   final bool sharePhone;
   final bool shareEmergency;
@@ -93,6 +95,7 @@ class UserProfile {
     String? riderTag,
     String? ridingStyle,
     int? avatarIndex,
+    String? avatarPhotoUrl,
     bool? ghostMode,
     bool? sharePhone,
     bool? shareEmergency,
@@ -123,6 +126,7 @@ class UserProfile {
       riderTag: riderTag ?? this.riderTag,
       ridingStyle: ridingStyle ?? this.ridingStyle,
       avatarIndex: avatarIndex ?? this.avatarIndex,
+      avatarPhotoUrl: avatarPhotoUrl ?? this.avatarPhotoUrl,
       ghostMode: ghostMode ?? this.ghostMode,
       sharePhone: sharePhone ?? this.sharePhone,
       shareEmergency: shareEmergency ?? this.shareEmergency,
@@ -161,6 +165,7 @@ class UserProfileController extends Notifier<UserProfile> {
   static const _riderTagKey = 'profile.rider_tag';
   static const _ridingStyleKey = 'profile.riding_style';
   static const _avatarIndexKey = 'profile.avatar_index';
+  static const _avatarPhotoUrlKey = 'profile.avatar_photo_url';
   static const _ghostModeKey = 'profile.ghost_mode';
   static const _sharePhoneKey = 'profile.share_phone';
   static const _shareEmergencyKey = 'profile.share_emergency';
@@ -226,6 +231,7 @@ class UserProfileController extends Notifier<UserProfile> {
         await ApexKvStore.getString(_ridingStyleKey) ?? 'Focused';
     final avatarIndex =
         int.tryParse(await ApexKvStore.getString(_avatarIndexKey) ?? '') ?? 0;
+    final avatarPhotoUrl = await ApexKvStore.getString(_avatarPhotoUrlKey);
     final ghostMode = await ApexKvStore.getBool(_ghostModeKey) ?? false;
     final sharePhone = await ApexKvStore.getBool(_sharePhoneKey) ?? false;
     final shareEmergency =
@@ -340,6 +346,7 @@ class UserProfileController extends Notifier<UserProfile> {
       riderTag: riderTag,
       ridingStyle: ridingStyle,
       avatarIndex: avatarIndex,
+      avatarPhotoUrl: avatarPhotoUrl,
       ghostMode: ghostMode,
       sharePhone: sharePhone,
       shareEmergency: shareEmergency,
@@ -387,6 +394,7 @@ class UserProfileController extends Notifier<UserProfile> {
       _riderTagKey,
       _ridingStyleKey,
       _avatarIndexKey,
+      _avatarPhotoUrlKey,
       _ghostModeKey,
       _sharePhoneKey,
       _shareEmergencyKey,
@@ -474,6 +482,7 @@ class UserProfileController extends Notifier<UserProfile> {
     final licensePlate = profileData['licensePlate'] as String? ?? '';
 
     final avatarIndex = profileData['avatarIndex'] as int? ?? 0;
+    final avatarPhotoUrl = profileData['avatarPhotoUrl'] as String?;
     final cardThemeIndex = profileData['cardThemeIndex'] as int? ?? 0;
     final ridingStyle = profileData['ridingStyle'] as String? ?? 'Focused';
     final isFoundingMember = profileData['isFoundingMember'] as bool? ?? false;
@@ -511,6 +520,7 @@ class UserProfileController extends Notifier<UserProfile> {
       youtube: youtube,
       licensePlate: licensePlate,
       avatarIndex: avatarIndex,
+      avatarPhotoUrl: avatarPhotoUrl,
       cardThemeIndex: cardThemeIndex,
       ridingStyle: ridingStyle,
       isFoundingMember: isFoundingMember,
@@ -537,6 +547,11 @@ class UserProfileController extends Notifier<UserProfile> {
     await ApexKvStore.setString(_licensePlateKey, licensePlate);
 
     await ApexKvStore.setString(_avatarIndexKey, avatarIndex.toString());
+    if (avatarPhotoUrl != null) {
+      await ApexKvStore.setString(_avatarPhotoUrlKey, avatarPhotoUrl);
+    } else {
+      await ApexKvStore.remove(_avatarPhotoUrlKey);
+    }
     await ApexKvStore.setString(_cardThemeIndexKey, cardThemeIndex.toString());
     await ApexKvStore.setString(_ridingStyleKey, ridingStyle);
     await ApexKvStore.setBool(_isFoundingMemberKey, isFoundingMember);
@@ -580,6 +595,7 @@ class UserProfileController extends Notifier<UserProfile> {
     final licensePlate = profileData['licensePlate'] as String? ?? '';
 
     final avatarIndex = profileData['avatarIndex'] as int? ?? 0;
+    final avatarPhotoUrl = profileData['avatarPhotoUrl'] as String?;
     final cardThemeIndex = profileData['cardThemeIndex'] as int? ?? 0;
     final ridingStyle = profileData['ridingStyle'] as String? ?? 'Focused';
     final isFoundingMember = profileData['isFoundingMember'] as bool? ?? false;
@@ -622,6 +638,7 @@ class UserProfileController extends Notifier<UserProfile> {
       youtube: youtube,
       licensePlate: licensePlate,
       avatarIndex: avatarIndex,
+      avatarPhotoUrl: avatarPhotoUrl,
       cardThemeIndex: cardThemeIndex,
       ridingStyle: ridingStyle,
       isFoundingMember: isFoundingMember,
@@ -648,6 +665,11 @@ class UserProfileController extends Notifier<UserProfile> {
     await ApexKvStore.setString(_licensePlateKey, licensePlate);
 
     await ApexKvStore.setString(_avatarIndexKey, avatarIndex.toString());
+    if (avatarPhotoUrl != null) {
+      await ApexKvStore.setString(_avatarPhotoUrlKey, avatarPhotoUrl);
+    } else {
+      await ApexKvStore.remove(_avatarPhotoUrlKey);
+    }
     await ApexKvStore.setString(_cardThemeIndexKey, cardThemeIndex.toString());
     await ApexKvStore.setString(_ridingStyleKey, ridingStyle);
     await ApexKvStore.setBool(_isFoundingMemberKey, isFoundingMember);
@@ -701,6 +723,7 @@ class UserProfileController extends Notifier<UserProfile> {
             profileData['isFoundingMember'] as bool? ?? false;
         final supporterTier = profileData['supporterTier'] as int? ?? 0;
         final avatarIndex = profileData['avatarIndex'] as int? ?? 0;
+        final avatarPhotoUrl = profileData['avatarPhotoUrl'] as String?;
 
         List<String> selectedBadges = [];
         if (profileData['selectedBadges'] != null) {
@@ -734,6 +757,7 @@ class UserProfileController extends Notifier<UserProfile> {
           youtube: youtube,
           licensePlate: licensePlate,
           avatarIndex: avatarIndex,
+          avatarPhotoUrl: avatarPhotoUrl,
           cardThemeIndex: cardThemeIndex,
           ridingStyle: ridingStyle,
           isFoundingMember: isFoundingMember,
@@ -758,6 +782,11 @@ class UserProfileController extends Notifier<UserProfile> {
         await ApexKvStore.setString(_licensePlateKey, licensePlate);
 
         await ApexKvStore.setString(_avatarIndexKey, avatarIndex.toString());
+        if (avatarPhotoUrl != null) {
+          await ApexKvStore.setString(_avatarPhotoUrlKey, avatarPhotoUrl);
+        } else {
+          await ApexKvStore.remove(_avatarPhotoUrlKey);
+        }
         await ApexKvStore.setString(
           _cardThemeIndexKey,
           cardThemeIndex.toString(),
@@ -829,6 +858,7 @@ class UserProfileController extends Notifier<UserProfile> {
     String? riderTag,
     String? ridingStyle,
     int? avatarIndex,
+    String? avatarPhotoUrl,
     bool? ghostMode,
     bool? sharePhone,
     bool? shareEmergency,
@@ -912,6 +942,7 @@ class UserProfileController extends Notifier<UserProfile> {
       riderTag: updatedTag,
       ridingStyle: ridingStyle ?? state.ridingStyle,
       avatarIndex: avatarIndex ?? state.avatarIndex,
+      avatarPhotoUrl: avatarPhotoUrl ?? state.avatarPhotoUrl,
       ghostMode: ghostMode ?? state.ghostMode,
       sharePhone: sharePhone ?? state.sharePhone,
       shareEmergency: shareEmergency ?? state.shareEmergency,
@@ -944,6 +975,11 @@ class UserProfileController extends Notifier<UserProfile> {
     await ApexKvStore.setString(_riderTagKey, state.riderTag);
     await ApexKvStore.setString(_ridingStyleKey, state.ridingStyle);
     await ApexKvStore.setString(_avatarIndexKey, state.avatarIndex.toString());
+    if (state.avatarPhotoUrl != null) {
+      await ApexKvStore.setString(_avatarPhotoUrlKey, state.avatarPhotoUrl!);
+    } else {
+      await ApexKvStore.remove(_avatarPhotoUrlKey);
+    }
     await ApexKvStore.setBool(_ghostModeKey, state.ghostMode);
     await ApexKvStore.setBool(_sharePhoneKey, state.sharePhone);
     await ApexKvStore.setBool(_shareEmergencyKey, state.shareEmergency);
@@ -1017,6 +1053,7 @@ class UserProfileController extends Notifier<UserProfile> {
     await ApexKvStore.remove(_riderTagKey);
     await ApexKvStore.remove(_ridingStyleKey);
     await ApexKvStore.remove(_avatarIndexKey);
+    await ApexKvStore.remove(_avatarPhotoUrlKey);
     await ApexKvStore.remove(_ghostModeKey);
     await ApexKvStore.remove(_sharePhoneKey);
     await ApexKvStore.remove(_shareEmergencyKey);
@@ -1226,6 +1263,7 @@ class UserProfileController extends Notifier<UserProfile> {
         harmonyScore: harmonyScore,
         ridingStyle: state.ridingStyle,
         avatarIndex: state.avatarIndex,
+        avatarPhotoUrl: state.avatarPhotoUrl,
         cardThemeIndex: state.cardThemeIndex,
         city: state.city,
         instagram: state.instagram,

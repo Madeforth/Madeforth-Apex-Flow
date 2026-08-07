@@ -248,6 +248,7 @@ class FriendsController extends Notifier<List<FriendProfile>> {
                   )),
               avatarIndex:
                   profileData['avatarIndex'] as int? ?? random.nextInt(6),
+              avatarPhotoUrl: profileData['avatarPhotoUrl'] as String?,
               activeBikeName:
                   profileData['activeBikeName'] as String? ??
                   (tInline(

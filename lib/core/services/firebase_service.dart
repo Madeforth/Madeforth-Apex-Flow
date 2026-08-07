@@ -1,8 +1,10 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -159,6 +161,7 @@ class FirebaseService {
     int? harmonyScore,
     String? ridingStyle,
     int? avatarIndex,
+    String? avatarPhotoUrl,
     int? cardThemeIndex,
     String? city,
     String? instagram,
@@ -216,6 +219,7 @@ class FirebaseService {
       if (licensePlate != null) tagData['licensePlate'] = licensePlate;
       if (activeBikeName != null) tagData['activeBikeName'] = activeBikeName;
       if (avatarIndex != null) tagData['avatarIndex'] = avatarIndex;
+      if (avatarPhotoUrl != null) tagData['avatarPhotoUrl'] = avatarPhotoUrl;
       if (cardThemeIndex != null) tagData['cardThemeIndex'] = cardThemeIndex;
       if (selectedBadges != null) tagData['selectedBadges'] = selectedBadges;
       if (ridingStyle != null) tagData['ridingStyle'] = ridingStyle;
@@ -293,6 +297,8 @@ class FirebaseService {
       if (harmonyScore != null) profileData['harmonyScore'] = harmonyScore;
       if (ridingStyle != null) profileData['ridingStyle'] = ridingStyle;
       if (avatarIndex != null) profileData['avatarIndex'] = avatarIndex;
+      if (avatarPhotoUrl != null)
+        profileData['avatarPhotoUrl'] = avatarPhotoUrl;
       if (cardThemeIndex != null)
         profileData['cardThemeIndex'] = cardThemeIndex;
       if (city != null) profileData['city'] = city;
@@ -664,6 +670,19 @@ class FirebaseService {
     } catch (_) {}
   }
 
+  /// Uploads a rider's profile photo to Storage at a single overwritable
+  /// path per user (avatars/{uid}.jpg) and returns a fresh download URL.
+  /// The caller is responsible for keeping the image small before calling
+  /// this (image_picker's maxWidth/maxHeight/imageQuality) — storage.rules
+  /// additionally rejects anything over 300 KB or not an image as
+  /// defense-in-depth.
+  Future<String> uploadAvatarPhoto(Uint8List bytes, String uid) async {
+    await init();
+    final ref = FirebaseStorage.instance.ref('avatars/$uid.jpg');
+    await ref.putData(bytes, SettableMetadata(contentType: 'image/jpeg'));
+    return ref.getDownloadURL();
+  }
+
   /// Fully deletes user data from Firestore collections and purges the Firebase Auth user account.
   /// Enforces strict UID and Email isolation to guarantee no cross-account data deletion.
   Future<void> deleteUserAccount(String targetUid, String riderTag) async {
@@ -693,6 +712,14 @@ class FirebaseService {
       if (tagDoc.exists && tagDoc.data()?['ownerId'] == activeUid) {
         await tagDoc.reference.delete();
       }
+    }
+
+    // 1b. Delete the uploaded avatar photo, if any (object-not-found is not
+    // an error — a user who never uploaded a photo has nothing to remove).
+    try {
+      await FirebaseStorage.instance.ref('avatars/$activeUid.jpg').delete();
+    } on FirebaseException catch (e) {
+      if (e.code != 'object-not-found') rethrow;
     }
 
     // 2. Delete the public rider-card projection
