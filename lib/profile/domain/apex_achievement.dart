@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 enum AchievementRewardType { badge, ridingStyle, premiumVault, none }
 
@@ -181,12 +180,10 @@ class AchievementCatalog {
           descriptionEn: 'Cover a total distance of $km kilometers.',
           descriptionDe: 'Laufe insgesamt $km Kilometer.',
           icon: km >= 100000
-              ? PhosphorIconsFill.crown
+              ? Icons.workspace_premium
               : (km >= 10000
-                    ? PhosphorIconsFill.trophy
-                    : (km >= 1000
-                          ? PhosphorIconsFill.lightning
-                          : PhosphorIconsFill.roadHorizon)),
+                    ? Icons.emoji_events
+                    : (km >= 1000 ? Icons.bolt : Icons.route)),
           category: 'km',
           requiredCount: km,
           reward: reward,
@@ -298,10 +295,8 @@ class AchievementCatalog {
           descriptionEn: 'Complete a total of $count ride sessions.',
           descriptionDe: 'Absolviere insgesamt $count Fahrten.',
           icon: count >= 1000
-              ? PhosphorIconsFill.medal
-              : (count >= 100
-                    ? PhosphorIconsFill.flagCheckered
-                    : PhosphorIconsFill.motorcycle),
+              ? Icons.military_tech
+              : (count >= 100 ? Icons.flag : Icons.motorcycle),
           category: 'ride',
           requiredCount: count,
           reward: reward,
@@ -393,10 +388,8 @@ class AchievementCatalog {
               'Log $count maintenance or daily check entries for your bike.',
           descriptionDe: 'Trage $count Wartungen oder Tages-Checks ein.',
           icon: count >= 50
-              ? PhosphorIconsFill.diamond
-              : (count >= 10
-                    ? PhosphorIconsFill.wrench
-                    : PhosphorIconsFill.screwdriver),
+              ? Icons.diamond
+              : (count >= 10 ? Icons.handyman : Icons.build),
           category: 'maintenance',
           requiredCount: count,
           reward: reward,
@@ -407,14 +400,14 @@ class AchievementCatalog {
 
     // 4. HARMONY & MOOD CATEGORY (40 Achievements)
     final moodTypes = <Map<String, Object>>[
+      {'nameTr': 'Odaklı', 'nameEn': 'Focused', 'icon': Icons.track_changes},
+      {'nameTr': 'Sakin', 'nameEn': 'Calm', 'icon': Icons.self_improvement},
       {
-        'nameTr': 'Odaklı',
-        'nameEn': 'Focused',
-        'icon': PhosphorIconsFill.target,
+        'nameTr': 'Spor',
+        'nameEn': 'Sporty',
+        'icon': Icons.local_fire_department,
       },
-      {'nameTr': 'Sakin', 'nameEn': 'Calm', 'icon': PhosphorIconsFill.yinYang},
-      {'nameTr': 'Spor', 'nameEn': 'Sporty', 'icon': PhosphorIconsFill.fire},
-      {'nameTr': 'Gece', 'nameEn': 'Night', 'icon': PhosphorIconsFill.moon},
+      {'nameTr': 'Gece', 'nameEn': 'Night', 'icon': Icons.nightlight_round},
     ];
     for (var mood in moodTypes) {
       for (int level = 1; level <= 10; level++) {
@@ -565,12 +558,10 @@ class AchievementCatalog {
               ? 'Füge $reqCount Motorrad-Freunde hinzu.'
               : 'Schalte das Abzeichen ${socialTitles[i]} frei.',
           icon: i < friendCounts.length
-              ? PhosphorIconsFill.handshake
+              ? Icons.handshake
               : (i % 5 == 0
-                    ? PhosphorIconsFill.sparkle
-                    : (i % 3 == 0
-                          ? PhosphorIconsFill.medalMilitary
-                          : PhosphorIconsFill.tag)),
+                    ? Icons.auto_awesome
+                    : (i % 3 == 0 ? Icons.military_tech : Icons.label)),
           category: 'social',
           requiredCount: reqCount,
           reward: reward,
