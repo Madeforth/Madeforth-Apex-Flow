@@ -2,7 +2,22 @@
 
 Status recorded 2026-08-04, from repo inspection (not from README claims alone unless marked as such).
 
-## 2026-08-06 — Bug Report → Discord pipeline: diagnosed, NOT fixed (known broken)
+## 2026-08-07 — Pre-release hardening: security fixes, App Check verified live, Discord pipeline fixed for real
+Full detail in `activeContext.md` "Current Task" — this is the status-tracking summary.
+
+**FIXED, verified working:**
+- Bug report → Discord dispatch (`bug_report_controller.dart` now actually calls `createBugReportDraft`) — **supersedes the entry immediately below, which is now stale**. Confirmed live via `firebase functions:log` (`app`/`auth` both `VALID`) and the user seeing the report land in Discord.
+- Hardcoded `@apex_dev#1881` premium backdoor — fully removed, no code path grants premium without a real RevenueCat/receipt check anymore.
+- `deleteUserAccount()` — was silently swallowing errors and deleting the Auth account regardless of Firestore cleanup failures; also missing several collections (`public_rider_cards`, `entitlements`, `users/{uid}` subcollections, `bug_reports`). All fixed; local device data is now also purged via `DbService.deleteAllForUser()`. This substantially closes CLAUDE.md's long-standing "incomplete per-user local isolation/account deletion" risk area for Android — not independently re-verified for iOS.
+- Stale local profile/insights data surviving an abnormal session end (crash/force-quit) and leaking to the next account on the same device — fixed via a last-hydrated-UID marker.
+- App Check: client activated, server enforcement flipped on for all 4 callables, verified live end-to-end on a real device. This closes the `enforceAppCheck: false` gap noted below.
+- A real Firebase project misconfiguration: the Android app was registered under the Flutter template's default package name (`com.example.apexflow`) instead of `com.apexflow.app`, and `main.dart` was handing Android builds the **web** app's Firebase config. Neither ever broke Auth/Firestore, but both would have made App Check permanently non-functional had they not been found. Fixed.
+
+**Still known-broken / not attempted:**
+- iOS Firebase app registration was not re-audited given the Android-side bug found above — genuinely unknown whether iOS has an analogous mismatch.
+- Full Discord bidirectional sync / buttons / roles (Phase 2+ per the original spec) — Phase 1 one-way dispatch is what's live.
+
+## 2026-08-06 — Bug Report → Discord pipeline: diagnosed, NOT fixed (known broken) — SUPERSEDED, see 2026-08-07 above
 User asked to check why in-app bug reports never show up in Discord. Root cause traced end-to-end, no code changed (user chose diagnosis-only for now):
 1. **Client never leaves the device.** `lib/features/support/bug_report/application/bug_report_controller.dart` (`submitReport`) only calls `LocalBugOutbox.saveReport(report)`, which writes to `ApexKvStore` (local SharedPreferences-backed storage). There is no Firestore write and no Cloud Functions call anywhere in `lib/` — confirmed via repo-wide grep for `createBugReportDraft`/`httpsCallable`/`bug_reports`, zero hits outside the local-outbox files. `my_bug_reports_screen.dart` / `my_bug_reports_controller.dart` only read back that same local queue, so the UI shows "submitted" reports that never actually transmitted anywhere.
 2. **Even the one Cloud Function that exists doesn't reach Discord.** `functions/index.js`'s `createBugReportDraft` (an `onCall` function, currently unused by the client per #1) only writes a doc to Firestore's `bug_reports` collection and returns — no Discord dispatch. The project's own spec (`docs/APEXFLOW_MADEFORTH_DISCORD_QA_BUG_REPORT_ENGINE_MASTER_SPEC.md`, ~line 1237) defines a separate `createDiscordBugThread()` function that POSTs to `discord.com/api/v10/channels/{forumId}/threads` using a bot token — that function does not exist in `functions/index.js` at all.
