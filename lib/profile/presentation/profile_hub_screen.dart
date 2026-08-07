@@ -113,12 +113,11 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                                 userProfile.name.isEmpty
                                     ? _t('Rider', 'Rider', 'Fahrer')
                                     : userProfile.name,
-                                style: const TextStyle(
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.w900,
-                                  color: Colors.white,
-                                  letterSpacing: -0.5,
-                                ),
+                                style: Theme.of(context).textTheme.headlineLarge
+                                    ?.copyWith(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w900,
+                                    ),
                                 overflow: TextOverflow.ellipsis,
                               ),
                               if (userProfile.isPremium) ...[
@@ -142,12 +141,12 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                                   ),
                                   child: Text(
                                     _t('PREMİUM', 'PREMIUM', 'PREMIUM'),
-                                    style: TextStyle(
-                                      color: context.colors.caution,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w900,
-                                      letterSpacing: 0.5,
-                                    ),
+                                    style: Theme.of(context).textTheme.bodySmall
+                                        ?.copyWith(
+                                          color: context.colors.caution,
+                                          fontWeight: FontWeight.w900,
+                                          letterSpacing: 0.5,
+                                        ),
                                   ),
                                 ),
                               ],
@@ -158,10 +157,10 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                                   'Your rider profile and social garage.',
                                   'Dein Fahrerprofil und soziale Garage.',
                                 ),
-                                style: TextStyle(
-                                  color: context.colors.textSecondary,
-                                  fontSize: 13,
-                                ),
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(
+                                      color: context.colors.textSecondary,
+                                    ),
                               ),
                             ],
                           ),
@@ -214,7 +213,11 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                                 color: context.colors.cyan,
                               ),
                               onPressed: widget.onOpenSettings,
-                              tooltip: _t('Ayarlar', 'Settings', 'Einstellungen'),
+                              tooltip: _t(
+                                'Ayarlar',
+                                'Settings',
+                                'Einstellungen',
+                              ),
                             ),
                             IconButton(
                               icon: Icon(
@@ -252,9 +255,14 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                                             'Cancel',
                                             'Stornieren',
                                           ),
-                                          style: TextStyle(
-                                            color: context.colors.textSecondary,
-                                          ),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium
+                                              ?.copyWith(
+                                                color: context
+                                                    .colors
+                                                    .textSecondary,
+                                              ),
                                         ),
                                         onPressed: () =>
                                             Navigator.pop(context, false),
@@ -266,9 +274,12 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                                             'Log Out',
                                             'Abmelden',
                                           ),
-                                          style: TextStyle(
-                                            color: context.colors.red,
-                                          ),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium
+                                              ?.copyWith(
+                                                color: context.colors.red,
+                                              ),
                                         ),
                                         onPressed: () =>
                                             Navigator.pop(context, true),
@@ -421,11 +432,13 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                                         'Create Your Rider Tag! ⚡',
                                         'Erstelle dein Rider-Tag! ⚡',
                                       ),
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.bold,
-                                        color: context.colors.cyan,
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                            color: context.colors.cyan,
+                                          ),
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
@@ -435,11 +448,12 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                                         'You are currently using a temporary tag. Create your custom Rider Tag to add friends and share phone number / emergency contact info with friends.',
                                         'Sie verwenden derzeit ein temporäres Tag. Erstellen Sie Ihren benutzerdefinierten Fahrer-Tag, um Freunde hinzuzufügen und Telefonnummern/Notfallkontaktinformationen mit Freunden zu teilen.',
                                       ),
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        color: context.colors.textSecondary,
-                                        height: 1.3,
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            color: context.colors.textSecondary,
+                                          ),
                                     ),
                                   ],
                                 ),
@@ -484,11 +498,11 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                                   'SOCIAL SHARING',
                                   'SOZIALES TEILEN',
                                 ),
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w900,
-                                  color: Colors.white,
-                                ),
+                                style: Theme.of(context).textTheme.labelMedium
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.w900,
+                                      color: Colors.white,
+                                    ),
                               ),
                             ],
                           ),
@@ -668,9 +682,7 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                                 children: [
                                   const Icon(Icons.people_outline, size: 13),
                                   const SizedBox(width: 4),
-                                  Text(
-                                    _t('Arkadaşlar', 'Friends', 'Freunde'),
-                                  ),
+                                  Text(_t('Arkadaşlar', 'Friends', 'Freunde')),
                                 ],
                               ),
                             ),
@@ -769,8 +781,7 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                       'Add Friend',
                       'Freund hinzufügen',
                     ),
-                    style: const TextStyle(
-                      fontSize: 16,
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       fontWeight: FontWeight.w900,
                     ),
                   ),
@@ -885,12 +896,12 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                             ),
                             child: Text(
                               userProfile.riderTag,
-                              style: const TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFFE2E8F0),
-                                letterSpacing: 0.5,
-                              ),
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: const Color(0xFFE2E8F0),
+                                    letterSpacing: 0.5,
+                                  ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -906,9 +917,8 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                         'Let friends scan your QR code',
                         'Lassen Sie Freunde Ihren QR-Code scannen',
                       ),
-                      style: TextStyle(
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: context.colors.textSecondary,
-                        fontSize: 11,
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -997,7 +1007,9 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
               TextField(
                 controller: _tagController,
                 cursorColor: context.colors.cyan,
-                style: TextStyle(color: context.colors.white),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: context.colors.white),
                 decoration: InputDecoration(
                   labelText: tInline(
                     AppStrings.currentLanguageCode,
@@ -1006,13 +1018,11 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                     'Fahrer-Tag',
                   ),
                   hintText: '@ruzgar_123',
-                  labelStyle: TextStyle(
+                  labelStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
                     color: context.colors.textSecondary,
-                    fontSize: 12,
                   ),
-                  hintStyle: TextStyle(
+                  hintStyle: Theme.of(context).textTheme.labelMedium?.copyWith(
                     color: context.colors.muted,
-                    fontSize: 12,
                   ),
                   filled: true,
                   fillColor: context.colors.elevated,
@@ -1171,8 +1181,7 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                       'FRIEND PROFILE',
                       'FREUNDPROFIL',
                     ),
-                    style: TextStyle(
-                      fontSize: 11,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       fontWeight: FontWeight.w900,
                       color: context.colors.cyan,
                       letterSpacing: 0.5,
@@ -1248,8 +1257,7 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                   'Added Modifications & Accessories',
                   'Modifikationen und Zubehör hinzugefügt',
                 ),
-                style: TextStyle(
-                  fontSize: 12,
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
                   fontWeight: FontWeight.w900,
                   color: context.colors.textSecondary,
                 ),
@@ -1263,8 +1271,7 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                     'No accessories added yet.',
                     'Noch kein Zubehör hinzugefügt.',
                   ),
-                  style: TextStyle(
-                    fontSize: 12,
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
                     color: context.colors.textSecondary,
                     fontStyle: FontStyle.italic,
                   ),
@@ -1280,10 +1287,8 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                         side: BorderSide(color: context.colors.border),
                         label: Text(
                           mod,
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: context.colors.white,
-                          ),
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: context.colors.white),
                         ),
                       ),
                   ],
@@ -1482,8 +1487,7 @@ class _CardThemeSelectorPanel extends ConsumerWidget {
                   'SELECT CARD THEME',
                   'KARTENTHEMA WÄHLEN',
                 ),
-                style: TextStyle(
-                  fontSize: 11,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   fontWeight: FontWeight.w900,
                   color: context.colors.cyan,
                   letterSpacing: 0.5,
@@ -1584,15 +1588,15 @@ class _CardThemeSelectorPanel extends ConsumerWidget {
                           theme.getLocalizedName(
                             AppStrings.currentLanguageCode,
                           ),
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: isSelected
-                                ? FontWeight.w700
-                                : FontWeight.w400,
-                            color: isSelected
-                                ? context.colors.white
-                                : context.colors.textSecondary,
-                          ),
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                fontWeight: isSelected
+                                    ? FontWeight.w700
+                                    : FontWeight.w400,
+                                color: isSelected
+                                    ? context.colors.white
+                                    : context.colors.textSecondary,
+                              ),
                           textAlign: TextAlign.center,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -1643,7 +1647,9 @@ class _CardThemeSelectorPanel extends ConsumerWidget {
               'Do you want to unlock the ${theme.nameEn} theme for \$0.99?',
               'Möchten Sie das Design "${theme.nameEn}" für \$0.99 freischalten?',
             ),
-            style: TextStyle(color: context.colors.textSecondary),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: context.colors.textSecondary,
+            ),
           ),
           actions: [
             TextButton(
@@ -1654,7 +1660,9 @@ class _CardThemeSelectorPanel extends ConsumerWidget {
                   'Cancel',
                   'Stornieren',
                 ),
-                style: TextStyle(color: context.colors.textSecondary),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: context.colors.textSecondary,
+                ),
               ),
               onPressed: () => Navigator.pop(context),
             ),
@@ -1666,7 +1674,9 @@ class _CardThemeSelectorPanel extends ConsumerWidget {
                   'Purchase',
                   'Kaufen',
                 ),
-                style: TextStyle(color: context.colors.cyan),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: context.colors.cyan),
               ),
               onPressed: () async {
                 await ref
@@ -1765,6 +1775,7 @@ class RiderIdCard extends StatelessWidget {
   final bool shareEmergency;
 
   Widget _buildProfileStatColumn({
+    required BuildContext context,
     required String value,
     required String label,
   }) {
@@ -1773,19 +1784,16 @@ class RiderIdCard extends StatelessWidget {
       children: [
         Text(
           value,
-          style: const TextStyle(
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             color: Colors.white,
-            fontSize: 14,
             fontWeight: FontWeight.bold,
           ),
         ),
         const SizedBox(height: 2),
         Text(
           label.toUpperCase(),
-          style: const TextStyle(
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
             color: Colors.white60,
-            fontSize: 11,
-            fontWeight: FontWeight.w500,
             letterSpacing: 1.0,
           ),
         ),
@@ -1909,22 +1917,24 @@ class RiderIdCard extends StatelessWidget {
                                   Flexible(
                                     child: Text(
                                       name,
-                                      style: TextStyle(
-                                        color: supporterTier >= 3
-                                            ? Colors.amber
-                                            : (supporterTier >= 2
-                                                  ? Colors.grey[300]
-                                                  : Colors.white),
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w900,
-                                        shadows: const [
-                                          Shadow(
-                                            color: Colors.black26,
-                                            offset: Offset(0, 1),
-                                            blurRadius: 4,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelLarge
+                                          ?.copyWith(
+                                            color: supporterTier >= 3
+                                                ? Colors.amber
+                                                : (supporterTier >= 2
+                                                      ? Colors.grey[300]
+                                                      : Colors.white),
+                                            fontWeight: FontWeight.w900,
+                                            shadows: const [
+                                              Shadow(
+                                                color: Colors.black26,
+                                                offset: Offset(0, 1),
+                                                blurRadius: 4,
+                                              ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
                                     ),
                                   ),
                                   if (supporterTier >= 1) ...[
@@ -1936,18 +1946,18 @@ class RiderIdCard extends StatelessWidget {
                               const SizedBox(height: 2),
                               Text(
                                 riderTag,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w900,
-                                  shadows: [
-                                    Shadow(
-                                      color: Colors.black26,
-                                      offset: Offset(0, 1),
-                                      blurRadius: 4,
+                                style: Theme.of(context).textTheme.labelMedium
+                                    ?.copyWith(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w900,
+                                      shadows: const [
+                                        Shadow(
+                                          color: Colors.black26,
+                                          offset: Offset(0, 1),
+                                          blurRadius: 4,
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
                               ),
                               if (city.isNotEmpty) ...[
                                 const SizedBox(height: 2),
@@ -1963,13 +1973,15 @@ class RiderIdCard extends StatelessWidget {
                                     const SizedBox(width: 3),
                                     Text(
                                       city,
-                                      style: TextStyle(
-                                        color: Colors.white.withValues(
-                                          alpha: 0.8,
-                                        ),
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            color: Colors.white.withValues(
+                                              alpha: 0.8,
+                                            ),
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                     ),
                                   ],
                                 ),
@@ -2147,21 +2159,25 @@ class RiderIdCard extends StatelessWidget {
                                     ),
                                     child: Text(
                                       'LVL $currentLevel',
-                                      style: const TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w900,
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w900,
+                                          ),
                                     ),
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
                                     rankTitle,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelMedium
+                                        ?.copyWith(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                   ),
                                 ],
                               ),
@@ -2202,6 +2218,7 @@ class RiderIdCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       _buildProfileStatColumn(
+                        context: context,
                         value: '${totalKm.toStringAsFixed(0)} KM',
                         label: _t(
                           'TOPLAM YOL',
@@ -2210,6 +2227,7 @@ class RiderIdCard extends StatelessWidget {
                         ),
                       ),
                       _buildProfileStatColumn(
+                        context: context,
                         value: _t(
                           '$totalRides SÜRÜŞ',
                           '$totalRides RIDES',
@@ -2222,6 +2240,7 @@ class RiderIdCard extends StatelessWidget {
                         ),
                       ),
                       _buildProfileStatColumn(
+                        context: context,
                         value: 'LVL ${RiderXpSystem.getLevelForXp(riderXp)}',
                         label: _t(
                           'SÜRÜCÜ SEVİYESİ',
@@ -2303,11 +2322,13 @@ class RiderIdCard extends StatelessWidget {
                                     const SizedBox(width: 4),
                                     Text(
                                       '@$instagram',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                     ),
                                   ],
                                 ),
@@ -2325,11 +2346,13 @@ class RiderIdCard extends StatelessWidget {
                                     const SizedBox(width: 4),
                                     Text(
                                       '@$tiktok',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                     ),
                                   ],
                                 ),
@@ -2347,11 +2370,13 @@ class RiderIdCard extends StatelessWidget {
                                     const SizedBox(width: 4),
                                     Text(
                                       '@$youtube',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                     ),
                                   ],
                                 ),
@@ -2387,12 +2412,12 @@ class RiderIdCard extends StatelessWidget {
                                 const SizedBox(width: 4),
                                 Text(
                                   licensePlate.toUpperCase(),
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 0.5,
-                                  ),
+                                  style: Theme.of(context).textTheme.bodySmall
+                                      ?.copyWith(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 0.5,
+                                      ),
                                 ),
                               ],
                             ),
@@ -2457,9 +2482,8 @@ class _ContactRow extends StatelessWidget {
         const SizedBox(width: 6),
         Text(
           label,
-          style: TextStyle(
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
             color: Colors.white.withValues(alpha: 0.6),
-            fontSize: 11,
             fontWeight: FontWeight.w900,
             letterSpacing: 0.5,
           ),
@@ -2468,9 +2492,8 @@ class _ContactRow extends StatelessWidget {
         Expanded(
           child: Text(
             value,
-            style: const TextStyle(
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
               color: Colors.white,
-              fontSize: 12,
               fontWeight: FontWeight.w700,
             ),
             overflow: TextOverflow.ellipsis,
@@ -2494,9 +2517,8 @@ class _BikerStat extends StatelessWidget {
       children: [
         Text(
           label,
-          style: TextStyle(
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
             color: Colors.white.withValues(alpha: 0.6),
-            fontSize: 11,
             fontWeight: FontWeight.w900,
             letterSpacing: 0.5,
           ),
@@ -2504,9 +2526,8 @@ class _BikerStat extends StatelessWidget {
         const SizedBox(height: 2),
         Text(
           value,
-          style: const TextStyle(
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             color: Colors.white,
-            fontSize: 13,
             fontWeight: FontWeight.w800,
           ),
         ),
@@ -2568,11 +2589,11 @@ class _ProfileStatsRow extends StatelessWidget {
                       children: [
                         Text(
                           activeBike,
-                          style: TextStyle(
-                            color: context.colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w800,
-                          ),
+                          style: Theme.of(context).textTheme.labelMedium
+                              ?.copyWith(
+                                color: context.colors.white,
+                                fontWeight: FontWeight.w800,
+                              ),
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
                         ),
@@ -2609,9 +2630,8 @@ class _ProfileStatsRow extends StatelessWidget {
                 children: [
                   Text(
                     _t('TOPLAM SÜRÜŞ', 'TOTAL RIDES', 'GESAMT FAHRTEN'),
-                    style: TextStyle(
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: context.colors.textSecondary,
-                      fontSize: 11,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 0.3,
                     ),
@@ -2619,9 +2639,8 @@ class _ProfileStatsRow extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     '$totalRides',
-                    style: TextStyle(
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: context.colors.white,
-                      fontSize: 16,
                       fontWeight: FontWeight.w900,
                     ),
                   ),
@@ -2643,9 +2662,8 @@ class _ProfileStatsRow extends StatelessWidget {
                 children: [
                   Text(
                     _t('TOPLAM MESAFE', 'TOTAL DISTANCE', 'GESAMTKILOMETER'),
-                    style: TextStyle(
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: context.colors.textSecondary,
-                      fontSize: 11,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 0.3,
                     ),
@@ -2653,9 +2671,8 @@ class _ProfileStatsRow extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     formattedKm,
-                    style: TextStyle(
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: context.colors.white,
-                      fontSize: 16,
                       fontWeight: FontWeight.w900,
                     ),
                   ),
@@ -2724,9 +2741,8 @@ class _ProfileBloodTypeRow extends StatelessWidget {
               const SizedBox(height: 2),
               Text(
                 bloodType,
-                style: TextStyle(
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: context.colors.white,
-                  fontSize: 14,
                   fontWeight: FontWeight.w800,
                 ),
               ),
@@ -2815,11 +2831,11 @@ class _ProfilePrivateDetailsSectionState
                               : ((AppStrings.currentLanguageCode == 'de')
                                     ? 'Private Daten & Freigabe'
                                     : 'Private details & sharing'),
-                          style: TextStyle(
-                            color: context.colors.white,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                          ),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                color: context.colors.white,
+                                fontWeight: FontWeight.w700,
+                              ),
                         ),
                         const SizedBox(height: 2),
                         Text(
@@ -2828,10 +2844,8 @@ class _ProfilePrivateDetailsSectionState
                               : ((AppStrings.currentLanguageCode == 'de')
                                     ? 'Telefon, Notfall, Kennzeichen & Sozial'
                                     : 'Phone, emergency contact, plate & social'),
-                          style: TextStyle(
-                            color: context.colors.textSecondary,
-                            fontSize: 11,
-                          ),
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: context.colors.textSecondary),
                         ),
                       ],
                     ),
@@ -2935,9 +2949,8 @@ class _ProfilePrivateDetailsSectionState
           const SizedBox(width: 10),
           Text(
             label,
-            style: TextStyle(
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: context.colors.textSecondary,
-              fontSize: 11,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -2945,9 +2958,8 @@ class _ProfilePrivateDetailsSectionState
           Expanded(
             child: Text(
               value,
-              style: TextStyle(
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(
                 color: context.colors.white,
-                fontSize: 12,
                 fontWeight: FontWeight.w600,
               ),
               overflow: TextOverflow.ellipsis,
@@ -3045,9 +3057,8 @@ class _ProfileSupportDeveloperTileState
                           : ((AppStrings.currentLanguageCode == 'de')
                                 ? 'Entwickler unterstützen'
                                 : 'Support the Developer'),
-                      style: const TextStyle(
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Colors.amber,
-                        fontSize: 13,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -3058,9 +3069,8 @@ class _ProfileSupportDeveloperTileState
                           : ((AppStrings.currentLanguageCode == 'de')
                                 ? 'Helfen Sie, Apex Flow Rider Hub zu verbessern'
                                 : 'Help improve Apex Flow Rider Hub'),
-                      style: TextStyle(
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: Colors.amber.withValues(alpha: 0.7),
-                        fontSize: 11,
                       ),
                     ),
                   ],
@@ -3290,7 +3300,9 @@ class _UserGarageModifications extends StatelessWidget {
             'No active motorcycle in garage.',
             'Kein aktives Motorrad in der Garage.',
           ),
-          style: TextStyle(color: context.colors.textSecondary),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: context.colors.textSecondary),
         ),
       );
     }
@@ -3300,7 +3312,9 @@ class _UserGarageModifications extends StatelessWidget {
       children: [
         Text(
           '$bikeName ($bikeModel)',
-          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w900),
+          style: Theme.of(
+            context,
+          ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w900),
         ),
         const SizedBox(height: 12),
         Expanded(
@@ -3317,9 +3331,8 @@ class _UserGarageModifications extends StatelessWidget {
                     'Your motorcycle is active in the garage.',
                     'Ihr Motorrad steht aktiv in der Garage.',
                   ),
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: context.colors.textSecondary,
-                    fontSize: 13,
                   ),
                 ),
               ],
@@ -3398,8 +3411,7 @@ class _FriendsListState extends ConsumerState<_FriendsList> {
           children: [
             Text(
               _t('Arkadaşlar', 'Friends', 'Freunde'),
-              style: const TextStyle(
-                fontSize: 28,
+              style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                 fontWeight: FontWeight.w900,
                 color: Colors.white,
               ),
@@ -3413,9 +3425,8 @@ class _FriendsListState extends ConsumerState<_FriendsList> {
               ),
               child: Text(
                 widget.friends.length.toString(),
-                style: const TextStyle(
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Colors.white70,
-                  fontSize: 13,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -3429,7 +3440,9 @@ class _FriendsListState extends ConsumerState<_FriendsList> {
             'Your rider circle and following.',
             'Dein Fahrerkreis und Gefolgte.',
           ),
-          style: TextStyle(color: context.colors.textSecondary, fontSize: 13),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: context.colors.textSecondary),
         ),
         const SizedBox(height: 18),
 
@@ -3449,14 +3462,18 @@ class _FriendsListState extends ConsumerState<_FriendsList> {
                 _searchQuery = val;
               });
             },
-            style: const TextStyle(color: Colors.white, fontSize: 13),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: Colors.white),
             decoration: InputDecoration(
               hintText: _t(
                 'Arkadaşlarda ara',
                 'Search friends',
                 'Freunde suchen',
               ),
-              hintStyle: const TextStyle(color: Colors.white30, fontSize: 13),
+              hintStyle: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: Colors.white30),
               prefixIcon: const Icon(
                 Icons.search,
                 color: Colors.white30,
@@ -3507,10 +3524,9 @@ class _FriendsListState extends ConsumerState<_FriendsList> {
                       'Friend Requests',
                       'Freundschaftsanfragen',
                     ),
-                    style: const TextStyle(
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
-                      fontSize: 13,
                     ),
                   ),
                 ),
@@ -3526,9 +3542,8 @@ class _FriendsListState extends ConsumerState<_FriendsList> {
                     ),
                     child: Text(
                       pendingCount.toString(),
-                      style: const TextStyle(
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: Colors.black,
-                        fontSize: 11,
                         fontWeight: FontWeight.w900,
                       ),
                     ),
@@ -3587,10 +3602,9 @@ class _FriendsListState extends ConsumerState<_FriendsList> {
                           'Nearby Riders',
                           'Fahrer in der Nähe',
                         ),
-                        style: const TextStyle(
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Colors.white,
                           fontWeight: FontWeight.w600,
-                          fontSize: 13,
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -3625,8 +3639,7 @@ class _FriendsListState extends ConsumerState<_FriendsList> {
           children: [
             Text(
               _t('Arkadaşların', 'Your Friends', 'Deine Freunde'),
-              style: const TextStyle(
-                fontSize: 15,
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
@@ -3655,9 +3668,8 @@ class _FriendsListState extends ConsumerState<_FriendsList> {
                     const SizedBox(width: 4),
                     Text(
                       _t('Arkadaş Ekle', 'Add Friend', 'Freund hinzufügen'),
-                      style: TextStyle(
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: context.colors.cyan,
-                        fontSize: 11,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -3679,9 +3691,8 @@ class _FriendsListState extends ConsumerState<_FriendsList> {
                   'No friends connected yet.',
                   'Es sind noch keine Freunde verbunden.',
                 ),
-                style: TextStyle(
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: context.colors.textSecondary,
-                  fontSize: 13,
                 ),
               ),
             ),
@@ -3755,9 +3766,8 @@ class _PendingRequestsScreen extends ConsumerWidget {
               : ((AppStrings.currentLanguageCode == 'de')
                     ? 'Freundschaftsanfragen'
                     : 'Friend Requests'),
-          style: const TextStyle(
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
             color: Colors.white,
-            fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -3779,7 +3789,9 @@ class _PendingRequestsScreen extends ConsumerWidget {
                     : ((AppStrings.currentLanguageCode == 'de')
                           ? 'Keine neuen Anfragen.'
                           : 'No new requests.'),
-                style: const TextStyle(color: Colors.white54),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: Colors.white54),
               ),
             )
           : ListView.builder(
@@ -3816,10 +3828,11 @@ class _PendingRequestsScreen extends ConsumerWidget {
                                       )
                                       .toUpperCase();
                           })(),
-                          style: TextStyle(
-                            color: context.colors.cyan,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                color: context.colors.cyan,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -3829,19 +3842,17 @@ class _PendingRequestsScreen extends ConsumerWidget {
                           children: [
                             Text(
                               req.title,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
-                              ),
+                              style: Theme.of(context).textTheme.bodyMedium
+                                  ?.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                             ),
                             const SizedBox(height: 2),
                             Text(
                               req.body,
-                              style: const TextStyle(
-                                color: Colors.white70,
-                                fontSize: 12,
-                              ),
+                              style: Theme.of(context).textTheme.labelMedium
+                                  ?.copyWith(color: Colors.white70),
                             ),
                           ],
                         ),
@@ -3974,9 +3985,8 @@ class _NearbyRidersScreenState extends ConsumerState<_NearbyRidersScreen>
         elevation: 0,
         title: Text(
           _t('Yakınındaki Kişiler', 'Nearby Riders', 'Fahrer in der Nähe'),
-          style: const TextStyle(
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
             color: Colors.white,
-            fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -4024,9 +4034,8 @@ class _NearbyRidersScreenState extends ConsumerState<_NearbyRidersScreen>
                       'Scanning riders within 100 km...',
                       'Scanner Fahrer im Umkreis von 100 km...',
                     ),
-                    style: const TextStyle(
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Colors.white70,
-                      fontSize: 13,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -4052,9 +4061,8 @@ class _NearbyRidersScreenState extends ConsumerState<_NearbyRidersScreen>
                         'No nearby active riders found',
                         'Keine aktiven Fahrer in der Nähe gefunden',
                       ),
-                      style: const TextStyle(
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
                         color: Colors.white,
-                        fontSize: 15,
                         fontWeight: FontWeight.bold,
                       ),
                       textAlign: TextAlign.center,
@@ -4066,10 +4074,9 @@ class _NearbyRidersScreenState extends ConsumerState<_NearbyRidersScreen>
                         'You can search other riders directly via @rider_tag or send a friend request.',
                         'Sie können nach anderen Fahrern direkt über @rider_tag suchen veya eine Freundschaftsanfrage senden.',
                       ),
-                      style: const TextStyle(
-                        color: Colors.white60,
-                        fontSize: 12.5,
-                      ),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.labelMedium?.copyWith(color: Colors.white60),
                       textAlign: TextAlign.center,
                     ),
                   ],
@@ -4136,19 +4143,21 @@ class _NearbyRidersScreenState extends ConsumerState<_NearbyRidersScreen>
                                   children: [
                                     Text(
                                       rider.name,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 13.5,
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium
+                                          ?.copyWith(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                     ),
                                     const SizedBox(height: 1),
                                     Text(
                                       rider.riderTag,
-                                      style: const TextStyle(
-                                        color: Colors.white70,
-                                        fontSize: 11,
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(color: Colors.white70),
                                     ),
                                     const SizedBox(height: 3),
                                     Row(
@@ -4225,13 +4234,13 @@ class _NearbyRidersScreenState extends ConsumerState<_NearbyRidersScreen>
                                     isAlreadyFriend
                                         ? _t('Eklendi', 'Added', 'Hinzugefügt')
                                         : _t('Ekle', 'Add', 'Hinzufügen'),
-                                    style: TextStyle(
-                                      color: isAlreadyFriend
-                                          ? Colors.white38
-                                          : context.colors.cyan,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                    style: Theme.of(context).textTheme.bodySmall
+                                        ?.copyWith(
+                                          color: isAlreadyFriend
+                                              ? Colors.white38
+                                              : context.colors.cyan,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                   ),
                                 ),
                               ),
@@ -4325,8 +4334,7 @@ class _LeaderboardListState extends State<_LeaderboardList> {
             'Leaderboard',
             'Bestenliste',
           ),
-          style: const TextStyle(
-            fontSize: 28,
+          style: Theme.of(context).textTheme.headlineLarge?.copyWith(
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
@@ -4342,8 +4350,7 @@ class _LeaderboardListState extends State<_LeaderboardList> {
                 'Weekly distance across your rider circle.',
                 'Wöchentliche Distanz in Ihrem Fahrerkreis.',
               ),
-              style: TextStyle(
-                fontSize: 13,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: context.colors.textSecondary,
               ),
             ),
@@ -4395,11 +4402,11 @@ class _LeaderboardListState extends State<_LeaderboardList> {
                     const SizedBox(height: 4),
                     Text(
                       '#$userRank',
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w900,
-                        color: Color(0xFFFFD700),
-                      ),
+                      style: Theme.of(context).textTheme.headlineMedium
+                          ?.copyWith(
+                            fontWeight: FontWeight.w900,
+                            color: const Color(0xFFFFD700),
+                          ),
                     ),
                   ],
                 ),
@@ -4410,8 +4417,7 @@ class _LeaderboardListState extends State<_LeaderboardList> {
                 child: Center(
                   child: Text(
                     '${userKm.toStringAsFixed(1)} km',
-                    style: const TextStyle(
-                      fontSize: 24,
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
@@ -4437,8 +4443,7 @@ class _LeaderboardListState extends State<_LeaderboardList> {
                             'Gut gemacht',
                           ),
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 11,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: context.colors.textSecondary,
                     ),
                   ),
@@ -4457,8 +4462,7 @@ class _LeaderboardListState extends State<_LeaderboardList> {
             'Top Riders',
             'Top Fahrer',
           ),
-          style: const TextStyle(
-            fontSize: 16,
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
@@ -4489,8 +4493,7 @@ class _LeaderboardListState extends State<_LeaderboardList> {
             'Weekly Ranking',
             'Wöchentliches Ranking',
           ),
-          style: const TextStyle(
-            fontSize: 16,
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
@@ -4598,8 +4601,7 @@ class _LeaderboardListState extends State<_LeaderboardList> {
               alignment: Alignment.topLeft,
               child: Text(
                 '${rank}',
-                style: TextStyle(
-                  fontSize: 16,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: rankColor,
                 ),
@@ -4621,8 +4623,7 @@ class _LeaderboardListState extends State<_LeaderboardList> {
                     textAlign: TextAlign.center,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 11,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                       height: 1.1,
@@ -4641,8 +4642,7 @@ class _LeaderboardListState extends State<_LeaderboardList> {
                 ),
                 child: Text(
                   tInline(AppStrings.currentLanguageCode, 'SEN', 'YOU', 'DU'),
-                  style: const TextStyle(
-                    fontSize: 11,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
                   ),
@@ -4652,16 +4652,14 @@ class _LeaderboardListState extends State<_LeaderboardList> {
             const SizedBox(height: 2),
             Text(
               item.tag,
-              style: TextStyle(
-                fontSize: 11,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: context.colors.textSecondary,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               '${item.km.toStringAsFixed(1)} km',
-              style: const TextStyle(
-                fontSize: 14,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w900,
                 color: Colors.white,
               ),
@@ -4683,8 +4681,7 @@ class _LeaderboardListState extends State<_LeaderboardList> {
               width: 24,
               child: Text(
                 '${rank}',
-                style: const TextStyle(
-                  fontSize: 14,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
@@ -4701,10 +4698,9 @@ class _LeaderboardListState extends State<_LeaderboardList> {
                     children: [
                       Text(
                         item.name,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          color: Colors.white,
-                        ),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodyMedium?.copyWith(color: Colors.white),
                       ),
                       if (item.isUser) ...[
                         const SizedBox(width: 6),
@@ -4724,11 +4720,11 @@ class _LeaderboardListState extends State<_LeaderboardList> {
                               'YOU',
                               'DU',
                             ),
-                            style: const TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
                           ),
                         ),
                       ],
@@ -4746,8 +4742,7 @@ class _LeaderboardListState extends State<_LeaderboardList> {
             ),
             Text(
               '${item.km.toStringAsFixed(1)} km',
-              style: const TextStyle(
-                fontSize: 13,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
@@ -6052,8 +6047,7 @@ class RiderHarmonyRadarChart extends ConsumerWidget {
                     'RIDER HARMONY ANALYSIS',
                     'FAHRERHARMONIE-ANALYSE',
                   ),
-                  style: TextStyle(
-                    fontSize: 11,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     fontWeight: FontWeight.w900,
                     color: context.colors.cyan,
                     letterSpacing: 0.5,
@@ -6069,9 +6063,8 @@ class RiderHarmonyRadarChart extends ConsumerWidget {
                 ),
                 child: Text(
                   '%$harmonyScore',
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: context.colors.cyan,
-                    fontSize: 11,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -6407,7 +6400,9 @@ class _RiderMatchmakerScreenState extends State<_RiderMatchmakerScreen>
               : ((AppStrings.currentLanguageCode == 'de')
                     ? 'Fahrerkameraden finden'
                     : 'Find Riding Buddies'),
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          style: Theme.of(
+            context,
+          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
         ),
       ),
       body: _scanning
@@ -6444,9 +6439,8 @@ class _RiderMatchmakerScreenState extends State<_RiderMatchmakerScreen>
                   const SizedBox(height: 32),
                   Text(
                     tScanning,
-                    style: const TextStyle(
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: Colors.white70,
-                      fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -6458,8 +6452,7 @@ class _RiderMatchmakerScreenState extends State<_RiderMatchmakerScreen>
               children: [
                 Text(
                   tFound,
-                  style: const TextStyle(
-                    fontSize: 20,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
@@ -6651,9 +6644,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   'Select Blood Type',
                   'Blutgruppe auswählen',
                 ),
-                style: const TextStyle(
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   color: Colors.white,
-                  fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -6688,7 +6680,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       ),
                       child: Text(
                         type,
-                        style: TextStyle(
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: isSelected
                               ? Colors.white
                               : context.colors.textSecondary,
@@ -6742,9 +6734,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 children: [
                   Text(
                     label,
-                    style: TextStyle(
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: context.colors.textSecondary,
-                      fontSize: 11,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -6776,16 +6767,15 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       enabled: !isLocked,
       keyboardType: keyboardType,
       inputFormatters: inputFormatters,
-      style: TextStyle(
+      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
         color: isLocked ? context.colors.textSecondary : Colors.white,
-        fontSize: 14,
         fontWeight: FontWeight.w600,
       ),
       decoration: InputDecoration(
         isDense: true,
         contentPadding: EdgeInsets.zero,
         hintText: hint,
-        hintStyle: TextStyle(
+        hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
           color: context.colors.textSecondary.withValues(alpha: 0.5),
         ),
         filled: true,
@@ -6813,8 +6803,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         ),
         title: Text(
           _t('Profili Düzenle', 'Edit profile', 'Profil bearbeiten'),
-          style: const TextStyle(
-            fontSize: 16,
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
@@ -6852,7 +6841,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                           : ((AppStrings.currentLanguageCode == 'de')
                                 ? 'Rider Card anpassen'
                                 : 'Customize Rider Card'),
-                      style: const TextStyle(color: Colors.white),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.labelLarge?.copyWith(color: Colors.white),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: context.colors.cyan,
@@ -6871,9 +6862,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   ),
                   child: Text(
                     _t('KİŞİSEL BİLGİLER', 'PERSONAL INFO', 'PERSÖNLICHE INFO'),
-                    style: TextStyle(
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: context.colors.textSecondary,
-                      fontSize: 11,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 1.2,
                     ),
@@ -6903,9 +6893,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       'Changing your tag invalidates any parking QR stickers you already printed.',
                       'Das Ändern Ihres Tags macht bereits gedruckte Park-QR-Aufkleber ungültig.',
                     ),
-                    style: TextStyle(
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: context.colors.textSecondary,
-                      fontSize: 11,
                     ),
                   ),
                 ),
@@ -6930,9 +6919,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   label: _t('Kan Grubu', 'Blood Type', 'Blutgruppe'),
                   child: Text(
                     bloodCtrl.text.isEmpty ? '—' : bloodCtrl.text,
-                    style: const TextStyle(
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Colors.white,
-                      fontSize: 14,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -6957,9 +6945,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   ),
                   child: Text(
                     _t('ACİL DURUM', 'EMERGENCY', 'NOTFALL'),
-                    style: TextStyle(
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: context.colors.textSecondary,
-                      fontSize: 11,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 1.2,
                     ),
@@ -7006,9 +6993,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   ),
                   child: Text(
                     _t('EKSTRA BİLGİLER', 'EXTRA INFO', 'ZUSATZINFO'),
-                    style: TextStyle(
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: context.colors.textSecondary,
-                      fontSize: 11,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 1.2,
                     ),
@@ -7096,11 +7082,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         alignment: Alignment.center,
                         child: Text(
                           leftLabel,
-                          style: const TextStyle(
-                            color: Colors.white70,
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                color: Colors.white70,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       ),
                     ),
@@ -7128,11 +7114,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         alignment: Alignment.center,
                         child: Text(
                           rightLabel,
-                          style: TextStyle(
-                            color: context.colors.cyan,
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                color: context.colors.cyan,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       ),
                     ),
@@ -7251,7 +7237,9 @@ class _ProfileAppearanceScreenState
               'Do you want to unlock the ${theme.nameEn} theme for \$0.99?',
               'Möchten Sie das Design "${theme.nameEn}" für \$0.99 freischalten?',
             ),
-            style: TextStyle(color: context.colors.textSecondary),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: context.colors.textSecondary,
+            ),
           ),
           actions: [
             TextButton(
@@ -7262,7 +7250,9 @@ class _ProfileAppearanceScreenState
                   'Cancel',
                   'Stornieren',
                 ),
-                style: TextStyle(color: context.colors.textSecondary),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: context.colors.textSecondary,
+                ),
               ),
               onPressed: () => Navigator.pop(context),
             ),
@@ -7274,7 +7264,9 @@ class _ProfileAppearanceScreenState
                   'Purchase',
                   'Kaufen',
                 ),
-                style: TextStyle(color: context.colors.cyan),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: context.colors.cyan),
               ),
               onPressed: () async {
                 Navigator.pop(context);
@@ -7473,8 +7465,7 @@ class _ProfileAppearanceScreenState
             'Rider Card Studio',
             'Fahrerkarte-Studio',
           ),
-          style: const TextStyle(
-            fontSize: 16,
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
@@ -7523,11 +7514,11 @@ class _ProfileAppearanceScreenState
                                 'Catalog updated',
                                 'Katalog aktualisiert',
                               ),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: Theme.of(context).textTheme.bodyMedium
+                                  ?.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                             ),
                             const SizedBox(height: 2),
                             Text(
@@ -7536,10 +7527,10 @@ class _ProfileAppearanceScreenState
                                 '3 new items waiting to be discovered',
                                 '3 neue Elemente warten darauf, entdeckt zu werden',
                               ),
-                              style: TextStyle(
-                                color: context.colors.textSecondary,
-                                fontSize: 11,
-                              ),
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(
+                                    color: context.colors.textSecondary,
+                                  ),
                             ),
                           ],
                         ),
@@ -7555,11 +7546,11 @@ class _ProfileAppearanceScreenState
                         ),
                         child: Text(
                           _t('YENİ', 'NEW', 'NEU'),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       ),
                     ],
@@ -7604,9 +7595,8 @@ class _ProfileAppearanceScreenState
                         'IDENTITY SETTINGS',
                         'IDENTITÄTSEINSTELLUNGEN',
                       ),
-                      style: TextStyle(
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: context.colors.textSecondary,
-                        fontSize: 11,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 1.2,
                       ),
@@ -7686,9 +7676,8 @@ class _ProfileAppearanceScreenState
                       'Selections are saved to profile identity. Ride data is unaffected.',
                       'Auswahlen werden im Profil gespeichert. Fahrdaten bleiben unverändert.',
                     ),
-                    style: TextStyle(
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: context.colors.textSecondary,
-                      fontSize: 11,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -7737,8 +7726,7 @@ class _ProfileAppearanceScreenState
         ),
         title: Text(
           _t('Kart Arka Planı', 'Card Background', 'Kartenhintergrund'),
-          style: const TextStyle(
-            fontSize: 16,
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
@@ -7770,13 +7758,13 @@ class _ProfileAppearanceScreenState
                         selectedColor: context.colors.cyan.withValues(
                           alpha: 0.15,
                         ),
-                        labelStyle: TextStyle(
-                          color: isSelected
-                              ? context.colors.cyan
-                              : context.colors.textSecondary,
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        labelStyle: Theme.of(context).textTheme.bodySmall
+                            ?.copyWith(
+                              color: isSelected
+                                  ? context.colors.cyan
+                                  : context.colors.textSecondary,
+                              fontWeight: FontWeight.bold,
+                            ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                           side: BorderSide(
@@ -7819,10 +7807,8 @@ class _ProfileAppearanceScreenState
                           'New themes are added with app updates. Current selection will be saved.',
                           'Neue Designs werden mit App-Updates hinzugefügt. Aktuelle Auswahl wird gespeichert.',
                         ),
-                        style: TextStyle(
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: context.colors.textSecondary,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
@@ -7947,15 +7933,15 @@ class _ProfileAppearanceScreenState
                                 theme.getLocalizedName(
                                   AppStrings.currentLanguageCode,
                                 ),
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: isSelected
-                                      ? FontWeight.bold
-                                      : FontWeight.normal,
-                                  color: isSelected
-                                      ? Colors.white
-                                      : context.colors.textSecondary,
-                                ),
+                                style: Theme.of(context).textTheme.labelMedium
+                                    ?.copyWith(
+                                      fontWeight: isSelected
+                                          ? FontWeight.bold
+                                          : FontWeight.normal,
+                                      color: isSelected
+                                          ? Colors.white
+                                          : context.colors.textSecondary,
+                                    ),
                                 textAlign: TextAlign.center,
                               ),
                             ),
@@ -8062,8 +8048,7 @@ class _ProfileAppearanceScreenState
         ),
         title: Text(
           _t('Sürüş Tipi', 'Riding Style', 'Fahrstil'),
-          style: const TextStyle(
-            fontSize: 16,
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
@@ -8087,9 +8072,8 @@ class _ProfileAppearanceScreenState
                     'Choose the primary riding identity that represents you best.',
                     'Wähle die primäre Fahridentität, die dich am besten beschreibt.',
                   ),
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: context.colors.textSecondary,
-                    fontSize: 13,
                   ),
                 ),
                 const SizedBox(height: 14),
@@ -8125,11 +8109,10 @@ class _ProfileAppearanceScreenState
                                 'Safe identity policy / Top speed or lean angle degree does not unlock riding types.',
                                 'Sichere Identitätsrichtlinie / Höchstgeschwindigkeit oder Schräglage schaltet keine Fahrstile frei.',
                               ),
-                          style: TextStyle(
-                            color: Colors.amber.withValues(alpha: 0.9),
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
-                          ),
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                color: Colors.amber.withValues(alpha: 0.9),
+                              ),
                         ),
                       ),
                     ],
@@ -8203,11 +8186,13 @@ class _ProfileAppearanceScreenState
                                     children: [
                                       Text(
                                         item['title'] as String,
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 13,
-                                        ),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyMedium
+                                            ?.copyWith(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                       ),
                                       if (isNew) ...[
                                         const SizedBox(width: 6),
@@ -8224,11 +8209,13 @@ class _ProfileAppearanceScreenState
                                           ),
                                           child: Text(
                                             _t('YENİ', 'NEW', 'NEU'),
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.bold,
-                                            ),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall
+                                                ?.copyWith(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
                                           ),
                                         ),
                                       ],
@@ -8237,10 +8224,10 @@ class _ProfileAppearanceScreenState
                                   const SizedBox(height: 2),
                                   Text(
                                     item['desc'] as String,
-                                    style: TextStyle(
-                                      color: context.colors.textSecondary,
-                                      fontSize: 11,
-                                    ),
+                                    style: Theme.of(context).textTheme.bodySmall
+                                        ?.copyWith(
+                                          color: context.colors.textSecondary,
+                                        ),
                                   ),
                                 ],
                               ),
@@ -8327,8 +8314,7 @@ class _ProfileAppearanceScreenState
         ),
         title: Text(
           _t('Rozet Kütüphanesi', 'Badge Library', 'Abzeichen-Bibliothek'),
-          style: const TextStyle(
-            fontSize: 16,
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
@@ -8350,16 +8336,14 @@ class _ProfileAppearanceScreenState
                         'Show up to three badges on your card. Press and hold to sort.',
                         'Zeige bis zu drei Abzeichen auf deiner Karte. Gedrückt halten zum Sortieren.',
                       ),
-                      style: TextStyle(
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: context.colors.textSecondary,
-                        fontSize: 11,
                       ),
                     ),
                     Text(
                       '${localSelectedBadges.length}/3 SEÇİLİ',
-                      style: TextStyle(
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: context.colors.cyan,
-                        fontSize: 11,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -8387,13 +8371,13 @@ class _ProfileAppearanceScreenState
                         selectedColor: context.colors.cyan.withValues(
                           alpha: 0.15,
                         ),
-                        labelStyle: TextStyle(
-                          color: isSelected
-                              ? context.colors.cyan
-                              : context.colors.textSecondary,
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        labelStyle: Theme.of(context).textTheme.bodySmall
+                            ?.copyWith(
+                              color: isSelected
+                                  ? context.colors.cyan
+                                  : context.colors.textSecondary,
+                              fontWeight: FontWeight.bold,
+                            ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                           side: BorderSide(
@@ -8436,10 +8420,8 @@ class _ProfileAppearanceScreenState
                           'Safe achievement policy / Top speed or lean angle is not a requirement. Location or route evidence is not shared.',
                           'Sichere Errungenschaftsrichtlinie / Höchstgeschwindigkeit oder Schräglage ist keine Voraussetzung. Standort- oder Routenbeweise werden nicht geteilt.',
                         ),
-                        style: TextStyle(
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: context.colors.textSecondary,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
@@ -8522,11 +8504,11 @@ class _ProfileAppearanceScreenState
                                   ),
                                   child: Text(
                                     _t('YENİ', 'NEW', 'NEU'),
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                    style: Theme.of(context).textTheme.bodySmall
+                                        ?.copyWith(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                   ),
                                 ),
                               ),
@@ -8560,11 +8542,11 @@ class _ProfileAppearanceScreenState
                                 if (isProgress) ...[
                                   Text(
                                     '%$progressVal',
-                                    style: TextStyle(
-                                      color: context.colors.cyan,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                    style: Theme.of(context).textTheme.bodySmall
+                                        ?.copyWith(
+                                          color: context.colors.cyan,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                   ),
                                   const SizedBox(height: 2),
                                   ClipRRect(
@@ -8581,20 +8563,20 @@ class _ProfileAppearanceScreenState
                                 ] else if (isLocked) ...[
                                   Text(
                                     _t('KİLİTLİ', 'LOCKED', 'GESPERRT'),
-                                    style: const TextStyle(
-                                      color: Colors.white24,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                    style: Theme.of(context).textTheme.bodySmall
+                                        ?.copyWith(
+                                          color: Colors.white24,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                   ),
                                 ] else ...[
                                   Text(
                                     _t('KAZANILDI', 'EARNED', 'ERHALTEN'),
-                                    style: const TextStyle(
-                                      color: Colors.green,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                    style: Theme.of(context).textTheme.bodySmall
+                                        ?.copyWith(
+                                          color: Colors.green,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                   ),
                                 ],
                               ],
@@ -8693,8 +8675,7 @@ class _ProfileAppearanceScreenState
         ),
         title: Text(
           _t('Avatar ve Çerçeve', 'Avatar and Frame', 'Avatar und Rahmen'),
-          style: const TextStyle(
-            fontSize: 16,
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
@@ -8714,9 +8695,8 @@ class _ProfileAppearanceScreenState
               children: [
                 Text(
                   _t('8 SEÇENEK', '8 OPTIONS', '8 OPTIONEN'),
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: context.colors.textSecondary,
-                    fontSize: 11,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1.2,
                   ),
@@ -8751,11 +8731,8 @@ class _ProfileAppearanceScreenState
                             'Avatar and frame are selected independently. A thin ring and checkmark are used instead of glow.',
                             'Avatar und Rahmen werden unabhängig voneinander ausgewählt. Anstelle von Glow wird ein dünner Ring und ein Häkchen verwendet.',
                           ),
-                          style: TextStyle(
-                            color: context.colors.textSecondary,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
-                          ),
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: context.colors.textSecondary),
                         ),
                       ),
                     ],
@@ -8796,9 +8773,8 @@ class _ProfileAppearanceScreenState
                 const SizedBox(height: 32),
                 Text(
                   _t('PROFİL ÇERÇEVESİ', 'PROFILE FRAME', 'PROFILRAHMEN'),
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: context.colors.textSecondary,
-                    fontSize: 11,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1.2,
                   ),
@@ -8874,19 +8850,21 @@ class _ProfileAppearanceScreenState
                                 children: [
                                   Text(
                                     f['name'] as String,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 13,
-                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
                                     f['desc'] as String,
-                                    style: TextStyle(
-                                      color: context.colors.textSecondary,
-                                      fontSize: 11,
-                                    ),
+                                    style: Theme.of(context).textTheme.bodySmall
+                                        ?.copyWith(
+                                          color: context.colors.textSecondary,
+                                        ),
                                   ),
                                 ],
                               ),
@@ -8952,10 +8930,9 @@ class _ProfileAppearanceScreenState
           children: [
             Text(
               title,
-              style: const TextStyle(
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
-                fontSize: 14,
               ),
             ),
             if (hasNew) ...[
@@ -8968,9 +8945,8 @@ class _ProfileAppearanceScreenState
                 ),
                 child: Text(
                   _t('YENİ', 'NEW', 'NEU'),
-                  style: const TextStyle(
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Colors.white,
-                    fontSize: 11,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -8980,7 +8956,9 @@ class _ProfileAppearanceScreenState
         ),
         subtitle: Text(
           subtitle,
-          style: TextStyle(color: context.colors.textSecondary, fontSize: 12),
+          style: Theme.of(context).textTheme.labelMedium?.copyWith(
+            color: context.colors.textSecondary,
+          ),
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
@@ -8988,9 +8966,8 @@ class _ProfileAppearanceScreenState
             if (actionLabel != null) ...[
               Text(
                 actionLabel,
-                style: TextStyle(
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
                   color: context.colors.cyan,
-                  fontSize: 12,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -9043,9 +9020,8 @@ class _ProfileAppearanceScreenState
                   alignment: Alignment.center,
                   child: Text(
                     label,
-                    style: TextStyle(
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: context.colors.cyan,
-                      fontSize: 14,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 0.5,
                     ),
@@ -9093,11 +9069,11 @@ class _ProfileAppearanceScreenState
                         alignment: Alignment.center,
                         child: Text(
                           leftLabel,
-                          style: const TextStyle(
-                            color: Colors.white70,
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                color: Colors.white70,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       ),
                     ),
@@ -9125,11 +9101,11 @@ class _ProfileAppearanceScreenState
                         alignment: Alignment.center,
                         child: Text(
                           rightLabel,
-                          style: TextStyle(
-                            color: context.colors.cyan,
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                color: context.colors.cyan,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       ),
                     ),
@@ -9212,12 +9188,12 @@ class _AchievementOverviewCard extends StatelessWidget {
                           'ACHIEVEMENTS & BADGES',
                           'ERFOLGE & ABZEICHEN',
                         ),
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w900,
-                          color: Colors.white,
-                          letterSpacing: 0.5,
-                        ),
+                        style: Theme.of(context).textTheme.labelMedium
+                            ?.copyWith(
+                              fontWeight: FontWeight.w900,
+                              color: Colors.white,
+                              letterSpacing: 0.5,
+                            ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -9324,8 +9300,7 @@ class _MiniBadgeChip extends StatelessWidget {
           const SizedBox(width: 4),
           Text(
             label,
-            style: TextStyle(
-              fontSize: 11,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: context.colors.textSecondary,
               fontWeight: FontWeight.w600,
             ),
@@ -9454,21 +9429,19 @@ class _AchievementSheetWidgetState
                               : (de
                                     ? 'ERFOLGE & FAHRER XP'
                                     : 'ACHIEVEMENT & RIDER XP'),
-                          style: const TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w900,
-                            color: Colors.white,
-                          ),
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(
+                                fontWeight: FontWeight.w900,
+                                color: Colors.white,
+                              ),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           tr
                               ? 'Tamamlanan başarımlarla Rider XP ve seviye kazan'
                               : 'Earn Rider XP & levels from completed achievements',
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: context.colors.textSecondary,
-                          ),
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: context.colors.textSecondary),
                         ),
                       ],
                     ),
@@ -9520,13 +9493,13 @@ class _AchievementSheetWidgetState
                                 const SizedBox(width: 6),
                                 Text(
                                   cat['label'] as String,
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.bold,
-                                    color: isSelected
-                                        ? Colors.black
-                                        : Colors.white,
-                                  ),
+                                  style: Theme.of(context).textTheme.bodySmall
+                                      ?.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: isSelected
+                                            ? Colors.black
+                                            : Colors.white,
+                                      ),
                                 ),
                               ],
                             ),
@@ -9743,15 +9716,17 @@ class _AchievementSheetWidgetState
                                           Expanded(
                                             child: Text(
                                               item.title(langCode),
-                                              style: TextStyle(
-                                                fontSize: 13,
-                                                fontWeight: FontWeight.bold,
-                                                color: isUnlocked
-                                                    ? Colors.white
-                                                    : context
-                                                          .colors
-                                                          .textSecondary,
-                                              ),
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyMedium
+                                                  ?.copyWith(
+                                                    fontWeight: FontWeight.bold,
+                                                    color: isUnlocked
+                                                        ? Colors.white
+                                                        : context
+                                                              .colors
+                                                              .textSecondary,
+                                                  ),
                                             ),
                                           ),
                                           if (isClaimed)
@@ -9778,13 +9753,16 @@ class _AchievementSheetWidgetState
                                                 tr
                                                     ? 'ÖDÜL ALINDI 👑'
                                                     : 'CLAIMED 👑',
-                                                style: const TextStyle(
-                                                  fontSize: 11,
-                                                  fontWeight: FontWeight.w900,
-                                                  color: Color(
-                                                    0xFFFBBF24,
-                                                  ), // Gold Text
-                                                ),
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodySmall
+                                                    ?.copyWith(
+                                                      fontWeight:
+                                                          FontWeight.w900,
+                                                      color: const Color(
+                                                        0xFFFBBF24,
+                                                      ), // Gold Text
+                                                    ),
                                               ),
                                             ),
                                         ],
@@ -9792,10 +9770,13 @@ class _AchievementSheetWidgetState
                                       const SizedBox(height: 4),
                                       Text(
                                         item.description(langCode),
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          color: context.colors.textSecondary,
-                                        ),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall
+                                            ?.copyWith(
+                                              color:
+                                                  context.colors.textSecondary,
+                                            ),
                                       ),
                                     ],
                                   ),
@@ -9942,8 +9923,7 @@ class _PremiumVaultButton extends StatelessWidget {
                       'REWARD VAULT 🔐',
                       'BELOHNUNGS TRESOR 🔐',
                     ),
-                    style: const TextStyle(
-                      fontSize: 12,
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
                       fontWeight: FontWeight.w900,
                       color: Colors.white,
                       letterSpacing: 0.5,
@@ -10059,8 +10039,7 @@ class _PremiumVaultSheetWidgetState
                     tr
                         ? 'ÖDÜL KASASI 🔐'
                         : (de ? 'BELOHNUNGS TRESOR 🔐' : 'REWARD VAULT 🔐'),
-                    style: const TextStyle(
-                      fontSize: 18,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w900,
                       color: Colors.white,
                     ),
@@ -10082,10 +10061,9 @@ class _PremiumVaultSheetWidgetState
                 tr
                     ? 'KASADAKİ ÖDÜLLER'
                     : (de ? 'TRESOR PRÄMIEN' : 'VAULT REWARDS'),
-                style: const TextStyle(
-                  fontSize: 12,
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF94A3B8),
+                  color: const Color(0xFF94A3B8),
                   letterSpacing: 1.0,
                 ),
               ),
@@ -10132,11 +10110,11 @@ class _PremiumVaultSheetWidgetState
                                 tr
                                     ? 'Premium Sürücü Lisansı'
                                     : 'Premium Rider License',
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
                               ),
                               const SizedBox(height: 2),
                               Text(
@@ -10147,12 +10125,12 @@ class _PremiumVaultSheetWidgetState
                                     : (tr
                                           ? '⚡ 24 Gün Kullanılabilir'
                                           : '⚡ 24 Days Available'),
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: userProfile.isPremium
-                                      ? SlatePalette.emerald
-                                      : const Color(0xFFC7D2FE),
-                                ),
+                                style: Theme.of(context).textTheme.labelMedium
+                                    ?.copyWith(
+                                      color: userProfile.isPremium
+                                          ? SlatePalette.emerald
+                                          : const Color(0xFFC7D2FE),
+                                    ),
                               ),
                             ],
                           ),
@@ -10197,10 +10175,8 @@ class _PremiumVaultSheetWidgetState
                             userProfile.isPremium
                                 ? (tr ? 'Aktif ⚡' : 'Active ⚡')
                                 : (tr ? 'Kullan ⚡' : 'Use ⚡'),
-                            style: const TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(fontWeight: FontWeight.bold),
                           ),
                         ),
                       ],
@@ -10241,21 +10217,19 @@ class _PremiumVaultSheetWidgetState
                             tr
                                 ? 'Özel Garaj Tema & Avatarlar'
                                 : 'Custom Garage Themes & Avatars',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
                           ),
                           const SizedBox(height: 2),
                           Text(
                             tr
                                 ? 'Seviye atladıkça veya etkinliklerle kilit aç'
                                 : 'Unlock as you level up or via events',
-                            style: const TextStyle(
-                              fontSize: 11,
-                              color: Color(0xFF94A3B8),
-                            ),
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(color: const Color(0xFF94A3B8)),
                           ),
                         ],
                       ),
@@ -10269,10 +10243,9 @@ class _PremiumVaultSheetWidgetState
                 tr
                     ? 'PROMO KOD VEYA YÖNETİCİ ÖDÜLÜ'
                     : 'PROMO CODE OR ADMIN REWARD',
-                style: const TextStyle(
-                  fontSize: 12,
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF94A3B8),
+                  color: const Color(0xFF94A3B8),
                   letterSpacing: 1.0,
                 ),
               ),
@@ -10282,15 +10255,15 @@ class _PremiumVaultSheetWidgetState
                   Expanded(
                     child: TextField(
                       controller: _promoController,
-                      style: const TextStyle(color: Colors.white, fontSize: 14),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodyMedium?.copyWith(color: Colors.white),
                       decoration: InputDecoration(
                         hintText: tr
                             ? 'Promo kodunuzu girin...'
                             : 'Enter promo code...',
-                        hintStyle: const TextStyle(
-                          color: Color(0xFF64748B),
-                          fontSize: 13,
-                        ),
+                        hintStyle: Theme.of(context).textTheme.bodyMedium
+                            ?.copyWith(color: const Color(0xFF64748B)),
                         filled: true,
                         fillColor: SlatePalette.surface,
                         contentPadding: const EdgeInsets.symmetric(
@@ -10360,8 +10333,7 @@ class _PremiumVaultSheetWidgetState
                     },
                     child: Text(
                       tr ? 'Uygula' : 'Apply',
-                      style: const TextStyle(
-                        fontSize: 12,
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
