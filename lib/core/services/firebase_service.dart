@@ -22,6 +22,21 @@ class FirebaseService {
       _initialized = true;
     } catch (_) {
       // Fail-safe if google-services.json is not configured yet
+      return;
+    }
+    try {
+      // Wait for Firebase Auth to finish restoring any persisted sign-in
+      // session before any caller reads `.currentUser`. Reading it
+      // synchronously right after Core init can race and return null even
+      // though a session is about to be restored — this previously made
+      // account-scoped local data (profile fields, garage/motorcycle
+      // records) look wiped/guest-mode right after a cold start.
+      await FirebaseAuth.instance.authStateChanges().first.timeout(
+        const Duration(seconds: 5),
+      );
+    } catch (_) {
+      // Timed out or failed to resolve — proceed with whatever
+      // currentUser already reflects rather than blocking startup.
     }
   }
 
@@ -421,22 +436,35 @@ class FirebaseService {
         data = Map<String, dynamic>.from(uidDoc.data()!);
       }
 
-      // 2. Fallback: If profile doc under uid does not exist or has empty data, search users collection by email
+      // 2. Fallback: If profile doc under uid does not exist or has empty
+      // data, search users collection by email. This only ever recovers
+      // pre-existing legacy records — firestore.rules scopes `/users/{uid}`
+      // reads to `isOwner(uid)`, so a collection-level query filtered by
+      // `email` (not `uid`) is always rejected with permission-denied for
+      // every account, including brand-new ones that simply don't have a
+      // profile doc yet. Never let that abort login — fall through to the
+      // "fill in defaults" branch below exactly as if nothing were found.
       if (data.isEmpty || (data['name'] as String? ?? '').isEmpty) {
-        final emailQuery1 = await FirebaseFirestore.instance
-            .collection('users')
-            .where('email', isEqualTo: cleanEmail)
-            .get();
-        if (emailQuery1.docs.isNotEmpty) {
-          data = Map<String, dynamic>.from(emailQuery1.docs.first.data());
-        } else {
-          final emailQuery2 = await FirebaseFirestore.instance
+        try {
+          final emailQuery1 = await FirebaseFirestore.instance
               .collection('users')
-              .where('email', isEqualTo: email.trim())
+              .where('email', isEqualTo: cleanEmail)
               .get();
-          if (emailQuery2.docs.isNotEmpty) {
-            data = Map<String, dynamic>.from(emailQuery2.docs.first.data());
+          if (emailQuery1.docs.isNotEmpty) {
+            data = Map<String, dynamic>.from(emailQuery1.docs.first.data());
+          } else {
+            final emailQuery2 = await FirebaseFirestore.instance
+                .collection('users')
+                .where('email', isEqualTo: email.trim())
+                .get();
+            if (emailQuery2.docs.isNotEmpty) {
+              data = Map<String, dynamic>.from(emailQuery2.docs.first.data());
+            }
           }
+        } catch (_) {
+          // Permission-denied (or any other Firestore error) here means
+          // no legacy record was recoverable this way — proceed with
+          // defaults instead of failing the whole login.
         }
       }
 
