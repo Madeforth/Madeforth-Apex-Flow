@@ -1,6 +1,40 @@
 # Active Context
 
-## Current Task (2026-08-07, branch `main`, pushed through commit `b77a29f`)
+## Current Task (2026-08-07 afternoon, branch `main`, pushed through commit `00885ca`) — HANDOFF, work continues on the home machine
+
+Machine-to-machine handoff: this session ran on the **work Mac** (company machine — do not assume the router/network or Firebase Console is freely modifiable there). The repo was re-cloned fresh into `~/Developer/Madeforth-Apex-Flow` after the local copy was accidentally deleted; GitHub `main` was and is the source of truth. Everything below is committed and pushed.
+
+### Shipped this session (4 commits, all verified `flutter analyze` 0 errors + `flutter test` 96/96)
+
+1. `88976cd` — 40 IconButtons across 18 files got locale-aware `tooltip`s (were unannounced to screen readers); 5 repeated hex literals centralized into `SlatePalette` (`cyanAccent`, `emerald`, `amber`, `warningYellow`, `background`); `HapticFeedback` added to destructive/confirming actions only (delete bike, archive toggle, logout, accept/decline friend request, remove wishlist part) — deliberately *not* to all 306 tap targets, per Apple HIG.
+2. `9359a93` — 26 real-UI text sites bumped from 6–9px to the type scale's own 11px floor. **Deliberately skipped** (needs on-device visual check before touching): chart-axis `TextPainter` labels in the garage cost chart and fuel insights chart, plus two fixed-dimension ID-card-mimicking widgets (Rider Pass wordmark, Park Contact card header).
+3. `a03c301` — **two real bugs, both reproduced and fixed on device.** (a) `loginWithEmail()`'s legacy fallback query `collection('users').where('email', ...)` is structurally rejected by `firestore.rules` for *every* account (the `/users/{uid}` read rule is `isOwner(uid)`-scoped, so Firestore can't validate an email-filtered collection query) — this threw on every fresh account's first login and surfaced as the generic "Hata oluştu", even though Firebase Auth had already signed the user in. Wrapped in try/catch so it falls through to defaults. (b) `FirebaseService.init()` now awaits the first `authStateChanges()` event (5s timeout) before anything reads `currentUser` — reading it right after `Firebase.initializeApp()` raced and returned null, which made `_purgeStaleProfileDataOnAccountSwitch()` treat a real signed-in user as a different/guest account and wipe local profile data after a cold start. This was the "motosiklet ve profil silindi" report.
+4. `00885ca` — UI pass driven by walking the running app on the LG G5 via `adb` screenshots (see "device workflow" below): floating nav bar clipped the bottom of *every* scroll surface (Insights' stat row was fully unreadable) → added `ApexSpacing.navBarClearance` and applied it to all 7 scroll surfaces; profile tab bar rendered a live `OVERFLOWED BY` stripe → trimmed `labelPadding` + `FittedBox(scaleDown)`, matching the Garage/Rides tab bars; `NumberFormat.decimalPattern()` was called with no locale so Turkish rendered "6,000" not "6.000", other sites printed raw "12000", currency concatenated to "TL0" → added `AppSettingsState.formatNumber`/`formatCurrency`; profile setup joined dial code + typed number verbatim producing "+90 0544…" → now strips the trunk zero; `_StatCard` titles clipped at `maxLines: 1` → wrap to 2 with the row in `IntrinsicHeight`.
+
+### Design audit — remaining items, in priority order (NOT started)
+
+Ranked from a design/typography/vector review; items 1–4 of the original 7 are the four shipped above.
+
+- **5. `TextStyle` system is built but unused.** `ApexTypography.textTheme()` defines a proper 9-step scale with tracking and tabular figures, but only **2 files** read `context.textTheme` — the other **941** `TextStyle(...)` literals are hand-written. Related drift: 305 uses of ambiguous `FontWeight.bold` and 96 of `w900` (the scale only defines w400/500/600/700), and 24 distinct `fontSize` values against the scale's 9. **This is the highest-value but widest-blast-radius item** — it should be done screen-by-screen with on-device verification after each, not as one sweep.
+- **6. Two icon languages are mixed.** Material Icons (423 uses across 32 files) alongside Phosphor (51 uses across 2 files) — different stroke weights and corner treatments in the same UI. Decide one direction (extend Phosphor, or retreat to Material) and convert. Bounded and concrete; good next task.
+- **7. No vector assets at all.** Zero `.svg` in the repo, 6 PNGs total, `flutter_svg` not a dependency. No brand mark, no empty-state illustrations. The in-app `CustomPainter` work (telemetry curve, score gauge — 10 files) is genuinely good and should be preserved as the reference for the visual language. This is asset creation, not a code task.
+
+### Additional issues spotted on-device but not yet filed as tasks
+
+- Achievement chip row on Profile clips ("Hız Canava…") and the "Tümünü Gör" link overlaps it.
+- The KM/MI selector in profile setup is orange with a white border — completely outside the app's cyan/pill design language.
+- Blood-type badge renders a bare "—" when unset, which reads as a broken value rather than an empty one.
+- `onboarding_screen.dart`'s login/register error handling doesn't branch on `FirebaseAuthException.code`, so wrong-password, network failure, and already-in-use all show the same one or two generic strings. (This is what made bug 3a above so hard to diagnose.)
+
+### Device/debug workflow that worked (reuse this)
+
+The LG G5 (`LGH85092a403f4`) is driven entirely over `adb` from the agent side: `adb exec-out screencap -p > file.png` then read the PNG, and `adb shell input tap/swipe/text` to navigate. **The device's own logcat is completely inaccessible** (returns empty even for self-injected `log -t` probes — hardened ROM), so the only way to see Dart/Firebase errors is `flutter run -d <id> --debug` and reading its console output. That is how bug 3a was caught.
+
+Also note: `android/key.properties` + `android/app/upload-keystore.jks` were copied in from `~/Developer/ApexFlow-main3107/` (verified SHA-256 `bce50c91…` matches the Firebase-registered upload cert). They are gitignored and will **not** be present on a fresh clone — copy them again before any release build. The work Mac's debug SHA-256 (`5d152739…`) was also registered on the Firebase Android app while chasing a dead end; harmless to leave, but it is not needed and can be removed from the Firebase Console.
+
+`pubspec.yaml` is at `1.0.0+30` (bumped from +29, which is the highest build already on Play Console). A signed AAB for +30 was built at `build/app/outputs/bundle/release/app-release.aab` but **not uploaded**.
+
+## Prior Task (2026-08-07 morning, branch `main`, pushed through commit `b77a29f`)
 User is preparing for first public release. This session covered: merging the last feature branch into `main`, actually fixing the Discord bug-report pipeline (previously only diagnosed), a pre-release security/privacy audit with fixes, discovering and fixing a real Firebase Android app misconfiguration that was silently blocking App Check, and a large UI pass (login screen, paywalls, app-wide corner-radius modernization).
 
 **1. Merged `agent/fix-safety-persistence-maps` into `main`** (commit `ba47953`) — resolved the "needs merging" item open since the prior session. 4 conflicts (pubspec.yaml deps, notification_scheduler.dart reminder logic, document_vault_screen.dart, activeContext.md itself) resolved by combining both sides' work, not picking one. Verified `flutter analyze`/`flutter test` clean post-merge, then pushed.

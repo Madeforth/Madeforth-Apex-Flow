@@ -2,6 +2,26 @@
 
 Status recorded 2026-08-04, from repo inspection (not from README claims alone unless marked as such).
 
+## 2026-08-07 (afternoon) — Accessibility/design pass + two real login/data-loss bugs fixed on device
+Full detail in `activeContext.md` "Current Task". Ran on the work Mac; repo re-cloned fresh after the local copy was lost. Pushed through `00885ca`.
+
+**FIXED, verified on a real device (LG G5) with before/after screenshots:**
+- Login threw for every freshly-registered account: `loginWithEmail()`'s email-filtered fallback query on `/users` is structurally rejected by `firestore.rules` (owner-scoped read rule can't validate a collection query filtered by `email`). Surfaced as the generic "Hata oluştu" *after* Firebase Auth had already signed the user in successfully. Now caught and fallen through.
+- Local profile + garage data appeared wiped after a cold start ("motosiklet ve profil silindi"): `FirebaseService.init()` didn't wait for Auth to restore its persisted session, so `currentUser` read null, and the account-switch purge treated the real user as a guest. Now awaits the first `authStateChanges()` event with a 5s timeout.
+- The floating nav bar clipped the bottom of every scroll surface — Insights' stat-card row was fully unreadable. Fixed app-wide via `ApexSpacing.navBarClearance`.
+- Profile tab bar was rendering a live `OVERFLOWED BY` stripe over the UI.
+- Number/currency formatting: locale-less `NumberFormat` gave Turkish "6,000" instead of "6.000"; other sites printed raw "12000"; currency concatenated to "TL0". Centralized in `AppSettingsState.formatNumber`/`formatCurrency`.
+- Phone numbers saved as "+90 0544…" (both international prefix and national trunk zero).
+- 40 IconButtons had no accessibility label; 26 UI text sites were 6–9px, below the type scale's own 11px floor.
+
+**Known-broken / not started (design audit items 5–7, see `activeContext.md` for detail):**
+- `ApexTypography`'s text theme is effectively dead — only 2 files use `context.textTheme`, against 941 hand-written `TextStyle` literals. Highest-value remaining item, but must be done screen-by-screen with device verification.
+- Material Icons (423 uses) and Phosphor (51 uses) are mixed in the same UI. Bounded; good next task.
+- No vector assets at all (0 SVG, `flutter_svg` not a dependency) — no brand mark, no empty-state illustrations.
+- Smaller on-device findings not yet filed: achievement chip row clips and overlaps "Tümünü Gör"; the KM/MI selector is orange/white, outside the design language; blood-type badge shows a bare "—" when unset; auth error handling doesn't branch on `FirebaseAuthException.code` (all failures collapse to one generic string).
+
+**Environment caveat for the next session:** the signing files (`android/key.properties`, `android/app/upload-keystore.jks`) are gitignored and absent from a fresh clone — copy them in before any release build. `pubspec.yaml` is at `1.0.0+30`; a signed AAB was built but not uploaded.
+
 ## 2026-08-07 — Pre-release hardening: security fixes, App Check verified live, Discord pipeline fixed for real
 Full detail in `activeContext.md` "Current Task" — this is the status-tracking summary.
 
