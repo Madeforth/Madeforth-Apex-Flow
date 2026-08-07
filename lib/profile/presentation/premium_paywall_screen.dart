@@ -231,12 +231,12 @@ class _PremiumPaywallScreenState extends ConsumerState<PremiumPaywallScreen> {
                         'PREMIUM RIDING SYSTEM',
                         'PREMIUM-FAHRSYSTEM',
                       ),
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w900,
-                        color: context.colors.white,
-                        letterSpacing: 0.5,
-                      ),
+                      style: Theme.of(context).textTheme.headlineMedium
+                          ?.copyWith(
+                            fontWeight: FontWeight.w900,
+                            color: context.colors.white,
+                            letterSpacing: 0.5,
+                          ),
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -248,9 +248,8 @@ class _PremiumPaywallScreenState extends ConsumerState<PremiumPaywallScreen> {
                         'Take control of the roads, discover the social ride network.',
                         'Übernehmen Sie die Kontrolle über die Straßen und entdecken Sie das soziale Fahrnetzwerk.',
                       ),
-                      style: TextStyle(
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: context.colors.textSecondary,
-                        fontSize: 13,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -379,11 +378,11 @@ class _PremiumPaywallScreenState extends ConsumerState<PremiumPaywallScreen> {
                             'You are already an Apex Flow Premium Member! 👑',
                             'Sie sind bereits Apex Flow Premium-Mitglied! 👑',
                           ),
-                          style: TextStyle(
-                            color: context.colors.cyan,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                color: context.colors.cyan,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       ),
                     ),
@@ -444,11 +443,13 @@ class _PremiumPaywallScreenState extends ConsumerState<PremiumPaywallScreen> {
                                         '\$4.99',
                                         '4,99 €',
                                       ),
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w900,
-                                        color: context.colors.white,
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleLarge
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w900,
+                                            color: context.colors.white,
+                                          ),
                                     ),
                                     Text(
                                       tInline(
@@ -457,10 +458,12 @@ class _PremiumPaywallScreenState extends ConsumerState<PremiumPaywallScreen> {
                                         '/ month',
                                         '/ Monat',
                                       ),
-                                      style: TextStyle(
-                                        color: context.colors.textSecondary,
-                                        fontSize: 11,
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            color: context.colors.textSecondary,
+                                          ),
                                     ),
                                   ],
                                 ),
@@ -514,11 +517,13 @@ class _PremiumPaywallScreenState extends ConsumerState<PremiumPaywallScreen> {
                                           'RECOMMENDED',
                                           'EMPFOHLEN',
                                         ),
-                                        style: TextStyle(
-                                          color: context.colors.onAccent,
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w900,
-                                        ),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall
+                                            ?.copyWith(
+                                              color: context.colors.onAccent,
+                                              fontWeight: FontWeight.w900,
+                                            ),
                                       ),
                                     ),
                                     const SizedBox(height: 4),
@@ -544,11 +549,13 @@ class _PremiumPaywallScreenState extends ConsumerState<PremiumPaywallScreen> {
                                         '\$29.99',
                                         '29,99 €',
                                       ),
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w900,
-                                        color: context.colors.white,
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleLarge
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w900,
+                                            color: context.colors.white,
+                                          ),
                                     ),
                                     Text(
                                       tInline(
@@ -557,10 +564,12 @@ class _PremiumPaywallScreenState extends ConsumerState<PremiumPaywallScreen> {
                                         '/ year',
                                         '/ Jahr',
                                       ),
-                                      style: TextStyle(
-                                        color: context.colors.textSecondary,
-                                        fontSize: 11,
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            color: context.colors.textSecondary,
+                                          ),
                                     ),
                                   ],
                                 ),
@@ -609,9 +618,10 @@ class _PremiumPaywallScreenState extends ConsumerState<PremiumPaywallScreen> {
                                       'Purchase via Google Play',
                                       'Kauf über Google Play',
                                     ),
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w900,
-                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelLarge
+                                        ?.copyWith(fontWeight: FontWeight.w900),
                                   ),
                                 ],
                               ),
@@ -631,11 +641,11 @@ class _PremiumPaywallScreenState extends ConsumerState<PremiumPaywallScreen> {
                             'Restore Purchases',
                             'Käufe wiederherstellen',
                           ),
-                          style: TextStyle(
-                            color: context.colors.textSecondary,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 13,
-                          ),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                color: context.colors.textSecondary,
+                                fontWeight: FontWeight.w600,
+                              ),
                         ),
                       ),
                     ),
@@ -665,19 +675,16 @@ class _PremiumPaywallScreenState extends ConsumerState<PremiumPaywallScreen> {
             children: [
               Text(
                 title,
-                style: TextStyle(
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: context.colors.white,
-                  fontSize: 13,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 2),
               Text(
                 subtitle,
-                style: TextStyle(
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: context.colors.textSecondary,
-                  fontSize: 11,
-                  height: 1.3,
                 ),
               ),
             ],

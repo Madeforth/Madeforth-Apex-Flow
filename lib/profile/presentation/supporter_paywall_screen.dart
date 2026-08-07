@@ -236,12 +236,12 @@ class _SupporterPaywallScreenState
                         'APEX FLOW SUPPORTER',
                         'APEX FLOW SUPPORTER',
                       ),
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w900,
-                        color: context.colors.white,
-                        letterSpacing: 0.5,
-                      ),
+                      style: Theme.of(context).textTheme.headlineMedium
+                          ?.copyWith(
+                            fontWeight: FontWeight.w900,
+                            color: context.colors.white,
+                            letterSpacing: 0.5,
+                          ),
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -253,9 +253,8 @@ class _SupporterPaywallScreenState
                         'Apex Flow is built by an indie developer. Help us develop the app and unlock exclusive rider flex features.',
                         'Apex Flow wurde von einem Indie-Entwickler entwickelt. Helfen Sie uns, die App zu entwickeln und exklusive Rider-Flex-Funktionen freizuschalten.',
                       ),
-                      style: TextStyle(
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: context.colors.textSecondary,
-                        fontSize: 13,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -280,11 +279,11 @@ class _SupporterPaywallScreenState
                             'Thank you for being a supporter! 👑',
                             'Vielen Dank, dass Sie ein Unterstützer sind! 👑',
                           ),
-                          style: TextStyle(
-                            color: context.colors.cyan,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                color: context.colors.cyan,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       ),
                     ),
@@ -402,10 +401,9 @@ class _SupporterPaywallScreenState
                           'Restore Purchases',
                           'Käufe wiederherstellen',
                         ),
-                        style: TextStyle(
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: context.colors.textSecondary,
                           fontWeight: FontWeight.w600,
-                          fontSize: 13,
                         ),
                       ),
                     ),
@@ -483,35 +481,35 @@ class _SupporterPaywallScreenState
                         const SizedBox(width: 8),
                         Text(
                           title,
-                          style: TextStyle(
-                            color: iconColor,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 1.2,
-                          ),
+                          style: Theme.of(context).textTheme.bodyLarge
+                              ?.copyWith(
+                                color: iconColor,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 1.2,
+                              ),
                         ),
                       ],
                     ),
                     Text(
                       price,
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w900,
-                        color: isRecommended
-                            ? Colors.white
-                            : context.colors.white,
-                      ),
+                      style: Theme.of(context).textTheme.headlineMedium
+                          ?.copyWith(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w900,
+                            color: isRecommended
+                                ? Colors.white
+                                : context.colors.white,
+                          ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 8),
                 Text(
                   tr ? descriptionTr : descriptionEn,
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: isRecommended
                         ? Colors.white70
                         : context.colors.textSecondary,
-                    fontSize: 13,
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -534,13 +532,13 @@ class _SupporterPaywallScreenState
                         Expanded(
                           child: Text(
                             tr ? featuresTr[index] : featuresEn[index],
-                            style: TextStyle(
-                              color: isRecommended
-                                  ? Colors.white
-                                  : context.colors.white,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                            ),
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(
+                                  color: isRecommended
+                                      ? Colors.white
+                                      : context.colors.white,
+                                  fontWeight: FontWeight.w600,
+                                ),
                           ),
                         ),
                       ],
@@ -607,7 +605,9 @@ class _SupporterPaywallScreenState
                                     'Support ($price)',
                                     'Unterstützen ($price)',
                                   )),
-                      style: const TextStyle(fontWeight: FontWeight.w900),
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        fontWeight: FontWeight.w900,
+                      ),
                     ),
                   ),
                 ),

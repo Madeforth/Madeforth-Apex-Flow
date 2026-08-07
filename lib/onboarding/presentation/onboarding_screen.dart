@@ -457,8 +457,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                       'Log in or create an account',
                       'Anmelden oder Konto erstellen',
                     ),
-                    style: TextStyle(
-                      fontSize: 15,
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
                       fontWeight: FontWeight.w700,
                       color: context.colors.white,
                     ),
@@ -545,8 +544,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
           ),
           child: Text(
             label,
-            style: TextStyle(
-              fontSize: 13,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w700,
               color: isSelected
                   ? context.colors.white
@@ -656,7 +654,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                         'Remember me',
                         'Erinnere dich',
                       ),
-                      style: TextStyle(
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: context.colors.textSecondary,
                         fontSize: 13,
                       ),
@@ -680,7 +678,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                     'Forgot password?',
                     'Passwort vergessen?',
                   ),
-                  style: TextStyle(color: context.colors.white, fontSize: 13),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: context.colors.white,
+                    fontSize: 13,
+                  ),
                 ),
               ),
             ],
@@ -727,7 +728,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                     "Don't have an account? ",
                     'Kein Konto? ',
                   ),
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: context.colors.textSecondary,
                     fontSize: 13,
                   ),
@@ -744,7 +745,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                       'Create one',
                       'Erstellen',
                     ),
-                    style: TextStyle(
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: context.colors.white,
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
@@ -874,7 +875,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                     'Already have an account? ',
                     'Bereits ein Konto? ',
                   ),
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: context.colors.textSecondary,
                     fontSize: 13,
                   ),
@@ -891,7 +892,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                       'Log in',
                       'Anmelden',
                     ),
-                    style: TextStyle(
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: context.colors.white,
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
@@ -924,8 +925,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
               'Forgot password?',
               'Passwort vergessen?',
             ),
-            style: TextStyle(
-              fontSize: 24,
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
               fontWeight: FontWeight.w800,
               color: context.colors.white,
             ),
@@ -938,7 +938,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
               'Enter your email and we\'ll send you a reset link',
               'Geben Sie Ihre E-Mail ein und wir senden Ihnen einen Reset-Link',
             ),
-            style: TextStyle(fontSize: 13, color: context.colors.textSecondary),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: context.colors.textSecondary,
+            ),
           ),
 
           const SizedBox(height: 24),
@@ -992,9 +994,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                 'Back to log in',
                 'Zurück zur Anmeldung',
               ),
-              style: TextStyle(
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: context.colors.white,
-                fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -1012,9 +1013,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                 'Create a new account',
                 'Neues Konto erstellen',
               ),
-              style: TextStyle(
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: context.colors.white,
-                fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -1071,8 +1071,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                           'Email Verification Required',
                           'E-Mail-Bestätigung erforderlich',
                         ),
-                        style: TextStyle(
-                          fontSize: 20,
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.w900,
                           color: context.colors.white,
                         ),
@@ -1086,10 +1085,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                           'Please click the verification link we sent to ${_signupEmail.text}.',
                           'Bitte klicken Sie auf den Bestätigungslink, den wir an ${_signupEmail.text} gesendet haben.',
                         ),
-                        style: TextStyle(
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: context.colors.textSecondary,
-                          fontSize: 13,
-                          height: 1.4,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -1141,7 +1138,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                               'Go Back',
                               'Geh zurück',
                             ),
-                            style: const TextStyle(fontWeight: FontWeight.w700),
+                            style: Theme.of(context).textTheme.labelLarge
+                                ?.copyWith(fontWeight: FontWeight.w700),
                           ),
                         ),
                       ),
@@ -1163,8 +1161,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
   Widget _fieldLabel(String label) {
     return Text(
       label,
-      style: TextStyle(
-        fontSize: 13,
+      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
         fontWeight: FontWeight.w600,
         color: context.colors.white.withValues(alpha: 0.8),
       ),
@@ -1183,10 +1180,14 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
       controller: controller,
       keyboardType: keyboardType,
       obscureText: obscure,
-      style: TextStyle(color: context.colors.white, fontSize: 14),
+      style: Theme.of(
+        context,
+      ).textTheme.bodyMedium?.copyWith(color: context.colors.white),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: TextStyle(color: context.colors.muted, fontSize: 14),
+        hintStyle: Theme.of(
+          context,
+        ).textTheme.bodyMedium?.copyWith(color: context.colors.muted),
         prefixIcon: prefixIcon != null
             ? Icon(prefixIcon, size: 18, color: context.colors.textSecondary)
             : null,
@@ -1250,10 +1251,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
               )
             : Text(
                 label,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
               ),
       ),
     );
@@ -1270,9 +1270,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
       ),
       child: Text(
         _error!,
-        style: TextStyle(
+        style: Theme.of(context).textTheme.labelMedium?.copyWith(
           color: context.colors.red,
-          fontSize: 12,
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -1290,8 +1289,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
             'Join our community',
             'Treten Sie unserer Community bei',
           ),
-          style: TextStyle(
-            fontSize: 12,
+          style: Theme.of(context).textTheme.labelMedium?.copyWith(
             fontWeight: FontWeight.w600,
             color: context.colors.textSecondary,
           ),
@@ -1334,11 +1332,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                         const SizedBox(width: 8),
                         Text(
                           'Discord',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: context.colors.white,
-                          ),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: context.colors.white,
+                              ),
                         ),
                       ],
                     ),
@@ -1397,11 +1396,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                         const SizedBox(width: 8),
                         Text(
                           'Instagram',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: context.colors.white,
-                          ),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: context.colors.white,
+                              ),
                         ),
                       ],
                     ),
