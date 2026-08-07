@@ -144,7 +144,7 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                                     _t('PREMİUM', 'PREMIUM', 'PREMIUM'),
                                     style: TextStyle(
                                       color: context.colors.caution,
-                                      fontSize: 9,
+                                      fontSize: 11,
                                       fontWeight: FontWeight.w900,
                                       letterSpacing: 0.5,
                                     ),
@@ -864,7 +864,7 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                             child: Text(
                               userProfile.riderTag,
                               style: const TextStyle(
-                                fontSize: 8,
+                                fontSize: 11,
                                 fontWeight: FontWeight.bold,
                                 color: Color(0xFFE2E8F0),
                                 letterSpacing: 0.5,
@@ -1563,7 +1563,7 @@ class _CardThemeSelectorPanel extends ConsumerWidget {
                             AppStrings.currentLanguageCode,
                           ),
                           style: TextStyle(
-                            fontSize: 9,
+                            fontSize: 11,
                             fontWeight: isSelected
                                 ? FontWeight.w700
                                 : FontWeight.w400,
@@ -1762,7 +1762,7 @@ class RiderIdCard extends StatelessWidget {
           label.toUpperCase(),
           style: const TextStyle(
             color: Colors.white60,
-            fontSize: 9,
+            fontSize: 11,
             fontWeight: FontWeight.w500,
             letterSpacing: 1.0,
           ),
@@ -2367,7 +2367,7 @@ class RiderIdCard extends StatelessWidget {
                                   licensePlate.toUpperCase(),
                                   style: const TextStyle(
                                     color: Colors.black,
-                                    fontSize: 9,
+                                    fontSize: 11,
                                     fontWeight: FontWeight.bold,
                                     letterSpacing: 0.5,
                                   ),
@@ -2437,7 +2437,7 @@ class _ContactRow extends StatelessWidget {
           label,
           style: TextStyle(
             color: Colors.white.withValues(alpha: 0.6),
-            fontSize: 9,
+            fontSize: 11,
             fontWeight: FontWeight.w900,
             letterSpacing: 0.5,
           ),
@@ -2474,7 +2474,7 @@ class _BikerStat extends StatelessWidget {
           label,
           style: TextStyle(
             color: Colors.white.withValues(alpha: 0.6),
-            fontSize: 9,
+            fontSize: 11,
             fontWeight: FontWeight.w900,
             letterSpacing: 0.5,
           ),
@@ -2589,7 +2589,7 @@ class _ProfileStatsRow extends StatelessWidget {
                     _t('TOPLAM SÜRÜŞ', 'TOTAL RIDES', 'GESAMT FAHRTEN'),
                     style: TextStyle(
                       color: context.colors.textSecondary,
-                      fontSize: 9,
+                      fontSize: 11,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 0.3,
                     ),
@@ -2623,7 +2623,7 @@ class _ProfileStatsRow extends StatelessWidget {
                     _t('TOPLAM MESAFE', 'TOTAL DISTANCE', 'GESAMTKILOMETER'),
                     style: TextStyle(
                       color: context.colors.textSecondary,
-                      fontSize: 9,
+                      fontSize: 11,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 0.3,
                     ),
@@ -4620,7 +4620,7 @@ class _LeaderboardListState extends State<_LeaderboardList> {
                 child: Text(
                   tInline(AppStrings.currentLanguageCode, 'SEN', 'YOU', 'DU'),
                   style: const TextStyle(
-                    fontSize: 8,
+                    fontSize: 11,
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
                   ),
@@ -4631,7 +4631,7 @@ class _LeaderboardListState extends State<_LeaderboardList> {
             Text(
               item.tag,
               style: TextStyle(
-                fontSize: 9,
+                fontSize: 11,
                 color: context.colors.textSecondary,
               ),
             ),
@@ -4703,7 +4703,7 @@ class _LeaderboardListState extends State<_LeaderboardList> {
                               'DU',
                             ),
                             style: const TextStyle(
-                              fontSize: 8,
+                              fontSize: 11,
                               fontWeight: FontWeight.bold,
                               color: Colors.black,
                             ),
@@ -6113,7 +6113,7 @@ class RadarChartPainter extends CustomPainter {
 
     final TextStyle labelStyle = TextStyle(
       color: Colors.white.withValues(alpha: 0.7),
-      fontSize: 9,
+      fontSize: 11,
       fontWeight: FontWeight.bold,
     );
 
@@ -7535,7 +7535,7 @@ class _ProfileAppearanceScreenState
                           _t('YENİ', 'NEW', 'NEU'),
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 9,
+                            fontSize: 11,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -8204,7 +8204,7 @@ class _ProfileAppearanceScreenState
                                             _t('YENİ', 'NEW', 'NEU'),
                                             style: const TextStyle(
                                               color: Colors.white,
-                                              fontSize: 8,
+                                              fontSize: 11,
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
@@ -8502,7 +8502,7 @@ class _ProfileAppearanceScreenState
                                     _t('YENİ', 'NEW', 'NEU'),
                                     style: const TextStyle(
                                       color: Colors.white,
-                                      fontSize: 7,
+                                      fontSize: 11,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -8540,7 +8540,7 @@ class _ProfileAppearanceScreenState
                                     '%$progressVal',
                                     style: TextStyle(
                                       color: context.colors.cyan,
-                                      fontSize: 9,
+                                      fontSize: 11,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -8561,7 +8561,7 @@ class _ProfileAppearanceScreenState
                                     _t('KİLİTLİ', 'LOCKED', 'GESPERRT'),
                                     style: const TextStyle(
                                       color: Colors.white24,
-                                      fontSize: 9,
+                                      fontSize: 11,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -8570,7 +8570,7 @@ class _ProfileAppearanceScreenState
                                     _t('KAZANILDI', 'EARNED', 'ERHALTEN'),
                                     style: const TextStyle(
                                       color: Colors.green,
-                                      fontSize: 9,
+                                      fontSize: 11,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -8948,7 +8948,7 @@ class _ProfileAppearanceScreenState
                   _t('YENİ', 'NEW', 'NEU'),
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 8,
+                    fontSize: 11,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -9303,7 +9303,7 @@ class _MiniBadgeChip extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              fontSize: 9,
+              fontSize: 11,
               color: context.colors.textSecondary,
               fontWeight: FontWeight.w600,
             ),
@@ -9757,7 +9757,7 @@ class _AchievementSheetWidgetState
                                                     ? 'ÖDÜL ALINDI 👑'
                                                     : 'CLAIMED 👑',
                                                 style: const TextStyle(
-                                                  fontSize: 9,
+                                                  fontSize: 11,
                                                   fontWeight: FontWeight.w900,
                                                   color: Color(
                                                     0xFFFBBF24,

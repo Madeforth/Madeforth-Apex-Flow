@@ -516,7 +516,7 @@ class _PremiumPaywallScreenState extends ConsumerState<PremiumPaywallScreen> {
                                         ),
                                         style: TextStyle(
                                           color: context.colors.onAccent,
-                                          fontSize: 9,
+                                          fontSize: 11,
                                           fontWeight: FontWeight.w900,
                                         ),
                                       ),

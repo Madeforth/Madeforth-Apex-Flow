@@ -1811,7 +1811,7 @@ class _LobbyRiderCardState extends State<_LobbyRiderCard>
                           ),
                           style: TextStyle(
                             color: context.colors.cyan,
-                            fontSize: 8,
+                            fontSize: 11,
                             fontWeight: FontWeight.w700,
                             letterSpacing: 0.8,
                           ),

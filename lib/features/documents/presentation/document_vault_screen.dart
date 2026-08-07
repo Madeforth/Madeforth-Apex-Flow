@@ -1070,7 +1070,7 @@ class _DocCard extends ConsumerWidget {
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
-                                  fontSize: 9,
+                                  fontSize: 11,
                                   fontWeight: FontWeight.bold,
                                   color: _isNearExpiry(doc.expirationDate)
                                       ? context.colors.red

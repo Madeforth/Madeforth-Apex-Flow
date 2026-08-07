@@ -414,7 +414,7 @@ class _ApexSplashScreenState extends ConsumerState<ApexSplashScreen>
                         _statusText.toUpperCase(),
                         style: TextStyle(
                           color: context.colors.muted.withValues(alpha: 0.8),
-                          fontSize: 9,
+                          fontSize: 11,
                           fontWeight: FontWeight.w800,
                           letterSpacing: 2.0,
                         ),
