@@ -1,4 +1,4 @@
-﻿import 'dart:math' as math;
+import 'dart:math' as math;
 import 'package:apexflow/rides/presentation/widgets/start_ride_sheet.dart';
 import 'package:apexflow/core/design/apex_colors.dart';
 import 'package:apexflow/shared/design/slate_palette.dart';
@@ -237,10 +237,8 @@ class ApexDashboardScreen extends ConsumerWidget {
                         en: 'Open Checklist',
                         de: 'Checkliste öffnen',
                       ),
-                      style: TextStyle(
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
                         color: context.colors.cyan,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
                       ),
                     ),
                     const SizedBox(width: 4),
@@ -293,10 +291,8 @@ class ApexDashboardScreen extends ConsumerWidget {
                         en: 'View all components',
                         de: 'Alle Komponenten ansehen',
                       ),
-                      style: TextStyle(
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
                         color: context.colors.cyan,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
                       ),
                     ),
                     const SizedBox(width: 4),
@@ -382,7 +378,8 @@ class _BikeSelectorDropdownState extends State<_BikeSelectorDropdown> {
   Widget build(BuildContext context) {
     return PopupMenuButton<String>(
       initialValue: widget.garage.activeBike.id,
-      color: SlatePalette.surfaceDeep, // Minimal dark slate, matches bg-background
+      color:
+          SlatePalette.surfaceDeep, // Minimal dark slate, matches bg-background
       elevation: 8,
       shadowColor: Colors.black.withValues(alpha: 0.5),
       shape: RoundedRectangleBorder(
@@ -435,11 +432,10 @@ class _BikeSelectorDropdownState extends State<_BikeSelectorDropdown> {
                   Expanded(
                     child: Text(
                       bike.model,
-                      style: TextStyle(
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: isSelected
                             ? Colors.cyan
                             : Colors.white70, // text-primary or white
-                        fontSize: 14,
                         fontWeight: isSelected
                             ? FontWeight.w600
                             : FontWeight.w400,
@@ -480,10 +476,8 @@ class _BikeSelectorDropdownState extends State<_BikeSelectorDropdown> {
             const SizedBox(width: 8),
             Text(
               widget.garage.activeBike.model,
-              style: const TextStyle(
-                fontSize: 16,
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 fontWeight: FontWeight.w600,
-                color: Colors.white,
                 letterSpacing: 0.5,
               ),
             ),
@@ -533,12 +527,7 @@ class _MainStatusSection extends StatelessWidget {
                   en: 'Ready to Ride',
                   de: 'Fahrbereit',
                 ),
-                style: const TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  height: 1.1,
-                ),
+                style: Theme.of(context).textTheme.headlineLarge,
               ),
               const SizedBox(height: 8),
               Wrap(
@@ -546,15 +535,15 @@ class _MainStatusSection extends StatelessWidget {
                 children: [
                   Text(
                     '$score/100',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
                       color: SlatePalette.warningYellow, // Yellow
                     ),
                   ),
-                  const Text(
+                  Text(
                     ' · ',
-                    style: TextStyle(color: Colors.white54, fontSize: 14),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.copyWith(color: Colors.white54),
                   ),
                   Text(
                     strings.t(
@@ -562,7 +551,9 @@ class _MainStatusSection extends StatelessWidget {
                       en: 'Maintenance suggested',
                       de: 'Wartung empfohlen',
                     ),
-                    style: const TextStyle(fontSize: 14, color: Colors.white54),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.copyWith(color: Colors.white54),
                   ),
                 ],
               ),
@@ -584,10 +575,8 @@ class _MainStatusSection extends StatelessWidget {
                         const SizedBox(width: 6),
                         Text(
                           '${_conditionLabel(state.weather.condition, strings.languageCode)} · ${state.weather.tempC}°C',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.white54,
-                          ),
+                          style: Theme.of(context).textTheme.labelMedium
+                              ?.copyWith(color: Colors.white54),
                         ),
                       ],
                     ),
@@ -821,11 +810,8 @@ class _StartRideActionState extends State<_StartRideAction>
                       children: [
                         Text(
                           buttonText,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: Theme.of(context).textTheme.bodyLarge
+                              ?.copyWith(fontWeight: FontWeight.w600),
                         ),
                         if (!widget.isRideActive) ...[
                           const SizedBox(width: 8),
@@ -854,11 +840,8 @@ class _StartRideActionState extends State<_StartRideAction>
                       children: [
                         Text(
                           buttonText,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: Theme.of(context).textTheme.bodyLarge
+                              ?.copyWith(fontWeight: FontWeight.w600),
                         ),
                         const SizedBox(width: 8),
                         const Icon(
@@ -892,7 +875,9 @@ class _StartRideActionState extends State<_StartRideAction>
                   en: 'No critical issues detected',
                   de: 'Keine kritischen Probleme erkannt',
                 ),
-                style: const TextStyle(color: Colors.white54, fontSize: 13),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: Colors.white54),
               ),
             ],
           ),
@@ -938,9 +923,8 @@ class _WarningBanner extends StatelessWidget {
                   en: 'Service overdue',
                   de: 'Service überfällig',
                 ),
-                style: const TextStyle(
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: SlatePalette.warningYellow,
-                  fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -953,11 +937,9 @@ class _WarningBanner extends StatelessWidget {
               en: 'You can continue riding.\nService is suggested before long routes.',
               de: 'Sie können weiterfahren.\nEin Service vor langen Strecken wird empfohlen.',
             ),
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 13,
-              height: 1.4,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: Colors.white70),
           ),
           const SizedBox(height: 12),
           Align(
@@ -984,10 +966,8 @@ class _WarningBanner extends StatelessWidget {
                       en: 'Plan Service',
                       de: 'Service planen',
                     ),
-                    style: const TextStyle(
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
                       color: SlatePalette.warningYellow,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   const SizedBox(width: 4),
@@ -1022,11 +1002,9 @@ class _MachineHealthRow extends StatelessWidget {
             en: 'Machine Health',
             de: 'Maschinenzustand',
           ),
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 12),
         Container(
@@ -1123,7 +1101,9 @@ class _HealthColumn extends StatelessWidget {
         const SizedBox(height: 8),
         Text(
           label,
-          style: const TextStyle(color: Colors.white54, fontSize: 12),
+          style: Theme.of(
+            context,
+          ).textTheme.labelMedium?.copyWith(color: Colors.white54),
         ),
         const SizedBox(height: 4),
         Row(
@@ -1132,16 +1112,17 @@ class _HealthColumn extends StatelessWidget {
           children: [
             Text(
               value,
-              style: TextStyle(
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 color: valueColor,
-                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
             if (suffix.isNotEmpty)
               Text(
                 suffix,
-                style: const TextStyle(color: Colors.white54, fontSize: 12),
+                style: Theme.of(
+                  context,
+                ).textTheme.labelMedium?.copyWith(color: Colors.white54),
               ),
           ],
         ),
@@ -1173,11 +1154,9 @@ class _AttentionRequiredList extends StatelessWidget {
                 en: 'Attention Required',
                 de: 'Aufmerksamkeit erforderlich',
               ),
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
             ),
             const SizedBox(width: 8),
             Container(
@@ -1186,11 +1165,10 @@ class _AttentionRequiredList extends StatelessWidget {
                 color: Colors.white.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Text(
+              child: Text(
                 '2',
-                style: TextStyle(
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
                   color: Colors.white,
-                  fontSize: 12,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -1253,9 +1231,7 @@ class _AttentionRow extends StatelessWidget {
     // Determine color and status word based on percent
     // In design, 50% is Yellow (Orta)
     final isCritical = percent < 20;
-    final color = isCritical
-        ? SlatePalette.danger
-        : SlatePalette.warningYellow;
+    final color = isCritical ? SlatePalette.danger : SlatePalette.warningYellow;
     final statusText = isCritical
         ? strings.t(tr: 'Kritik', en: 'Critical', de: 'Kritisch')
         : strings.t(tr: 'Orta', en: 'Moderate', de: 'Mittel');
@@ -1272,16 +1248,17 @@ class _AttentionRow extends StatelessWidget {
               width: 80,
               child: Text(
                 label,
-                style: const TextStyle(
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Colors.white,
-                  fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
               ),
             ),
             Text(
               '%$percent',
-              style: const TextStyle(color: Colors.white, fontSize: 14),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: Colors.white),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -1304,11 +1281,9 @@ class _AttentionRow extends StatelessWidget {
               ),
               child: Text(
                 statusText,
-                style: TextStyle(
-                  color: color,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.labelMedium?.copyWith(color: color),
               ),
             ),
             const SizedBox(width: 12),
