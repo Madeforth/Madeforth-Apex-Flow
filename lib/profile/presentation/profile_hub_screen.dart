@@ -5803,16 +5803,19 @@ class RiderAvatarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final int cleanIndex = avatarIndex % 12;
-    final theme = avatarThemes[cleanIndex];
+    // No preset avatar gallery anymore — riders either upload their own
+    // photo or see this neutral generic-rider glyph. `avatarIndex` is kept
+    // on the model for backward compatibility with existing stored
+    // profiles/friends/lobby snapshots, but no longer drives what renders.
+    final Color neutralAccent = color ?? Colors.white70;
 
     Border? customBorder = Border.all(
-      color: theme.accentColor.withValues(alpha: 0.6),
+      color: Colors.white.withValues(alpha: 0.18),
       width: 1.5,
     );
     List<BoxShadow> customShadows = [
       BoxShadow(
-        color: theme.accentColor.withValues(alpha: 0.25),
+        color: Colors.black.withValues(alpha: 0.25),
         blurRadius: 8,
         spreadRadius: 1,
         offset: const Offset(0, 2),
@@ -5839,13 +5842,21 @@ class RiderAvatarWidget extends StatelessWidget {
       ];
     }
 
+    final Widget genericRiderIcon = Center(
+      child: Icon(
+        Icons.person_rounded,
+        size: radius * 1.15,
+        color: neutralAccent,
+      ),
+    );
+
     final Widget avatarCore = Container(
       width: radius * 2,
       height: radius * 2,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        gradient: LinearGradient(
-          colors: theme.bgColors,
+        gradient: const LinearGradient(
+          colors: [Color(0xFF334155), Color(0xFF1E293B)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -5857,25 +5868,10 @@ class RiderAvatarWidget extends StatelessWidget {
             ? CachedNetworkImage(
                 imageUrl: avatarPhotoUrl!,
                 fit: BoxFit.cover,
-                placeholder: (context, url) => CustomPaint(
-                  painter: PremiumAvatarPainter(
-                    index: cleanIndex,
-                    color: color ?? theme.accentColor,
-                  ),
-                ),
-                errorWidget: (context, url, error) => CustomPaint(
-                  painter: PremiumAvatarPainter(
-                    index: cleanIndex,
-                    color: color ?? theme.accentColor,
-                  ),
-                ),
+                placeholder: (context, url) => genericRiderIcon,
+                errorWidget: (context, url, error) => genericRiderIcon,
               )
-            : CustomPaint(
-                painter: PremiumAvatarPainter(
-                  index: cleanIndex,
-                  color: color ?? theme.accentColor,
-                ),
-              ),
+            : genericRiderIcon,
       ),
     );
 
@@ -7706,6 +7702,7 @@ class _ProfileAppearanceScreenState
                     totalKm: 4500.5,
                     harmonyScore: 95,
                     avatarIndex: localAvatarIndex,
+                    avatarPhotoUrl: localAvatarPhotoUrl,
                     themeIndex: localThemeIndex,
                     selectedFrameIndex: localSelectedFrameIndex,
                     selectedBadges: localSelectedBadges,
@@ -8828,15 +8825,6 @@ class _ProfileAppearanceScreenState
                 bottom: 120,
               ),
               children: [
-                Text(
-                  _t('8 SEÇENEK', '8 OPTIONS', '8 OPTIONEN'),
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: context.colors.textSecondary,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.2,
-                  ),
-                ),
-                const SizedBox(height: 12),
                 Container(
                   margin: const EdgeInsets.only(bottom: 16),
                   padding: const EdgeInsets.symmetric(
@@ -8862,9 +8850,9 @@ class _ProfileAppearanceScreenState
                       Expanded(
                         child: Text(
                           _t(
-                            'Avatar ve çerçeve birbirinden bağımsız seçilir. Glow yerine ince halka ve onay işareti kullanılır.',
-                            'Avatar and frame are selected independently. A thin ring and checkmark are used instead of glow.',
-                            'Avatar und Rahmen werden unabhängig voneinander ausgewählt. Anstelle von Glow wird ein dünner Ring und ein Häkchen verwendet.',
+                            'Profil fotoğrafı yükleyebilir ve buna bağımsız bir çerçeve seçebilirsin.',
+                            'You can upload a profile photo and choose a frame for it independently.',
+                            'Du kannst ein Profilfoto hochladen und unabhängig davon einen Rahmen auswählen.',
                           ),
                           style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(color: context.colors.textSecondary),
@@ -8930,7 +8918,10 @@ class _ProfileAppearanceScreenState
                               onPressed: _isUploadingPhoto
                                   ? null
                                   : () => setState(
-                                      () => localAvatarPhotoUrl = null,
+                                      // Empty string (not null) is the
+                                      // explicit "clear" signal threaded
+                                      // through _save() -> updateProfile().
+                                      () => localAvatarPhotoUrl = '',
                                     ),
                               child: Text(
                                 _t(
@@ -8954,39 +8945,6 @@ class _ProfileAppearanceScreenState
                       ),
                     ),
                   ],
-                ),
-                const SizedBox(height: 16),
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 4,
-                    mainAxisSpacing: 14,
-                    crossAxisSpacing: 14,
-                  ),
-                  itemCount: 8,
-                  itemBuilder: (context, index) {
-                    final isSelected = localAvatarIndex == index;
-                    return GestureDetector(
-                      onTap: () => setState(() => localAvatarIndex = index),
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: isSelected
-                                ? context.colors.cyan
-                                : Colors.transparent,
-                            width: 2,
-                          ),
-                        ),
-                        child: RiderAvatarWidget(
-                          avatarIndex: index,
-                          radius: 24,
-                        ),
-                      ),
-                    );
-                  },
                 ),
                 const SizedBox(height: 32),
                 Text(

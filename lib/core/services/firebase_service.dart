@@ -219,7 +219,11 @@ class FirebaseService {
       if (licensePlate != null) tagData['licensePlate'] = licensePlate;
       if (activeBikeName != null) tagData['activeBikeName'] = activeBikeName;
       if (avatarIndex != null) tagData['avatarIndex'] = avatarIndex;
-      if (avatarPhotoUrl != null) tagData['avatarPhotoUrl'] = avatarPhotoUrl;
+      if (avatarPhotoUrl != null) {
+        tagData['avatarPhotoUrl'] = avatarPhotoUrl.isEmpty
+            ? FieldValue.delete()
+            : avatarPhotoUrl;
+      }
       if (cardThemeIndex != null) tagData['cardThemeIndex'] = cardThemeIndex;
       if (selectedBadges != null) tagData['selectedBadges'] = selectedBadges;
       if (ridingStyle != null) tagData['ridingStyle'] = ridingStyle;
@@ -297,8 +301,11 @@ class FirebaseService {
       if (harmonyScore != null) profileData['harmonyScore'] = harmonyScore;
       if (ridingStyle != null) profileData['ridingStyle'] = ridingStyle;
       if (avatarIndex != null) profileData['avatarIndex'] = avatarIndex;
-      if (avatarPhotoUrl != null)
-        profileData['avatarPhotoUrl'] = avatarPhotoUrl;
+      if (avatarPhotoUrl != null) {
+        profileData['avatarPhotoUrl'] = avatarPhotoUrl.isEmpty
+            ? FieldValue.delete()
+            : avatarPhotoUrl;
+      }
       if (cardThemeIndex != null)
         profileData['cardThemeIndex'] = cardThemeIndex;
       if (city != null) profileData['city'] = city;

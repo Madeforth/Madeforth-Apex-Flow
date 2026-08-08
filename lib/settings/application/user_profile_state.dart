@@ -942,7 +942,13 @@ class UserProfileController extends Notifier<UserProfile> {
       riderTag: updatedTag,
       ridingStyle: ridingStyle ?? state.ridingStyle,
       avatarIndex: avatarIndex ?? state.avatarIndex,
-      avatarPhotoUrl: avatarPhotoUrl ?? state.avatarPhotoUrl,
+      // An empty string is the explicit "clear the photo" signal (used by
+      // the Remove Photo button) — distinct from null, which means "leave
+      // whatever's already there alone." `?? state.avatarPhotoUrl` alone
+      // can't tell those apart since both look like "no value passed."
+      avatarPhotoUrl: (avatarPhotoUrl != null && avatarPhotoUrl.isEmpty)
+          ? null
+          : (avatarPhotoUrl ?? state.avatarPhotoUrl),
       ghostMode: ghostMode ?? state.ghostMode,
       sharePhone: sharePhone ?? state.sharePhone,
       shareEmergency: shareEmergency ?? state.shareEmergency,
@@ -1263,7 +1269,11 @@ class UserProfileController extends Notifier<UserProfile> {
         harmonyScore: harmonyScore,
         ridingStyle: state.ridingStyle,
         avatarIndex: state.avatarIndex,
-        avatarPhotoUrl: state.avatarPhotoUrl,
+        // Empty string (not null) tells syncUserProfile to explicitly clear
+        // the field in Firestore — deleting an already-absent field is a
+        // harmless no-op, so this is safe to send on every sync regardless
+        // of whether the photo was ever set.
+        avatarPhotoUrl: state.avatarPhotoUrl ?? '',
         cardThemeIndex: state.cardThemeIndex,
         city: state.city,
         instagram: state.instagram,
