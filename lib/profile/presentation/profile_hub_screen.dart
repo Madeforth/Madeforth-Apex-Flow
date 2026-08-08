@@ -113,9 +113,10 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                userProfile.name.isEmpty
-                                    ? _t('Rider', 'Rider', 'Fahrer')
-                                    : userProfile.name,
+                                // The rider's name is shown inside the
+                                // RiderIdCard below, not repeated here —
+                                // this is just the screen's section title.
+                                _t('Profil', 'Profile', 'Profil'),
                                 style: Theme.of(context).textTheme.headlineLarge
                                     ?.copyWith(
                                       color: Colors.white,
