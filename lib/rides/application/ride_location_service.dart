@@ -287,7 +287,19 @@ class RideLocationService {
 
     _isTracking = false;
 
-    if (_positions.length < 2) {
+    // Finalize V2 Validated Speed Engine Summary first — it tracks its own
+    // accepted-sample count using ValidatedSpeedEngine/Kalman-filter
+    // validation (config.absolutePositionRejectAccuracyM = 50m). `_positions`
+    // below uses a separate, stricter 45m cutoff kept only for the
+    // lean-angle/braking telemetry analyzer's input quality; gating the
+    // whole ride on `_positions.length` here — as this used to do — meant a
+    // ride with real, valid distance/speed accepted by the engine could
+    // still get silently zeroed and reported as "no movement detected" if
+    // GPS accuracy spent most of the ride between 45m and 50m. Gating on
+    // the engine's own accepted-sample count instead removes that mismatch.
+    final summary = _speedEngine.finalizeRide(endTime: DateTime.now());
+
+    if (summary.acceptedSampleCount < 2) {
       final msg = _statusMessage.isNotEmpty
           ? _statusMessage
           : (tInline(
@@ -307,9 +319,6 @@ class RideLocationService {
         summary: null,
       );
     }
-
-    // Finalize V2 Validated Speed Engine Summary
-    final summary = _speedEngine.finalizeRide(endTime: DateTime.now());
 
     final distanceKm = summary.totalDistanceKm;
     final maxSpeedKmh =
