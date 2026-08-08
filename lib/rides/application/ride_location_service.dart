@@ -338,6 +338,7 @@ class RideLocationService {
       _positions,
       maxSpeedKmh,
       fusedMaxLeanAngle: _maxFusedLeanAngle,
+      speedEstimates: _speedEngine.estimates,
     );
 
     return RideLocationResult(

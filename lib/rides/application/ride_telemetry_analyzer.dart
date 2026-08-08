@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:geolocator/geolocator.dart';
+import 'package:apexflow/rides/domain/speed_telemetry_models.dart';
 
 class TelemetryAnalysis {
   const TelemetryAnalysis({
@@ -27,10 +28,16 @@ class RideTelemetryAnalyzer {
   const RideTelemetryAnalyzer();
 
   /// Analyzes the raw GPS positions to determine the true riding style and physics-based lean angle.
+  /// [speedEstimates] should be ValidatedSpeedEngine's own Kalman-filtered,
+  /// NIS-gated per-sample speed series — hard-braking/rapid-acceleration
+  /// detection is derived from that instead of raw `Position.speed` so it
+  /// stays consistent with the distance/max-speed numbers computed from the
+  /// same filtered series, rather than reacting to raw GPS noise.
   TelemetryAnalysis analyze(
     List<Position> positions,
     double maxSpeedKmh, {
     double? fusedMaxLeanAngle,
+    List<SpeedEstimate> speedEstimates = const [],
   }) {
     if (positions.length < 3) {
       return const TelemetryAnalysis(
@@ -52,15 +59,23 @@ class RideTelemetryAnalyzer {
     double maxLean = 0.0;
     const double g = 9.81; // Gravity m/s^2
 
-    for (int i = 1; i < positions.length; i++) {
-      final prev = positions[i - 1];
-      final curr = positions[i];
+    // Only samples the Kalman filter actually accepted — outlier spikes
+    // (GPS noise, not real braking/acceleration) are already excluded.
+    final acceptedEstimates = speedEstimates
+        .where((e) => e.acceptedForDistance)
+        .toList();
 
-      final dt = curr.timestamp.difference(prev.timestamp).inSeconds.toDouble();
+    for (int i = 1; i < acceptedEstimates.length; i++) {
+      final prev = acceptedEstimates[i - 1];
+      final curr = acceptedEstimates[i];
+
+      final dt =
+          curr.timestamp.difference(prev.timestamp).inMilliseconds / 1000.0;
       if (dt <= 0 || dt > 10) continue;
 
-      // Calculate physics metrics for acceleration/braking
-      final dv = curr.speed - prev.speed; // m/s
+      // Calculate physics metrics for acceleration/braking from the same
+      // filtered speed series distance/max-speed are computed from.
+      final dv = curr.speedMps - prev.speedMps; // m/s
       final acceleration = dv / dt; // m/s^2
 
       if (acceleration < -3.5) {

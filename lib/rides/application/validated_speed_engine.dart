@@ -17,6 +17,13 @@ class ValidatedSpeedEngine {
   final List<RawTelemetrySample> _rawSamples = [];
   final List<SpeedEstimate> _estimates = [];
 
+  /// The Kalman-filtered, NIS-gated speed estimate for every processed
+  /// sample (accepted or rejected) — the same series distance/max-speed are
+  /// computed from. Consumers that want per-sample speed (e.g. hard-braking
+  /// detection) should read this instead of raw `Position.speed`, so their
+  /// numbers agree with what the rest of the ride's telemetry is built on.
+  List<SpeedEstimate> get estimates => List.unmodifiable(_estimates);
+
   DateTime? _rideStartTime;
   DateTime? _lastAcceptedTimestamp;
   double _lastAcceptedSpeedMps = 0.0;
