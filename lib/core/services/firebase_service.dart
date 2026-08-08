@@ -671,14 +671,17 @@ class FirebaseService {
   }
 
   /// Uploads a rider's profile photo to Storage at a single overwritable
-  /// path per user (avatars/{uid}.jpg) and returns a fresh download URL.
+  /// path per user (avatars/{uid}) and returns a fresh download URL. No
+  /// file extension in the path — Storage security rules can't match a
+  /// wildcard segment plus a literal suffix in one path segment, so the
+  /// content type is carried entirely via metadata instead.
   /// The caller is responsible for keeping the image small before calling
   /// this (image_picker's maxWidth/maxHeight/imageQuality) — storage.rules
   /// additionally rejects anything over 300 KB or not an image as
   /// defense-in-depth.
   Future<String> uploadAvatarPhoto(Uint8List bytes, String uid) async {
     await init();
-    final ref = FirebaseStorage.instance.ref('avatars/$uid.jpg');
+    final ref = FirebaseStorage.instance.ref('avatars/$uid');
     await ref.putData(bytes, SettableMetadata(contentType: 'image/jpeg'));
     return ref.getDownloadURL();
   }
@@ -717,7 +720,7 @@ class FirebaseService {
     // 1b. Delete the uploaded avatar photo, if any (object-not-found is not
     // an error — a user who never uploaded a photo has nothing to remove).
     try {
-      await FirebaseStorage.instance.ref('avatars/$activeUid.jpg').delete();
+      await FirebaseStorage.instance.ref('avatars/$activeUid').delete();
     } on FirebaseException catch (e) {
       if (e.code != 'object-not-found') rethrow;
     }

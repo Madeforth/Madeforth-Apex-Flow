@@ -8,7 +8,7 @@ service firebase.storage {
     // e.g. rider_tags in firestore.rules), writable only by the owner, with
     // server-side size/type checks behind the client-side compression done
     // at pick time (image_picker maxWidth/maxHeight/imageQuality).
-    match /avatars/{uid}.jpg {
+    match /avatars/{uid} {
       allow read: if request.auth != null;
       allow write: if request.auth != null
         && request.auth.uid == uid
