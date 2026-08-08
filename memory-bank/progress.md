@@ -2,6 +2,25 @@
 
 Status recorded 2026-08-04, from repo inspection (not from README claims alone unless marked as such).
 
+## 2026-08-08 — Typography/icon rollout done, profile photo upload shipped, real ride-telemetry bugs fixed
+Full detail in `activeContext.md` "Current Task". All commits `flutter analyze` (0 new errors) + `flutter test` (96/96) verified; most also confirmed on-device (LG G5).
+
+**FIXED, verified on device:**
+- `ApexTypography` design-system text theme now wired into all high-traffic screens (dashboard, garage, profile hub, rides, insights, documents, settings, onboarding, both paywalls) — closes the design audit's long-standing "9-step scale defined but unused" item. Found and fixed a real overflow regression along the way (tight fixed-width rows growing 1px/char when a literal's font size was smaller than its mapped theme step).
+- Icon language unified on Material Icons; `phosphor_flutter` dependency removed (was 2 files/51 sites vs. 423 Material uses elsewhere).
+- New feature: custom profile photo upload (Firebase Storage, size-capped client-side, visible to other riders via the existing public `rider_tags` channel). Firebase Storage had never been enabled on this project — set up live with the user this session. Found and fixed a real "Remove Photo doesn't actually clear" bug (nullable-copyWith ambiguity between "no change" and "explicit clear").
+- Preset 8-avatar picker removed at user's request; no-photo state now shows one neutral generic-rider icon instead.
+- **Real bug**: rides were being discarded as "no movement detected" regardless of actual GPS movement. Root cause: `RideLocationService.stopTracking()` gated the whole ride on a stricter, separate accuracy cutoff (45m) than the speed engine's own (50m) — a ride with real, validly-computed distance could still get zeroed before that data was ever read. Fixed by gating on the speed engine's own accepted-sample count. **Not verified with a real outdoor ride** (can't simulate device motion in this environment).
+- **Real bug**: `_LastRidePanel` showed a hardcoded fake max-speed number (`113,1 km/sa`) whenever a real ride's speed was genuinely unmeasured (0) — violated the codebase's own "don't fabricate unmeasured telemetry" rule at the display layer even though the model layer already respected it. Now shows `-`.
+- Hard-braking/rapid-acceleration detection now derived from the same Kalman-filtered speed series as distance/max-speed, instead of raw noisy GPS speed (which could disagree and register noise spikes as fake hard-braking events).
+- Duplicate rider-name header removed from the Profile tab (was shown both above and inside the `RiderIdCard`; now only inside the card).
+
+**Known-broken / explicitly deferred:**
+- `friends_state.dart` reads a friend's profile from `users/{friendUid}`, which is permission-denied under `firestore.rules` (owner-scoped read) — a real, pre-existing bug, load-bearing for whether the new profile photo is actually visible to friends. Not fixed this session (the new photo feature was deliberately built around the channel that *does* work — `rider_tags` — rather than on top of this bug).
+- Vector/brand-asset design-audit item explicitly out of scope — **user has permanently banned any app logo/icon changes, including drafts**, after a brand-mark proposal was shown and rejected. Do not re-propose without being asked.
+- Cross-account visibility of the new profile photo (friends, group ride lobby) and iOS support for the same feature — neither tested this session (no second test account, no iOS device).
+- 38 pre-existing lint-level `flutter analyze` issues in `profile_hub_screen.dart` (unused imports/private classes, deprecated `withOpacity`, style notes) — catalogued, not fixed (user asked for a memory-bank update instead of a cleanup pass this time).
+
 ## 2026-08-07 (afternoon) — Accessibility/design pass + two real login/data-loss bugs fixed on device
 Full detail in `activeContext.md` "Current Task". Ran on the work Mac; repo re-cloned fresh after the local copy was lost. Pushed through `00885ca`.
 

@@ -1,6 +1,72 @@
 # Active Context
 
-## Current Task (2026-08-07 afternoon, branch `main`, pushed through commit `00885ca`) — HANDOFF, work continues on the home machine
+## Current Task (2026-08-08, branch `main`, pushed through commit `7b96795`)
+
+Long session covering the design audit's remaining items 5–7 from the prior session (typography rollout, icon unification — asset creation/vector work was scoped out, see below), a new profile-photo-upload feature, and a real ride-telemetry bug hunt. All commits below are individually `flutter analyze` (0 new errors) + `flutter test` (96/96) verified, most also confirmed on-device (LG G5, `LGH85092a403f4`).
+
+### 1. `ApexTypography` rolled out screen-by-screen (closes design-audit item 5)
+
+Converted hand-written `TextStyle(...)` literals to `Theme.of(context).textTheme.<step>` across the app's highest-traffic screens, one commit per screen/group with on-device before/after screenshot comparison each time: dashboard (`d811df9`), garage (`7a2c73f`), profile hub (`6e8b962`), rides+insights (`ace4222`), documents+settings (`a9f9c37`), onboarding+both paywalls (`f1ef321`). Rule followed throughout: only consolidate size/weight/height/letterSpacing onto the 9-step scale, always preserve the original literal's color via `.copyWith(color:)` — kept separate from color-token unification (still deferred, see below). Sub-11px badges, `CustomPainter`/`TextSpan` canvas text (no `BuildContext`), and genuinely custom telemetry-style large numbers (score gauges, odometer displays) were left as literals by design, not oversight.
+
+**Real regression found and fixed mid-pass**: `rides_screen.dart`'s weather/GPS status row and `_RideMemoryRow`'s columns had several `TextStyle`s with an explicit size *smaller* than the theme step they mapped to (13px → `bodyMedium`'s 14px default). Since those sat in tightly fixed-width `Row`s with no `Expanded`/ellipsis, the 1px-per-character growth caused a real `RenderFlex overflowed` on a narrow-viewport widget test. Fixed by pinning an explicit `fontSize` override in those specific spots; the same risk was explicitly called out to every subsequent screen's conversion (documents/settings/onboarding/paywalls) and each was checked for it before committing — supporter_paywall's tier-price text needed the same pin (`fontSize: 22` explicit), premium_paywall's didn't need one (its price text's size matched the step exactly).
+
+Typography rollout is now considered **done** for the screens listed above. Remaining hand-written `TextStyle` literals elsewhere in the app were not swept — no evidence they're a problem, just not yet touched.
+
+### 2. Icon language unified on Material, Phosphor dropped (closes design-audit item 6)
+
+Commit `9c9cdad`. Phosphor was used in exactly 2 files (51 sites: `apex_achievement.dart`, `profile_hub_screen.dart`) against 423 Material Icons uses across 32 files elsewhere — converted the 2 outlier files to Material rather than the reverse. Each `PhosphorIconsFill.X` mapped to its closest solid Material equivalent by semantic intent (e.g. `crown`→`workspace_premium`, `trophy`→`emoji_events`, `yinYang`→`self_improvement`, `sparkle`→`auto_awesome`). Removed the now-unused `phosphor_flutter` pubspec dependency. Verified on-device that achievement chip icons render correctly (no missing-glyph boxes).
+
+**Design-audit item 7 (vector/brand assets) was explicitly skipped** — the user vetoed the brand-mark draft immediately and stated the app logo/icon is **never to be touched**, even in draft/preview form (see `[[feedback_never_touch_app_logo]]` in the assistant's own persistent memory, not this Memory Bank). An empty-state illustration example (dashed-motorcycle SVG for the empty garage state) was drafted and shown but the user said to skip the whole item, so nothing from it is in the codebase.
+
+### 3. Custom profile photo upload — new feature, planned then built (commits `10c4cc4`, `719e936`, `61f6b35`)
+
+User asked for riders to upload their own profile photo (replacing the 12-option preset avatar gallery), size-capped so it doesn't burden the app or Firebase, visible to other users. This was planned via `EnterPlanMode` first because it touched Firebase Storage (previously **zero** usage anywhere in the repo — no `firebase_storage` dependency, no `storage.rules`, no bucket) and because investigation surfaced a real pre-existing bug shaping the plan.
+
+**Pre-existing bug found during planning, not fixed, load-bearing for this feature's design**: `friends_state.dart` reads a friend's profile straight from `users/{friendUid}`, but that collection's Firestore rule is owner-read-only (`isOwner(uid)`) — this read is permission-denied for anyone but the account owner. The actually-public, rule-compliant channel already in production use is `rider_tags/{tag}` (public read, owner write) — `FirebaseService.syncUserProfile()` already writes `avatarIndex` into both `rider_tags` (public) and `users` (private) in one batch. The new `avatarPhotoUrl` field was threaded the same dual way specifically so "other users can see it" actually works, without touching the separate `friends_state.dart` bug (still open, not fixed this session).
+
+**Built**: `firebase_storage` + `cached_network_image` deps; `storage.rules` (path `avatars/{uid}`, signed-in read, owner-only write, 300KB/image-type server-side check) — **had to fix the path mid-deploy**: Cloud Storage rules can't mix a wildcard capture with a literal suffix in one path segment (`{uid}.jpg` doesn't compile, unlike Firestore rules), so the path dropped the extension entirely (content-type carried via `SettableMetadata` instead). `avatarPhotoUrl` threaded end-to-end: `UserProfile` model + local persistence, `FirebaseService.syncUserProfile`, `FriendProfile` + Isar `FriendEntity` (additive nullable field, no migration needed), group-ride lobby snapshots. `RiderAvatarWidget` (the single widget every avatar-showing screen already funnels through) renders the photo via `CachedNetworkImage` when present. Account deletion now also removes the Storage object. Client-side size cap via `image_picker`'s `maxWidth/maxHeight/imageQuality` (512×512, quality 82) — no `image_cropper` dependency, no extra native config.
+
+**Firebase Storage had never been enabled on this project** (`apex-flow-7baea`) — first deploy attempt failed with "Firebase Storage has not been set up." User set it up live via Firebase Console (bucket created, "No cost location"/US-CENTRAL1, production-mode default rules), then `firebase deploy --only storage` succeeded with the corrected rules.
+
+**Real bug found and fixed during on-device testing** (commit `61f6b35`, same commit as the preset-gallery removal below): Remove Photo didn't actually clear anything. `UserProfileController.updateProfile`'s `avatarPhotoUrl ?? state.avatarPhotoUrl` couldn't distinguish "no change requested" (null) from "explicitly clear" (also looked like null) — the classic nullable-copyWith ambiguity. Fixed by making empty string the explicit clear signal (Remove Photo button sets `''`, not `null`), normalized to `null` in local state, and threaded to Firestore as `FieldValue.delete()` (deleting an already-absent field is a safe no-op, so every sync call can now unconditionally reflect current local state via `avatarPhotoUrl: state.avatarPhotoUrl ?? ''`).
+
+**Verified end-to-end on-device (LG G5)**: camera capture → compressed upload → Storage → download URL → rendered on profile card, friends-list-adjacent widgets, and the appearance-studio live preview. Remove Photo correctly persists across app relaunch. **Not verified**: iOS (no iOS device available), and cross-account visibility (would need a second real test account — user has not done this yet).
+
+### 4. Preset avatar gallery removed at user's request (commit `61f6b35`)
+
+Immediately after the photo-upload feature shipped, user asked to remove the 8-option preset avatar picker entirely — riders with no uploaded photo should see one neutral generic-rider icon instead. `RiderAvatarWidget`'s no-photo fallback no longer varies by `avatarIndex` (dropped the per-theme gradient/`PremiumAvatarPainter`), now a flat slate-gradient circle with `Icons.person_rounded`. `avatarIndex` stays on every model (`UserProfile`, `FriendProfile`, lobby snapshots) for backward compatibility with existing stored data — it's just inert for rendering now. The 8-avatar `GridView` and its "N SEÇENEK" label were deleted from the Avatar & Frame screen.
+
+### 5. Ride telemetry bug hunt — user reported rides never saving ("hareket algılanmadı")
+
+User reported that ending a ride, regardless of how much real movement happened, shows "ride too short or no movement detected" and discards it — a recurring issue, also relevant to group rides (same shared `RideLocationService` singleton, so one fix covers both).
+
+**Root cause found and fixed** (commit `2ab6ef0`): `RideLocationService.stopTracking()` gated the *entire* ride on `_positions.length < 2`, where `_positions` only accepted a GPS fix with accuracy ≤45m — a stricter, separate cutoff from `ValidatedSpeedEngine`'s own internal accuracy rejection threshold (50m, `TelemetryConfig.absolutePositionRejectAccuracyM`). Whenever real-ride GPS accuracy spent most of its time between 45–50m (plausible on some devices, especially right after acquiring a fix), the speed engine validly accumulated distance/speed internally, but `stopTracking()` zeroed all of it before ever looking, because of the separate stricter gate. Fixed by gating on the speed engine's own `summary.acceptedSampleCount` instead. **Not verified with a real outdoor GPS ride** — no way to simulate real device motion in this environment; the fix is a provable logic correction, but needs a real ride to confirm it resolves the symptom in practice (OEM battery-optimization GPS throttling, already flagged in existing code comments for LG/Samsung — the connected test device is an LG — may also be a contributing factor worth checking if the symptom persists).
+
+**Button-wiring check** (user specifically flagged that past design updates to the Start/Stop Ride button area had broken this before): traced `FlipStateButton`'s `onTap` → `_StartRidePanel`'s `onStart`/`onEnd` → `showQuickStartRideSheet`/`_endRideAutomatically` → `RideLocationService.startTracking`/`stopTracking` end to end. Currently wired correctly, nothing broken found right now — flagged as something to protect specifically (not just visually) if this button area gets a design pass again.
+
+**Two more real bugs found while investigating, both fixed**:
+- (`0959d54`) `_LastRidePanel` showed a hardcoded fake `'113,1 km/sa'` whenever a real saved ride's `maxSpeedKmh` was genuinely `0` (unmeasured) — the model layer already refuses to fabricate this (`ride_state.dart`'s own "DOC 24 SECTION 37: do not generate fake maxSpeed" rule), but the display layer was undoing that honesty. Now shows `-`, matching the pattern already used for unmeasured lean angle on the same card. `_showRideSummary`'s similar hardcoded fallbacks (`'82 km/h'`, `'134 km/h'`, `'12.4 km'`) are dead code in current usage (both call sites always pass a real session) — flagged but not touched.
+- (`b042f1f`) Hard-braking/rapid-acceleration event detection (`RideTelemetryAnalyzer`) computed acceleration from consecutive **raw** `Position.speed` values, while distance/avg/max speed are computed from `ValidatedSpeedEngine`'s Kalman-filtered, NIS-outlier-gated series — the two pipelines could disagree, with GPS noise spikes registering as fake "hard brakes." Exposed `ValidatedSpeedEngine.estimates` and threaded it into the analyzer, which now derives acceleration from consecutive *accepted* filtered estimates instead. Lean-angle curvature analysis untouched (derives its own speed from lat/lon differentiation, unrelated to `Position.speed`).
+
+### 6. Duplicate name header removed (commit `7b96795`)
+
+User: the rider's name appeared both in a large header above the `RiderIdCard` *and* inside the card itself on the Profile tab — asked for the header instance removed, name should only ever appear inside the card. Header now reads a static "Profil" title instead of `userProfile.name`/the "Rider" placeholder.
+
+### Also this session, not app code
+- User ran the third-party `caveman` Claude Code skill installer (`JuliusBrussee/caveman`, terse-output skill) via a `irm | iex` PowerShell one-liner the user pasted — inspected the installer + repo before running (skill's purpose: compress agent output). Installed at `.agents/skills/` (repo-local, untracked, not part of the app).
+- Saved a persistent-memory feedback entry (`feedback_never_touch_app_logo`, assistant's own cross-session memory, not this Memory Bank): the app logo/icon is never to be touched, including draft/preview proposals — user shut this down immediately after a brand-mark draft was shown.
+
+### Design audit — status update
+Items 1–4 were the accessibility/design pass from the prior session (already shipped). Items 5 and 6 (typography, icons) are now **done** per above. Item 7 (vector/brand assets) is **explicitly out of scope** — do not re-propose brand-mark or app-icon work without being asked again; an empty-state-illustration-only version of item 7 could still be revisited if asked, since that's distinct from the logo.
+
+### Known follow-ups, not yet done
+- `friends_state.dart`'s `users/{friendUid}` permission-denied bug (see section 3 above) — real, load-bearing for the new avatar photo's cross-account visibility, not fixed.
+- The "no movement detected" ride-save fix (section 5) needs a real outdoor ride to confirm.
+- Cross-account visibility of the new profile photo (friends list, group ride lobby) not tested with a second real account.
+- iOS not verified for the profile-photo feature (no iOS device in this environment all session).
+- 38 pre-existing `flutter analyze` lint issues in `profile_hub_screen.dart` (unused imports, deprecated `withOpacity`, 5 unused private classes/functions, minor style notes) — catalogued for the user, fix declined for now (asked, user redirected to memory-bank update instead). List is reproducible via `flutter analyze --no-pub lib/profile/presentation/profile_hub_screen.dart` if revisited.
+
+## Prior Task (2026-08-07 afternoon, branch `main`, pushed through commit `00885ca`) — HANDOFF, work continues on the home machine
 
 Machine-to-machine handoff: this session ran on the **work Mac** (company machine — do not assume the router/network or Firebase Console is freely modifiable there). The repo was re-cloned fresh into `~/Developer/Madeforth-Apex-Flow` after the local copy was accidentally deleted; GitHub `main` was and is the source of truth. Everything below is committed and pushed.
 
