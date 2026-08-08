@@ -717,8 +717,9 @@ class _LastRidePanel extends StatelessWidget {
       avgSpeed:
           '${latestRide.averageSpeedKmh.toStringAsFixed(1).replaceAll('.', ',')} ${tInline(Localizations.localeOf(context).languageCode, 'km/sa', 'km/h', 'km/h')}',
       smoothness: '${latestRide.harmonyScore}/100',
-      maxSpeed:
-          '${latestRide.maxSpeedKmh > 0 ? latestRide.maxSpeedKmh.toStringAsFixed(1).replaceAll('.', ',') : '113,1'} ${tInline(Localizations.localeOf(context).languageCode, 'km/sa', 'km/h', 'km/h')}',
+      maxSpeed: latestRide.maxSpeedKmh > 0
+          ? '${latestRide.maxSpeedKmh.toStringAsFixed(1).replaceAll('.', ',')} ${tInline(Localizations.localeOf(context).languageCode, 'km/sa', 'km/h', 'km/h')}'
+          : '-',
       maxLean: () {
         final sanitized = LeanPersistenceSanitizer.sanitizeForUiDisplay(
           latestRide.maxLeanAngle,
