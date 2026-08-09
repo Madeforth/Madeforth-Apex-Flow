@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:apexflow/core/services/firebase_service.dart';
 import 'package:flutter/services.dart';
 import 'dart:math' as math;
-import 'dart:io';
 import 'dart:ui' as ui;
-import 'package:flutter/rendering.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:apexflow/core/design/apex_colors.dart';
 import 'package:apexflow/core/design/apex_spacing.dart';
 import 'package:apexflow/core/i18n/app_strings.dart';
 import 'package:apexflow/core/i18n/app_settings_state.dart';
@@ -22,13 +17,11 @@ import 'package:apexflow/rides/application/ride_state.dart';
 import 'package:apexflow/profile/application/friends_state.dart';
 import 'package:apexflow/profile/domain/friend_profile.dart';
 import 'package:apexflow/shared/design/slate_palette.dart';
-import 'package:apexflow/shared/widgets/apex_panel.dart';
 import 'package:apexflow/notifications/application/notification_state.dart';
 import 'package:apexflow/notifications/domain/app_notification.dart';
 import 'package:apexflow/profile/presentation/premium_paywall_screen.dart';
 import 'package:apexflow/profile/presentation/supporter_paywall_screen.dart';
 import 'package:apexflow/profile/domain/rider_xp_system.dart';
-import 'package:apexflow/core/utils/phone_formatter.dart';
 import 'package:apexflow/profile/presentation/qr_scanner_screen.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:apexflow/profile/application/circular_sticker_pdf.dart';
@@ -1130,16 +1123,6 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
     );
   }
 
-  Map<String, String> _parsePhoneNumber(String combinedPhone) {
-    for (final cc in availableCountryCodes) {
-      if (combinedPhone.startsWith(cc.code)) {
-        final raw = combinedPhone.substring(cc.code.length).trim();
-        return {'code': cc.code, 'number': raw};
-      }
-    }
-    return {'code': '+90', 'number': combinedPhone};
-  }
-
   void _showEditProfileSheet(
     BuildContext context,
     bool tr,
@@ -1461,259 +1444,6 @@ final List<RiderCardTheme> riderCardThemes = [
     requiredSupporterTier: 1,
   ),
 ];
-
-class _CardThemeSelectorPanel extends ConsumerWidget {
-  const _CardThemeSelectorPanel({
-    required this.tr,
-    required this.userProfile,
-    required this.strings,
-  });
-
-  final bool tr;
-  final UserProfile userProfile;
-  final AppStrings strings;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return ApexPanel(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                Icons.palette_outlined,
-                color: context.colors.cyan,
-                size: 18,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                tInline(
-                  AppStrings.currentLanguageCode,
-                  'KART TEMASI SEÇİMİ',
-                  'SELECT CARD THEME',
-                  'KARTENTHEMA WÄHLEN',
-                ),
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  fontWeight: FontWeight.w900,
-                  color: context.colors.cyan,
-                  letterSpacing: 0.5,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 108,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: riderCardThemes.length,
-              itemBuilder: (context, index) {
-                final theme = riderCardThemes[index];
-                final isSelected = userProfile.cardThemeIndex == index;
-
-                var isUnlocked = true;
-                if (theme.isPremiumOnly && !userProfile.isPremium) {
-                  isUnlocked = false;
-                } else if (theme.isPaid &&
-                    !userProfile.purchasedThemes.contains(index)) {
-                  isUnlocked = false;
-                } else if (theme.requiredSupporterTier > 0 &&
-                    userProfile.supporterTier < theme.requiredSupporterTier) {
-                  isUnlocked = false;
-                }
-
-                return GestureDetector(
-                  onTap: () {
-                    if (isUnlocked) {
-                      ref.read(userProfileProvider.notifier).selectTheme(index);
-                    } else {
-                      if (theme.requiredSupporterTier > 0) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                SupporterPaywallScreen(strings: strings),
-                          ),
-                        );
-                      } else if (theme.isPremiumOnly) {
-                        _showPaywall(context);
-                      } else {
-                        _showPurchaseDialog(context, ref, index, theme);
-                      }
-                    }
-                  },
-                  child: Container(
-                    width: 84,
-                    margin: const EdgeInsets.only(right: 10),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: isSelected
-                            ? context.colors.cyan
-                            : const Color(0xFF2D2D2F),
-                        width: isSelected ? 1.5 : 0.5,
-                      ),
-                      borderRadius: BorderRadius.circular(ApexSpacing.radius),
-                      color: const Color(0xFF0A0A0A),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 50,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: theme.colors,
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            borderRadius: BorderRadius.circular(
-                              ApexSpacing.radius,
-                            ),
-                          ),
-                          child: Center(
-                            child: isSelected
-                                ? const Icon(
-                                    Icons.check_circle_outline_rounded,
-                                    color: Colors.white,
-                                    size: 22,
-                                  )
-                                : (!isUnlocked
-                                      ? Icon(
-                                          theme.isPremiumOnly
-                                              ? Icons.star_rounded
-                                              : Icons.lock_outline_rounded,
-                                          color: Colors.white70,
-                                          size: 16,
-                                        )
-                                      : null),
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          theme.getLocalizedName(
-                            AppStrings.currentLanguageCode,
-                          ),
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(
-                                fontWeight: isSelected
-                                    ? FontWeight.w700
-                                    : FontWeight.w400,
-                                color: isSelected
-                                    ? context.colors.white
-                                    : context.colors.textSecondary,
-                              ),
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showPaywall(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => PremiumPaywallScreen(strings: strings),
-      ),
-    );
-  }
-
-  void _showPurchaseDialog(
-    BuildContext context,
-    WidgetRef ref,
-    int index,
-    RiderCardTheme theme,
-  ) {
-    showDialog<void>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: context.colors.surface,
-          title: Text(
-            tInline(
-              AppStrings.currentLanguageCode,
-              'Temayı Satın Al',
-              'Unlock Theme',
-              'Theme freischalten',
-            ),
-          ),
-          content: Text(
-            tInline(
-              AppStrings.currentLanguageCode,
-              '${theme.nameTr} temasını 35₺ (\$0.99) karşılığında satın almak istiyor musunuz?',
-              'Do you want to unlock the ${theme.nameEn} theme for \$0.99?',
-              'Möchten Sie das Design "${theme.nameEn}" für \$0.99 freischalten?',
-            ),
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: context.colors.textSecondary,
-            ),
-          ),
-          actions: [
-            TextButton(
-              child: Text(
-                tInline(
-                  AppStrings.currentLanguageCode,
-                  'İptal',
-                  'Cancel',
-                  'Stornieren',
-                ),
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: context.colors.textSecondary,
-                ),
-              ),
-              onPressed: () => Navigator.pop(context),
-            ),
-            TextButton(
-              child: Text(
-                tInline(
-                  AppStrings.currentLanguageCode,
-                  'Satın Al',
-                  'Purchase',
-                  'Kaufen',
-                ),
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyMedium?.copyWith(color: context.colors.cyan),
-              ),
-              onPressed: () async {
-                await ref
-                    .read(userProfileProvider.notifier)
-                    .purchaseTheme(index);
-                await ref.read(userProfileProvider.notifier).selectTheme(index);
-                if (context.mounted) {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        tInline(
-                          AppStrings.currentLanguageCode,
-                          'Tema başarıyla satın alındı ve seçildi!',
-                          'Theme purchased and selected!',
-                          'Theme gekauft und ausgewählt!',
-                        ),
-                      ),
-                      backgroundColor: context.colors.cyan,
-                    ),
-                  );
-                }
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-}
 
 class RiderIdCard extends StatelessWidget {
   const RiderIdCard({
@@ -2108,11 +1838,11 @@ class RiderIdCard extends StatelessWidget {
                             ),
                             decoration: BoxDecoration(
                               color:
-                                  Colors.red[900]?.withOpacity(0.3) ??
-                                  Colors.red.withOpacity(0.15),
+                                  Colors.red[900]?.withValues(alpha: 0.3) ??
+                                  Colors.red.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
-                                color: Colors.redAccent.withOpacity(0.5),
+                                color: Colors.redAccent.withValues(alpha: 0.5),
                               ),
                             ),
                             child: Text(
@@ -2546,224 +2276,6 @@ class _BikerStat extends StatelessWidget {
   }
 }
 
-/// Stats row panel: active motorcycle, total rides, total distance — 3 columns with vertical dividers.
-class _ProfileStatsRow extends StatelessWidget {
-  const _ProfileStatsRow({
-    required this.activeBike,
-    required this.totalRides,
-    required this.totalKm,
-    required this.tr,
-    this.de = false,
-  });
-
-  final String activeBike;
-  final int totalRides;
-  final double totalKm;
-  final bool tr;
-  final bool de;
-
-  @override
-  Widget build(BuildContext context) {
-    String _t(String trStr, String enStr, String deStr) =>
-        tr ? trStr : ((AppStrings.currentLanguageCode == 'de') ? deStr : enStr);
-    final formattedKm = totalKm >= 1000
-        ? '${(totalKm / 1000).toStringAsFixed(0)},${(totalKm % 1000).toStringAsFixed(0).padLeft(3, '0')} km'
-        : '${totalKm.toStringAsFixed(0)} km';
-
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-      decoration: BoxDecoration(
-        color: context.colors.surface,
-        border: Border.all(
-          color: context.colors.border.withValues(alpha: 0.82),
-        ),
-        borderRadius: BorderRadius.circular(ApexSpacing.radius),
-      ),
-      child: IntrinsicHeight(
-        child: Row(
-          children: [
-            // Active motorcycle
-            Expanded(
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.two_wheeler,
-                    size: 20,
-                    color: context.colors.textSecondary,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          activeBike,
-                          style: Theme.of(context).textTheme.labelMedium
-                              ?.copyWith(
-                                color: context.colors.white,
-                                fontWeight: FontWeight.w800,
-                              ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          _t(
-                            'Aktif motosiklet',
-                            'Active motorcycle',
-                            'Aktives Motorrad',
-                          ),
-                          style: TextStyle(
-                            color: context.colors.textSecondary,
-                            fontSize: 10,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            VerticalDivider(
-              color: context.colors.border,
-              width: 24,
-              thickness: 1,
-              indent: 2,
-              endIndent: 2,
-            ),
-            // Total rides
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    _t('TOPLAM SÜRÜŞ', 'TOTAL RIDES', 'GESAMT FAHRTEN'),
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: context.colors.textSecondary,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.3,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '$totalRides',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: context.colors.white,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            VerticalDivider(
-              color: context.colors.border,
-              width: 24,
-              thickness: 1,
-              indent: 2,
-              endIndent: 2,
-            ),
-            // Total distance
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    _t('TOPLAM MESAFE', 'TOTAL DISTANCE', 'GESAMTKILOMETER'),
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: context.colors.textSecondary,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.3,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    formattedKm,
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: context.colors.white,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Blood type display row.
-class _ProfileBloodTypeRow extends StatelessWidget {
-  const _ProfileBloodTypeRow({
-    required this.bloodType,
-    required this.tr,
-    this.de = false,
-  });
-
-  final String bloodType;
-  final bool tr;
-  final bool de;
-
-  @override
-  Widget build(BuildContext context) {
-    if (bloodType.isEmpty || bloodType == '—') return const SizedBox.shrink();
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: context.colors.surface,
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: context.colors.border.withValues(alpha: 0.82),
-              ),
-            ),
-            child: Icon(
-              Icons.water_drop_outlined,
-              size: 18,
-              color: context.colors.textSecondary,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                tr
-                    ? 'KAN GRUBU'
-                    : ((AppStrings.currentLanguageCode == 'de')
-                          ? 'BLUTGRUPPE'
-                          : 'BLOOD TYPE'),
-                style: TextStyle(
-                  color: context.colors.textSecondary,
-                  fontSize: 10,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.3,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                bloodType,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: context.colors.white,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 /// Expandable private details section (phone, emergency, plate, social).
 class _ProfilePrivateDetailsSection extends StatefulWidget {
   const _ProfilePrivateDetailsSection({
@@ -3111,20 +2623,18 @@ class CardVectorOverlayPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.2;
 
-    final fillPaint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.03)
-      ..style = PaintingStyle.fill;
-
     final w = size.width;
     final h = size.height;
 
     // Draw background vector lines based on themeIndex
     switch (themeIndex) {
       case 0:
-        for (double x = 20; x < w; x += 30)
+        for (double x = 20; x < w; x += 30) {
           canvas.drawLine(Offset(x, 0), Offset(x, h), paint);
-        for (double y = 20; y < h; y += 30)
+        }
+        for (double y = 20; y < h; y += 30) {
           canvas.drawLine(Offset(0, y), Offset(w, y), paint);
+        }
         break;
       case 1:
         final path1 = Path()
@@ -3163,8 +2673,9 @@ class CardVectorOverlayPainter extends CustomPainter {
         break;
       case 3:
         paint.strokeWidth = 0.8;
-        for (double i = -h; i < w; i += 12)
+        for (double i = -h; i < w; i += 12) {
           canvas.drawLine(Offset(i, 0), Offset(i + h, h), paint);
+        }
         break;
       case 4:
         final center = Offset(w * 0.8, h * 0.7);
@@ -3222,8 +2733,9 @@ class CardVectorOverlayPainter extends CustomPainter {
         break;
       case 7:
         canvas.drawCircle(Offset(w * 0.8, h * 0.4), 28, paint);
-        for (double y = h * 0.6; y < h; y += 12)
+        for (double y = h * 0.6; y < h; y += 12) {
           canvas.drawLine(Offset(0, y), Offset(w, y), paint);
+        }
         break;
       case 8:
         final shard1 = Path()
@@ -3287,73 +2799,6 @@ class CardVectorOverlayPainter extends CustomPainter {
   }
 }
 
-// User garage modifications list view
-class _UserGarageModifications extends StatelessWidget {
-  const _UserGarageModifications({
-    required this.bikeName,
-    required this.bikeModel,
-    required this.tr,
-  });
-
-  final String bikeName;
-  final String bikeModel;
-  final bool tr;
-
-  @override
-  Widget build(BuildContext context) {
-    if (bikeName == '—') {
-      return Center(
-        child: Text(
-          tInline(
-            AppStrings.currentLanguageCode,
-            'Garajda aktif motosiklet yok.',
-            'No active motorcycle in garage.',
-            'Kein aktives Motorrad in der Garage.',
-          ),
-          style: Theme.of(
-            context,
-          ).textTheme.bodyMedium?.copyWith(color: context.colors.textSecondary),
-        ),
-      );
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          '$bikeName ($bikeModel)',
-          style: Theme.of(
-            context,
-          ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w900),
-        ),
-        const SizedBox(height: 12),
-        Expanded(
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.two_wheeler, size: 48, color: context.colors.cyan),
-                const SizedBox(height: 8),
-                Text(
-                  tInline(
-                    AppStrings.currentLanguageCode,
-                    'Motosikletiniz garajda aktif durumda.',
-                    'Your motorcycle is active in the garage.',
-                    'Ihr Motorrad steht aktiv in der Garage.',
-                  ),
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: context.colors.textSecondary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
 // Friends List tab
 class _FriendsList extends ConsumerStatefulWidget {
   const _FriendsList({
@@ -3391,7 +2836,6 @@ class _FriendsListState extends ConsumerState<_FriendsList> {
   @override
   Widget build(BuildContext context) {
     final tr = widget.tr;
-    final de = AppStrings.currentLanguageCode == 'de';
     String _t(String trStr, String enStr, String deStr) =>
         tr ? trStr : ((AppStrings.currentLanguageCode == 'de') ? deStr : enStr);
 
@@ -4302,7 +3746,6 @@ class _LeaderboardList extends StatefulWidget {
 class _LeaderboardListState extends State<_LeaderboardList> {
   @override
   Widget build(BuildContext context) {
-    final tr = widget.tr;
     final userName = widget.userName;
     final userKm = widget.userKm;
 
@@ -4616,7 +4059,7 @@ class _LeaderboardListState extends State<_LeaderboardList> {
             Align(
               alignment: Alignment.topLeft,
               child: Text(
-                '${rank}',
+                '$rank',
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: rankColor,
@@ -4697,7 +4140,7 @@ class _LeaderboardListState extends State<_LeaderboardList> {
             SizedBox(
               width: 24,
               child: Text(
-                '${rank}',
+                '$rank',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -6415,7 +5858,6 @@ class _RiderMatchmakerScreenState extends State<_RiderMatchmakerScreen>
 
   @override
   Widget build(BuildContext context) {
-    final bool de = widget.strings.locale.languageCode == 'de';
     final String tFound = widget.tr
         ? 'Sürücüler Bulundu'
         : ((AppStrings.currentLanguageCode == 'de')
@@ -6550,12 +5992,12 @@ class _CompactShareToggle extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.all(6),
         decoration: BoxDecoration(
-          color: isActive ? color.withOpacity(0.2) : Colors.transparent,
+          color: isActive ? color.withValues(alpha: 0.2) : Colors.transparent,
           shape: BoxShape.circle,
           border: Border.all(
             color: isActive
                 ? color
-                : context.colors.textSecondary.withOpacity(0.3),
+                : context.colors.textSecondary.withValues(alpha: 0.3),
             width: 1.5,
           ),
         ),
@@ -8231,17 +7673,7 @@ class _ProfileAppearanceScreenState
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          _t(
-                                'Bu seçim öz tanımdır; telemetri tarafından atanmaz. İstediğin zaman değiştirebilirsin.',
-                                'This selection is a self-definition; it is not assigned by telemetry. You can change it anytime.',
-                                'Diese Auswahl ist eine Selbstdefinition; sie wird nicht per Telemetrie zugewiesen. Du kannst sie jederzeit ändern.',
-                              ) +
-                              '\n\n' +
-                              _t(
-                                'Güvenli kimlik ilkesi / Hız veya yatış derecesi sürüş tipi açmaz.',
-                                'Safe identity policy / Top speed or lean angle degree does not unlock riding types.',
-                                'Sichere Identitätsrichtlinie / Höchstgeschwindigkeit oder Schräglage schaltet keine Fahrstile frei.',
-                              ),
+                          '${_t('Bu seçim öz tanımdır; telemetri tarafından atanmaz. İstediğin zaman değiştirebilirsin.', 'This selection is a self-definition; it is not assigned by telemetry. You can change it anytime.', 'Diese Auswahl ist eine Selbstdefinition; sie wird nicht per Telemetrie zugewiesen. Du kannst sie jederzeit ändern.')}\n\n${_t('Güvenli kimlik ilkesi / Hız veya yatış derecesi sürüş tipi açmaz.', 'Safe identity policy / Top speed or lean angle degree does not unlock riding types.', 'Sichere Identitätsrichtlinie / Höchstgeschwindigkeit oder Schräglage schaltet keine Fahrstile frei.')}',
                           style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(
                                 color: Colors.amber.withValues(alpha: 0.9),
@@ -9716,7 +9148,7 @@ class _AchievementSheetWidgetState
                   controller: scrollController,
                   padding: const EdgeInsets.all(16),
                   itemCount: filtered.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  separatorBuilder: (_, _) => const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final item = filtered[index];
                     // Calculate actual real progress dynamically for each achievement
