@@ -51,7 +51,8 @@ service cloud.firestore {
     // possible without a schema change. Signed-in access only, scoped decision
     // 2026-08-04 — see memory-bank/progress.md.)
     match /lobbies/{lobbyId} {
-      allow read, write: if signedIn();
+      allow get, write: if signedIn();
+      allow list: if false;
     }
 
     // Smart Park QR contact notes (written anonymously by qr_contact_web with no
@@ -71,16 +72,39 @@ service cloud.firestore {
       allow write: if false;
     }
 
-    // Rider Tag lookup registry (Public read, Owner manage permitted)
+    // Rider Tag lookup registry. Anonymous QR users may fetch a known tag,
+    // but only signed-in users may list/search the registry. Private account
+    // identifiers are forbidden from this public projection.
     match /rider_tags/{tag} {
-      allow read: if true;
+      allow get: if true;
+      allow list: if signedIn();
       allow create, update: if signedIn() && (
         resource == null
         || resource.data.ownerId == request.auth.uid
-      ) && request.resource.data.ownerId == request.auth.uid;
+      ) && request.resource.data.ownerId == request.auth.uid
+        && !request.resource.data.keys().hasAny([
+          'email', 'phoneNumber', 'bloodType', 'emergencyContactName',
+          'emergencyContactPhone', 'licensePlate', 'fcmToken', 'password'
+        ]);
       // Separate from create/update: request.resource is always null on
       // delete, so the write rule above can never actually permit a delete.
       allow delete: if signedIn() && resource.data.ownerId == request.auth.uid;
+    }
+
+    // Owner-controlled projection for fields explicitly shared with friends.
+    // A friendship document is deterministic but its UID order may vary, so
+    // both possible paths are checked. These fields are never anonymous.
+    match /friend_profiles/{uid} {
+      allow read: if isOwner(uid) || (signedIn() && (
+        exists(/databases/$(database)/documents/friendships/$(request.auth.uid + '_' + uid))
+        || exists(/databases/$(database)/documents/friendships/$(uid + '_' + request.auth.uid))
+      ));
+      allow create, update: if isOwner(uid)
+        && request.resource.data.ownerId == request.auth.uid
+        && !request.resource.data.keys().hasAny([
+          'email', 'fcmToken', 'password'
+        ]);
+      allow delete: if isOwner(uid);
     }
 
     // Entitlements & Premium subscriptions (Owner read only, Backend/Store webhook write only)

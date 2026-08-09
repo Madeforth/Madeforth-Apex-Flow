@@ -1,5 +1,17 @@
 {
   "projects": {
     "default": "apex-flow-7baea"
+  },
+  "targets": {
+    "apex-flow-7baea": {
+      "hosting": {
+        "qr-contact": [
+          "apex-flow-7baea"
+        ],
+        "privacy": [
+          "apex-flow-privacy-7baea"
+        ]
+      }
+    }
   }
 }

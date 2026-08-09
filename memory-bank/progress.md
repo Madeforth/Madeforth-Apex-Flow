@@ -2,6 +2,59 @@
 
 Status recorded 2026-08-04, from repo inspection (not from README claims alone unless marked as such).
 
+## 2026-08-09 — Closed-beta build `1.0.0+34` and live privacy backend
+
+- Final signed artifact: `build/app/outputs/bundle/release/app-release.aab`,
+  86,758,816 bytes, manifest `versionCode=34` / `versionName=1.0.0`, verified by
+  `jarsigner`. SHA-256:
+  `24FA0A7F7D4108C0D70D8BD978C6EA7EEB3EDD514CD4C9A64CA538CE174E4603`.
+  Matching release APK installed successfully on the LG G5. Builds `+31` through
+  `+33` are superseded.
+- Deployed Firestore rules to `apex-flow-7baea`. Friend-only blood type, phone,
+  emergency phone, and license-plate toggles now save and persist; all were
+  device-tested, then restored to OFF. Email and emergency-contact name are
+  never shared. Compact, text-scale-bounded sharing rows were visually checked
+  on LG G5; Samsung Galaxy S21 FE remains a useful typography check.
+- Leaderboard duplicate informal/current-user labels were removed. It now shows
+  only localized `Siz`/`You`/`Sie`, with formal Turkish week copy; verified on
+  the LG G5.
+- Deployed only the previously missing v2 callable `deleteAccountAndData` to
+  `europe-west1`. The app now deletes remotely before local cleanup and cannot
+  remain visually signed in merely because local DB cleanup fails. No real
+  account was destroyed during verification; run a final disposable-account
+  deletion test on v34. Follow-up: move off Node.js 20 before its scheduled
+  2026-10-30 decommission and update the warned-old `firebase-functions` package.
+- Created and deployed the separate privacy site
+  `https://apex-flow-privacy-7baea.web.app/`; QR hosting remains separate and was
+  not redeployed. Privacy and deletion pages have complete TR/EN/DE content,
+  language selector and `?lang=` routing. The app opens them in its active
+  language. All languages/cross-links passed live DOM checks; Turkish navigation
+  from the app was confirmed on-device.
+- Verification: Flutter 97/97 tests pass; targeted analyze has no errors (two
+  pre-existing async-context info notices); wider analyze has 276 warning/info
+  items and no errors; Functions lint, legal JS syntax, and diff whitespace
+  checks pass.
+- Scoped live changes only: Firestore rules, `deleteAccountAndData`, and privacy
+  hosting. No commit or push. Worktree remains dirty with mixed pre-existing,
+  user, and Claude changes.
+
+## 2026-08-09 — Friend-only profile visibility (earlier local snapshot; superseded by `+34` above)
+
+- Added independent opt-in controls for blood type, phone, emergency phone,
+  and license plate under Settings; all default off except the backward-compatible
+  blood-type migration from the former combined emergency toggle. The emergency
+  contact person's name is explicitly never shared.
+- Sensitive friend fields moved to friendship-gated `friend_profiles/{uid}`;
+  `rider_tags` explicitly rejects email and sensitive profile fields.
+- Friend add/sync merges allowed fields only after a friendship document exists;
+  profile UI points users to Settings and states that email is never shown.
+- Account deletion and privacy policy cover the new projection.
+- Verified locally: Flutter tests 97/97, Functions lint/syntax pass, QR web build
+  passes, Firestore rules compile in Firebase CLI dry-run. Not deployed or
+  cross-account device-tested.
+- Internal-test artifact advanced to `1.0.0+31`; signed release AAB built and
+  release manifest verified as `versionCode=31`, not uploaded.
+
 ## 2026-08-08 — Typography/icon rollout done, profile photo upload shipped, real ride-telemetry bugs fixed
 Full detail in `activeContext.md` "Current Task". All commits `flutter analyze` (0 new errors) + `flutter test` (96/96) verified; most also confirmed on-device (LG G5).
 
@@ -39,7 +92,7 @@ Full detail in `activeContext.md` "Current Task". Ran on the work Mac; repo re-c
 - No vector assets at all (0 SVG, `flutter_svg` not a dependency) — no brand mark, no empty-state illustrations.
 - Smaller on-device findings not yet filed: achievement chip row clips and overlaps "Tümünü Gör"; the KM/MI selector is orange/white, outside the design language; blood-type badge shows a bare "—" when unset; auth error handling doesn't branch on `FirebaseAuthException.code` (all failures collapse to one generic string).
 
-**Environment caveat for the next session:** the signing files (`android/key.properties`, `android/app/upload-keystore.jks`) are gitignored and absent from a fresh clone — copy them in before any release build. `pubspec.yaml` is at `1.0.0+30`; a signed AAB was built but not uploaded.
+**Environment caveat for the next session:** the signing files (`android/key.properties`, `android/app/upload-keystore.jks`) are gitignored and absent from a fresh clone — copy them in before any release build. The current local release is `1.0.0+34`; its signed AAB was built and verified locally.
 
 ## 2026-08-07 — Pre-release hardening: security fixes, App Check verified live, Discord pipeline fixed for real
 Full detail in `activeContext.md` "Current Task" — this is the status-tracking summary.

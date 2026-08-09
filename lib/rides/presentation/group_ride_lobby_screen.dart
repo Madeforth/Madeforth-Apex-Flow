@@ -3,11 +3,9 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 import 'package:apexflow/shared/design/slate_palette.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:apexflow/core/design/apex_colors.dart';
 import 'package:apexflow/core/design/apex_spacing.dart';
 import 'package:apexflow/core/i18n/app_strings.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -15,13 +13,12 @@ import 'package:apexflow/settings/application/user_profile_state.dart';
 import 'package:apexflow/garage/application/garage_state.dart';
 import 'package:apexflow/rides/application/ride_location_service.dart';
 import 'package:apexflow/rides/application/ride_state.dart';
+import 'package:apexflow/rides/presentation/widgets/ride_location_disclosure.dart';
 import 'package:apexflow/profile/application/friends_state.dart';
 import 'package:apexflow/profile/domain/friend_profile.dart';
-import 'package:apexflow/shared/widgets/apex_panel.dart';
 import 'package:apexflow/shared/widgets/flip_state_button.dart';
 import 'package:apexflow/core/services/firebase_service.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:apexflow/rides/domain/meeting_point.dart';
 import 'package:apexflow/rides/presentation/map_picker_dialog.dart';
 import 'package:apexflow/features/dashboard/dashboard_state.dart';
@@ -121,20 +118,7 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
 
       setState(() {
         if (!_isRideActive && status == 'active') {
-          ref
-              .read(rideStateProvider.notifier)
-              .startRide(
-                mood: tInline(
-                  AppStrings.currentLanguageCode,
-                  'Grup Sürüşü',
-                  'Group Ride',
-                  'Gruppenfahrt',
-                ),
-              );
-          _locationService.startTracking(
-            isTurkish: widget.strings.locale.languageCode == 'tr',
-            isMounted: false,
-          );
+          unawaited(_startRemotelyActivatedGroupRide());
         }
 
         _isRideActive = status == 'active';
@@ -374,13 +358,9 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
       'modifications': const ['Standard OEM Parts'],
       'supporterTier': userProfile.supporterTier,
       'cardThemeIndex': userProfile.cardThemeIndex,
-      'bloodType': userProfile.bloodType,
-      'phone': userProfile.phoneNumber,
-      'emergencyPhone': userProfile.emergencyContactPhone,
       'city': userProfile.city,
       'instagram': userProfile.instagram,
       'tiktok': userProfile.tiktok,
-      'licensePlate': userProfile.licensePlate,
       'selectedBadges': userProfile.selectedBadges,
     };
 
@@ -1364,7 +1344,29 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
     );
   }
 
-  void _handleGroupRideToggle() {
+  Future<void> _startRemotelyActivatedGroupRide() async {
+    final consented =
+        Platform.environment.containsKey('FLUTTER_TEST') ||
+        await confirmRideLocationUse(context, widget.strings.languageCode);
+    if (!consented || !mounted) return;
+
+    ref
+        .read(rideStateProvider.notifier)
+        .startRide(
+          mood: tInline(
+            AppStrings.currentLanguageCode,
+            'Grup Sürüşü',
+            'Group Ride',
+            'Gruppenfahrt',
+          ),
+        );
+    await _locationService.startTracking(
+      isTurkish: widget.strings.locale.languageCode == 'tr',
+      isMounted: false,
+    );
+  }
+
+  Future<void> _handleGroupRideToggle() async {
     final tr = widget.strings.locale.languageCode == 'tr';
     final de = widget.strings.locale.languageCode == 'de';
 
@@ -1420,6 +1422,11 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
         FirebaseService.instance.deleteLobby(_activeLobbyId!);
       }
     } else {
+      final consented =
+          Platform.environment.containsKey('FLUTTER_TEST') ||
+          await confirmRideLocationUse(context, widget.strings.languageCode);
+      if (!consented || !mounted) return;
+
       setState(() {
         _isRideActive = true;
       });
@@ -1431,7 +1438,7 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
           .startRide(
             mood: tr ? 'Grup Sürüşü' : (de ? 'Gruppenfahrt' : 'Group Ride'),
           );
-      _locationService.startTracking(isTurkish: tr, isMounted: false);
+      await _locationService.startTracking(isTurkish: tr, isMounted: false);
     }
   }
 

@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -183,6 +184,8 @@ class FirebaseService {
     double? totalKm,
     bool? sharePhone,
     bool? shareEmergency,
+    bool? shareBloodType,
+    bool? shareLicensePlate,
     List<Map<String, dynamic>>? fuelLogs,
     List<Map<String, dynamic>>? motorcycles,
     List<Map<String, dynamic>>? serviceLogs,
@@ -213,10 +216,16 @@ class FirebaseService {
         'name': name,
         'ownerId': instId,
         'isPremium': isPremium,
+        // Never retain private identifiers in this public lookup document.
+        // FieldValue.delete also scrubs legacy values on the next sync.
+        'email': FieldValue.delete(),
+        'licensePlate': FieldValue.delete(),
+        'phoneNumber': FieldValue.delete(),
+        'bloodType': FieldValue.delete(),
+        'emergencyContactName': FieldValue.delete(),
+        'emergencyContactPhone': FieldValue.delete(),
       };
-      if (email != null && email.isNotEmpty) tagData['email'] = email;
       if (city != null) tagData['city'] = city;
-      if (licensePlate != null) tagData['licensePlate'] = licensePlate;
       if (activeBikeName != null) tagData['activeBikeName'] = activeBikeName;
       if (avatarIndex != null) tagData['avatarIndex'] = avatarIndex;
       if (avatarPhotoUrl != null) {
@@ -232,19 +241,38 @@ class FirebaseService {
       if (harmonyScore != null) tagData['harmonyScore'] = harmonyScore;
       if (isFoundingMember != null)
         tagData['isFoundingMember'] = isFoundingMember;
-      if (sharePhone != null) tagData['sharePhone'] = sharePhone;
-      if (sharePhone == true && phone.isNotEmpty)
-        tagData['phoneNumber'] = phone;
-      if (shareEmergency != null) tagData['shareEmergency'] = shareEmergency;
-      if (shareEmergency == true) {
-        if (bloodType.isNotEmpty) tagData['bloodType'] = bloodType;
-        if (emergencyName.isNotEmpty)
-          tagData['emergencyContactName'] = emergencyName;
-        if (emergencyPhone.isNotEmpty)
-          tagData['emergencyContactPhone'] = emergencyPhone;
-      }
-
       batch.set(tagDocRef, tagData, SetOptions(merge: true));
+
+      // Sensitive fields live in an authenticated, friendship-gated
+      // projection. They never belong in the anonymously readable Rider Tag
+      // registry, even when the owner has opted to share them with friends.
+      final friendProfileRef = FirebaseFirestore.instance
+          .collection('friend_profiles')
+          .doc(instId);
+      final friendProfileData = <String, dynamic>{
+        'ownerId': instId,
+        'sharePhone': sharePhone ?? false,
+        'shareEmergency': shareEmergency ?? false,
+        'shareBloodType': shareBloodType ?? false,
+        'shareLicensePlate': shareLicensePlate ?? false,
+        'phoneNumber': sharePhone == true && phone.isNotEmpty
+            ? phone
+            : FieldValue.delete(),
+        'bloodType': shareBloodType == true && bloodType.isNotEmpty
+            ? bloodType
+            : FieldValue.delete(),
+        'emergencyContactName': FieldValue.delete(),
+        'emergencyContactPhone':
+            shareEmergency == true && emergencyPhone.isNotEmpty
+            ? emergencyPhone
+            : FieldValue.delete(),
+        'licensePlate':
+            shareLicensePlate == true && (licensePlate?.isNotEmpty ?? false)
+            ? licensePlate
+            : FieldValue.delete(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      };
+      batch.set(friendProfileRef, friendProfileData, SetOptions(merge: true));
 
       // Delete the old Rider Tag document from Firestore if it is different
       if (oldTag != null &&
@@ -328,6 +356,10 @@ class FirebaseService {
       if (sharePhone != null) profileData['sharePhone'] = sharePhone;
       if (shareEmergency != null)
         profileData['shareEmergency'] = shareEmergency;
+      if (shareBloodType != null)
+        profileData['shareBloodType'] = shareBloodType;
+      if (shareLicensePlate != null)
+        profileData['shareLicensePlate'] = shareLicensePlate;
       if (fuelLogs != null) profileData['fuelLogs'] = fuelLogs;
       if (motorcycles != null) profileData['motorcycles'] = motorcycles;
       if (serviceLogs != null) profileData['serviceLogs'] = serviceLogs;
@@ -493,37 +525,17 @@ class FirebaseService {
         data['email'] = cleanEmail;
       }
 
-      // 3. Safeguard: If riderTag is missing or empty in data, search rider_tags collection
+      // 3. Safeguard: recover the tag by authenticated owner UID. Email is
+      // deliberately never stored in the public rider_tags registry.
       var currentTag = data['riderTag'] as String? ?? '';
       if (currentTag.isEmpty) {
-        // Query rider_tags by lowercase email
-        final tagQueryByEmail1 = await FirebaseFirestore.instance
+        final tagQueryByOwner = await FirebaseFirestore.instance
             .collection('rider_tags')
-            .where('email', isEqualTo: cleanEmail)
+            .where('ownerId', isEqualTo: user.uid)
             .get();
-        if (tagQueryByEmail1.docs.isNotEmpty) {
+        if (tagQueryByOwner.docs.isNotEmpty) {
           currentTag =
-              tagQueryByEmail1.docs.first.data()['tag'] as String? ?? '';
-        } else {
-          // Query rider_tags by exact email string
-          final tagQueryByEmail2 = await FirebaseFirestore.instance
-              .collection('rider_tags')
-              .where('email', isEqualTo: email.trim())
-              .get();
-          if (tagQueryByEmail2.docs.isNotEmpty) {
-            currentTag =
-                tagQueryByEmail2.docs.first.data()['tag'] as String? ?? '';
-          } else {
-            // Query rider_tags by ownerId
-            final tagQueryByOwner = await FirebaseFirestore.instance
-                .collection('rider_tags')
-                .where('ownerId', isEqualTo: user.uid)
-                .get();
-            if (tagQueryByOwner.docs.isNotEmpty) {
-              currentTag =
-                  tagQueryByOwner.docs.first.data()['tag'] as String? ?? '';
-            }
-          }
+              tagQueryByOwner.docs.first.data()['tag'] as String? ?? '';
         }
       }
 
@@ -559,7 +571,12 @@ class FirebaseService {
       batch.set(tagDocRef, {
         'tag': currentTag,
         'ownerId': user.uid,
-        'email': cleanEmail,
+        'email': FieldValue.delete(),
+        'licensePlate': FieldValue.delete(),
+        'phoneNumber': FieldValue.delete(),
+        'bloodType': FieldValue.delete(),
+        'emergencyContactName': FieldValue.delete(),
+        'emergencyContactPhone': FieldValue.delete(),
         'updatedAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
 
@@ -628,9 +645,43 @@ class FirebaseService {
       publicData.remove('fcmToken');
       publicData.remove('password');
 
+      final friendFields = await getFriendSharedProfile(ownerId);
+      if (friendFields != null) {
+        publicData.addAll(friendFields);
+      }
+
       return publicData;
     } catch (_) {
       return null;
+    }
+  }
+
+  /// Returns only the fields the owner explicitly exposed to connected
+  /// friends. Firestore rules reject this read when no friendship exists.
+  Future<Map<String, dynamic>?> getFriendSharedProfile(String uid) async {
+    if (Platform.environment.containsKey('FLUTTER_TEST')) return null;
+    await init();
+    if (!_initialized || FirebaseAuth.instance.currentUser == null) return null;
+
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('friend_profiles')
+          .doc(uid)
+          .get();
+      if (!snapshot.exists || snapshot.data() == null) return null;
+
+      final data = snapshot.data()!;
+      return {
+        if (data['phoneNumber'] is String) 'phoneNumber': data['phoneNumber'],
+        if (data['bloodType'] is String) 'bloodType': data['bloodType'],
+        if (data['emergencyContactPhone'] is String)
+          'emergencyContactPhone': data['emergencyContactPhone'],
+        if (data['licensePlate'] is String)
+          'licensePlate': data['licensePlate'],
+      };
+    } on FirebaseException catch (error) {
+      if (error.code == 'permission-denied') return null;
+      rethrow;
     }
   }
 
@@ -721,164 +772,23 @@ class FirebaseService {
     return ref.getDownloadURL();
   }
 
-  /// Fully deletes user data from Firestore collections and purges the Firebase Auth user account.
-  /// Enforces strict UID and Email isolation to guarantee no cross-account data deletion.
+  /// Deletes the active account through the App Check-protected backend.
+  ///
+  /// Backend ownership is required because several records (entitlements,
+  /// public rider cards, QA outbox/Discord copies and Auth itself) correctly
+  /// reject client-side deletion in Firestore rules.
   Future<void> deleteUserAccount(String targetUid, String riderTag) async {
     await init();
-    if (!_initialized) return;
+    if (!_initialized) throw StateError('Firebase is not initialized.');
 
     final currentUser = FirebaseAuth.instance.currentUser;
-    // Strict isolation check: Must be signed in, and target UID must strictly match active user's UID
     if (currentUser == null || currentUser.uid != targetUid) {
       throw Exception('Oturum açmış kullanıcı ile silinecek hesap uyuşmuyor.');
     }
 
-    final activeUid = currentUser.uid;
-
-    // Each step below deliberately does NOT swallow errors: a real Firestore
-    // failure here must abort before the Auth account is deleted (step 12),
-    // otherwise the account becomes undeletable-but-orphaned — no session
-    // left to authorize retrying the cleanup, per firestore.rules' UID checks.
-
-    // 1. Delete Rider Tag document (only if associated with this user)
-    if (riderTag.isNotEmpty) {
-      final cleanTag = riderTag.toLowerCase().replaceAll('@', '');
-      final tagDoc = await FirebaseFirestore.instance
-          .collection('rider_tags')
-          .doc(cleanTag)
-          .get();
-      if (tagDoc.exists && tagDoc.data()?['ownerId'] == activeUid) {
-        await tagDoc.reference.delete();
-      }
-    }
-
-    // 1b. Delete the uploaded avatar photo, if any (object-not-found is not
-    // an error — a user who never uploaded a photo has nothing to remove).
-    try {
-      await FirebaseStorage.instance.ref('avatars/$activeUid').delete();
-    } on FirebaseException catch (e) {
-      if (e.code != 'object-not-found') rethrow;
-    }
-
-    // 2. Delete the public rider-card projection
-    await FirebaseFirestore.instance
-        .collection('public_rider_cards')
-        .doc(activeUid)
-        .delete();
-
-    // 3. Delete the Store/webhook-owned entitlement record
-    await FirebaseFirestore.instance
-        .collection('entitlements')
-        .doc(activeUid)
-        .delete();
-
-    // 4. Delete User Profile document strictly matching activeUid
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(activeUid)
-        .delete();
-
-    // 5. Delete users/{uid} subcollections — deleting the parent doc above
-    // does NOT cascade-delete these in Firestore.
-    for (final subcollection in [
-      'telemetry_dna_events',
-      'reward_wallet',
-      'entitlements',
-    ]) {
-      final docs = await FirebaseFirestore.instance
-          .collection('users/$activeUid/$subcollection')
-          .get();
-      for (final doc in docs.docs) {
-        await doc.reference.delete();
-      }
-    }
-    for (final docPath in [
-      'users/$activeUid/telemetry_dna/state/current',
-      'users/$activeUid/achievement_private/state',
-    ]) {
-      await FirebaseFirestore.instance.doc(docPath).delete();
-    }
-
-    // 6. Delete user's garage bikes strictly filtered by activeUid
-    final bikesQuery = await FirebaseFirestore.instance
-        .collection('bikes')
-        .where('userId', isEqualTo: activeUid)
-        .get();
-    for (final doc in bikesQuery.docs) {
-      await doc.reference.delete();
-    }
-
-    // 7. Delete user's ride sessions strictly filtered by activeUid
-    final ridesQuery = await FirebaseFirestore.instance
-        .collection('rides')
-        .where('userId', isEqualTo: activeUid)
-        .get();
-    for (final doc in ridesQuery.docs) {
-      await doc.reference.delete();
-    }
-
-    // 8. Delete friendships involving activeUid
-    final friendQueryA = await FirebaseFirestore.instance
-        .collection('friendships')
-        .where('userA', isEqualTo: activeUid)
-        .get();
-    for (final doc in friendQueryA.docs) {
-      await doc.reference.delete();
-    }
-    final friendQueryB = await FirebaseFirestore.instance
-        .collection('friendships')
-        .where('userB', isEqualTo: activeUid)
-        .get();
-    for (final doc in friendQueryB.docs) {
-      await doc.reference.delete();
-    }
-
-    // 9. Delete registered FCM device tokens
-    final deviceDocs = await FirebaseFirestore.instance
-        .collection('notification_tokens')
-        .doc(activeUid)
-        .collection('devices')
-        .get();
-    for (final doc in deviceDocs.docs) {
-      await doc.reference.delete();
-    }
-
-    // 10. Delete this user's submitted bug reports
-    final bugReportsQuery = await FirebaseFirestore.instance
-        .collection('bug_reports')
-        .where('reporterUid', isEqualTo: activeUid)
-        .get();
-    for (final doc in bugReportsQuery.docs) {
-      await doc.reference.delete();
-    }
-
-    if (riderTag.isNotEmpty) {
-      final cleanTag = riderTag.toLowerCase().replaceAll('@', '');
-
-      // 11. Delete group ride lobbies this user hosted (hostId is the rider
-      // tag, not the UID — lobbies key participants by rider tag, see
-      // firestore.rules).
-      final hostedLobbies = await FirebaseFirestore.instance
-          .collection('lobbies')
-          .where('hostId', isEqualTo: cleanTag)
-          .get();
-      for (final doc in hostedLobbies.docs) {
-        await doc.reference.delete();
-      }
-
-      // 12. Delete parking QR notes addressed to this user's rider tag
-      final parkingNotes = await FirebaseFirestore.instance
-          .collection('parking_notifications')
-          .where('vehicleId', isEqualTo: cleanTag)
-          .get();
-      for (final doc in parkingNotes.docs) {
-        await doc.reference.delete();
-      }
-    }
-
-    // 13. Delete Firebase Auth user account — only reached if every step
-    // above succeeded.
-    await currentUser.delete();
+    await FirebaseFunctions.instanceFor(
+      region: 'europe-west1',
+    ).httpsCallable('deleteAccountAndData').call<void>();
   }
 
   /// Queries all friendships where the current user is a participant

@@ -468,7 +468,7 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                       const SizedBox(height: ApexSpacing.x2),
                     ],
 
-                    // 1. Minimal Social Sharing Settings
+                    // Friend visibility is managed centrally from Settings.
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
@@ -479,88 +479,27 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                         borderRadius: BorderRadius.circular(ApexSpacing.radius),
                       ),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.share_outlined,
-                                color: context.colors.cyan,
-                                size: 20,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                tInline(
-                                  AppStrings.currentLanguageCode,
-                                  'SOSYAL PAYLAŞIM',
-                                  'SOCIAL SHARING',
-                                  'SOZIALES TEILEN',
-                                ),
-                                style: Theme.of(context).textTheme.labelMedium
-                                    ?.copyWith(
-                                      fontWeight: FontWeight.w900,
-                                      color: Colors.white,
-                                    ),
-                              ),
-                            ],
+                          Icon(
+                            Icons.admin_panel_settings_outlined,
+                            color: context.colors.cyan,
+                            size: 20,
                           ),
-                          Row(
-                            children: [
-                              _CompactShareToggle(
-                                icon: Icons.phone_android,
-                                isActive:
-                                    userProfile.isPremium &&
-                                    userProfile.sharePhone,
-                                onToggle: (val) {
-                                  if (!userProfile.isPremium) {
-                                    _showPaywall(context);
-                                  } else {
-                                    ref
-                                        .read(userProfileProvider.notifier)
-                                        .updateProfile(
-                                          name: userProfile.name,
-                                          phoneNumber: userProfile.phoneNumber,
-                                          bloodType: userProfile.bloodType,
-                                          emergencyContactName:
-                                              userProfile.emergencyContactName,
-                                          emergencyContactPhone:
-                                              userProfile.emergencyContactPhone,
-                                          sharePhone: val,
-                                          shareEmergency:
-                                              userProfile.shareEmergency,
-                                        );
-                                  }
-                                },
-                                color: context.colors.cyan,
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              tInline(
+                                AppStrings.currentLanguageCode,
+                                'Kan grubu, telefon, acil durum telefonu ve plaka görünürlüğünü Ayarlar > Arkadaşlarla Bilgi Paylaşımı bölümünden yönetebilirsiniz. E-posta adresiniz gösterilmez.',
+                                'Manage blood type, phone, emergency phone, and license plate visibility under Settings > Information Shared with Friends. Your email is never shown.',
+                                'Die Sichtbarkeit von Blutgruppe, Telefon, Notfallnummer und Kennzeichen verwalten Sie unter Einstellungen > Mit Freunden geteilte Informationen. Ihre E-Mail wird nie angezeigt.',
                               ),
-                              const SizedBox(width: 12),
-                              _CompactShareToggle(
-                                icon: Icons.local_hospital_outlined,
-                                isActive:
-                                    userProfile.isPremium &&
-                                    userProfile.shareEmergency,
-                                onToggle: (val) {
-                                  if (!userProfile.isPremium) {
-                                    _showPaywall(context);
-                                  } else {
-                                    ref
-                                        .read(userProfileProvider.notifier)
-                                        .updateProfile(
-                                          name: userProfile.name,
-                                          phoneNumber: userProfile.phoneNumber,
-                                          bloodType: userProfile.bloodType,
-                                          emergencyContactName:
-                                              userProfile.emergencyContactName,
-                                          emergencyContactPhone:
-                                              userProfile.emergencyContactPhone,
-                                          sharePhone: userProfile.sharePhone,
-                                          shareEmergency: val,
-                                        );
-                                  }
-                                },
-                                color: context.colors.red,
-                              ),
-                            ],
+                              style: Theme.of(context).textTheme.labelMedium
+                                  ?.copyWith(
+                                    color: context.colors.textSecondary,
+                                    height: 1.35,
+                                  ),
+                            ),
                           ),
                         ],
                       ),
@@ -601,14 +540,6 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                 _LeaderboardList(
                   friends: friends,
                   userKm: totalKm,
-                  userName: userProfile.name.isEmpty
-                      ? (tInline(
-                          AppStrings.currentLanguageCode,
-                          'Siz',
-                          'You',
-                          'Du',
-                        ))
-                      : userProfile.name,
                   tr: tr,
                   userSupporterTier: userProfile.supporterTier,
                   userAvatarIndex: userProfile.avatarIndex,
@@ -728,14 +659,6 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  void _showPaywall(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => PremiumPaywallScreen(strings: widget.strings),
       ),
     );
   }
@@ -1227,8 +1150,9 @@ class _ProfileHubScreenState extends ConsumerState<ProfileHubScreen>
                 isViewedBySelf: false,
                 sharePhone: friend.phone != null && friend.phone!.isNotEmpty,
                 shareEmergency:
-                    friend.emergencyPhone != null &&
-                    friend.emergencyPhone!.isNotEmpty,
+                    (friend.emergencyPhone != null &&
+                        friend.emergencyPhone!.isNotEmpty) ||
+                    (friend.bloodType.isNotEmpty && friend.bloodType != '—'),
               ),
               const SizedBox(height: ApexSpacing.x2),
               RiderHarmonyRadarChart(
@@ -3184,6 +3108,11 @@ class _FriendsListState extends ConsumerState<_FriendsList> {
                 selectedBadges: friend.selectedBadges,
                 supporterTier: friend.supporterTier,
                 compact: true,
+                sharePhone: friend.phone != null && friend.phone!.isNotEmpty,
+                shareEmergency:
+                    (friend.emergencyPhone != null &&
+                        friend.emergencyPhone!.isNotEmpty) ||
+                    (friend.bloodType.isNotEmpty && friend.bloodType != '—'),
                 onTap: () => widget.onFriendTap(friend),
               ),
             );
@@ -3718,7 +3647,6 @@ class _LeaderboardList extends StatefulWidget {
   const _LeaderboardList({
     required this.friends,
     required this.userKm,
-    required this.userName,
     required this.tr,
     required this.userSupporterTier,
     required this.userAvatarIndex,
@@ -3730,7 +3658,6 @@ class _LeaderboardList extends StatefulWidget {
 
   final List<FriendProfile> friends;
   final double userKm;
-  final String userName;
   final bool tr;
   final int userSupporterTier;
   final int userAvatarIndex;
@@ -3746,14 +3673,13 @@ class _LeaderboardList extends StatefulWidget {
 class _LeaderboardListState extends State<_LeaderboardList> {
   @override
   Widget build(BuildContext context) {
-    final userName = widget.userName;
     final userKm = widget.userKm;
 
     // Merge user with friends and sort by weeklyKm
     final items = <_LeaderboardItem>[
       _LeaderboardItem(
-        name: userName,
-        tag: tInline(AppStrings.currentLanguageCode, 'Siz', 'You', 'Du'),
+        name: tInline(AppStrings.currentLanguageCode, 'Siz', 'You', 'Sie'),
+        tag: '',
         km: userKm,
         isUser: true,
         supporterTier: widget.userSupporterTier,
@@ -3849,7 +3775,7 @@ class _LeaderboardListState extends State<_LeaderboardList> {
                     Text(
                       tInline(
                         AppStrings.currentLanguageCode,
-                        'SENİN HAFTAN',
+                        'SİZİN HAFTANIZ',
                         'YOUR WEEK',
                         'DEINE WOCHE',
                       ),
@@ -3891,13 +3817,13 @@ class _LeaderboardListState extends State<_LeaderboardList> {
                     userRank == 1
                         ? tInline(
                             AppStrings.currentLanguageCode,
-                            'Çevrene liderlik ediyorsun',
+                            'Çevrenize liderlik ediyorsunuz',
                             'Leading your circle',
                             'Führend in deinem Kreis',
                           )
                         : tInline(
                             AppStrings.currentLanguageCode,
-                            'İyi gidiyorsun',
+                            'İyi gidiyorsunuz',
                             'Doing great',
                             'Gut gemacht',
                           ),
@@ -4092,30 +4018,15 @@ class _LeaderboardListState extends State<_LeaderboardList> {
                 ),
               ],
             ),
-            if (item.isUser) ...[
-              const SizedBox(height: 4),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFD700),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  tInline(AppStrings.currentLanguageCode, 'SEN', 'YOU', 'DU'),
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
+            if (item.tag.isNotEmpty) ...[
+              const SizedBox(height: 2),
+              Text(
+                item.tag,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: context.colors.textSecondary,
                 ),
               ),
             ],
-            const SizedBox(height: 2),
-            Text(
-              item.tag,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: context.colors.textSecondary,
-              ),
-            ),
             const SizedBox(height: 8),
             Text(
               '${item.km.toStringAsFixed(1)} km',
@@ -4158,49 +4069,20 @@ class _LeaderboardListState extends State<_LeaderboardList> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Text(
-                        item.name,
-                        style: Theme.of(
-                          context,
-                        ).textTheme.bodyMedium?.copyWith(color: Colors.white),
-                      ),
-                      if (item.isUser) ...[
-                        const SizedBox(width: 6),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 4,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFFD700),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            tInline(
-                              AppStrings.currentLanguageCode,
-                              'SEN',
-                              'YOU',
-                              'DU',
-                            ),
-                            style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
                   Text(
-                    item.tag,
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: context.colors.textSecondary,
-                    ),
+                    item.name,
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.copyWith(color: Colors.white),
                   ),
+                  if (item.tag.isNotEmpty)
+                    Text(
+                      item.tag,
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: context.colors.textSecondary,
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -5967,46 +5849,6 @@ class _RiderMatchmakerScreenState extends State<_RiderMatchmakerScreen>
                 ],
               ],
             ),
-    );
-  }
-}
-
-class _CompactShareToggle extends StatelessWidget {
-  const _CompactShareToggle({
-    required this.icon,
-    required this.isActive,
-    required this.onToggle,
-    required this.color,
-  });
-
-  final IconData icon;
-  final bool isActive;
-  final ValueChanged<bool> onToggle;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => onToggle(!isActive),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.all(6),
-        decoration: BoxDecoration(
-          color: isActive ? color.withValues(alpha: 0.2) : Colors.transparent,
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: isActive
-                ? color
-                : context.colors.textSecondary.withValues(alpha: 0.3),
-            width: 1.5,
-          ),
-        ),
-        child: Icon(
-          icon,
-          size: 18,
-          color: isActive ? color : context.colors.textSecondary,
-        ),
-      ),
     );
   }
 }

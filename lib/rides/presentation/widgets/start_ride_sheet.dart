@@ -6,8 +6,7 @@ import 'package:apexflow/core/design/apex_spacing.dart';
 import 'package:apexflow/core/i18n/app_strings.dart';
 import 'package:apexflow/rides/application/ride_state.dart';
 import 'package:apexflow/rides/application/ride_location_service.dart';
-import 'dart:io' show Platform;
-import 'package:flutter/foundation.dart' show kIsWeb, kReleaseMode;
+import 'package:apexflow/rides/presentation/widgets/ride_location_disclosure.dart';
 
 void showQuickStartRideSheet(
   BuildContext context,
@@ -38,6 +37,12 @@ void showQuickStartRideSheet(
             }
             return;
           }
+
+          final consented = await confirmRideLocationUse(
+            context,
+            strings.languageCode,
+          );
+          if (!consented || !context.mounted) return;
 
           final locationService = RideLocationService();
           final status = await locationService.startTracking(

@@ -36,6 +36,8 @@ class UserProfile {
     this.ghostMode = false,
     this.sharePhone = false,
     this.shareEmergency = false,
+    this.shareBloodType = false,
+    this.shareLicensePlate = false,
     this.isPremium = false,
     this.isTagCustomized = false,
     this.cardThemeIndex = 0,
@@ -70,6 +72,8 @@ class UserProfile {
   final bool ghostMode;
   final bool sharePhone;
   final bool shareEmergency;
+  final bool shareBloodType;
+  final bool shareLicensePlate;
   final bool isPremium;
   final bool isTagCustomized;
   final int cardThemeIndex;
@@ -99,6 +103,8 @@ class UserProfile {
     bool? ghostMode,
     bool? sharePhone,
     bool? shareEmergency,
+    bool? shareBloodType,
+    bool? shareLicensePlate,
     bool? isPremium,
     bool? isTagCustomized,
     int? cardThemeIndex,
@@ -130,6 +136,8 @@ class UserProfile {
       ghostMode: ghostMode ?? this.ghostMode,
       sharePhone: sharePhone ?? this.sharePhone,
       shareEmergency: shareEmergency ?? this.shareEmergency,
+      shareBloodType: shareBloodType ?? this.shareBloodType,
+      shareLicensePlate: shareLicensePlate ?? this.shareLicensePlate,
       isPremium: isPremium ?? this.isPremium,
       isTagCustomized: isTagCustomized ?? this.isTagCustomized,
       cardThemeIndex: cardThemeIndex ?? this.cardThemeIndex,
@@ -169,6 +177,8 @@ class UserProfileController extends Notifier<UserProfile> {
   static const _ghostModeKey = 'profile.ghost_mode';
   static const _sharePhoneKey = 'profile.share_phone';
   static const _shareEmergencyKey = 'profile.share_emergency';
+  static const _shareBloodTypeKey = 'profile.share_blood_type';
+  static const _shareLicensePlateKey = 'profile.share_license_plate';
   static const _isPremiumKey = 'profile.is_premium';
   static const _isTagCustomizedKey = 'profile.is_tag_customized';
   static const _cardThemeIndexKey = 'profile.card_theme_index';
@@ -236,6 +246,10 @@ class UserProfileController extends Notifier<UserProfile> {
     final sharePhone = await ApexKvStore.getBool(_sharePhoneKey) ?? false;
     final shareEmergency =
         await ApexKvStore.getBool(_shareEmergencyKey) ?? false;
+    final shareBloodType =
+        await ApexKvStore.getBool(_shareBloodTypeKey) ?? shareEmergency;
+    final shareLicensePlate =
+        await ApexKvStore.getBool(_shareLicensePlateKey) ?? false;
     var riderTag = await ApexKvStore.getString(_riderTagKey) ?? '';
     // Format the tag according to rules during hydration if empty or malformed
     var rawTag = riderTag.trim();
@@ -350,6 +364,8 @@ class UserProfileController extends Notifier<UserProfile> {
       ghostMode: ghostMode,
       sharePhone: sharePhone,
       shareEmergency: shareEmergency,
+      shareBloodType: shareBloodType,
+      shareLicensePlate: shareLicensePlate,
       isPremium: isPremium,
       isTagCustomized: isTagCustomized,
       cardThemeIndex: themeIndex,
@@ -398,6 +414,8 @@ class UserProfileController extends Notifier<UserProfile> {
       _ghostModeKey,
       _sharePhoneKey,
       _shareEmergencyKey,
+      _shareBloodTypeKey,
+      _shareLicensePlateKey,
       _isPremiumKey,
       _isTagCustomizedKey,
       _cardThemeIndexKey,
@@ -474,6 +492,12 @@ class UserProfileController extends Notifier<UserProfile> {
     final blood = profileData['bloodType'] as String? ?? '';
     final emName = profileData['emergencyContactName'] as String? ?? '';
     final emPhone = profileData['emergencyContactPhone'] as String? ?? '';
+    final sharePhone = profileData['sharePhone'] as bool? ?? false;
+    final shareEmergency = profileData['shareEmergency'] as bool? ?? false;
+    final shareBloodType =
+        profileData['shareBloodType'] as bool? ?? shareEmergency;
+    final shareLicensePlate =
+        profileData['shareLicensePlate'] as bool? ?? false;
 
     final city = profileData['city'] as String? ?? '';
     final instagram = profileData['instagram'] as String? ?? '';
@@ -514,6 +538,10 @@ class UserProfileController extends Notifier<UserProfile> {
       bloodType: blood,
       emergencyContactName: emName,
       emergencyContactPhone: emPhone,
+      sharePhone: sharePhone,
+      shareEmergency: shareEmergency,
+      shareBloodType: shareBloodType,
+      shareLicensePlate: shareLicensePlate,
       city: city,
       instagram: instagram,
       tiktok: tiktok,
@@ -539,6 +567,10 @@ class UserProfileController extends Notifier<UserProfile> {
     await ApexKvStore.setString(_emergencyPhoneKey, emPhone);
     await ApexKvStore.setString(_riderTagKey, restoredTag);
     await ApexKvStore.setBool(_isPremiumKey, isPremium);
+    await ApexKvStore.setBool(_sharePhoneKey, sharePhone);
+    await ApexKvStore.setBool(_shareEmergencyKey, shareEmergency);
+    await ApexKvStore.setBool(_shareBloodTypeKey, shareBloodType);
+    await ApexKvStore.setBool(_shareLicensePlateKey, shareLicensePlate);
 
     await ApexKvStore.setString(_cityKey, city);
     await ApexKvStore.setString(_instagramKey, instagram);
@@ -584,6 +616,12 @@ class UserProfileController extends Notifier<UserProfile> {
     final blood = profileData['bloodType'] as String? ?? '';
     final emName = profileData['emergencyContactName'] as String? ?? '';
     final emPhone = profileData['emergencyContactPhone'] as String? ?? '';
+    final sharePhone = profileData['sharePhone'] as bool? ?? false;
+    final shareEmergency = profileData['shareEmergency'] as bool? ?? false;
+    final shareBloodType =
+        profileData['shareBloodType'] as bool? ?? shareEmergency;
+    final shareLicensePlate =
+        profileData['shareLicensePlate'] as bool? ?? false;
     final isTagCustomized =
         profileData['isTagCustomized'] as bool? ??
         (restoredTag.isNotEmpty && !restoredTag.startsWith('@rider#'));
@@ -631,6 +669,10 @@ class UserProfileController extends Notifier<UserProfile> {
       bloodType: blood,
       emergencyContactName: emName,
       emergencyContactPhone: emPhone,
+      sharePhone: sharePhone,
+      shareEmergency: shareEmergency,
+      shareBloodType: shareBloodType,
+      shareLicensePlate: shareLicensePlate,
       isTagCustomized: isTagCustomized,
       city: city,
       instagram: instagram,
@@ -656,6 +698,10 @@ class UserProfileController extends Notifier<UserProfile> {
     await ApexKvStore.setString(_emergencyPhoneKey, emPhone);
     await ApexKvStore.setString(_riderTagKey, activeTag);
     await ApexKvStore.setBool(_isPremiumKey, isPremium);
+    await ApexKvStore.setBool(_sharePhoneKey, sharePhone);
+    await ApexKvStore.setBool(_shareEmergencyKey, shareEmergency);
+    await ApexKvStore.setBool(_shareBloodTypeKey, shareBloodType);
+    await ApexKvStore.setBool(_shareLicensePlateKey, shareLicensePlate);
     await ApexKvStore.setBool(_isTagCustomizedKey, isTagCustomized);
 
     await ApexKvStore.setString(_cityKey, city);
@@ -710,6 +756,12 @@ class UserProfileController extends Notifier<UserProfile> {
         final blood = profileData['bloodType'] as String? ?? '';
         final emName = profileData['emergencyContactName'] as String? ?? '';
         final emPhone = profileData['emergencyContactPhone'] as String? ?? '';
+        final sharePhone = profileData['sharePhone'] as bool? ?? false;
+        final shareEmergency = profileData['shareEmergency'] as bool? ?? false;
+        final shareBloodType =
+            profileData['shareBloodType'] as bool? ?? shareEmergency;
+        final shareLicensePlate =
+            profileData['shareLicensePlate'] as bool? ?? false;
 
         final city = profileData['city'] as String? ?? '';
         final instagram = profileData['instagram'] as String? ?? '';
@@ -751,6 +803,10 @@ class UserProfileController extends Notifier<UserProfile> {
           bloodType: blood,
           emergencyContactName: emName,
           emergencyContactPhone: emPhone,
+          sharePhone: sharePhone,
+          shareEmergency: shareEmergency,
+          shareBloodType: shareBloodType,
+          shareLicensePlate: shareLicensePlate,
           city: city,
           instagram: instagram,
           tiktok: tiktok,
@@ -774,6 +830,10 @@ class UserProfileController extends Notifier<UserProfile> {
         await ApexKvStore.setString(_emergencyPhoneKey, emPhone);
         await ApexKvStore.setString(_riderTagKey, tag);
         await ApexKvStore.setBool(_isPremiumKey, isPremium);
+        await ApexKvStore.setBool(_sharePhoneKey, sharePhone);
+        await ApexKvStore.setBool(_shareEmergencyKey, shareEmergency);
+        await ApexKvStore.setBool(_shareBloodTypeKey, shareBloodType);
+        await ApexKvStore.setBool(_shareLicensePlateKey, shareLicensePlate);
 
         await ApexKvStore.setString(_cityKey, city);
         await ApexKvStore.setString(_instagramKey, instagram);
@@ -862,6 +922,8 @@ class UserProfileController extends Notifier<UserProfile> {
     bool? ghostMode,
     bool? sharePhone,
     bool? shareEmergency,
+    bool? shareBloodType,
+    bool? shareLicensePlate,
     bool? isPremium,
     String? email,
     String? city,
@@ -952,6 +1014,8 @@ class UserProfileController extends Notifier<UserProfile> {
       ghostMode: ghostMode ?? state.ghostMode,
       sharePhone: sharePhone ?? state.sharePhone,
       shareEmergency: shareEmergency ?? state.shareEmergency,
+      shareBloodType: shareBloodType ?? state.shareBloodType,
+      shareLicensePlate: shareLicensePlate ?? state.shareLicensePlate,
       isPremium: isPremium ?? state.isPremium,
       isTagCustomized: isCustomized,
       cardThemeIndex: state.cardThemeIndex,
@@ -989,6 +1053,8 @@ class UserProfileController extends Notifier<UserProfile> {
     await ApexKvStore.setBool(_ghostModeKey, state.ghostMode);
     await ApexKvStore.setBool(_sharePhoneKey, state.sharePhone);
     await ApexKvStore.setBool(_shareEmergencyKey, state.shareEmergency);
+    await ApexKvStore.setBool(_shareBloodTypeKey, state.shareBloodType);
+    await ApexKvStore.setBool(_shareLicensePlateKey, state.shareLicensePlate);
     await ApexKvStore.setBool(_isPremiumKey, state.isPremium);
     await ApexKvStore.setBool(_isTagCustomizedKey, state.isTagCustomized);
     await ApexKvStore.setString(_cityKey, state.city);
@@ -1019,7 +1085,8 @@ class UserProfileController extends Notifier<UserProfile> {
     );
 
     // Sync to Firestore database
-    await _syncProfileToFirestore(oldTag: oldTag, email: email);
+    final synced = await _syncProfileToFirestore(oldTag: oldTag, email: email);
+    if (!synced) return false;
 
     // Sync with home_widget for Android home screen widget display
     try {
@@ -1045,6 +1112,37 @@ class UserProfileController extends Notifier<UserProfile> {
     return true;
   }
 
+  Future<bool> updateFriendVisibility({
+    bool? sharePhone,
+    bool? shareEmergency,
+    bool? shareBloodType,
+    bool? shareLicensePlate,
+  }) async {
+    final previous = state;
+    final success = await updateProfile(
+      name: state.name,
+      phoneNumber: state.phoneNumber,
+      bloodType: state.bloodType,
+      emergencyContactName: state.emergencyContactName,
+      emergencyContactPhone: state.emergencyContactPhone,
+      sharePhone: sharePhone ?? state.sharePhone,
+      shareEmergency: shareEmergency ?? state.shareEmergency,
+      shareBloodType: shareBloodType ?? state.shareBloodType,
+      shareLicensePlate: shareLicensePlate ?? state.shareLicensePlate,
+    );
+    if (success) return true;
+
+    state = previous;
+    await ApexKvStore.setBool(_sharePhoneKey, previous.sharePhone);
+    await ApexKvStore.setBool(_shareEmergencyKey, previous.shareEmergency);
+    await ApexKvStore.setBool(_shareBloodTypeKey, previous.shareBloodType);
+    await ApexKvStore.setBool(
+      _shareLicensePlateKey,
+      previous.shareLicensePlate,
+    );
+    return false;
+  }
+
   Future<void> logout() async {
     try {
       await FirebaseAuth.instance.signOut();
@@ -1063,6 +1161,8 @@ class UserProfileController extends Notifier<UserProfile> {
     await ApexKvStore.remove(_ghostModeKey);
     await ApexKvStore.remove(_sharePhoneKey);
     await ApexKvStore.remove(_shareEmergencyKey);
+    await ApexKvStore.remove(_shareBloodTypeKey);
+    await ApexKvStore.remove(_shareLicensePlateKey);
     await ApexKvStore.remove(_isPremiumKey);
     await ApexKvStore.remove(_isTagCustomizedKey);
     await ApexKvStore.remove(_selectedFrameIndexKey);
@@ -1110,10 +1210,17 @@ class UserProfileController extends Notifier<UserProfile> {
     if (uid != null) {
       try {
         await FirebaseService.instance.deleteUserAccount(uid, riderTag);
-        await ref.read(dbServiceProvider).deleteAllForUser(uid);
       } catch (_) {
         return false;
       }
+
+      // The backend has already removed Authentication and cloud data at
+      // this point. A device-local database cleanup failure must not leave
+      // the deleted account looking signed in or report the remote deletion
+      // as failed; logout below clears the remaining KV/in-memory state.
+      try {
+        await ref.read(dbServiceProvider).deleteAllForUser(uid);
+      } catch (_) {}
     }
 
     await logout();
@@ -1208,10 +1315,12 @@ class UserProfileController extends Notifier<UserProfile> {
     }
   }
 
-  Future<void> _syncProfileToFirestore({String? oldTag, String? email}) async {
-    if (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST')) return;
+  Future<bool> _syncProfileToFirestore({String? oldTag, String? email}) async {
+    if (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST')) {
+      return true;
+    }
     await FirebaseService.instance.init();
-    if (Firebase.apps.isEmpty) return;
+    if (Firebase.apps.isEmpty) return false;
 
     final garage = ref.read(garageStateProvider);
     final rides = ref.read(rideStateProvider);
@@ -1243,49 +1352,51 @@ class UserProfileController extends Notifier<UserProfile> {
       // Ignore FCM errors if not configured yet
     }
 
-    unawaited(
-      FirebaseService.instance.syncUserProfile(
-        name: state.name,
-        tag: state.riderTag,
-        isPremium: state.isPremium,
-        phone: state.phoneNumber,
-        bloodType: state.bloodType,
-        emergencyName: state.emergencyContactName,
-        emergencyPhone: state.emergencyContactPhone,
-        email: cleanEmail,
-        oldTag: oldTag,
-        fcmToken: fcmToken,
-        activeBikeName: isBikeEmpty ? null : bike.name,
-        activeBikeModel: isBikeEmpty ? null : bike.model,
-        activeBikeOdometer: isBikeEmpty ? null : bike.odometerKm,
-        activeBikeLastService: isBikeEmpty ? null : bike.lastServiceKm,
-        activeBikeServiceInterval: isBikeEmpty ? null : bike.serviceIntervalKm,
-        chainWearPercent: isBikeEmpty ? null : bike.chainWearPercent,
-        tireWearPercent: isBikeEmpty ? null : bike.tireWearPercent,
-        brakeWearPercent: isBikeEmpty ? null : bike.brakeWearPercent,
-        oilHealthPercent: isBikeEmpty ? null : bike.oilHealthPercent,
-        batteryHealthPercent: isBikeEmpty ? null : bike.batteryHealthPercent,
-        weeklyKm: weeklyKm,
-        harmonyScore: harmonyScore,
-        ridingStyle: state.ridingStyle,
-        avatarIndex: state.avatarIndex,
-        // Empty string (not null) tells syncUserProfile to explicitly clear
-        // the field in Firestore — deleting an already-absent field is a
-        // harmless no-op, so this is safe to send on every sync regardless
-        // of whether the photo was ever set.
-        avatarPhotoUrl: state.avatarPhotoUrl ?? '',
-        cardThemeIndex: state.cardThemeIndex,
-        city: state.city,
-        instagram: state.instagram,
-        tiktok: state.tiktok,
-        youtube: state.youtube,
-        licensePlate: state.licensePlate,
-        selectedBadges: state.selectedBadges,
-        unlockedBadges: state.unlockedBadges,
-        isFoundingMember: state.isFoundingMember,
-        supporterTier: state.supporterTier,
-        unlockedSupporterTiers: state.unlockedSupporterTiers.toList(),
-      ),
+    return FirebaseService.instance.syncUserProfile(
+      name: state.name,
+      tag: state.riderTag,
+      isPremium: state.isPremium,
+      phone: state.phoneNumber,
+      bloodType: state.bloodType,
+      emergencyName: state.emergencyContactName,
+      emergencyPhone: state.emergencyContactPhone,
+      email: cleanEmail,
+      oldTag: oldTag,
+      fcmToken: fcmToken,
+      activeBikeName: isBikeEmpty ? null : bike.name,
+      activeBikeModel: isBikeEmpty ? null : bike.model,
+      activeBikeOdometer: isBikeEmpty ? null : bike.odometerKm,
+      activeBikeLastService: isBikeEmpty ? null : bike.lastServiceKm,
+      activeBikeServiceInterval: isBikeEmpty ? null : bike.serviceIntervalKm,
+      chainWearPercent: isBikeEmpty ? null : bike.chainWearPercent,
+      tireWearPercent: isBikeEmpty ? null : bike.tireWearPercent,
+      brakeWearPercent: isBikeEmpty ? null : bike.brakeWearPercent,
+      oilHealthPercent: isBikeEmpty ? null : bike.oilHealthPercent,
+      batteryHealthPercent: isBikeEmpty ? null : bike.batteryHealthPercent,
+      weeklyKm: weeklyKm,
+      harmonyScore: harmonyScore,
+      ridingStyle: state.ridingStyle,
+      avatarIndex: state.avatarIndex,
+      // Empty string (not null) tells syncUserProfile to explicitly clear
+      // the field in Firestore — deleting an already-absent field is a
+      // harmless no-op, so this is safe to send on every sync regardless
+      // of whether the photo was ever set.
+      avatarPhotoUrl: state.avatarPhotoUrl ?? '',
+      cardThemeIndex: state.cardThemeIndex,
+      city: state.city,
+      instagram: state.instagram,
+      tiktok: state.tiktok,
+      youtube: state.youtube,
+      licensePlate: state.licensePlate,
+      sharePhone: state.sharePhone,
+      shareEmergency: state.shareEmergency,
+      shareBloodType: state.shareBloodType,
+      shareLicensePlate: state.shareLicensePlate,
+      selectedBadges: state.selectedBadges,
+      unlockedBadges: state.unlockedBadges,
+      isFoundingMember: state.isFoundingMember,
+      supporterTier: state.supporterTier,
+      unlockedSupporterTiers: state.unlockedSupporterTiers.toList(),
     );
   }
 

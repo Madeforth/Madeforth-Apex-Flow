@@ -76,6 +76,12 @@ class FriendsController extends Notifier<List<FriendProfile>> {
     // 2. Map Firebase profile fields to FriendProfile
     final random = Random();
     final friendUid = profileData['uid'] as String?;
+    if (friendUid != null) {
+      await FirebaseService.instance.addFriendConnection(myId, friendUid);
+      final friendFields = await FirebaseService.instance
+          .getFriendSharedProfile(friendUid);
+      if (friendFields != null) profileData.addAll(friendFields);
+    }
     final newFriend = FriendProfile(
       stableId: friendUid ?? 'friend-${DateTime.now().millisecondsSinceEpoch}',
       name: profileData['name'] as String? ?? 'Rider',
@@ -104,7 +110,7 @@ class FriendsController extends Notifier<List<FriendProfile>> {
       modifications: const [],
       phone: profileData['phoneNumber'] as String?,
       emergencyPhone: profileData['emergencyContactPhone'] as String?,
-      bloodType: profileData['bloodType'] as String? ?? '—',
+      bloodType: profileData['bloodType'] as String? ?? '',
       cardThemeIndex: profileData['cardThemeIndex'] as int? ?? 0,
       city: profileData['city'] as String? ?? '',
       instagram: profileData['instagram'] as String? ?? '',
@@ -119,11 +125,6 @@ class FriendsController extends Notifier<List<FriendProfile>> {
 
     final db = ref.read(dbServiceProvider);
     await db.saveFriend(newFriend, userId: myId);
-
-    // Save bidirectional link in Firestore
-    if (friendUid != null) {
-      unawaited(FirebaseService.instance.addFriendConnection(myId, friendUid));
-    }
 
     if (!_mounted) return true;
     state = [newFriend, ...state];
@@ -265,7 +266,7 @@ class FriendsController extends Notifier<List<FriendProfile>> {
             modifications: const [],
             phone: profileData['phoneNumber'] as String?,
             emergencyPhone: profileData['emergencyContactPhone'] as String?,
-            bloodType: profileData['bloodType'] as String? ?? '—',
+            bloodType: profileData['bloodType'] as String? ?? '',
             cardThemeIndex: profileData['cardThemeIndex'] as int? ?? 0,
             city: profileData['city'] as String? ?? '',
             instagram: profileData['instagram'] as String? ?? '',

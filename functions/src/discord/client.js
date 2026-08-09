@@ -29,4 +29,27 @@ async function createForumThread({ forumId, botToken, threadName, embed }) {
   return response.json();
 }
 
-module.exports = { createForumThread };
+async function deleteDiscordChannel({ channelId, botToken }) {
+  const response = await fetch(
+      `https://discord.com/api/v10/channels/${channelId}`,
+      {
+        method: "DELETE",
+        headers: {"Authorization": `Bot ${botToken}`},
+      },
+  );
+
+  // A missing thread is already in the desired deleted state, which makes
+  // account deletion safe to retry after a partial failure.
+  if (response.status === 404) return;
+
+  if (!response.ok) {
+    const bodyText = await response.text().catch(() => "");
+    const error = new Error(
+        `Discord delete error ${response.status}: ${bodyText.slice(0, 300)}`,
+    );
+    error.status = response.status;
+    throw error;
+  }
+}
+
+module.exports = { createForumThread, deleteDiscordChannel };

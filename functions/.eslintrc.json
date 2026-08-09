@@ -21,6 +21,7 @@
     "camelcase": "off",
     "arrow-parens": "off",
     "padded-blocks": "off",
-    "operator-linebreak": "off"
+    "operator-linebreak": "off",
+    "linebreak-style": "off"
   }
 }

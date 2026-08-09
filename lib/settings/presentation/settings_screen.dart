@@ -23,9 +23,12 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+  bool _isSavingFriendVisibility = false;
+
   @override
   Widget build(BuildContext context) {
     final settings = ref.watch(appSettingsProvider);
+    final userProfile = ref.watch(userProfileProvider);
 
     return Scaffold(
       body: SafeArea(
@@ -64,15 +67,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 children: [
                   Text(
                     widget.strings.settingsNotificationTitle,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w900,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.15,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     widget.strings.settingsNotificationDesc,
-                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: context.colors.textSecondary,
+                      height: 1.4,
                     ),
                   ),
                   const SizedBox(height: ApexSpacing.x1),
@@ -262,6 +267,85 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
             const SizedBox(height: ApexSpacing.x2),
 
+            ApexPanel(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    tInline(
+                      AppStrings.currentLanguageCode,
+                      'Arkadaşlarla Bilgi Paylaşımı',
+                      'Information Shared with Friends',
+                      'Mit Freunden geteilte Informationen',
+                    ),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    tInline(
+                      AppStrings.currentLanguageCode,
+                      'Açtığınız bilgiler yalnızca Apex Flow arkadaşlarınıza gösterilir. E-postanız paylaşılmaz.',
+                      'Enabled information is shown only to your Apex Flow friends. Your email is never shared.',
+                      'Aktivierte Informationen werden nur Ihren Apex-Flow-Freunden gezeigt. Ihre E-Mail-Adresse wird nie geteilt.',
+                    ),
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                      color: context.colors.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: ApexSpacing.x1),
+                  _FriendVisibilitySwitch(
+                    icon: Icons.bloodtype_outlined,
+                    title: tInline(
+                      AppStrings.currentLanguageCode,
+                      'Kan grubu',
+                      'Blood type',
+                      'Blutgruppe',
+                    ),
+                    value: userProfile.shareBloodType,
+                    onChanged: (value) =>
+                        _updateFriendVisibility(shareBloodType: value),
+                  ),
+                  _FriendVisibilitySwitch(
+                    icon: Icons.phone_outlined,
+                    title: tInline(
+                      AppStrings.currentLanguageCode,
+                      'Telefon numarası',
+                      'Phone number',
+                      'Telefonnummer',
+                    ),
+                    value: userProfile.sharePhone,
+                    onChanged: (value) =>
+                        _updateFriendVisibility(sharePhone: value),
+                  ),
+                  _FriendVisibilitySwitch(
+                    icon: Icons.contact_emergency_outlined,
+                    title: tInline(
+                      AppStrings.currentLanguageCode,
+                      'Acil durum telefonu',
+                      'Emergency phone',
+                      'Notfallnummer',
+                    ),
+                    value: userProfile.shareEmergency,
+                    onChanged: (value) =>
+                        _updateFriendVisibility(shareEmergency: value),
+                  ),
+                  _FriendVisibilitySwitch(
+                    icon: Icons.pin_outlined,
+                    title: tInline(
+                      AppStrings.currentLanguageCode,
+                      'Plaka',
+                      'License plate',
+                      'Kennzeichen',
+                    ),
+                    value: userProfile.shareLicensePlate,
+                    onChanged: (value) =>
+                        _updateFriendVisibility(shareLicensePlate: value),
+                  ),
+                ],
+              ),
+            ),
             const SizedBox(height: ApexSpacing.x2),
 
             // 5. Support & Madeforth QA Bug Report
@@ -385,6 +469,27 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton.icon(
+                      onPressed: () => launchUrl(
+                        Uri.https('apex-flow-privacy-7baea.web.app', '/', {
+                          'lang': AppStrings.currentLanguageCode,
+                        }),
+                        mode: LaunchMode.externalApplication,
+                      ),
+                      icon: const Icon(Icons.privacy_tip_outlined, size: 18),
+                      label: Text(
+                        tInline(
+                          AppStrings.currentLanguageCode,
+                          'Gizlilik Politikasını Oku',
+                          'Read Privacy Policy',
+                          'Datenschutzerklärung lesen',
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: ApexSpacing.x1),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
                       style: OutlinedButton.styleFrom(
                         foregroundColor: Colors.redAccent,
                         side: BorderSide(
@@ -461,7 +566,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      'v1.0.0 (Build 1)',
+                      'v1.0.0 (Build 34)',
                       style: TextStyle(
                         fontSize: 10,
                         color: context.colors.textSecondary.withValues(
@@ -480,6 +585,42 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _updateFriendVisibility({
+    bool? sharePhone,
+    bool? shareEmergency,
+    bool? shareBloodType,
+    bool? shareLicensePlate,
+  }) async {
+    if (_isSavingFriendVisibility) return;
+    setState(() => _isSavingFriendVisibility = true);
+    try {
+      final success = await ref
+          .read(userProfileProvider.notifier)
+          .updateFriendVisibility(
+            sharePhone: sharePhone,
+            shareEmergency: shareEmergency,
+            shareBloodType: shareBloodType,
+            shareLicensePlate: shareLicensePlate,
+          );
+      if (!success && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              tInline(
+                AppStrings.currentLanguageCode,
+                'Paylaşım tercihi kaydedilemedi. Bağlantınızı kontrol edip tekrar deneyin.',
+                'Sharing preference could not be saved. Check your connection and try again.',
+                'Die Freigabeeinstellung konnte nicht gespeichert werden. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.',
+              ),
+            ),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSavingFriendVisibility = false);
+    }
   }
 
   void _showDeleteAccountConfirmationDialog(
@@ -567,9 +708,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     content: Text(
                       tInline(
                         AppStrings.currentLanguageCode,
-                        'Hesabınız ve tüm verileriniz Firebase\'den siliniyor...',
-                        'Deleting your account and data from Firebase...',
-                        'Wird gelöscht...',
+                        'Silme isteği işleniyor. Oturum ekranı açılana kadar bekleyin...',
+                        'Deletion is in progress. Wait until the sign-in screen appears...',
+                        'Löschung läuft. Warten Sie, bis der Anmeldebildschirm erscheint...',
                       ),
                     ),
                     duration: const Duration(seconds: 2),
@@ -580,7 +721,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     .read(userProfileProvider.notifier)
                     .deleteAccount();
                 if (!mounted) return;
-                if (success) return;
+                if (success) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      backgroundColor: SlatePalette.emerald,
+                      content: Text(
+                        tInline(
+                          AppStrings.currentLanguageCode,
+                          'Hesabınız ve verileriniz kalıcı olarak silindi.',
+                          'Your account and data were permanently deleted.',
+                          'Ihr Konto und Ihre Daten wurden dauerhaft gelöscht.',
+                        ),
+                      ),
+                    ),
+                  );
+                  return;
+                }
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     backgroundColor: Colors.redAccent,
@@ -611,6 +767,78 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ],
         );
       },
+    );
+  }
+}
+
+class _FriendVisibilitySwitch extends StatelessWidget {
+  const _FriendVisibilitySwitch({
+    required this.icon,
+    required this.title,
+    required this.value,
+    required this.onChanged,
+  });
+
+  final IconData icon;
+  final String title;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return MediaQuery.withClampedTextScaling(
+      maxScaleFactor: 1.2,
+      child: Semantics(
+        label: title,
+        toggled: value,
+        button: true,
+        child: InkWell(
+          onTap: () => onChanged(!value),
+          borderRadius: BorderRadius.circular(12),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 52),
+            child: Row(
+              children: [
+                Container(
+                  width: 32,
+                  height: 32,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: context.colors.cyan.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(icon, color: context.colors.cyan, size: 18),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontWeight: FontWeight.w600,
+                      height: 1.25,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                ExcludeSemantics(
+                  child: Transform.scale(
+                    scale: 0.86,
+                    child: Switch.adaptive(
+                      value: value,
+                      activeTrackColor: context.colors.cyan,
+                      onChanged: onChanged,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

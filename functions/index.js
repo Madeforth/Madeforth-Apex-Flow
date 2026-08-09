@@ -183,6 +183,9 @@ exports.dispatchBugReportToDiscord =
 exports.discordInteractions =
   require("./src/discord/interactions").discordInteractions;
 
+exports.deleteAccountAndData =
+  require("./src/account/deleteAccount").deleteAccountAndData;
+
 // Telemetry DNA & Badge Engine Callable: verifyRideContribution
 exports.verifyRideContribution = onCall(
   { region: "europe-west1", enforceAppCheck: true },
@@ -318,4 +321,3 @@ exports.activateApexPass = onCall(
     });
   }
 );
-

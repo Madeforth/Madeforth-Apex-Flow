@@ -70,5 +70,38 @@ void main() {
         expect(prefs.getString('profile.avatar_index'), '10');
       },
     );
+
+    test(
+      'friend visibility preferences are independent and persisted',
+      () async {
+        SharedPreferences.setMockInitialValues({});
+        await ApexKvStore.init(useFallback: true);
+
+        final container = ProviderContainer();
+        addTearDown(container.dispose);
+        final controller = container.read(userProfileProvider.notifier);
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+
+        final success = await controller.updateFriendVisibility(
+          shareBloodType: true,
+          sharePhone: false,
+          shareEmergency: true,
+          shareLicensePlate: true,
+        );
+
+        expect(success, isTrue);
+        final profile = container.read(userProfileProvider);
+        expect(profile.shareBloodType, isTrue);
+        expect(profile.sharePhone, isFalse);
+        expect(profile.shareEmergency, isTrue);
+        expect(profile.shareLicensePlate, isTrue);
+
+        final prefs = await SharedPreferences.getInstance();
+        expect(prefs.getBool('profile.share_blood_type'), isTrue);
+        expect(prefs.getBool('profile.share_phone'), isFalse);
+        expect(prefs.getBool('profile.share_emergency'), isTrue);
+        expect(prefs.getBool('profile.share_license_plate'), isTrue);
+      },
+    );
   });
 }

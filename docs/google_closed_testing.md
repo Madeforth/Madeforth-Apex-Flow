@@ -1,9 +1,9 @@
 # ApexFlow — Google Play Kapalı Test (Closed Testing) Rehberi
 
-> **Uygulama**: ApexFlow  
-> **Paket Adı**: `com.apexflow.app`  
-> **Versiyon**: 1.0.0+27  
-> **Tarih**: 2026-08-04  
+> **Uygulama**: ApexFlow
+> **Paket Adı**: `com.apexflow.app`
+> **Versiyon**: 1.0.0+34
+> **Güncelleme**: 2026-08-09
 
 ---
 
@@ -14,8 +14,9 @@
 | Google Play Console hesabı (25$ ücret ödendi) | ☐ |
 | Uygulama Google Play Console'da oluşturuldu | ☐ |
 | Signing key (upload key) hazır (`key.properties`) | ☐ |
-| Privacy Policy URL mevcut | ☐ |
-| En az 20 kapalı test kullanıcısı (e-posta listesi) | ☐ |
+| Privacy Policy URL: `https://apex-flow-privacy-7baea.web.app/` | ☐ |
+| Hesap silme URL: `https://apex-flow-privacy-7baea.web.app/delete-account/` | ☐ |
+| Yeni kişisel hesaplarda en az 12 kapalı test kullanıcısı | ☐ |
 
 ---
 
@@ -27,7 +28,7 @@ flutter clean
 flutter pub get
 
 # AAB (Android App Bundle) oluştur
-flutter build appbundle --release --build-number=27 --build-name=1.0.0
+flutter build appbundle --release --build-number=34 --build-name=1.0.0
 
 # Çıktı konumu:
 # build/app/outputs/bundle/release/app-release.aab
@@ -59,7 +60,9 @@ jarsigner -verify build/app/outputs/bundle/release/app-release.aab
 1. **Testers** sekmesi → **"Create email list"**
 2. Liste adı: `apexflow-beta-testers`
 3. Test kullanıcılarının e-posta adreslerini gir (Google hesapları)
-4. **Minimum 20 kişi** gerekli (Google'ın kapalı test politikası)
+4. 13 Kasım 2023 sonrasında açılmış kişisel geliştirici hesaplarında en az
+   **12 test kullanıcısı 14 gün kesintisiz opt-in** kalmalıdır. Play Console'da
+   hesabınız için gösterilen şart esastır.
 
 **Seçenek B — Google Groups ile:**
 1. Bir Google Group oluştur (ör. `apexflow-testers@googlegroups.com`)
@@ -71,7 +74,7 @@ jarsigner -verify build/app/outputs/bundle/release/app-release.aab
 1. **Releases** sekmesi → **"Create new release"**
 2. **App signing by Google Play** → kabul et (ilk seferde)
 3. `app-release.aab` dosyasını sürükle-bırak ile yükle
-4. **Release name**: `1.0.0 (27) — Closed Beta`
+4. **Release name**: `1.0.0 (34) — Internal Test` (kapalı teste taşırken aynı artifact kullanılabilir)
 5. **Release notes** (Türkçe):
    ```
    ApexFlow v1.0.0 Kapalı Beta
@@ -143,15 +146,80 @@ ApexFlow, motosiklet tutkunları için geliştirilmiş akıllı bakım ve sürü
 3. Tüm sorulara "Hayır" (şiddet, kumar, vb. yok)
 4. Beklenen sonuç: **PEGI 3 / Everyone**
 
-### 5.2 Data Safety
-1. **Policy** → **App content** → **Data safety**
-2. Toplanan veriler:
-   - ✅ E-posta adresi (hesap oluşturma)
-   - ✅ Konum (sürüş rotası — kullanıcı izniyle)
-   - ✅ Cihaz sensör verileri (AHRS)
-   - ✅ Uygulama kullanım verileri (Firebase Analytics)
-3. Veri şifreleme: ✅ Transit'te şifrelenir
-4. Veri silme: ✅ Kullanıcılar hesap silme talep edebilir
+### 5.2 Data Safety — Kodla Doğrulanmış Beyan
+
+Genel cevaplar:
+
+| Soru | Cevap |
+|---|---|
+| Uygulama gerekli veri türlerinden birini topluyor veya paylaşıyor mu? | **Evet** |
+| Toplanan kullanıcı verileri aktarım sırasında şifreleniyor mu? | **Evet** |
+| Kullanıcı hesap silme talep edebilir mi? | **Evet** — uygulama içi + harici URL |
+| Bağımsız güvenlik incelemesi yapıldı mı? | **Hayır** (sertifika yoksa Evet işaretleme) |
+| Veriler satılıyor veya reklam için kullanılıyor mu? | **Hayır** |
+
+`Paylaşım` sorusu için **Hayır** seçilir: Firebase, RevenueCat ve özel QA
+altyapısı uygulama adına hizmet sağlayıcı olarak işler; arkadaş/grup görünürlüğü
+kullanıcının açıkça başlattığı uygulama işlevleridir. Bu durum değişirse form ve
+gizlilik politikası birlikte güncellenmelidir.
+
+Telefon, kan grubu, acil durum telefonu ve plaka varsayılan olarak kapalıdır.
+Kullanıcı her alanı ayrı ayrı "arkadaşlara aç" yaptığında veri yalnızca
+Firestore'da doğrulanmış Apex Flow arkadaşlarına gösterilir; e-posta hiçbir
+sosyal profil görünümüne eklenmez.
+
+Play Console'da aşağıdaki veri türlerini ekle:
+
+| Kategori / Veri türü | Toplanıyor | Zorunlu mu? | Amaç |
+|---|---:|---|---|
+| Konum → Kesin konum | Evet | İsteğe bağlı | Uygulama işlevselliği (sürüş, buluşma noktası) |
+| Kişisel bilgiler → Ad | Evet | Hesap profili için zorunlu | Uygulama işlevselliği, hesap yönetimi |
+| Kişisel bilgiler → E-posta adresi | Evet | E-posta hesabında zorunlu | Hesap yönetimi, kimlik doğrulama |
+| Kişisel bilgiler → Kullanıcı kimlikleri | Evet | Zorunlu | Uygulama işlevselliği, hesap yönetimi, güvenlik |
+| Kişisel bilgiler → Telefon numarası | Evet | İsteğe bağlı | Uygulama işlevselliği |
+| Kişisel bilgiler → Diğer bilgiler | Evet | İsteğe bağlı | Rider Tag, şehir, sosyal profil, motosiklet/profil özeti |
+| Sağlık ve fitness → Sağlık bilgileri | Evet | İsteğe bağlı | Acil durum kartı / uygulama işlevselliği |
+| Finansal bilgiler → Satın alma geçmişi | Evet | İsteğe bağlı | Premium hakkı, hesap yönetimi, dolandırıcılığı önleme |
+| Fotoğraflar ve videolar → Fotoğraflar | Evet | İsteğe bağlı | Profil fotoğrafı |
+| Mesajlar → Diğer uygulama içi mesajlar | Evet | İsteğe bağlı | Park QR yanıtları ve destek iletişimi |
+| Uygulama etkinliği → Diğer kullanıcı tarafından oluşturulan içerik | Evet | İsteğe bağlı | Profil alanları, grup lobisi, hata raporları |
+| Uygulama bilgileri ve performansı → Teşhis | Evet | İsteğe bağlı | Kullanıcının gönderdiği hata raporunu inceleme |
+| Cihaz veya diğer kimlikler | Evet | Bildirimlerde isteğe bağlı | FCM bildirimi, güvenlik, dolandırıcılığı önleme |
+
+Şunları **işaretleme** (mevcut üretim kodunda cihaz dışına toplanmıyor): kişiler,
+SMS/MMS, ses, takvim, web tarama geçmişi, reklam kimliği, crash logları ve tam
+ödeme kartı bilgisi. Şifreli belge görselleri ve ayrıntılı sürüş rota örnekleri
+cihazda kalır; bu nedenle yalnızca yerel işlenen veri olarak Data Safety
+`toplanan` listesine eklenmez.
+
+### 5.3 Konum ve Foreground Service Beyanı
+
+- Manifestte `ACCESS_FINE_LOCATION` ve `ACCESS_COARSE_LOCATION` bulunur.
+- `ACCESS_BACKGROUND_LOCATION` **bulunmaz**; Play Console'da bu izin için
+  `Hayır / kullanılmıyor` beyanı verilir.
+- `FOREGROUND_SERVICE_LOCATION` kullanılır. Foreground service türü:
+  **Location**.
+- Konum yalnızca kullanıcı uygulama içinden bir sürüş başlattıktan sonra alınır.
+- Ekran kilitli/uygulama küçültülmüşken görünür `Sürüş Devam Ediyor` bildirimi
+  gösterilir ve kullanıcı sürüşü bitirdiğinde servis durur.
+
+Play Console açıklama metni:
+
+> Apex Flow records motorcycle ride location only after the user taps Begin
+> Ride. A persistent Ride in Progress notification remains visible while the
+> screen is locked or the app is minimized. GPS is used to calculate the
+> user-requested ride's distance, speed and telemetry. Tracking stops
+> immediately when the user ends or cancels the ride. Without this foreground
+> service, recording would be interrupted when the screen locks and the ride
+> result would be incomplete.
+
+İnceleme videosu tek kesintisiz kayıtta şunları göstermeli:
+
+1. Sürüşler ekranını aç.
+2. `Sürüşü Başlat` → belirgin konum açıklaması → `Devam Et` → Android izin penceresi.
+3. Sürüş aktifken kalıcı bildirimi göster.
+4. Ana ekrana geç / ekranı kilitle; bildirimin devam ettiğini göster.
+5. Uygulamaya dön, sürüşü bitir; bildirimin kaybolduğunu göster.
 
 ---
 
@@ -175,7 +243,7 @@ Kullanıcılar bu bağlantıya tıklayarak:
 | # | Adım | Durum |
 |---|---|---|
 | 1 | Kapalı test en az 14 gün sürdü | ☐ |
-| 2 | Minimum 20 tester katıldı | ☐ |
+| 2 | Hesap için gerekiyorsa minimum 12 tester 14 gün kesintisiz kaldı | ☐ |
 | 3 | Kritik crash oranı < %2 | ☐ |
 | 4 | ANR oranı < %0.5 | ☐ |
 | 5 | Kullanıcı geri bildirimleri değerlendirildi | ☐ |
@@ -183,7 +251,7 @@ Kullanıcılar bu bağlantıya tıklayarak:
 | 7 | Content rating onaylandı | ☐ |
 | 8 | Data safety formu dolduruldu | ☐ |
 | 9 | Tüm ekran görüntüleri yüklendi | ☐ |
-| 10 | Privacy policy URL girildi | ☐ |
+| 10 | Privacy policy ve hesap silme URL'leri girildi | ☐ |
 
 ---
 

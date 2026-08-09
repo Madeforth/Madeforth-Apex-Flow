@@ -1,5 +1,58 @@
 # Active Context
 
+## Current Local Work (2026-08-09, branch `main`, uncommitted)
+
+Google Play internal/closed-beta preparation is now at `1.0.0+34`. The current
+signed AAB is `build/app/outputs/bundle/release/app-release.aab` (86,758,816
+bytes, built 2026-08-09 23:47:48 local). Its manifest reports
+`versionCode=34`, `versionName=1.0.0`; `jarsigner` reports `jar verified`, and
+SHA-256 is
+`24FA0A7F7D4108C0D70D8BD978C6EA7EEB3EDD514CD4C9A64CA538CE174E4603`.
+The matching release APK was rebuilt and installed successfully on the LG G5.
+Earlier `+31`, `+32`, and `+33` artifacts are superseded.
+
+Friend-only visibility is live for independently opt-in blood type, phone,
+emergency phone, and license plate fields. Email and the emergency contact
+person's name are never shared. Firestore rules were compiled and deployed to
+project `apex-flow-7baea`; all four toggles saved, survived force-stop/relaunch,
+and were then returned to OFF and verified persistent on the LG G5. The sharing
+panel now uses compact custom rows with bounded text scaling and was visually
+verified on-device. Samsung font scaling still needs a final check on the
+reported Galaxy S21 FE.
+
+The Leaderboard now uses only localized `Siz`/`You`/`Sie` for the current rider
+and formal Turkish copy (`SİZİN HAFTANIZ`, `Çevrenize liderlik ediyorsunuz`,
+`İyi gidiyorsunuz`). This was verified on the LG G5.
+
+Account deletion's missing live backend was the root cause of the reported
+failure. The v2 callable `deleteAccountAndData` was deployed alone to
+`europe-west1` and confirmed in the live function list. The app now performs
+remote deletion first and still signs out/cleans local state if device-local DB
+cleanup fails; success text appears only after backend success. A destructive
+end-to-end deletion was deliberately not run without a disposable account, so
+v34 still needs one real disposable-account test, ideally also on the Galaxy.
+Firebase warns that Node.js 20 is deprecated and scheduled for decommission on
+2026-10-30, and that `firebase-functions` is outdated; upgrade both before that
+date (not a present beta blocker).
+
+A separate free Firebase Hosting site is live at
+`https://apex-flow-privacy-7baea.web.app/`, independent from the QR contact
+site. Privacy and account-deletion pages contain full Turkish, English, and
+German text. Their TR/EN/DE selector supports `?lang=tr|en|de`, persistence,
+browser-language fallback, URL/title/`html lang` updates, and language-preserving
+cross-page links. The app passes its active language to the site. Live headless
+checks passed for all three languages, and the Turkish app-to-browser path was
+verified on the LG G5. Only the privacy hosting target was deployed; QR hosting
+was not redeployed.
+
+Verification: Flutter tests pass 97/97; targeted analyze has no errors (two
+pre-existing `use_build_context_synchronously` info notices); Functions lint,
+legal JavaScript syntax, and diff whitespace checks pass. The wider analyze run
+still reports 276 warning/info items and no errors. Firestore rules, only the
+`deleteAccountAndData` function, and only privacy hosting were deployed. No git
+commit or push was performed; the dirty worktree includes pre-existing/user/
+Claude changes and must not be attributed wholesale to this pass.
+
 ## Current Task (2026-08-08, branch `main`, pushed through commit `7b96795`)
 
 Long session covering the design audit's remaining items 5–7 from the prior session (typography rollout, icon unification — asset creation/vector work was scoped out, see below), a new profile-photo-upload feature, and a real ride-telemetry bug hunt. All commits below are individually `flutter analyze` (0 new errors) + `flutter test` (96/96) verified, most also confirmed on-device (LG G5, `LGH85092a403f4`).
@@ -98,7 +151,9 @@ The LG G5 (`LGH85092a403f4`) is driven entirely over `adb` from the agent side: 
 
 Also note: `android/key.properties` + `android/app/upload-keystore.jks` were copied in from `~/Developer/ApexFlow-main3107/` (verified SHA-256 `bce50c91…` matches the Firebase-registered upload cert). They are gitignored and will **not** be present on a fresh clone — copy them again before any release build. The work Mac's debug SHA-256 (`5d152739…`) was also registered on the Firebase Android app while chasing a dead end; harmless to leave, but it is not needed and can be removed from the Firebase Console.
 
-`pubspec.yaml` is at `1.0.0+30` (bumped from +29, which is the highest build already on Play Console). A signed AAB for +30 was built at `build/app/outputs/bundle/release/app-release.aab` but **not uploaded**.
+Historical note: `pubspec.yaml` was previously `1.0.0+30` (bumped from +29,
+which was then the highest build on Play Console). That artifact and subsequent
+`+31` through `+33` builds are superseded by the current local `1.0.0+34` AAB.
 
 ## Prior Task (2026-08-07 morning, branch `main`, pushed through commit `b77a29f`)
 User is preparing for first public release. This session covered: merging the last feature branch into `main`, actually fixing the Discord bug-report pipeline (previously only diagnosed), a pre-release security/privacy audit with fixes, discovering and fixing a real Firebase Android app misconfiguration that was silently blocking App Check, and a large UI pass (login screen, paywalls, app-wide corner-radius modernization).
