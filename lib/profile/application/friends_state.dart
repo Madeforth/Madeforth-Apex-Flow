@@ -6,7 +6,6 @@ import 'package:apexflow/core/storage/db_provider.dart';
 import 'package:apexflow/profile/domain/friend_profile.dart';
 import 'package:apexflow/core/services/firebase_service.dart'; // Added Firebase import
 import 'package:apexflow/core/i18n/app_settings_state.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:apexflow/core/i18n/app_strings.dart';
 
 final friendsStateProvider =
@@ -226,71 +225,68 @@ class FriendsController extends Notifier<List<FriendProfile>> {
       if (friendUid == myId) continue;
 
       try {
-        final profileDoc = await FirebaseFirestore.instance
-            .collection('users')
-            .doc(friendUid)
-            .get();
-        if (profileDoc.exists) {
-          final profileData = profileDoc.data();
-          if (profileData != null) {
-            final random = Random();
-            final updatedFriend = FriendProfile(
-              stableId: friendUid,
-              name: profileData['name'] as String? ?? 'Rider',
-              riderTag: profileData['riderTag'] as String? ?? '@rider',
-              ridingStyle:
-                  profileData['ridingStyle'] as String? ??
-                  (tInline(
-                    AppStrings.currentLanguageCode,
-                    'Odaklı',
-                    'Focused',
-                    'Konzentriert',
-                  )),
-              avatarIndex:
-                  profileData['avatarIndex'] as int? ?? random.nextInt(6),
-              avatarPhotoUrl: profileData['avatarPhotoUrl'] as String?,
-              activeBikeName:
-                  profileData['activeBikeName'] as String? ??
-                  (tInline(
-                    AppStrings.currentLanguageCode,
-                    'Motosiklet',
-                    'Bike',
-                    'Fahrrad',
-                  )),
-              activeBikeModel:
-                  profileData['activeBikeModel'] as String? ?? '2023',
-              weeklyKm: (profileData['weeklyKm'] as num?)?.toDouble() ?? 120.0,
-              harmonyScore:
-                  (profileData['harmonyScore'] as num?)?.toInt() ?? 95,
-              ghostMode: false,
-              modifications: const [],
-              phone: profileData['phoneNumber'] as String?,
-              emergencyPhone: profileData['emergencyContactPhone'] as String?,
-              bloodType: profileData['bloodType'] as String? ?? '—',
-              cardThemeIndex: profileData['cardThemeIndex'] as int? ?? 0,
-              city: profileData['city'] as String? ?? '',
-              instagram: profileData['instagram'] as String? ?? '',
-              tiktok: profileData['tiktok'] as String? ?? '',
-              licensePlate: profileData['licensePlate'] as String? ?? '',
-              selectedBadges:
-                  (profileData['selectedBadges'] as List<dynamic>?)
-                      ?.map((e) => e.toString())
-                      .toList() ??
-                  const [],
-            );
+        // users/{uid} is owner-read-only per firestore.rules — reading it
+        // for another rider's uid is always permission-denied. Look the
+        // rider up via the public rider_tags channel instead (the same one
+        // syncUserProfile already writes avatarIndex/avatarPhotoUrl into).
+        final profileData = await FirebaseService.instance.getProfileByUid(
+          friendUid,
+        );
+        if (profileData != null) {
+          final random = Random();
+          final updatedFriend = FriendProfile(
+            stableId: friendUid,
+            name: profileData['name'] as String? ?? 'Rider',
+            riderTag: profileData['riderTag'] as String? ?? '@rider',
+            ridingStyle:
+                profileData['ridingStyle'] as String? ??
+                (tInline(
+                  AppStrings.currentLanguageCode,
+                  'Odaklı',
+                  'Focused',
+                  'Konzentriert',
+                )),
+            avatarIndex:
+                profileData['avatarIndex'] as int? ?? random.nextInt(6),
+            avatarPhotoUrl: profileData['avatarPhotoUrl'] as String?,
+            activeBikeName:
+                profileData['activeBikeName'] as String? ??
+                (tInline(
+                  AppStrings.currentLanguageCode,
+                  'Motosiklet',
+                  'Bike',
+                  'Fahrrad',
+                )),
+            activeBikeModel:
+                profileData['activeBikeModel'] as String? ?? '2023',
+            weeklyKm: (profileData['weeklyKm'] as num?)?.toDouble() ?? 120.0,
+            harmonyScore: (profileData['harmonyScore'] as num?)?.toInt() ?? 95,
+            ghostMode: false,
+            modifications: const [],
+            phone: profileData['phoneNumber'] as String?,
+            emergencyPhone: profileData['emergencyContactPhone'] as String?,
+            bloodType: profileData['bloodType'] as String? ?? '—',
+            cardThemeIndex: profileData['cardThemeIndex'] as int? ?? 0,
+            city: profileData['city'] as String? ?? '',
+            instagram: profileData['instagram'] as String? ?? '',
+            tiktok: profileData['tiktok'] as String? ?? '',
+            licensePlate: profileData['licensePlate'] as String? ?? '',
+            selectedBadges:
+                (profileData['selectedBadges'] as List<dynamic>?)
+                    ?.map((e) => e.toString())
+                    .toList() ??
+                const [],
+          );
 
-            await db.saveFriend(updatedFriend, userId: myId);
+          await db.saveFriend(updatedFriend, userId: myId);
 
-            final index = updatedList.indexWhere(
-              (f) => f.stableId == friendUid,
-            );
-            if (index != -1) {
-              updatedList[index] = updatedFriend;
-            } else {
-              updatedList.add(updatedFriend);
-            }
-            stateUpdated = true;
+          final index = updatedList.indexWhere((f) => f.stableId == friendUid);
+          if (index != -1) {
+            updatedList[index] = updatedFriend;
+          } else {
+            updatedList.add(updatedFriend);
           }
+          stateUpdated = true;
         }
       } catch (_) {}
     }

@@ -618,6 +618,7 @@ class FirebaseService {
       }
 
       publicData['uid'] = ownerId;
+      publicData['avatarPhotoUrl'] ??= tagData?['avatarPhotoUrl'];
 
       // Strict PII sanitization - never leak private fields
       publicData.remove('phoneNumber');
@@ -628,6 +629,33 @@ class FirebaseService {
       publicData.remove('password');
 
       return publicData;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Looks up a rider's public profile fields by Firebase UID instead of
+  /// tag — reverse-queries `rider_tags` (public read, the only channel a
+  /// non-owner can actually read per firestore.rules) by `ownerId`. Use
+  /// this instead of reading `users/{uid}` directly for another rider:
+  /// that collection's rule is owner-scoped and denies every other caller.
+  Future<Map<String, dynamic>?> getProfileByUid(String uid) async {
+    if (Platform.environment.containsKey('FLUTTER_TEST')) return null;
+    await init();
+    if (!_initialized) return null;
+
+    try {
+      final tagQuery = await FirebaseFirestore.instance
+          .collection('rider_tags')
+          .where('ownerId', isEqualTo: uid)
+          .limit(1)
+          .get();
+      if (tagQuery.docs.isEmpty) return null;
+
+      final tagData = tagQuery.docs.first.data();
+      return getProfileByTag(
+        tagData['tag'] as String? ?? tagQuery.docs.first.id,
+      );
     } catch (_) {
       return null;
     }
