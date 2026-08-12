@@ -6,7 +6,6 @@ class RideSession {
     required this.mood,
     required this.mechanicalObservation,
     this.maxSpeedKmh = 0,
-    this.maxLeanAngle = 0,
     this.hardAccelerations = 0,
     this.hardBrakes = 0,
     this.harmonyScore = 0,
@@ -19,7 +18,6 @@ class RideSession {
   final String mood;
   final String mechanicalObservation;
   final double maxSpeedKmh;
-  final double maxLeanAngle;
   final int hardAccelerations;
   final int hardBrakes;
   final int harmonyScore;
@@ -33,7 +31,6 @@ class RideSession {
       'mood': mood,
       'mechanicalObservation': mechanicalObservation,
       'maxSpeedKmh': maxSpeedKmh,
-      'maxLeanAngle': maxLeanAngle,
       'hardAccelerations': hardAccelerations,
       'hardBrakes': hardBrakes,
       'harmonyScore': harmonyScore,
@@ -49,7 +46,6 @@ class RideSession {
       mood: json['mood'] as String? ?? 'Focused',
       mechanicalObservation: json['mechanicalObservation'] as String? ?? '',
       maxSpeedKmh: (json['maxSpeedKmh'] as num?)?.toDouble() ?? 0,
-      maxLeanAngle: (json['maxLeanAngle'] as num?)?.toDouble() ?? 0,
       hardAccelerations: json['hardAccelerations'] as int? ?? 0,
       hardBrakes: json['hardBrakes'] as int? ?? 0,
       harmonyScore: json['harmonyScore'] as int? ?? 0,

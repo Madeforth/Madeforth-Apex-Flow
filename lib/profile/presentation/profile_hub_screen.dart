@@ -7515,7 +7515,7 @@ class _ProfileAppearanceScreenState
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          '${_t('Bu seçim öz tanımdır; telemetri tarafından atanmaz. İstediğin zaman değiştirebilirsin.', 'This selection is a self-definition; it is not assigned by telemetry. You can change it anytime.', 'Diese Auswahl ist eine Selbstdefinition; sie wird nicht per Telemetrie zugewiesen. Du kannst sie jederzeit ändern.')}\n\n${_t('Güvenli kimlik ilkesi / Hız veya yatış derecesi sürüş tipi açmaz.', 'Safe identity policy / Top speed or lean angle degree does not unlock riding types.', 'Sichere Identitätsrichtlinie / Höchstgeschwindigkeit oder Schräglage schaltet keine Fahrstile frei.')}',
+                          '${_t('Bu seçim öz tanımdır; telemetri tarafından atanmaz. İstediğin zaman değiştirebilirsin.', 'This selection is a self-definition; it is not assigned by telemetry. You can change it anytime.', 'Diese Auswahl ist eine Selbstdefinition; sie wird nicht per Telemetrie zugewiesen. Du kannst sie jederzeit ändern.')}\n\n${_t('Güvenli kimlik ilkesi / Hız sürüş tipi açmaz.', 'Safe identity policy / Top speed does not unlock riding types.', 'Sichere Identitätsrichtlinie / Höchstgeschwindigkeit schaltet keine Fahrstile frei.')}',
                           style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(
                                 color: Colors.amber.withValues(alpha: 0.9),
@@ -7823,9 +7823,9 @@ class _ProfileAppearanceScreenState
                     Expanded(
                       child: Text(
                         _t(
-                          'Güvenli achievement politikası / Maksimum hız ve yatış açısı rozet koşulu değildir. Konum ve rota kanıtı profilde paylaşılmaz.',
-                          'Safe achievement policy / Top speed or lean angle is not a requirement. Location or route evidence is not shared.',
-                          'Sichere Errungenschaftsrichtlinie / Höchstgeschwindigkeit oder Schräglage ist keine Voraussetzung. Standort- oder Routenbeweise werden nicht geteilt.',
+                          'Güvenli achievement politikası / Maksimum hız rozet koşulu değildir. Konum ve rota kanıtı profilde paylaşılmaz.',
+                          'Safe achievement policy / Top speed is not a requirement. Location or route evidence is not shared.',
+                          'Sichere Errungenschaftsrichtlinie / Höchstgeschwindigkeit ist keine Voraussetzung. Standort- oder Routenbeweise werden nicht geteilt.',
                         ),
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: context.colors.textSecondary,

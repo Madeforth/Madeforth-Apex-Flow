@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:apexflow/rides/application/ride_completion.dart';
 import 'package:apexflow/rides/presentation/widgets/start_ride_sheet.dart';
 import 'package:apexflow/rituals/application/rituals_state.dart';
 import 'package:apexflow/rituals/presentation/ride_readiness_screen.dart';
@@ -8,7 +9,6 @@ import 'package:apexflow/shared/design/slate_palette.dart';
 import 'package:apexflow/core/i18n/app_strings.dart';
 import 'package:apexflow/rides/application/ride_location_service.dart';
 import 'package:apexflow/rides/application/ride_state.dart';
-import 'package:apexflow/rides/application/lean_angle_engine_v3.dart';
 import 'package:apexflow/rides/domain/ride_session.dart';
 import 'package:apexflow/rides/application/ride_invite_pdf.dart';
 import 'package:apexflow/settings/application/user_profile_state.dart';
@@ -48,10 +48,7 @@ class _RidesScreenState extends ConsumerState<RidesScreen> {
   Future<void> _resumeGpsTracking() async {
     final tr = strings.locale.languageCode == 'tr';
     final de = strings.locale.languageCode == 'de';
-    final statusMsg = await _locationService.startTracking(
-      isTurkish: tr,
-      isMounted: false,
-    );
+    final statusMsg = await _locationService.startTracking(isTurkish: tr);
     if (mounted) {
       setState(() => _gpsStatusMessage = statusMsg);
     }
@@ -430,18 +427,12 @@ class _RidesScreenState extends ConsumerState<RidesScreen> {
     final de = strings.locale.languageCode == 'de';
     final gpsResult = _locationService.stopTracking(isTurkish: tr);
 
-    // Fallback if no GPS logic (omitted complex details for brevity but keeps core logic)
-    final distanceKm = gpsResult.hasGpsData
-        ? double.parse(gpsResult.distanceKm.toStringAsFixed(2))
-        : 0.0;
-    final averageSpeedKmh = gpsResult.hasGpsData
-        ? double.parse(gpsResult.averageSpeedKmh.toStringAsFixed(1))
-        : 0.0;
-    final durationMinutes = gpsResult.hasGpsData
-        ? gpsResult.activeDurationMinutes
-        : 0;
+    final metrics = resolveRideCompletion(gpsResult);
+    final distanceKm = metrics.distanceKm;
+    final averageSpeedKmh = metrics.averageSpeedKmh;
+    final durationMinutes = metrics.durationMinutes;
 
-    if (distanceKm < 0.1 && averageSpeedKmh < 1.0) {
+    if (metrics.shouldDiscard) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -460,7 +451,7 @@ class _RidesScreenState extends ConsumerState<RidesScreen> {
       return;
     }
 
-    final telemetry = gpsResult.telemetry;
+    final telemetry = metrics.telemetry;
     final saved = ref
         .read(rideStateProvider.notifier)
         .endRide(
@@ -474,8 +465,7 @@ class _RidesScreenState extends ConsumerState<RidesScreen> {
             'Ride completed',
             'Fahrt abgeschlossen',
           ),
-          maxSpeedKmh: gpsResult.hasGpsData ? gpsResult.maxSpeedKmh : 0.0,
-          maxLeanAngle: telemetry?.maxLeanAngle ?? 0.0,
+          maxSpeedKmh: metrics.maxSpeedKmh,
           hardAccelerations: telemetry?.rapidAccelerationEvents ?? 0,
           hardBrakes: telemetry?.hardBrakingEvents ?? 0,
           harmonyScore: telemetry?.smoothnessScore ?? 0,
@@ -720,12 +710,6 @@ class _LastRidePanel extends StatelessWidget {
       maxSpeed: latestRide.maxSpeedKmh > 0
           ? '${latestRide.maxSpeedKmh.toStringAsFixed(1).replaceAll('.', ',')} ${tInline(Localizations.localeOf(context).languageCode, 'km/sa', 'km/h', 'km/h')}'
           : '-',
-      maxLean: () {
-        final sanitized = LeanPersistenceSanitizer.sanitizeForUiDisplay(
-          latestRide.maxLeanAngle,
-        );
-        return sanitized != null ? '${sanitized.toStringAsFixed(0)}°' : '-';
-      }(),
       tr: tr,
       hardBrakes: latestRide.hardBrakes,
       hardAccelerations: latestRide.hardAccelerations,
@@ -789,7 +773,6 @@ Widget _buildCard(
   required String avgSpeed,
   required String smoothness,
   required String maxSpeed,
-  required String maxLean,
   required bool tr,
   int hardBrakes = 0,
   int hardAccelerations = 0,
@@ -975,38 +958,6 @@ Widget _buildCard(
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    width: 1,
-                    height: 16,
-                    color: Colors.white.withValues(alpha: 0.1),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.screen_rotation,
-                          color: SlatePalette.oledMutedText,
-                          size: 16,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          '${tInline(AppStrings.currentLanguageCode, 'Maks. Yatış:', 'Max Lean:', 'Max. Neigung:')} ',
-                          style: Theme.of(context).textTheme.labelMedium
-                              ?.copyWith(color: SlatePalette.oledMutedText),
-                        ),
-                        Text(
-                          maxLean,
-                          style: Theme.of(context).textTheme.labelMedium
-                              ?.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
                         ),
                       ],
                     ),
@@ -1668,17 +1619,6 @@ void _showRideSummary(
       final topSpeed = session != null
           ? '${session.maxSpeedKmh.toStringAsFixed(1)} km/h'
           : '134 km/h';
-      final sanitizedLean = session != null
-          ? LeanPersistenceSanitizer.sanitizeForUiDisplay(session.maxLeanAngle)
-          : null;
-      final maxLean = sanitizedLean != null
-          ? '${sanitizedLean.toStringAsFixed(0)}°'
-          : tInline(
-              AppStrings.currentLanguageCode,
-              'Veri Yetersiz',
-              'Unavailable',
-              'Nicht verfügbar',
-            );
       final harmony = session != null ? '${session.harmonyScore}' : '92';
       final hardBrake = session != null ? '${session.hardBrakes}' : '2';
       final rapidAccel = session != null ? '${session.hardAccelerations}' : '1';
@@ -1850,31 +1790,6 @@ void _showRideSummary(
               style: Theme.of(context).textTheme.labelMedium?.copyWith(
                 color: context.colors.textSecondary,
                 fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 12),
-            _buildSummaryRow(
-              context,
-              tInline(
-                AppStrings.currentLanguageCode,
-                'Tahmini Maks. Yatış Açısı',
-                'Estimated Max Lean Angle',
-                'Geschätzter max. Neigungswinkel',
-              ),
-              maxLean,
-            ),
-            const SizedBox(height: 2),
-            Text(
-              tInline(
-                AppStrings.currentLanguageCode,
-                '* GNSS ve sürüş yörünge dinamiklerinden hesaplanan tahmini değerdir.',
-                '* Estimated value derived from GNSS and trajectory dynamics.',
-                '* Geschätzter Wert aus GNSS- und Trajektoriendynamik.',
-              ),
-              style: TextStyle(
-                color: context.colors.textSecondary,
-                fontSize: 10,
-                fontStyle: FontStyle.italic,
               ),
             ),
             _buildSummaryRow(

@@ -57,28 +57,23 @@ const RideSessionEntitySchema = CollectionSchema(
       name: r'loggedAtIso',
       type: IsarType.string,
     ),
-    r'maxLeanAngle': PropertySchema(
-      id: 8,
-      name: r'maxLeanAngle',
-      type: IsarType.double,
-    ),
     r'maxSpeedKmh': PropertySchema(
-      id: 9,
+      id: 8,
       name: r'maxSpeedKmh',
       type: IsarType.double,
     ),
     r'mechanicalObservation': PropertySchema(
-      id: 10,
+      id: 9,
       name: r'mechanicalObservation',
       type: IsarType.string,
     ),
     r'mood': PropertySchema(
-      id: 11,
+      id: 10,
       name: r'mood',
       type: IsarType.string,
     ),
     r'userId': PropertySchema(
-      id: 12,
+      id: 11,
       name: r'userId',
       type: IsarType.string,
     )
@@ -152,11 +147,10 @@ void _rideSessionEntitySerialize(
   writer.writeLong(offsets[5], object.hardBrakes);
   writer.writeLong(offsets[6], object.harmonyScore);
   writer.writeString(offsets[7], object.loggedAtIso);
-  writer.writeDouble(offsets[8], object.maxLeanAngle);
-  writer.writeDouble(offsets[9], object.maxSpeedKmh);
-  writer.writeString(offsets[10], object.mechanicalObservation);
-  writer.writeString(offsets[11], object.mood);
-  writer.writeString(offsets[12], object.userId);
+  writer.writeDouble(offsets[8], object.maxSpeedKmh);
+  writer.writeString(offsets[9], object.mechanicalObservation);
+  writer.writeString(offsets[10], object.mood);
+  writer.writeString(offsets[11], object.userId);
 }
 
 RideSessionEntity _rideSessionEntityDeserialize(
@@ -175,11 +169,10 @@ RideSessionEntity _rideSessionEntityDeserialize(
   object.harmonyScore = reader.readLong(offsets[6]);
   object.id = id;
   object.loggedAtIso = reader.readString(offsets[7]);
-  object.maxLeanAngle = reader.readDouble(offsets[8]);
-  object.maxSpeedKmh = reader.readDouble(offsets[9]);
-  object.mechanicalObservation = reader.readString(offsets[10]);
-  object.mood = reader.readString(offsets[11]);
-  object.userId = reader.readString(offsets[12]);
+  object.maxSpeedKmh = reader.readDouble(offsets[8]);
+  object.mechanicalObservation = reader.readString(offsets[9]);
+  object.mood = reader.readString(offsets[10]);
+  object.userId = reader.readString(offsets[11]);
   return object;
 }
 
@@ -209,12 +202,10 @@ P _rideSessionEntityDeserializeProp<P>(
     case 8:
       return (reader.readDouble(offset)) as P;
     case 9:
-      return (reader.readDouble(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 10:
       return (reader.readString(offset)) as P;
     case 11:
-      return (reader.readString(offset)) as P;
-    case 12:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -1092,72 +1083,6 @@ extension RideSessionEntityQueryFilter
   }
 
   QueryBuilder<RideSessionEntity, RideSessionEntity, QAfterFilterCondition>
-      maxLeanAngleEqualTo(
-    double value, {
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'maxLeanAngle',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<RideSessionEntity, RideSessionEntity, QAfterFilterCondition>
-      maxLeanAngleGreaterThan(
-    double value, {
-    bool include = false,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'maxLeanAngle',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<RideSessionEntity, RideSessionEntity, QAfterFilterCondition>
-      maxLeanAngleLessThan(
-    double value, {
-    bool include = false,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'maxLeanAngle',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<RideSessionEntity, RideSessionEntity, QAfterFilterCondition>
-      maxLeanAngleBetween(
-    double lower,
-    double upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'maxLeanAngle',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<RideSessionEntity, RideSessionEntity, QAfterFilterCondition>
       maxSpeedKmhEqualTo(
     double value, {
     double epsilon = Query.epsilon,
@@ -1754,20 +1679,6 @@ extension RideSessionEntityQuerySortBy
   }
 
   QueryBuilder<RideSessionEntity, RideSessionEntity, QAfterSortBy>
-      sortByMaxLeanAngle() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'maxLeanAngle', Sort.asc);
-    });
-  }
-
-  QueryBuilder<RideSessionEntity, RideSessionEntity, QAfterSortBy>
-      sortByMaxLeanAngleDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'maxLeanAngle', Sort.desc);
-    });
-  }
-
-  QueryBuilder<RideSessionEntity, RideSessionEntity, QAfterSortBy>
       sortByMaxSpeedKmh() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'maxSpeedKmh', Sort.asc);
@@ -1952,20 +1863,6 @@ extension RideSessionEntityQuerySortThenBy
   }
 
   QueryBuilder<RideSessionEntity, RideSessionEntity, QAfterSortBy>
-      thenByMaxLeanAngle() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'maxLeanAngle', Sort.asc);
-    });
-  }
-
-  QueryBuilder<RideSessionEntity, RideSessionEntity, QAfterSortBy>
-      thenByMaxLeanAngleDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'maxLeanAngle', Sort.desc);
-    });
-  }
-
-  QueryBuilder<RideSessionEntity, RideSessionEntity, QAfterSortBy>
       thenByMaxSpeedKmh() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'maxSpeedKmh', Sort.asc);
@@ -2081,13 +1978,6 @@ extension RideSessionEntityQueryWhereDistinct
   }
 
   QueryBuilder<RideSessionEntity, RideSessionEntity, QDistinct>
-      distinctByMaxLeanAngle() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'maxLeanAngle');
-    });
-  }
-
-  QueryBuilder<RideSessionEntity, RideSessionEntity, QDistinct>
       distinctByMaxSpeedKmh() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'maxSpeedKmh');
@@ -2177,13 +2067,6 @@ extension RideSessionEntityQueryProperty
       loggedAtIsoProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'loggedAtIso');
-    });
-  }
-
-  QueryBuilder<RideSessionEntity, double, QQueryOperations>
-      maxLeanAngleProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'maxLeanAngle');
     });
   }
 

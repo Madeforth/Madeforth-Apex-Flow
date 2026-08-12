@@ -1,14 +1,14 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import 'package:apexflow/core/storage/apex_kv_store.dart';
 import 'package:apexflow/rides/application/ride_telemetry_analyzer.dart';
 import 'package:apexflow/core/i18n/app_strings.dart';
-import 'package:apexflow/rides/application/telemetry_isolate.dart';
-import 'package:apexflow/rides/application/sensor_fusion_engine.dart';
 
 import 'package:apexflow/rides/domain/speed_telemetry_models.dart';
 import 'package:apexflow/rides/application/validated_speed_engine.dart';
@@ -49,37 +49,56 @@ class RideLocationService {
 
   RideLocationService._internal();
 
-  final ValidatedSpeedEngine _speedEngine = ValidatedSpeedEngine();
+  /// Single source of truth for both the platform's location request and the
+  /// engine's tolerances. They were previously independent — the config asked
+  /// for a 1 s cadence while the Android request hardcoded 4 s — and nothing
+  /// tied them together, which is how a sampling interval slower than the
+  /// distance-integration window shipped unnoticed.
+  static const TelemetryConfig _config = TelemetryConfig();
+
+  final ValidatedSpeedEngine _speedEngine = ValidatedSpeedEngine(
+    config: _config,
+  );
   StreamSubscription<Position>? _positionSubscription;
   final List<Position> _positions = [];
   bool _isTracking = false;
   String _statusMessage = '';
 
-  final TelemetryIsolate _telemetryIsolate = TelemetryIsolate();
-  StreamSubscription<TelemetryIsolateMessage>? _telemetrySub;
-  double _maxFusedLeanAngle = 0.0;
-  bool _isPhoneMounted = false;
+  /// Persisted key holding the in-progress ride's aggregates, so a ride
+  /// survives the app process being killed mid-ride (common on aggressive
+  /// Android battery managers). Without this, resuming tracking restarted the
+  /// speed engine from zero and the whole commute was reported as "no
+  /// movement detected".
+  static const String _snapshotKey = 'rides.telemetry_snapshot';
+
+  /// Aggregates carried over from earlier segments of the same ride.
+  double _carriedDistanceKm = 0.0;
+  double _carriedMovingDistanceKm = 0.0;
+  double _carriedCoordinateDistanceKm = 0.0;
+  int _carriedMovingSeconds = 0;
+  double _carriedMaxSpeedKmh = 0.0;
+  DateTime? _lastSnapshotWallClock;
+  DateTime? _lastSnapshotSampleTime;
 
   bool get isTracking => _isTracking;
-  bool get hasGpsData => _positions.length >= 2;
 
-  /// Calibrates the gyroscope zero-offset for the lean angle telemetry.
-  void calibrateMount() {
-    if (_telemetryIsolate.isRunning) {
-      _telemetryIsolate.calibrateZeroOffset();
-    }
+  /// Loads the aggregates of a ride that was interrupted by a process kill,
+  /// so the rider can end it from any screen — not only from the one that
+  /// happens to resume GPS tracking. No-op while tracking is live, otherwise
+  /// the already-carried totals would be counted twice.
+  Future<void> restoreInterruptedRide() async {
+    if (_isTracking) return;
+    await _loadSnapshot();
   }
 
   /// Start listening to GPS position updates with background support.
-  Future<String> startTracking({
-    required bool isTurkish,
-    required bool isMounted,
-  }) async {
+  Future<String> startTracking({required bool isTurkish}) async {
     _positions.clear();
     _speedEngine.startRide(startTime: DateTime.now());
     _statusMessage = '';
-    _maxFusedLeanAngle = 0.0;
-    _isPhoneMounted = isMounted;
+    _lastSnapshotWallClock = null;
+    _lastSnapshotSampleTime = null;
+    await _loadSnapshot();
 
     if (kIsWeb) {
       _statusMessage = tInline(
@@ -147,8 +166,14 @@ class RideLocationService {
       if (defaultTargetPlatform == TargetPlatform.android) {
         locationSettings = AndroidSettings(
           accuracy: LocationAccuracy.bestForNavigation,
-          distanceFilter: 10, // Battery optimized distance filter
-          intervalDuration: const Duration(seconds: 4),
+          // distanceFilter must stay 0: geolocator maps it to
+          // setMinUpdateDistanceMeters, which suppresses updates while the
+          // bike crawls or waits at lights, starving speed integration.
+          distanceFilter: 0,
+          // Also mapped to setMinUpdateIntervalMillis, i.e. a hard floor on
+          // the sample spacing. Driven by the engine's own desired cadence so
+          // the two can never drift apart again.
+          intervalDuration: Duration(milliseconds: _config.desiredIntervalMs),
           foregroundNotificationConfig: ForegroundNotificationConfig(
             notificationTitle: tInline(
               AppStrings.currentLanguageCode,
@@ -172,7 +197,7 @@ class RideLocationService {
       } else if (defaultTargetPlatform == TargetPlatform.iOS) {
         locationSettings = AppleSettings(
           accuracy: LocationAccuracy.bestForNavigation,
-          distanceFilter: 10,
+          distanceFilter: 0,
           activityType: ActivityType.automotiveNavigation,
           pauseLocationUpdatesAutomatically: false,
           showBackgroundLocationIndicator: true,
@@ -181,7 +206,7 @@ class RideLocationService {
       } else {
         locationSettings = const LocationSettings(
           accuracy: LocationAccuracy.bestForNavigation,
-          distanceFilter: 5,
+          distanceFilter: 0,
         );
       }
 
@@ -203,28 +228,6 @@ class RideLocationService {
         'Fahrtaufzeichnung gestartet.',
       );
 
-      // Start High-Frequency Sensor Fusion (Now supports Pocket Mode via AHRS)
-      await _telemetryIsolate.start();
-      _telemetryIsolate.setMountMode(_isPhoneMounted);
-
-      _telemetrySub = _telemetryIsolate.telemetryStream.listen((msg) {
-        final absLean = msg.fusedLeanAngle.abs();
-        if (absLean > _maxFusedLeanAngle &&
-            !absLean.isNaN &&
-            !absLean.isInfinite) {
-          _maxFusedLeanAngle = absLean;
-        }
-      });
-
-      if (!_isPhoneMounted) {
-        _statusMessage += tInline(
-          AppStrings.currentLanguageCode,
-          ' (Akıllı Telemetri: Cep)',
-          ' (Smart Telemetry: Pocket)',
-          ' (Smart-Telemetrie: Tasche)',
-        );
-      }
-
       return _statusMessage;
     } catch (e) {
       _statusMessage = tInline(
@@ -238,6 +241,80 @@ class RideLocationService {
     }
   }
 
+  /// Restores aggregates written by an earlier segment of the *same* ride.
+  /// The snapshot is keyed on `rides.started_at_iso`, so a freshly started
+  /// ride (whose start marker is still empty or different) never inherits a
+  /// previous ride's distance.
+  Future<void> _loadSnapshot() async {
+    _carriedDistanceKm = 0.0;
+    _carriedMovingDistanceKm = 0.0;
+    _carriedCoordinateDistanceKm = 0.0;
+    _carriedMovingSeconds = 0;
+    _carriedMaxSpeedKmh = 0.0;
+
+    try {
+      final startedAtIso = await ApexKvStore.getString('rides.started_at_iso');
+      if (startedAtIso == null || startedAtIso.isEmpty) return;
+
+      final isActive = await ApexKvStore.getBool('rides.is_active') ?? false;
+      if (!isActive) return;
+
+      final raw = await ApexKvStore.getString(_snapshotKey);
+      if (raw == null || raw.isEmpty) return;
+
+      final data = jsonDecode(raw) as Map<String, dynamic>;
+      if (data['startedAtIso'] != startedAtIso) return;
+
+      _carriedDistanceKm = (data['distanceKm'] as num?)?.toDouble() ?? 0.0;
+      _carriedMovingDistanceKm =
+          (data['movingDistanceKm'] as num?)?.toDouble() ?? 0.0;
+      _carriedCoordinateDistanceKm =
+          (data['coordinateDistanceKm'] as num?)?.toDouble() ?? 0.0;
+      _carriedMovingSeconds = (data['movingSeconds'] as num?)?.toInt() ?? 0;
+      _carriedMaxSpeedKmh = (data['maxSpeedKmh'] as num?)?.toDouble() ?? 0.0;
+    } catch (e) {
+      debugPrint('RideLocationService: snapshot restore failed: $e');
+    }
+  }
+
+  /// Writes the ride's running totals so they survive a process kill.
+  /// `finalizeRide` only reads engine state, so calling it mid-ride is safe.
+  Future<void> _writeSnapshot() async {
+    try {
+      final startedAtIso = await ApexKvStore.getString('rides.started_at_iso');
+      if (startedAtIso == null || startedAtIso.isEmpty) return;
+
+      final summary = _speedEngine.finalizeRide(endTime: DateTime.now());
+      final maxSpeedKmh =
+          summary.validatedMaxSpeedKmh ?? summary.rawMaxSpeedKmh;
+
+      await ApexKvStore.setString(
+        _snapshotKey,
+        jsonEncode({
+          'startedAtIso': startedAtIso,
+          'distanceKm': _carriedDistanceKm + summary.totalDistanceKm,
+          'movingDistanceKm':
+              _carriedMovingDistanceKm + summary.movingDistanceKm,
+          'coordinateDistanceKm':
+              _carriedCoordinateDistanceKm + summary.coordinateDistanceKm,
+          'movingSeconds':
+              _carriedMovingSeconds + summary.movingDuration.inSeconds,
+          'maxSpeedKmh': math.max(_carriedMaxSpeedKmh, maxSpeedKmh ?? 0.0),
+        }),
+      );
+    } catch (e) {
+      debugPrint('RideLocationService: snapshot write failed: $e');
+    }
+  }
+
+  Future<void> _clearSnapshot() async {
+    try {
+      await ApexKvStore.remove(_snapshotKey);
+    } catch (e) {
+      debugPrint('RideLocationService: snapshot clear failed: $e');
+    }
+  }
+
   void _onPositionUpdate(Position position) {
     // Process position through V2 Validated Speed Engine (Kalman Filter + NIS Outlier Gate + Motion State Machine)
     _speedEngine.processPosition(
@@ -246,34 +323,26 @@ class RideLocationService {
       sequence: _positions.length,
     );
 
-    // Feed GPS kinematic lean angle to the sensor fusion isolate to correct gyro drift
-    if (_positions.isNotEmpty) {
-      final prev = _positions.last;
-      final dt = position.timestamp
-          .difference(prev.timestamp)
-          .inSeconds
-          .toDouble();
-      if (dt > 0) {
-        double headingDiff = position.heading - prev.heading;
-        if (headingDiff > 180) headingDiff -= 360;
-        if (headingDiff < -180) headingDiff += 360;
-        final omega = (headingDiff / dt) * (math.pi / 180.0);
-        final gpsLean = SensorFusionEngine.calculateGpsKinematicAngle(
-          position.speed,
-          omega,
-        );
-
-        // Pass speed and headingRate for AHRS gravity vectoring
-        _telemetryIsolate.updateWithGpsKinematic(
-          gpsLean,
-          speed: position.speed,
-          headingRate: omega,
-        );
-      }
-    }
-
     if (position.accuracy <= 45.0) {
       _positions.add(position);
+    }
+
+    // Checkpoint the running totals every 10 s. Both clocks are considered:
+    // sample time is what actually advances the ride, wall time is the
+    // backstop if a device reports odd fix timestamps.
+    final now = DateTime.now();
+    final sampleTime = position.timestamp;
+    final wallDue =
+        _lastSnapshotWallClock == null ||
+        now.difference(_lastSnapshotWallClock!).inSeconds >= 10;
+    final sampleDue =
+        _lastSnapshotSampleTime == null ||
+        sampleTime.difference(_lastSnapshotSampleTime!).inSeconds.abs() >= 10;
+
+    if (wallDue || sampleDue) {
+      _lastSnapshotWallClock = now;
+      _lastSnapshotSampleTime = sampleTime;
+      unawaited(_writeSnapshot());
     }
   }
 
@@ -281,9 +350,6 @@ class RideLocationService {
   RideLocationResult stopTracking({required bool isTurkish}) {
     _positionSubscription?.cancel();
     _positionSubscription = null;
-
-    _telemetrySub?.cancel();
-    _telemetryIsolate.stop();
 
     _isTracking = false;
 
@@ -299,7 +365,9 @@ class RideLocationService {
     // the engine's own accepted-sample count instead removes that mismatch.
     final summary = _speedEngine.finalizeRide(endTime: DateTime.now());
 
-    if (summary.acceptedSampleCount < 2) {
+    final hasCarriedRide = _carriedDistanceKm > 0.05;
+
+    if (summary.acceptedSampleCount < 2 && !hasCarriedRide) {
       final msg = _statusMessage.isNotEmpty
           ? _statusMessage
           : (tInline(
@@ -308,6 +376,7 @@ class RideLocationService {
               'Insufficient location data. Distance could not be recorded.',
               'Unzureichende Standortdaten. Entfernung konnte nicht erfasst werden.',
             ));
+      unawaited(_clearSnapshot());
       return RideLocationResult(
         distanceKm: 0,
         averageSpeedKmh: 0,
@@ -320,24 +389,63 @@ class RideLocationService {
       );
     }
 
-    final distanceKm = summary.totalDistanceKm;
-    final maxSpeedKmh =
-        summary.validatedMaxSpeedKmh ?? (summary.rawMaxSpeedKmh ?? 0.0);
+    // Last-resort guard against losing a real ride: if the filtered-speed
+    // integration produced (near) nothing but the accepted GPS fixes clearly
+    // moved across the map, trust the plain great-circle distance rather than
+    // discarding the ride as "no movement detected".
+    final segmentDistanceKm = summary.totalDistanceKm < 0.05
+        ? summary.coordinateDistanceKm
+        : summary.totalDistanceKm;
+
+    // Add whatever earlier segments of this same ride already covered before
+    // the process was killed and tracking had to be resumed.
+    final distanceKm = _carriedDistanceKm + segmentDistanceKm;
+    final movingSeconds =
+        _carriedMovingSeconds + summary.movingDuration.inSeconds;
+    final maxSpeedKmh = math.max(
+      _carriedMaxSpeedKmh,
+      summary.validatedMaxSpeedKmh ?? (summary.rawMaxSpeedKmh ?? 0.0),
+    );
 
     // Calculate active duration minutes (minimum 1 minute if distance > 0)
-    final activeMinutes = (summary.movingDuration.inSeconds / 60.0).round();
+    final activeMinutes = (movingSeconds / 60.0).round();
     final finalActiveDuration = activeMinutes > 0 ? activeMinutes : 1;
 
-    final averageSpeedKmh = summary.movingAverageSpeedKmh > 0
-        ? summary.movingAverageSpeedKmh
-        : summary.tripAverageSpeedKmh;
+    // Only distance the motion state machine actually classified as moving may
+    // be divided by moving time. Substituting the whole segment's distance
+    // here would inflate the average of a resumed ride, whose carried moving
+    // seconds cover a period this segment's distance does not.
+    final movingDistanceKm =
+        _carriedMovingDistanceKm + summary.movingDistanceKm;
+
+    var averageSpeedKmh = 0.0;
+    if (movingSeconds > 0 && movingDistanceKm > 0) {
+      averageSpeedKmh = movingDistanceKm / (movingSeconds / 3600.0);
+    }
+    if (averageSpeedKmh <= 0) {
+      averageSpeedKmh = summary.movingAverageSpeedKmh > 0
+          ? summary.movingAverageSpeedKmh
+          : summary.tripAverageSpeedKmh;
+    }
+    if (averageSpeedKmh <= 0 && distanceKm > 0) {
+      final elapsedHours = summary.elapsedDuration.inSeconds / 3600.0;
+      if (elapsedHours > 0) {
+        averageSpeedKmh = distanceKm / elapsedHours;
+      }
+    }
+
+    unawaited(_clearSnapshot());
+    _carriedDistanceKm = 0.0;
+    _carriedMovingDistanceKm = 0.0;
+    _carriedCoordinateDistanceKm = 0.0;
+    _carriedMovingSeconds = 0;
+    _carriedMaxSpeedKmh = 0.0;
 
     // Analyze telemetry to infer riding style
     final analyzer = const RideTelemetryAnalyzer();
     final telemetry = analyzer.analyze(
       _positions,
       maxSpeedKmh,
-      fusedMaxLeanAngle: _maxFusedLeanAngle,
       speedEstimates: _speedEngine.estimates,
     );
 

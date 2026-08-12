@@ -2,6 +2,287 @@
 
 Status recorded 2026-08-04, from repo inspection (not from README claims alone unless marked as such).
 
+## 2026-08-12 — Root cause of rides discarded as "no movement detected"
+
+- Reported on-device: a real commute at an indicated 130 km/h ended with
+  "Sürüş çok kısa veya hareket algılanmadı. Kaydedilmedi." and no saved ride.
+- Root cause (Android, primary): `ValidatedSpeedEngine.processPosition` only
+  integrated a segment into ride distance when the gap between accepted samples
+  was `<= TelemetryConfig.continuousDataGapSeconds` (3.0 s), while
+  `RideLocationService` requested `AndroidSettings.intervalDuration` of 4 s.
+  `geolocator_android` 4.6.2 maps that to `setIntervalMillis` and
+  `setMinUpdateIntervalMillis`, a hard floor on sample spacing, so every segment
+  of every ride was above the 3.0 s gate and dropped. The ride finalized with
+  `totalDistanceKm == 0` and zero average speed, and the caller's
+  `distanceKm < 0.1 && averageSpeedKmh < 1.0` check discarded it. The earlier
+  `acceptedSampleCount` fix did not cover this second, independent gate.
+- Root cause (secondary): validated max speed required a supporting neighbour
+  sample within a hardcoded 3.5 s window, which no sample can satisfy at a 4 s
+  cadence, so `validatedMaxSpeedKmh` was always null on Android and the UI fell
+  back to the unverified raw peak.
+- Fixes: added `TelemetryConfig.maxDistanceIntegrationDtSeconds` (15.0) and used
+  it for distance integration, leaving `continuousDataGapSeconds` as the
+  diagnostic gap flag only; scaled the max-speed support window to the ride's own
+  median sample spacing; set Android `intervalDuration` to 1 s and
+  `distanceFilter` to 0 on all platforms (a non-zero `distanceFilter` maps to
+  `setMinUpdateDistanceMeters` and starves integration at low speed).
+- Added a last-resort guard: the engine now also accumulates a plain
+  great-circle `coordinateDistanceKm` across accepted samples (segments implying
+  over 90 m/s are skipped), and `stopTracking` uses it when the integrated
+  distance is under 0.05 km, plus an elapsed-time average-speed fallback. A real
+  ride can no longer be discarded merely because the integrator produced nothing.
+- Verification: `flutter test` 98/98 pass, including a new regression test that
+  drives the engine at a 4 s cadence at 130 km/h. `dart format` and
+  `flutter analyze lib/rides` clean for the changed files (pre-existing unused
+  variable/element warnings in `rides_screen.dart` remain).
+- Not verified on-device yet: this needs one real ride on the LG G5 (and ideally
+  an iPhone) to confirm the fix end to end, plus a battery-drain sanity check now
+  that positions stream at 1 Hz with no distance filter.
+- Still open after the first pass, then fixed in the second pass below: ride
+  telemetry lived only in memory until the rider ended the ride.
+
+## 2026-08-12 — Second audit pass: mid-ride process kill was a second, independent cause
+
+- Re-audited the whole path including the three screens that end a ride
+  (`rides_screen.dart`, `apex_dashboard_screen.dart`,
+  `group_ride_lobby_screen.dart`) and the start path (`start_ride_sheet.dart`).
+- Found a second live defect producing the identical "no movement detected"
+  symptom, unaffected by the sampling-cadence fix: `rides.is_active` and
+  `rides.started_at_iso` persist across a process kill, but the ride's telemetry
+  did not. `RidesScreen.initState` resumes tracking via `_resumeGpsTracking`,
+  and `startTracking` calls `_positions.clear()` plus
+  `ValidatedSpeedEngine.startRide`, wiping every kilometre accumulated before
+  the kill. On an aggressive Android battery manager this loses a whole commute.
+- Fix: `RideLocationService` now checkpoints the ride's running aggregates
+  (distance, moving distance, coordinate distance, moving seconds, max speed) to
+  `rides.telemetry_snapshot` at most every 10 s, keyed on
+  `rides.started_at_iso`. `startTracking` restores them, `stopTracking` merges
+  them into the result and clears the key. A snapshot whose `startedAtIso` does
+  not match the current ride is ignored, so a new ride can never inherit an old
+  one's distance.
+- Fix: `RideController._hydrate` calls `RideLocationService.restoreInterruptedRide()`
+  when a ride is active, so an interrupted ride can also be ended from the
+  dashboard or the group lobby — screens that call `stopTracking` without ever
+  calling `startTracking`. The method is a no-op while tracking is live, which
+  prevents double-counting.
+- `stopTracking` no longer bails out on `acceptedSampleCount < 2` when carried
+  distance exists, and average speed is now derived from the merged moving
+  distance and moving time.
+- Account deletion now also removes `rides.telemetry_snapshot`.
+- Removed the dead, misleading `RideLocationService.hasGpsData` getter, which
+  still expressed the old `_positions.length >= 2` gate that caused the original
+  bug. The `RideLocationResult.hasGpsData` field is unrelated and unchanged.
+- Verification: `flutter test` 100/100 pass, including a new
+  `test/ride_resume_snapshot_test.dart` covering both the carry-forward and the
+  stale-snapshot-rejection cases. `flutter analyze lib/rides` reports no errors.
+- Known remaining inconsistencies, not changed here: the three end-ride blocks
+  are near-duplicates with divergent thresholds (`< 0.1 km` on rides/dashboard,
+  `< 0.5 km` in the group lobby), which is how the earlier partial fix missed a
+  gate. Consolidating them into one application-layer helper is the right next
+  step. Still unverified on-device: one real ride, an app-kill-mid-ride test, and
+  a battery check at the new 1 Hz cadence.
+
+## 2026-08-12 — One discard rule for solo and group rides
+
+- User decision: group rides are measured by the same engine and stored in the
+  same record, so a separate threshold made no sense. Removed
+  `RideDiscardPolicy` entirely; `resolveRideCompletion` now applies one rule.
+- `kGroupRideMinimumDistanceKm` (0.5) is gone. `kSoloRideMinimumDistanceKm` and
+  `kSoloRideMinimumAverageSpeedKmh` are renamed `kRideMinimumDistanceKm` (0.1)
+  and `kRideMinimumAverageSpeedKmh` (1.0). A group ride between 100 m and 500 m
+  is now kept instead of being silently discarded.
+- The group policy's extra `!hasGpsData` clause was dropped as redundant:
+  without GPS every metric is already zeroed, so the shared AND rule discards it
+  anyway. The group lobby's one-minute duration floor was also redundant —
+  `stopTracking` already floors the active duration at 1 when GPS data exists.
+- `allowWithoutGps` is kept for the group lobby's `FLUTTER_TEST` path.
+- Verification: `flutter test` 110/110 pass, including the group ride lobby
+  widget test; `flutter analyze lib test` reports zero errors.
+
+## 2026-08-12 — Lean angle removed from the product entirely
+
+User decision: remove the lean-angle feature completely, including the stored
+field. The pocket-mode fix below is superseded — it is kept as the record of why
+the feature was unreliable.
+
+- Deleted `lib/rides/application/sensor_fusion_engine.dart`,
+  `lib/rides/application/lean_angle_engine_v3.dart` (which also held the dead
+  `LeanAngleEngineV3` and `LeanPersistenceSanitizer`), and
+  `lib/rides/application/telemetry_isolate.dart`. The telemetry isolate existed
+  only to fuse lean angle, so the whole isolate and its sensor subscriptions are
+  gone; `sensors_plus` was dropped from `pubspec.yaml` as it had no other user.
+- `RideLocationService`: removed the isolate, `_maxFusedLeanAngle`,
+  `calibrateMount()`, the GPS kinematic feed, the mount/pocket status suffix,
+  and the `isMounted` parameter of `startTracking`. The snapshot no longer
+  carries a lean maximum.
+- `RideTelemetryAnalyzer`: removed `maxLeanAngle`, the `fusedMaxLeanAngle`
+  parameter, the trajectory-curvature block, and the ">35° cornering master"
+  mood branch. Hard braking, rapid acceleration and smoothness are unchanged.
+- Removed `maxLeanAngle` from `RideSession`, its JSON, `RideSessionEntity` and
+  the regenerated Isar schema (`build_runner`). Isar 3 drops a removed property
+  on open; `IsarDbService` already backs the file up and falls back to read-only
+  if an open ever fails.
+- Removed the lean inputs from `HarmonyEngine` penalties/bonuses and from
+  `GarageState.applyRideImpact` (aggressive-wear detection now uses mood, speed
+  and hard braking).
+- UI: removed the "Max Lean" row from the last-ride card, the "Estimated Max
+  Lean Angle" summary row and its GNSS footnote, and the mount-mode plumbing in
+  `start_ride_sheet.dart` (its `_isMounted` was already hardcoded false).
+- Removed the `BugCategory.leanAngle` report category and its `LEAN_ANGLE`
+  Discord tag. `BugReport.fromJson` resolves unknown categories with
+  `orElse: () => BugCategory.other`, so previously filed reports still parse.
+  Also reworded the report title placeholder and two profile policy sentences
+  that referenced lean angle.
+- Added `test/ride_session_legacy_lean_test.dart`: legacy JSON carrying
+  `maxLeanAngle` still parses, serialization no longer emits it, and an entity
+  round-trip preserves the remaining metrics. Deleted `lean_fusion_test.dart`
+  and `lean_angle_engine_v3_test.dart`.
+- Verification: `flutter test` 111/111 pass; `flutter analyze lib test` reports
+  zero errors; `flutter build apk --debug` succeeds.
+- Not verified on-device: opening an existing Isar database whose ride records
+  still contain the removed property. Isar 3 handles this, but confirm the ride
+  history still lists correctly on first launch of a build with this change.
+
+## 2026-08-12 — Pocket-mode lean angle was destroyed by the gyroscope handler
+
+- Reported: the app no longer measures lean angle. Root cause in
+  `telemetry_isolate.dart`'s `'GYRO'` command, pocket mode branch: it set
+  `currentLeanAngle = 0.0` on every gyroscope sample. The gyroscope streams at
+  50 Hz (20 ms sampling) while GPS corrections arrive at 1 Hz, so every
+  GPS-derived angle was wiped within 20 ms and the 5 Hz reporting timer almost
+  always emitted ~0. `RideLocationService._maxFusedLeanAngle` therefore stayed
+  at 0 for every pocket ride. Introduced in `3c82b60` (2026-08-03).
+  This is the "pocket telemetry zeroing" risk listed in CLAUDE.md, now closed.
+- The intent (pocket mode must not integrate the gyroscope, DOC 24 §17) was
+  correct; the implementation also discarded the independent GPS kinematic
+  estimate, which is the only valid pocket-mode source.
+- Fix: extracted the fusion into `LeanFusionState` in `sensor_fusion_engine.dart`
+  and made the isolate delegate to it. In pocket mode the gyroscope now only
+  zeroes the reported roll rate and leaves the angle untouched.
+- Pocket-mode GPS smoothing changed from alpha 0.85 to 0.6. With no gyroscope
+  contribution the filter is purely a GPS noise smoother, and at 1 Hz an alpha
+  of 0.85 reached only ~14° of a real 30° corner before it ended.
+- Added `SensorFusionEngine.maxPlausibleLeanDeg` (55°): a computed angle above
+  it comes from a GPS heading jump, not from the rider, and is now rejected
+  rather than stored as a personal record.
+- `_maxFusedLeanAngle` is now carried in the ride snapshot, so a ride
+  interrupted by a process kill keeps its maximum lean as well as its distance.
+- Added `test/lean_fusion_test.dart` (9 tests): the gyroscope may not erase a
+  GPS angle, a sustained corner converges above 24° of a 30° corner, the
+  gyroscope alone never invents an angle in pocket mode, mounted mode still
+  integrates, calibration zeroes the offset, implausible gaps are ignored, and
+  a heading-jump angle is rejected.
+- Verification: `flutter test` 120/120 pass; `flutter analyze lib test` reports
+  zero errors; `flutter build apk --debug` succeeds.
+- Not verified on-device: the actual gyroscope/heading behaviour of a real
+  phone in a pocket during cornering.
+
+## 2026-08-12 — Fifth pass: end-to-end verification without a device
+
+- Added `test/ride_location_service_integration_test.dart`, which drives the
+  real `RideLocationService` (Android branch, real permission flow, real engine,
+  real Hive/SharedPreferences snapshotting) with a scripted
+  `GeolocatorPlatform`. permission_handler and sensors_plus channels are mocked
+  so the lean-angle isolate does not abort tracking.
+  - A 5-minute 130 km/h commute records 10.83 km ± 0.4 and 130 km/h ± 6, and
+    `resolveRideCompletion` keeps it.
+  - A ride split by a simulated process kill (two 3-minute segments) finishes
+    with ~13 km. Verified this test fails at 6.46 km when snapshot restore is
+    disabled, i.e. it reproduces the exact reported data loss.
+- Changed snapshot checkpointing to trigger on either 10 s of sample time or
+  10 s of wall time. Sample time is what actually advances a ride; wall time
+  remains the backstop for devices reporting odd fix timestamps.
+- `flutter build apk --debug` succeeds, so the change set builds for the target
+  platform.
+- Verified from the merged manifest (`build/app/intermediates/merged_manifests`)
+  that `GeolocatorLocationService` is declared with
+  `foregroundServiceType="location"` alongside `FOREGROUND_SERVICE`,
+  `FOREGROUND_SERVICE_LOCATION` and `WAKE_LOCK`, and that `ic_notification` is
+  present in `res/drawable` and packaged into the APK. Every tracking start path
+  (`start_ride_sheet`, `RidesScreen.initState` resume, group ride) runs with the
+  app in the foreground, which is the condition under which a location-type
+  foreground service keeps location access without `ACCESS_BACKGROUND_LOCATION`.
+  The 2026-08-09 removal of that permission is therefore correct for this flow.
+- Genuinely not machine-verifiable and still open: real GPS hardware behaviour
+  on the LG G5 (fix rate and accuracy) and battery drain at the 1 Hz cadence.
+  These are physical measurements, not code defects.
+
+## 2026-08-12 — Fourth pass: config and platform request tied together
+
+- Root structural cause of the whole episode: `TelemetryConfig.desiredIntervalMs`
+  (1000 ms) was dead code — never read anywhere — while `RideLocationService`
+  hardcoded a 4 s Android interval. The engine's tolerances and the platform's
+  actual delivery rate had no link, so they could drift apart silently.
+  `RideLocationService` now owns one `TelemetryConfig`, passes it to
+  `ValidatedSpeedEngine`, and derives `AndroidSettings.intervalDuration` from
+  `desiredIntervalMs`.
+- Added a config-invariant test: the distance-integration window must be at
+  least four times the requested sampling interval, and the diagnostic gap
+  threshold must stay strictly below the integration window. This fails the
+  build if anyone reintroduces the original mismatch.
+- Self-review fix: `stopTracking` no longer substitutes the whole segment's
+  distance for moving distance when the motion machine classified none of it as
+  moving. On a resumed ride that inflated the average speed, because the carried
+  moving seconds covered time the substituted distance did not.
+- Self-review fix: replaced the null-assertions in the engine's great-circle
+  fallback with local non-null bindings.
+- `minimumIntervalMs` and `maxSampleAgeSeconds` remain unused in
+  `TelemetryConfig`; left in place but noted here so they are not mistaken for
+  live tuning knobs.
+- Verification: `flutter test` 109/109 pass; `flutter analyze lib test` reports
+  zero errors.
+
+## 2026-08-12 — End-ride logic consolidated into one policy
+
+- Added `lib/rides/application/ride_completion.dart`: `resolveRideCompletion`
+  plus `RideDiscardPolicy.solo` / `.group` and the named thresholds
+  (`kSoloRideMinimumDistanceKm` 0.1, `kSoloRideMinimumAverageSpeedKmh` 1.0,
+  `kGroupRideMinimumDistanceKm` 0.5). It owns the rounding, the no-GPS zeroing,
+  the group ride's one-minute duration floor and the discard decision.
+- Rewired all four end-ride call sites to it: `rides_screen.dart`,
+  `apex_dashboard_screen.dart`, and both paths in `group_ride_lobby_screen.dart`.
+  Behavior is preserved exactly, including the group lobby's stricter 0.5 km
+  minimum and its `FLUTTER_TEST` bypass (now the explicit `allowWithoutGps`
+  flag). The duplication is what let the earlier telemetry fix land on one
+  screen's gate and miss the others.
+- Added `test/ride_completion_policy_test.dart` covering both policies: a real
+  commute is kept, a short-but-moving ride is kept (the rule is an AND, not an
+  OR), a stationary ride is discarded, missing GPS zeroes every metric, and the
+  group minimum and duration floor hold.
+- Verification: `flutter test` 108/108 pass; `flutter analyze lib` reports no
+  errors. An unrelated whitespace-only reformat of `telemetry_isolate.dart`,
+  picked up by a directory-wide `dart format`, was reverted.
+
+## 2026-08-12 — Third audit pass: hardening and independent verification
+
+- Closed a race introduced by the second pass: `RideController._hydrate` now
+  awaits `restoreInterruptedRide()` (and re-checks `_mounted`) before publishing
+  `isRideActive: true`, so the rider cannot press stop on the dashboard before
+  the interrupted ride's aggregates are loaded.
+- Added `test/ride_commute_simulation_test.dart`: a 20-minute commute simulated
+  at Android's 4 s cadence with varying accuracy (4–38 m), three stops, periodic
+  GPS speed spikes and a 40 s tunnel outage. It asserts recorded distance within
+  10% of ground truth, a validated max speed of 130 ± 12 km/h, moving time that
+  excludes the stops, and that the outage is flagged. Confirmed this test fails
+  with `totalDistanceKm == 0.0` when the pre-fix integration gate is restored,
+  so it genuinely guards the shipped bug rather than merely passing.
+- Reviewed but deliberately not changed: `ACCESS_BACKGROUND_LOCATION` was
+  removed from `AndroidManifest.xml` in `bdd264b` (2026-08-09). With the
+  `GeolocatorLocationService` foreground service (`foregroundServiceType=location`,
+  `FOREGROUND_SERVICE_LOCATION`, `WAKE_LOCK`) this is the Play-policy-correct
+  setup and should keep tracking alive with the screen locked, but it changed one
+  day before the reported failure and has not been re-verified on-device. Test a
+  screen-locked ride explicitly.
+- Confirmed correct on inspection: `IsarDbService.saveRideSession` writes inside
+  a `writeTxn`; snapshot restore cannot double-count (the persisted value already
+  includes previously carried totals, and `restoreInterruptedRide` is a no-op
+  while tracking); a snapshot cannot leak into a new ride (start marker mismatch).
+- Known limitation of resume, accepted for now: `_positions` is not persisted, so
+  after a process kill the lean-angle and hard-braking analysis covers only the
+  final segment. Distance, speed and duration are complete.
+- Verification: `flutter test` 101/101 pass; `flutter analyze lib test` reports
+  zero errors.
+
 ## 2026-08-09 — Closed-beta build `1.0.0+34` and live privacy backend
 
 - Final signed artifact: `build/app/outputs/bundle/release/app-release.aab`,

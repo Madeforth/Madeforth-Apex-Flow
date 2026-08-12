@@ -10,6 +10,7 @@ class TelemetryConfig {
     this.minimumIntervalMs = 500,
     this.maxSampleAgeSeconds = 5.0,
     this.continuousDataGapSeconds = 3.0,
+    this.maxDistanceIntegrationDtSeconds = 15.0,
     this.maxCoordinateDtSeconds = 3.0,
     this.maxCoordinateHorizontalAccuracyM = 30.0,
     this.absolutePositionRejectAccuracyM = 50.0,
@@ -27,7 +28,17 @@ class TelemetryConfig {
   final int desiredIntervalMs;
   final int minimumIntervalMs;
   final double maxSampleAgeSeconds;
+
+  /// Flags a ride as having telemetry gaps when samples arrive further apart
+  /// than this. Diagnostic only — it must never gate distance integration.
   final double continuousDataGapSeconds;
+
+  /// Longest gap between two accepted samples that is still integrated into
+  /// ride distance. Must stay comfortably above the platform's real location
+  /// update interval, otherwise every segment is dropped and a genuine ride
+  /// finalizes with zero distance.
+  final double maxDistanceIntegrationDtSeconds;
+
   final double maxCoordinateDtSeconds;
   final double maxCoordinateHorizontalAccuracyM;
   final double absolutePositionRejectAccuracyM;
@@ -119,6 +130,7 @@ class RideTelemetrySummary {
     this.maxSpeedSupportingSampleCount = 0,
     this.totalDistanceKm = 0.0,
     this.movingDistanceKm = 0.0,
+    this.coordinateDistanceKm = 0.0,
     this.elapsedDuration = Duration.zero,
     this.movingDuration = Duration.zero,
     this.tripAverageSpeedKmh = 0.0,
@@ -142,6 +154,12 @@ class RideTelemetrySummary {
 
   final double totalDistanceKm;
   final double movingDistanceKm;
+
+  /// Plain great-circle distance across accepted samples, independent of the
+  /// filtered-speed integration. Used only as a last-resort sanity fallback so
+  /// a genuine ride is never discarded as "no movement" when the integrator
+  /// produces nothing.
+  final double coordinateDistanceKm;
   final Duration elapsedDuration;
   final Duration movingDuration;
   final double tripAverageSpeedKmh;
@@ -166,6 +184,7 @@ class RideTelemetrySummary {
       'maxSpeedSupportingSampleCount': maxSpeedSupportingSampleCount,
       'totalDistanceKm': totalDistanceKm,
       'movingDistanceKm': movingDistanceKm,
+      'coordinateDistanceKm': coordinateDistanceKm,
       'elapsedDurationMs': elapsedDuration.inMilliseconds,
       'movingDurationMs': movingDuration.inMilliseconds,
       'tripAverageSpeedKmh': tripAverageSpeedKmh,

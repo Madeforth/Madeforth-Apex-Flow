@@ -45,10 +45,7 @@ void showQuickStartRideSheet(
           if (!consented || !context.mounted) return;
 
           final locationService = RideLocationService();
-          final status = await locationService.startTracking(
-            isTurkish: tr,
-            isMounted: isMounted,
-          );
+          final status = await locationService.startTracking(isTurkish: tr);
 
           if (!locationService.isTracking && context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -62,9 +59,6 @@ void showQuickStartRideSheet(
 
           ref.read(rideStateProvider.notifier).startRide(mood: mood);
 
-          if (isMounted) {
-            locationService.calibrateMount();
-          }
           if (context.mounted) {
             Navigator.pop(context);
           }

@@ -384,7 +384,6 @@ class GarageController extends Notifier<GarageState> {
     required String mood,
     required double averageSpeedKmh,
     double maxSpeedKmh = 0,
-    double maxLeanAngle = 0,
     int hardBrakes = 0,
   }) {
     if (state.motorcycles.isEmpty || distanceKm <= 0) {
@@ -403,7 +402,6 @@ class GarageController extends Notifier<GarageState> {
         moodLower.contains('sportif') ||
         maxSpeedKmh > 130.0 ||
         averageSpeedKmh > 95.0 ||
-        maxLeanAngle > 45.0 ||
         hardBrakes > 3;
     final wearMultiplier = isAggressive ? 2.0 : 1.0;
 

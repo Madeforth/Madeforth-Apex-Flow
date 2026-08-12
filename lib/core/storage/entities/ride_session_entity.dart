@@ -21,7 +21,6 @@ class RideSessionEntity {
   late String loggedAtIso;
 
   double maxSpeedKmh = 0;
-  double maxLeanAngle = 0;
   int hardAccelerations = 0;
   int hardBrakes = 0;
   int harmonyScore = 0;
@@ -34,7 +33,6 @@ class RideSessionEntity {
       mood: mood,
       mechanicalObservation: mechanicalObservation,
       maxSpeedKmh: maxSpeedKmh,
-      maxLeanAngle: maxLeanAngle,
       hardAccelerations: hardAccelerations,
       hardBrakes: hardBrakes,
       harmonyScore: harmonyScore,
@@ -42,7 +40,11 @@ class RideSessionEntity {
     );
   }
 
-  static RideSessionEntity fromDomain(RideSession domain, String bikeStableId, {String userId = ''}) {
+  static RideSessionEntity fromDomain(
+    RideSession domain,
+    String bikeStableId, {
+    String userId = '',
+  }) {
     return RideSessionEntity()
       ..bikeStableId = bikeStableId
       ..userId = userId
@@ -52,7 +54,6 @@ class RideSessionEntity {
       ..mood = domain.mood
       ..mechanicalObservation = domain.mechanicalObservation
       ..maxSpeedKmh = domain.maxSpeedKmh
-      ..maxLeanAngle = domain.maxLeanAngle
       ..hardAccelerations = domain.hardAccelerations
       ..hardBrakes = domain.hardBrakes
       ..harmonyScore = domain.harmonyScore

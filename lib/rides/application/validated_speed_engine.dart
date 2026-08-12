@@ -30,6 +30,10 @@ class ValidatedSpeedEngine {
 
   double _totalDistanceMeters = 0.0;
   double _movingDistanceMeters = 0.0;
+  double _coordinateDistanceMeters = 0.0;
+
+  double? _lastAcceptedLatitude;
+  double? _lastAcceptedLongitude;
 
   int _acceptedSampleCount = 0;
   int _rejectedSampleCount = 0;
@@ -46,6 +50,9 @@ class ValidatedSpeedEngine {
     _lastAcceptedSpeedMps = 0.0;
     _totalDistanceMeters = 0.0;
     _movingDistanceMeters = 0.0;
+    _coordinateDistanceMeters = 0.0;
+    _lastAcceptedLatitude = null;
+    _lastAcceptedLongitude = null;
     _acceptedSampleCount = 0;
     _rejectedSampleCount = 0;
     _containsMockedLocations = false;
@@ -210,7 +217,12 @@ class ValidatedSpeedEngine {
         final dt =
             measurementTime.difference(_lastAcceptedTimestamp!).inMilliseconds /
             1000.0;
-        if (dt > 0 && dt <= config.continuousDataGapSeconds) {
+        // Integrate over the real sampling cadence, not the (much stricter)
+        // gap-diagnostic threshold: Android streams positions no faster than
+        // AndroidSettings.intervalDuration, so gating on
+        // `continuousDataGapSeconds` dropped every single segment of a real
+        // ride and finalized it with zero distance.
+        if (dt > 0 && dt <= config.maxDistanceIntegrationDtSeconds) {
           final segDist =
               ((_lastAcceptedSpeedMps + filterResult.speedMps) / 2.0) * dt;
           _totalDistanceMeters += segDist;
@@ -221,7 +233,31 @@ class ValidatedSpeedEngine {
         }
       }
 
+      // Independent great-circle accumulation, used only as a fallback if the
+      // speed integration above yields nothing. Segments implying more than
+      // 90 m/s (324 km/h) are treated as GPS jumps and skipped.
+      final previousLat = _lastAcceptedLatitude;
+      final previousLon = _lastAcceptedLongitude;
+      final previousTime = _lastAcceptedTimestamp;
+      if (previousLat != null && previousLon != null && previousTime != null) {
+        final dt =
+            measurementTime.difference(previousTime).inMilliseconds / 1000.0;
+        final coordMeters = Geolocator.distanceBetween(
+          previousLat,
+          previousLon,
+          position.latitude,
+          position.longitude,
+        );
+        if (dt > 0 &&
+            dt <= config.maxDistanceIntegrationDtSeconds &&
+            coordMeters / dt <= 90.0) {
+          _coordinateDistanceMeters += coordMeters;
+        }
+      }
+
       _lastAcceptedTimestamp = measurementTime;
+      _lastAcceptedLatitude = position.latitude;
+      _lastAcceptedLongitude = position.longitude;
       _lastAcceptedSpeedMps = filterResult.speedMps;
       _acceptedSampleCount++;
     }
@@ -259,6 +295,24 @@ class ValidatedSpeedEngine {
 
     _estimates.add(estimate);
     return estimate;
+  }
+
+  /// Median spacing between consecutive processed samples, in seconds.
+  /// Returns 0 when there are not enough samples to measure a cadence.
+  double _medianSampleGapSeconds() {
+    if (_estimates.length < 2) return 0.0;
+    final gaps = <double>[];
+    for (int i = 1; i < _estimates.length; i++) {
+      final dt =
+          _estimates[i].timestamp
+              .difference(_estimates[i - 1].timestamp)
+              .inMilliseconds /
+          1000.0;
+      if (dt > 0) gaps.add(dt);
+    }
+    if (gaps.isEmpty) return 0.0;
+    gaps.sort();
+    return gaps[gaps.length ~/ 2];
   }
 
   /// Finalizes the ride session, performing backward smoothing for verified max speed.
@@ -299,6 +353,16 @@ class ValidatedSpeedEngine {
     SpeedEstimate? maxEstimate;
     int maxSupportingCount = 0;
 
+    // Neighbours only count as supporting if they are close in time. A fixed
+    // 3.5 s window silently disqualified every sample on platforms that
+    // deliver positions more slowly than that (Android honours
+    // AndroidSettings.intervalDuration), leaving a real ride with no
+    // validated max speed at all. Scale the window to the ride's own cadence.
+    final supportWindowSeconds = math.min(
+      config.maxDistanceIntegrationDtSeconds,
+      math.max(3.5, _medianSampleGapSeconds() * 2.0),
+    );
+
     for (int i = 0; i < _estimates.length; i++) {
       final curr = _estimates[i];
       if (!curr.acceptedForMaximumSpeed) continue;
@@ -320,7 +384,7 @@ class ValidatedSpeedEngine {
                 .inMilliseconds
                 .abs()) /
             1000.0;
-        if (dt <= 3.5 &&
+        if (dt <= supportWindowSeconds &&
             (neighbor.speedMps - curr.speedMps).abs() <=
                 math.max(3.0, curr.speedMps * 0.15)) {
           supportingCount++;
@@ -357,6 +421,7 @@ class ValidatedSpeedEngine {
       maxSpeedSupportingSampleCount: maxSupportingCount,
       totalDistanceKm: totalDistanceKm,
       movingDistanceKm: movingDistanceKm,
+      coordinateDistanceKm: _coordinateDistanceMeters / 1000.0,
       elapsedDuration: elapsedDuration,
       movingDuration: movingDuration,
       tripAverageSpeedKmh: tripAvgKmh,

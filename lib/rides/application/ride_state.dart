@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:apexflow/garage/application/garage_state.dart';
 import 'package:apexflow/core/storage/apex_kv_store.dart';
 import 'package:apexflow/core/storage/db_provider.dart';
+import 'package:apexflow/rides/application/ride_location_service.dart';
 import 'package:apexflow/rides/domain/ride_session.dart';
 import 'package:apexflow/settings/application/user_profile_state.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -110,7 +111,6 @@ class RideController extends Notifier<RideState> {
     required String mood,
     required String mechanicalObservation,
     double maxSpeedKmh = 0,
-    double maxLeanAngle = 0,
     int hardAccelerations = 0,
     int hardBrakes = 0,
     int harmonyScore = 0,
@@ -123,9 +123,8 @@ class RideController extends Notifier<RideState> {
       return false;
     }
 
-    // DOC 24 SECTION 37: Do not generate fake maxSpeed (average * 1.5) or fake maxLeanAngle when unmeasured!
+    // DOC 24 SECTION 37: Do not generate a fake maxSpeed (average * 1.5) when unmeasured!
     final maxSpeed = maxSpeedKmh > 0 ? maxSpeedKmh : 0.0;
-    final maxLean = maxLeanAngle > 0 ? maxLeanAngle : 0.0;
     final hardAcc = hardAccelerations;
     final hardBrk = hardBrakes;
     final harmony = harmonyScore > 0
@@ -146,7 +145,6 @@ class RideController extends Notifier<RideState> {
             )
           : mechanicalObservation.trim(),
       maxSpeedKmh: maxSpeed,
-      maxLeanAngle: maxLean,
       hardAccelerations: hardAcc,
       hardBrakes: hardBrk,
       harmonyScore: harmony,
@@ -161,7 +159,6 @@ class RideController extends Notifier<RideState> {
           mood: session.mood,
           averageSpeedKmh: averageSpeedKmh,
           maxSpeedKmh: maxSpeed,
-          maxLeanAngle: maxLean,
           hardBrakes: hardBrk,
         );
 
@@ -208,6 +205,17 @@ class RideController extends Notifier<RideState> {
 
     final sortedSessions = List<RideSession>.from(sessions)
       ..sort((a, b) => b.loggedAtIso.compareTo(a.loggedAtIso));
+
+    // A ride that was interrupted by a process kill must be endable from any
+    // screen, so pull its persisted telemetry back into the location service
+    // even if GPS tracking is never resumed in this process.
+    // Awaited on purpose: the ride-active UI (and therefore its stop button)
+    // only appears after this state update, so the aggregates are in place
+    // before the rider can end the ride.
+    if (isRideActive) {
+      await RideLocationService().restoreInterruptedRide();
+      if (!_mounted) return;
+    }
 
     state = state.copyWith(
       isHydrating: false,

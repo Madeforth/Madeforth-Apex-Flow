@@ -197,7 +197,6 @@ class HarmonyEngine {
     final isAggressive =
         mood.contains('saldırgan') ||
         mood.contains('aggressive') ||
-        latestRide.maxLeanAngle > 45.0 ||
         latestRide.hardBrakes > 3;
     final telemetryPenalty = isAggressive ? 6 : 0;
 
@@ -215,10 +214,7 @@ class HarmonyEngine {
     final isRelaxed =
         mood.contains('sakin') ||
         mood.contains('relaxed') ||
-        (latestRide.maxLeanAngle > 0 &&
-            latestRide.maxLeanAngle < 30.0 &&
-            latestRide.hardBrakes == 0 &&
-            latestRide.hardAccelerations <= 1);
+        (latestRide.hardBrakes == 0 && latestRide.hardAccelerations <= 1);
     final telemetryBonus = isRelaxed ? 5 : 0;
 
     return baseBonus + telemetryBonus;

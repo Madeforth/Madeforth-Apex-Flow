@@ -11,6 +11,7 @@ import 'package:apexflow/core/i18n/app_strings.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:apexflow/settings/application/user_profile_state.dart';
 import 'package:apexflow/garage/application/garage_state.dart';
+import 'package:apexflow/rides/application/ride_completion.dart';
 import 'package:apexflow/rides/application/ride_location_service.dart';
 import 'package:apexflow/rides/application/ride_state.dart';
 import 'package:apexflow/rides/presentation/widgets/ride_location_disclosure.dart';
@@ -185,16 +186,12 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
     final gpsResult = _locationService.stopTracking(isTurkish: tr);
 
     final isTest = Platform.environment.containsKey('FLUTTER_TEST');
-    final distanceKm = double.parse(gpsResult.distanceKm.toStringAsFixed(2));
-    final averageSpeedKmh = double.parse(
-      gpsResult.averageSpeedKmh.toStringAsFixed(1),
-    );
-    int durationMinutes = gpsResult.activeDurationMinutes;
-    if (durationMinutes <= 0) durationMinutes = 1;
+    final metrics = resolveRideCompletion(gpsResult, allowWithoutGps: isTest);
+    final distanceKm = metrics.distanceKm;
+    final averageSpeedKmh = metrics.averageSpeedKmh;
+    final durationMinutes = metrics.durationMinutes;
 
-    final isInvalid = (!gpsResult.hasGpsData || distanceKm < 0.5) && !isTest;
-
-    if (isInvalid) {
+    if (metrics.shouldDiscard) {
       ref.read(rideStateProvider.notifier).cancelRide();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -243,8 +240,7 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
             averageSpeedKmh: averageSpeedKmh,
             mood: finalMood,
             mechanicalObservation: observation,
-            maxSpeedKmh: gpsResult.hasGpsData ? gpsResult.maxSpeedKmh : 0,
-            maxLeanAngle: gpsResult.telemetry?.maxLeanAngle ?? 0.0,
+            maxSpeedKmh: metrics.maxSpeedKmh,
             hardAccelerations:
                 gpsResult.telemetry?.rapidAccelerationEvents ?? 0,
             hardBrakes: gpsResult.telemetry?.hardBrakingEvents ?? 0,
@@ -1362,7 +1358,6 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
         );
     await _locationService.startTracking(
       isTurkish: widget.strings.locale.languageCode == 'tr',
-      isMounted: false,
     );
   }
 
@@ -1376,15 +1371,10 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
         _isRideActive = false;
       });
       final gpsResult = _locationService.stopTracking(isTurkish: tr);
-      final distanceKm = gpsResult.hasGpsData
-          ? double.parse(gpsResult.distanceKm.toStringAsFixed(2))
-          : 0.0;
-      final averageSpeedKmh = gpsResult.hasGpsData
-          ? double.parse(gpsResult.averageSpeedKmh.toStringAsFixed(1))
-          : 0.0;
-      final durationMinutes = gpsResult.hasGpsData
-          ? gpsResult.activeDurationMinutes
-          : 0;
+      final metrics = resolveRideCompletion(gpsResult);
+      final distanceKm = metrics.distanceKm;
+      final averageSpeedKmh = metrics.averageSpeedKmh;
+      final durationMinutes = metrics.durationMinutes;
 
       final saved = ref
           .read(rideStateProvider.notifier)
@@ -1396,8 +1386,7 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
             mechanicalObservation: tr
                 ? 'Sorunsuz'
                 : (de ? 'Problemlos' : 'Fine'),
-            maxSpeedKmh: gpsResult.hasGpsData ? gpsResult.maxSpeedKmh : 0.0,
-            maxLeanAngle: gpsResult.telemetry?.maxLeanAngle ?? 0.0,
+            maxSpeedKmh: metrics.maxSpeedKmh,
             hardAccelerations:
                 gpsResult.telemetry?.rapidAccelerationEvents ?? 0,
             hardBrakes: gpsResult.telemetry?.hardBrakingEvents ?? 0,
@@ -1438,7 +1427,7 @@ class _GroupRideLobbyScreenState extends ConsumerState<GroupRideLobbyScreen> {
           .startRide(
             mood: tr ? 'Grup Sürüşü' : (de ? 'Gruppenfahrt' : 'Group Ride'),
           );
-      await _locationService.startTracking(isTurkish: tr, isMounted: false);
+      await _locationService.startTracking(isTurkish: tr);
     }
   }
 

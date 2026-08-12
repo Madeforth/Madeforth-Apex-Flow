@@ -1187,6 +1187,7 @@ class UserProfileController extends Notifier<UserProfile> {
     await ApexKvStore.remove('rides.is_active');
     await ApexKvStore.remove('rides.active_mood');
     await ApexKvStore.remove('rides.started_at_iso');
+    await ApexKvStore.remove('rides.telemetry_snapshot');
 
     // Invalidate data providers to reset in-memory state
     ref.invalidate(rideStateProvider);

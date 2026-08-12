@@ -1,5 +1,37 @@
 # Active Context
 
+## Current Task (2026-08-12, branch `main`, uncommitted)
+
+Fixed the recurring "no movement detected" ride loss reported after a real
+130 km/h commute. Distance integration was gated at 3.0 s while Android delivers
+positions no faster than the requested 4 s interval, so every segment was
+dropped and the ride finalized at zero distance; validated max speed had the same
+class of bug via a hardcoded 3.5 s neighbour window. Changed files:
+`lib/rides/domain/speed_telemetry_models.dart`,
+`lib/rides/application/validated_speed_engine.dart`,
+`lib/rides/application/ride_location_service.dart`,
+`test/speed_telemetry_engine_v2_test.dart`. See `progress.md` (2026-08-12) for
+the full analysis. Next step: ride the LG G5 once to confirm on-device, and watch
+battery now that positions stream at 1 Hz with `distanceFilter: 0`.
+
+A second audit pass found an independent cause of the same symptom: a ride
+interrupted by a process kill lost all telemetry, because resuming tracking
+reset the speed engine. The service now checkpoints ride aggregates to
+`rides.telemetry_snapshot` and merges them back on stop, and `RideController`
+restores them on hydrate so the ride can be ended from any screen.
+
+The lean-angle feature has since been removed from the product entirely at the
+user's request, including the stored `maxLeanAngle` field and the Isar schema
+property. The sensor-fusion engine, the lean engine and the telemetry isolate
+are deleted and `sensors_plus` is no longer a dependency. See `progress.md`
+(2026-08-12, "Lean angle removed from the product entirely").
+
+Also changed:
+`lib/rides/application/ride_state.dart`,
+`lib/settings/application/user_profile_state.dart`,
+`test/ride_resume_snapshot_test.dart`. 100/100 tests pass; still unverified on a
+real device, including an app-kill-mid-ride test.
+
 ## Current Local Work (2026-08-09, branch `main`, uncommitted)
 
 Google Play internal/closed-beta preparation is now at `1.0.0+34`. The current

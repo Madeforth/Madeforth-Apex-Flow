@@ -219,8 +219,8 @@ class _BugReportScreenState extends ConsumerState<BugReportScreen> {
                       decoration: _inputDeco(
                         tInline(
                           lang,
-                          'Başlık (Örn: Yatış açısı 168° gösteriyor)',
-                          'Title (e.g. Lean angle shows 168°)',
+                          'Başlık (Örn: Sürüş kaydedilmedi)',
+                          'Title (e.g. Ride was not saved)',
                           'Titel',
                         ),
                       ),

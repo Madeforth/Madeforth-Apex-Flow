@@ -1,5 +1,4 @@
 enum BugCategory {
-  leanAngle,
   speedTelemetry,
   gpsDrift,
   uiLayout,
@@ -10,8 +9,6 @@ enum BugCategory {
 
   String get labelTr {
     switch (this) {
-      case BugCategory.leanAngle:
-        return 'Yatış Açısı / Telemetri';
       case BugCategory.speedTelemetry:
         return 'Hız Hesaplama / Kalman';
       case BugCategory.gpsDrift:
@@ -31,8 +28,6 @@ enum BugCategory {
 
   String get labelEn {
     switch (this) {
-      case BugCategory.leanAngle:
-        return 'Lean Angle / Telemetry';
       case BugCategory.speedTelemetry:
         return 'Speed Math / Kalman';
       case BugCategory.gpsDrift:
@@ -52,8 +47,6 @@ enum BugCategory {
 
   String get labelDe {
     switch (this) {
-      case BugCategory.leanAngle:
-        return 'Schräglage / Telemetrie';
       case BugCategory.speedTelemetry:
         return 'Geschwindigkeit / Kalman';
       case BugCategory.gpsDrift:
@@ -73,8 +66,6 @@ enum BugCategory {
 
   String get tag {
     switch (this) {
-      case BugCategory.leanAngle:
-        return 'LEAN_ANGLE';
       case BugCategory.speedTelemetry:
         return 'SPEED_TELEMETRY';
       case BugCategory.gpsDrift:

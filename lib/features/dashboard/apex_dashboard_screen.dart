@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'package:apexflow/rides/application/ride_completion.dart';
 import 'package:apexflow/rides/presentation/widgets/start_ride_sheet.dart';
 import 'package:apexflow/core/design/apex_colors.dart';
 import 'package:apexflow/shared/design/slate_palette.dart';
@@ -138,19 +139,12 @@ class ApexDashboardScreen extends ConsumerWidget {
                     isTurkish: tr,
                   );
 
-                  final distanceKm = gpsResult.hasGpsData
-                      ? double.parse(gpsResult.distanceKm.toStringAsFixed(2))
-                      : 0.0;
-                  final averageSpeedKmh = gpsResult.hasGpsData
-                      ? double.parse(
-                          gpsResult.averageSpeedKmh.toStringAsFixed(1),
-                        )
-                      : 0.0;
-                  final durationMinutes = gpsResult.hasGpsData
-                      ? gpsResult.activeDurationMinutes
-                      : 0;
+                  final metrics = resolveRideCompletion(gpsResult);
+                  final distanceKm = metrics.distanceKm;
+                  final averageSpeedKmh = metrics.averageSpeedKmh;
+                  final durationMinutes = metrics.durationMinutes;
 
-                  if (distanceKm < 0.1 && averageSpeedKmh < 1.0) {
+                  if (metrics.shouldDiscard) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
@@ -168,7 +162,7 @@ class ApexDashboardScreen extends ConsumerWidget {
                     return;
                   }
 
-                  final telemetry = gpsResult.telemetry;
+                  final telemetry = metrics.telemetry;
                   final saved = ref
                       .read(rideStateProvider.notifier)
                       .endRide(
@@ -182,10 +176,7 @@ class ApexDashboardScreen extends ConsumerWidget {
                           'Ride completed',
                           'Fahrt abgeschlossen',
                         ),
-                        maxSpeedKmh: gpsResult.hasGpsData
-                            ? gpsResult.maxSpeedKmh
-                            : 0.0,
-                        maxLeanAngle: telemetry?.maxLeanAngle ?? 0.0,
+                        maxSpeedKmh: metrics.maxSpeedKmh,
                         hardAccelerations:
                             telemetry?.rapidAccelerationEvents ?? 0,
                         hardBrakes: telemetry?.hardBrakingEvents ?? 0,

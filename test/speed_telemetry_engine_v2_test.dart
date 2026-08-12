@@ -66,6 +66,28 @@ void main() {
     );
   });
 
+  group('TelemetryConfig invariants', () {
+    test('distance integration tolerates a slower-than-requested cadence', () {
+      const config = TelemetryConfig();
+      final requestedIntervalSeconds = config.desiredIntervalMs / 1000.0;
+
+      // The integration window must survive several consecutive missed
+      // samples. When it was narrower than the platform's actual delivery
+      // interval, every segment was dropped and real rides finalized at 0 km.
+      expect(
+        config.maxDistanceIntegrationDtSeconds,
+        greaterThanOrEqualTo(requestedIntervalSeconds * 4),
+      );
+
+      // The gap flag is a diagnostic and is allowed to be stricter, but it
+      // must never be mistaken for the integration window again.
+      expect(
+        config.continuousDataGapSeconds,
+        lessThan(config.maxDistanceIntegrationDtSeconds),
+      );
+    });
+  });
+
   group('ValidatedSpeedEngine V2 Integration Tests', () {
     test('single GPS speed spike does not become validated max speed', () {
       final engine = ValidatedSpeedEngine();
@@ -141,6 +163,50 @@ void main() {
         summary.validatedMaxSpeedKmh,
         lessThan(150.0),
       ); // 324 km/h spike was rejected!
+    });
+
+    test('integrates distance when positions arrive at the platform sampling '
+        'interval, not only at 1 Hz', () {
+      // Android delivers positions no faster than
+      // AndroidSettings.intervalDuration. A real 130 km/h commute sampled at
+      // that cadence must still produce distance and speed — it used to
+      // finalize at 0 km and get discarded as "no movement detected".
+      const sampleGap = Duration(seconds: 4);
+      const speedMps = 36.1; // 130 km/h
+
+      final engine = ValidatedSpeedEngine();
+      final now = DateTime.now().toUtc();
+      engine.startRide(startTime: now);
+
+      for (int i = 0; i < 20; i++) {
+        engine.processPosition(
+          Position(
+            longitude: 29.0 + (i * 0.0017),
+            latitude: 41.0,
+            timestamp: now.add(sampleGap * i),
+            accuracy: 8.0,
+            altitude: 10.0,
+            altitudeAccuracy: 1.0,
+            heading: 90.0,
+            headingAccuracy: 1.0,
+            speed: speedMps,
+            speedAccuracy: 0.5,
+          ),
+          rideId: 'test_ride',
+          sequence: i,
+        );
+      }
+
+      final summary = engine.finalizeRide(endTime: now.add(sampleGap * 20));
+
+      expect(summary.acceptedSampleCount, greaterThanOrEqualTo(2));
+      // 19 segments * 4 s * 36.1 m/s ~= 2.74 km
+      expect(summary.totalDistanceKm, closeTo(2.74, 0.3));
+      expect(summary.movingDistanceKm, greaterThan(2.0));
+      // Independent fallback track must agree with the integrated distance.
+      expect(summary.coordinateDistanceKm, closeTo(2.71, 0.3));
+      expect(summary.movingAverageSpeedKmh, closeTo(130.0, 10.0));
+      expect(summary.validatedMaxSpeedKmh, closeTo(130.0, 10.0));
     });
   });
 }
