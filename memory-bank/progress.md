@@ -82,6 +82,42 @@ Status recorded 2026-08-04, from repo inspection (not from README claims alone u
   step. Still unverified on-device: one real ride, an app-kill-mid-ride test, and
   a battery check at the new 1 Hz cadence.
 
+## 2026-08-12 — Build `1.0.0+35` and first on-device checks (LG G5)
+
+- Bumped to `1.0.0+35`; build 34 was already uploaded and Play rejects a
+  duplicate versionCode. Release bundle:
+  `build/app/outputs/bundle/release/app-release.aab`, 86,731,400 bytes,
+  `jarsigner` reports `jar verified`. SHA-256:
+  `F7CBB60799C50C6A1E7591D38D00A0C816C0E70C94A8C6A7D60F055E7A01C7D2`.
+  The AAB manifest carries `FOREGROUND_SERVICE_LOCATION`, has no
+  `ACCESS_BACKGROUND_LOCATION`, and no sensor permission (confirming
+  `sensors_plus` really left the build).
+- Installed the matching release APK over v34 on the LG G5 (LG H850,
+  Android 8.0.0 / API 26) with `adb install -r`, so app data was preserved.
+  `dumpsys package` confirms `versionCode=35`.
+- **Isar schema change verified on real data.** The app launches and the
+  dashboard renders the existing garage (bike `hddgrcf`, readiness 54/100,
+  service-overdue warning), so opening a database whose records still carry the
+  removed `maxLeanAngle` property works. This closes the last open item from the
+  lean-angle removal.
+- **The GPS interval fix is live on hardware.** With a ride running,
+  `dumpsys location` shows
+  `gps com.google.android.gms Request[ACCURACY_FINE gps requested=+1s0ms fastest=+1s0ms]`,
+  i.e. the 1 s cadence now derived from `TelemetryConfig.desiredIntervalMs`.
+  The old build would have requested 4 s, which is what starved distance
+  integration.
+- `dumpsys activity services` confirms `GeolocatorLocationService` runs with
+  `isForeground=true` on channel `geolocator_channel_01`.
+- Note for this device specifically: API 26 predates `ACCESS_BACKGROUND_LOCATION`
+  (API 29+), so its removal cannot affect screen-locked tracking on the G5. That
+  risk still needs checking on an Android 10+ device.
+- Ride history on the device is empty (0 km, 0 rides), which is itself evidence
+  that rides were never being saved before this change set. It also means there
+  is no pre-existing ride record to compare against.
+- Still open: the real ride. The rider is at work and will test after hours.
+  Watch for distance sanity, max speed against the bike's dashboard, and battery
+  at the 1 Hz cadence, plus the kill-mid-ride recovery.
+
 ## 2026-08-12 — One discard rule for solo and group rides
 
 - User decision: group rides are measured by the same engine and stored in the

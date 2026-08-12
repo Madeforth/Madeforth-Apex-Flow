@@ -1,6 +1,19 @@
 # Active Context
 
-## Current Task (2026-08-12, branch `main`, uncommitted)
+## Status (2026-08-12, branch `main`, committed and pushed)
+
+The ride-recording work below is committed (`c96100a`) and pushed to
+`origin/main`, along with the lean-angle removal and the version bump to
+`1.0.0+35` (`d0bd113`). Build 35 is installed on the LG G5 and its first
+on-device checks pass: the Isar database opens with existing records, the
+foreground service runs, and the GPS request is now at the intended 1 s cadence.
+
+**The one thing still unproven is a real ride.** The rider will test after work.
+If a ride is still not saved, the exact wording of the on-screen message
+identifies which gate rejected it — see `progress.md` for the three messages and
+their conditions.
+
+## Task history (2026-08-12)
 
 Fixed the recurring "no movement detected" ride loss reported after a real
 130 km/h commute. Distance integration was gated at 3.0 s while Android delivers
